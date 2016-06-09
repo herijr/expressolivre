@@ -1,0 +1,51 @@
+Esse arquivo descreve todas as correções, alterações e novas implementações do 
+módulo Agenda de Eventos, e a partir da versão 29/11/2006 [calendar 0.9.17]
+Nilton Emilio Buhrer Neto.
+
+--------------------------- NOTA IMPORTANTE --------------------------
+
+A partir de Agosto de 2007, todos os registros de bugs aqui relatados foram
+transferidos para o site do ExpressoLivre, no Wiki-Trac do módulo.
+Vide: http://www.expressolivre.org/dev/wiki/calendar/changelog
+
+----------------------------------------------------------------------
+27/07/2007 - [0.9.2]
+- Implementação de funcionalidade no hook_admin. O administrador poderá 
+escolher entre 2 tipos de visualização da árvore ldap, na seleção de usuários 
+em um compromisso: o primeiro mostra o 1º nível de OUs somente, com busca 
+recursiva. Já o segundo, mostra todos os N níveis com busca no mesmo nível.
+
+04/07/2007 - [0.9.2]
+- Correção de bug referente ao envio de mensagens pela Agenda. Houve uma modificação 
+na maneira de se enviar emails pelo módulo, porém apresentou problemas. Agora está ok.
+Onde pegava valores de configuração da $_SESSION foi alterado para pegar do $_GLOBALS.
+
+02/07/2007 - [0.9.2]
+- Adicionado suporte ao espanhol.
+
+05/06/2007 - [0.9.2]
+- Adicionando funcionalidade de adicionar eventos externos, pelo email
+- Corrigido problema de carregar os usuários da organização selecionada, ao criar um compromisso.
+
+22/05/2007 - [0.9.2]
+- Adicionando/corrigindo funcionalidade de exportar vcard de todos os eventos
+
+22/05/2007 - [0.9.2]
+- Adicionando funcionalidade de exportar vcard de eventos externos
+
+03/05/2007 - [0.9.2]
+- Corrigido bug. Caso o horário do alarme seja mais antigo que a data atual não pode ser adicionada.
+
+03/05/2007 - [0.9.2]
+- Corrigido bug que possibilita adicionar 2 alarmes no mesmo evento no mesmo horário.
+
+02/05/2007 - [0.9.2]
+- Corrigindo bug que mostra todos os alarmes de um evento
+independente do dono. Agora só mostra os eventos do dono.
+
+30/04/2007 - [0.9.2]
+- Ajustado o layout da versão de impressão do calendário.
+
+27/02/2007 - [0.9.2]
+- Corrigido problema que enviava mensagem de aviso de compromisso, com assunto vazio,
+em compromissos que tinham somente participantes externos.

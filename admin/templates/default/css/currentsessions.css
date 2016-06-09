@@ -1,0 +1,27 @@
+.mdiv { min-width: 800px; width: 60%; margin: 0 auto; }
+.mdiv .pagination { border: 1px solid #9cbde5; background-color: #d9e5f2; padding: 0 3px; margin: 2px; }
+.mdiv .pagination tr { white-space: nowrap; }
+.mdiv .pagination td.icpad { padding: 0 5px; }
+.mdiv .pagination input { height: 21px; border: 1px solid #c8c8c8; padding: 0 3px; }
+.mdiv .pagination input.cpage { width: 30px; }
+.mdiv .pagination input.cfilter { width: 130px; }
+.mdiv .pagination div.sep { width: 0px; height: 13px; border: 1px solid; border-color: transparent #ffffff transparent #9dc9fc; }
+.mdiv .pagination .disabled { cursor: inherit; }
+.mtable { text-align: center; white-space: nowrap; }
+.mtable td { padding: 2px 6px; }
+.mtable td:first-child { text-align: left; }
+.mtable thead tr { background-color: #d3dce3; }
+.mtable tbody tr:nth-child(odd) { background-color: #f4f8fb; }
+.mtable tbody tr:nth-child(even) { background-color: #ffffff; }
+.ui-dialog label { vertical-align: middle; padding-left: 12px; }
+.bmargin {margin-bottom: 8px; }
+.wmax { width: 100%; }
+.hidden { display: none; }
+.invisible { opacity: 0; }
+.hline { display: table; height: 30px; width: 100%; }
+.cell { display: table-cell; }
+td.icon { cursor: pointer; }
+.force-wrap { max-width: 200px; white-space: normal; word-wrap: break-word; }
+.ui-dialog-icon-pos { float:left; margin:0 7px 20px 0; }
+.no-close .ui-dialog-titlebar-close { display: none; }
+.mdiv a { color: #006699; }

@@ -1,0 +1,36 @@
+#tables_profiles
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	margin: 45px;
+	width: 90%;
+	text-align: left;
+	border-collapse: collapse;
+	border: 1px solid #69c;
+}
+#tables_profiles th
+{
+	padding: 15px 10px 10px 10px;
+	font-weight: normal;
+	font-size: 14px;
+	color: #039;
+}
+#tables_profiles tbody
+{
+	background: #e8edff;
+}
+#tables_profiles td
+{
+	padding: 10px;
+	color: #669;
+	border-top: 1px dashed #fff;
+}
+#tables_profiles tbody tr:hover td
+{
+	color: #339;
+	background: #d0dafd;
+}
+#tables_profiles ul li { display: inline; list-style: none; padding: 0 5px;}
+#tables_profiles ul li span{ color: red; padding:0 10px;}
+#tables_profiles ul li a { text-decoration: none; text-align: center }
+#navigation { padding :0 50px; margin-bottom: 10px; }

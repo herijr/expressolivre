@@ -1,0 +1,155 @@
+<h2 class="right-side">Exemplos de Uso</h2>
+<div id="page_content">
+<p>
+<h3>1 - Utilizando CURL para fazer a requisi&ccedil;&atilde;o para a API.</h3>
+
+    <br><br>
+    Caso ainda n&atilde;o tenha o pacote instalado, instale o pacote CURL no Linux:<br>
+    <pre class='prettyprint'>
+sudo apt-get update
+sudo apt-get install curl</pre>
+    <br><br>
+    Autentique-se na API, Substitua o valor de <b>LOGIN</b> e <b>SENHA</b> pelo usu&aacute;rio que ir&aacute; fazer a requisicao para a API.<br>
+
+    <pre class='prettyprint'>
+curl -X POST -d 'id=1&amp;params={"user":"<b>LOGIN</b>","password":"<b>SENHA</b>"}' https://api.expresso.pr.gov.br/Login</pre>
+    <br><br>
+    O retorno dos dados ser&aacute; parecido com esse:<br>
+    <pre class='prettyprint'>{"id":"1","result":{"auth":"<b>743qi9g6njdg543r8ls7am9n81:5e82ad04793d9fe9eff855139a84</b>", ... }]}}</pre>
+    <br><br>
+    Identifique no retorno dos dados o token de autentica&ccedil;&atilde;o <b>AUTH</b>, voc&ecirc; ter&aacute; que utilizar este token para as requisi&ccedil;&otilde;es que necessitam de autentica&ccedil;&atilde;o. Substitua no comando abaixo o <b>AUTH</b> que foi retornado na sua autentica&ccedil;&atilde;o e realize outras requisi&ccedil;&otilde;es na API.<br><br>
+    Exemplo: <br>
+    <pre class='prettyprint'>
+curl -X POST -d 'id=1&amp;params={"auth":"<B>AUTH</B>"}' https://api.expresso.pr.gov.br/Mail/Folders</pre>
+</p>
+
+<br><br><br>
+
+<p>
+	<h3>2 - Utilizando o Ajax da Jquery</h3>
+
+<p>
+    Um exemplo de c&oacute;digo de uma chamada AJAX, utilizando a Jquery. Para enviar par&acirc;metros consulte a aba Recursos,onde &eacute; demonstrado o envio destes par&acirc;metros e quais dever&atilde;o ser enviados a cada resource.
+</p>
+
+	<pre class='prettyprint'>
+        $.ajax(
+        {
+            type 	: "POST",
+            url 	: "client_rest.php",
+            data	:
+            {
+                id          : &lt; ID &gt;
+                params      : &lt; ENVIE AQUI SEUS PARAMETROS EM FORMATO JSON Exemplo : {"param1":"valor"} &gt;
+                serverUrl   : "http://expresso.pr.gov.br/api/rest/&lt; RESOURCE REST &gt;",
+                methodType  : "POST"
+            }
+        });
+    </pre>
+
+	</p>
+
+<p>
+	O resource ExpressoVersion n&atilde;o necessita de par&acirc;metros e responde a vers&atilde;o do Expresso e a vers&atilde;o da API REST.
+	No trecho abaixo &eacute; demonstrado um c&oacute;digo que utiliza este resource. 
+</p>
+
+<p>	
+	Veja este exemplo funcionando ( <a href="./exemplo/exemplo.zip">BAIXAR ESTE EXEMPLO</a>).
+</p>
+
+<p>
+	<h3>Enviando as informa&ccedil;&otilde;es com Javascript</h3>
+
+	<pre class='prettyprint'>
+        $.ajax(
+        {
+            type 	: "POST",
+            url 	: "client_rest.php",
+            data	:
+            {
+                id          : "";
+                params      : "";
+                serverUrl   : "http://expresso.pr.gov.br/api/rest/ExpressoVersion",
+                methodType  : "POST"
+            },
+            beforeSend: function()
+            {
+                // Coloque aqui seu c&oacute;digo;
+            },
+            success: function(response)				
+            {
+                //Coloque aqui seu c&oacute;digo;
+            },
+            error: function(response)
+            {
+                //Coloque aqui seu c&oacute;digo;
+            }
+        });
+    </pre>
+
+	</p>
+
+<p>
+	<h3>Recebendo as informa&ccedil;&otilde;es no PHP</h3>
+
+	<pre class='prettyprint'>
+        &lt;?php
+
+            $serverUrl  = $_REQUEST['serverUrl'];
+            $methodType = $_REQUEST['methodType'];
+            $params     = $_REQUEST['params'];
+            $id         = ( $_REQUEST['id'] ) ? $_REQUEST['id'] : time();
+            
+            $data = "id=".$id."&amp;params=" . stripslashes($params);
+
+            function callJSONRPC($url, $data, $method)
+            {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                
+                if($method == "POST"){
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                }
+                
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/x-www-form-urlencoded"));
+                
+                $result     = curl_exec($ch);
+                $errorCode  = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+                $lastURL    = curl_getinfo($ch,CURLINFO_EFFECTIVE_URL);
+                
+                curl_close($ch);
+                
+                switch($errorCode)
+                {
+                    case 200:
+                        break;
+
+                    case 404:
+                        $result = json_encode(array("error" => array("code" => 404, "message" => "RECURSO NAO ENCONTRADO => $lastURL")));
+                        break;
+                
+                    case 500:
+                        $result = json_encode(array("error" => array("code" => 500, "message" => "ERRO INTERNO. CONSULTE O LOG DO SERVIDOR")));
+                        break;
+                    
+                    default:
+                        $result = json_encode(array("error" => array("code" => -1, "message" => "ERRO DESCONHECIDO. CONSULTE O LOG DO SERVIDOR")));
+                        break;
+                }
+                
+                return $result;
+            }
+
+            $result = callJSONRPC($serverUrl, $data, $methodType);
+
+            echo $result;
+        ?&gt;
+
+    </pre>
+
+	</p>
+</div>

@@ -1,0 +1,89 @@
+Addresses	contactcenter	pt	Endereços
+Address 1	contactcenter	pt	Endereço 1
+Address 2	contactcenter	pt	Endereço 2
+Address Other	contactcenter	pt	Outro Endereço
+Alias	common	pt	Apelido
+Available	contactcenter	pt	Disponível
+Birthdate	contactcenter	pt	Nascimento
+Browse	common	pt	Procurar
+Catalogues	contactcenter	pt	Catálogos
+Cards View	contactcenter	pt	Ver Cartões
+Reset	common	pt	Limpar
+Complement	contactcenter	pt	Complemento
+Confirm Removal of this Contact?	contactcenter	pt	Confirmar a exclusão deste Contato?
+Confirm Removal of this Group?	contactcenter	pt	Confirmar a exclusão deste Grupo?
+Connection Name	contactcenter	pt	Nome da Conexão
+Connection Value	contactcenter	pt	Valor da Conexão
+Connections	contactcenter	pt	Conexões
+Contact Center	common	pt	Contact Center
+Contact Group List	common	pt	Lista de Grupos de Contatos
+contactcenter	common	pt	Contact Center
+Contacting Server...	contactcenter	pt	Contactando Servidor...
+Contacts	common	pt	Contatos
+Choose City	contactcenter	pt	Escolher Cidade...
+Choose Country	contactcenter	pt	Escolher País...
+Choose Prefix...	contactcenter	pt	Escolher Prefixo...
+Choose Sex ...	contactcenter	pt	Escolher Sexo ...
+Choose State	contactcenter	pt	Escolher Estado...
+Choose Suffix...	contactcenter	pt	Escolher Sufixo...
+Choose Type of Address	contactcenter	pt	Escolher Tipo de Endereço
+Choose Type of Connection	contactcenter	pt	Escolher Tipo de Conexão
+Couldn't contact server or server response is invalid. Contact Admin.	contactcenter	pt	Não foi possível estabelecer conexão com o servidor. Contacte o Administrador do sistema.
+Edit Contact	contactcenter	pt	Editar Contato
+Edit Group	contactcenter	pt	Editar Grupo
+Entry added with success!	contactcenter	pt	Contato adicionado com sucesso!
+Empty	contactcenter	pt	Vazio
+Family Names	common	pt	Sobrenome
+Female	contactcenter	pt	Feminino
+Found %1 Entries	common	pt	Encontrado %1 Resultado(s)
+Full Name	contactcenter	pt	Nome Completo
+Given Names	common	pt	Nome
+GPG Finger Print	contactcenter	pt	Assinatura GPG
+Go	common	pt	Ir
+Group Add	common	pt	Adicionar Grupo
+Home Phone	contactcenter	pt-br	Casa
+Is Default?	contactcenter	pt	É Padrão?
+Insert a New Group	common	pt	Inserir um Novo Grupo
+insert	common	pt	Inserir
+Main	contactcenter	pt	Principal
+Male	contactcenter	pt	Masculino
+New	contactcenter	pt	Novo
+New City	contactcenter	pt	Nova Cidade
+New from the same Type	contactcenter	pt	Novo do mesmo tipo
+New State	contactcenter	pt	Novo Estado
+No Cards	contactcenter	pt	Nenhum
+No City	contactcenter	pt	Nenhuma Cidade
+No Entries Found!	contactcenter	pt	Nenhum resultado encontrado!
+No State	contactcenter	pt	Nenhum Estado
+No Cities found for this State.	contactcenter	pt	Nenhuma Cidade encontrada para este Estado.
+No States found for this Country.	contactcenter	pt	Nenhum Estado encontrado para este País.
+Participants	common	pt	Participantes
+People	contactcenter	pt	Pessoas
+Personal Contacts	common	pt	Contatos Pessoais
+Phone	contactcenter	pt	Telefone
+Postal Code	contactcenter	pt	CEP
+PO Box	contactcenter	pt	Caixa Postal
+Prefix	contactcenter	pt	Prefixo
+Processing Information...	contactcenter pt	Processando Informações...
+Problems on adding your Contact. The email "%1" already exists in: %2	common	pt	Nao foi possivel adicionar. O email "%1" ja existe nos seguintes contatos: %2
+Quick Add	common	pt	Adição Rápida
+Reset	contactcenter	pt	Limpar
+Removed Entry!	common	pt	Contato removido com sucesso !
+Removed Entry ID %1!	common	pt	Contato removido com sucesso (ID = %1)!
+Remove Contact	contactcenter	pt	Remover Contato
+Remove Group	contactcenter	pt	Remover Grupo
+Remove	common	pt	Remover
+Search for...	common	pt	Pesquisar por ...
+Search for Catalog Entries	contactcenter	pt	Pesquisar por Resultados no Catálogo
+Select Photo	contactcenter	pt	Selecionar Foto
+Send Mail	common	pt	Enviar email
+Sex	contactcenter	pt	Sexo
+Showing found entries	common	pt	Mostrando itens encontrados
+Suffix	contactcenter	pt	Sufixo
+Table View	contactcenter	pt	Ver Tabela
+Type new city here	contactcenter	pt	Digite o nome aqui
+Type new state here	contactcenter	pt	Digite o nome aqui
+Type of Connection	contactcenter	pt	Tipo de Conexão
+Type of Address	contactcenter	pt	Tipo de Endereço
+Unavailable or empty Catalog	contactcenter	pt	Catálogo vazio ou indisponível
+Updated Successfully!	contactcenter	pt	Atualizado com Sucesso!

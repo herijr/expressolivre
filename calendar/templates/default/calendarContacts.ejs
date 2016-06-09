@@ -1,0 +1,9 @@
+<div>
+	<select style="width:670px; height:330px" size="12">
+		<% for( var i in obj ) { %>
+			<% if( $.type(obj[i]) != null && $.isNumeric(i) ) { %>
+				<option value='"<%= obj[i].cn %>" <<%= obj[i].mail%>>'> <%= obj[i].cn %> ( <%= obj[i].mail %> ) - <%= obj[i].phone %></option>
+			<% } %>
+		<% } %>
+	</select>
+</div>

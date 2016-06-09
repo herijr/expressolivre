@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	<IfModule mod_vhost_alias.c>
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteCond %{REQUEST_FILENAME}:::%{DOCUMENT_ROOT}%{REQUEST_URI} ^(.+):::\1
+		RewriteRule ^(.*)$ dispatch.php [QSA,L]
+		
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteCond %{REQUEST_FILENAME}:::%{DOCUMENT_ROOT}%{REQUEST_URI} !^(.+):::\1
+		RewriteRule ^(.*)$ /dispatch.php [QSA,L]
+	</IfModule>
+	<IfModule !mod_vhost_alias.c>
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteRule ^(.*)$ dispatch.php [QSA,L]
+	</IfModule>
+</IfModule>

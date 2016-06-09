@@ -1,0 +1,16 @@
+<div style="text-align:center;height:300px;">
+	<img src="templates/default/images/attention.png">
+	<h1 style="text-transform:uppercase;color:red"><%=get_lang('Attention')%></h1>
+	<h2><%=get_lang('Your mailbox is migrated')%></h2>
+	<div style="font-size:11pt;">
+		<label><%=get_lang('Migration status')%> : </label>
+		<label style='color:red;font-weight:bold'><%=status%></label>
+	</div>
+	<div style="font-size:11pt;margin-top:10px;">
+		<% if( queue != '-1' ) {%>
+			<label>
+				<%=get_lang('Its position in the migration queue is')%> : <font style="color:red;font-weight:bold;font-size:12pt;"><%=queue%></font>
+			</label>
+		<% } %>
+	</div>
+</div>

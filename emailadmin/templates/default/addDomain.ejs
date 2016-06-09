@@ -1,0 +1,31 @@
+<div>
+	<fieldset>
+		<div>
+			<label class="add_domain"><%=lang['label_profile']%></label>
+			<div>
+				<select id="selected_profile">
+					<% for(var i in profiles){ %>
+						<option value="<%=profiles[i]['profileid']%>"> <%=profiles[i]['description']%> </option>
+					<% } %>
+				</select>
+			</div>
+		</div>
+
+		<div>
+			<label class="add_domain"><%=lang['label_domain']%></label>
+			<input type="text" size="50" id="input_search_domain">
+		</div>
+		<div>
+			<label class="add_domain"><%=lang['label_ous']%></label>
+			<select id="select_ous_domain" style="width:100%;"><%=organization_units%></select>
+			<button id="selected_ous_domain_add" type="button" style="margin: 5px 0;">
+				<img style="vertical-align: middle;" src="expressoAdmin1_2/templates/default/images/add.png">&nbsp;<%=lang['add']%>
+			</button>
+			<button id="selected_ous_domain_remove" type="button" style="float: right; margin: 5px 0;">
+				<img style="vertical-align: middle;" src="expressoAdmin1_2/templates/default/images/rem.png">&nbsp;<%=lang['remove']%>
+			</button>
+			<select id="selected_organization_units" multiple style="width:100%;min-height: 58px;"></select>
+		</div>
+		
+	</fieldset>
+</div>

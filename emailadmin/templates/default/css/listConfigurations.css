@@ -1,0 +1,5 @@
+#configurations ul li { display: inline-block; list-style: none; width: 150px;height: 120px; } 
+#configurations ul li a { display: block; color: black; text-decoration: none; font-weight: bold; width: 150px;height: 120px; text-align: center; }
+#configurations ul li a img { margin: 5px 0 3px; }
+#configurations ul li a span { font-size: 9pt; }
+#navigation { margin: 30px 30px }

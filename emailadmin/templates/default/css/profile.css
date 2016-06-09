@@ -1,0 +1,27 @@
+.buttons {
+	
+	margin: 10px 0 10px 20px;
+}
+
+.table_domains {
+
+	width: 50%;
+	font-size: 11pt;
+	margin:10px;
+}
+
+.table_domains th {
+	background: #D3DCE3;
+	text-align: left;
+	font-size: 10pt;
+}
+
+.th_size {
+	width: 10%;
+	text-align:center !important;
+}
+
+.td_size {
+	width: 10%;
+	text-align:center !important;
+}

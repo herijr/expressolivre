@@ -1,0 +1,60 @@
+.add_domain{
+    margin-right: 1em;
+    float: none;
+    text-align: left;
+    width: auto;
+}
+.search_domain{
+    margin-right: 1em;
+    float: none;
+    text-align: left;
+    width: auto;
+}
+.list_domains{
+	margin:10px;
+	width:90%;
+}
+
+#tables_domains
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	margin: 20px 0 20px;
+	width: 100%;
+	text-align: left;
+	border-collapse: collapse;
+	border: 1px solid #69c;
+}
+#tables_domains th
+{
+	padding: 15px 10px 10px 10px;
+	font-weight: normal;
+	font-size: 14px;
+	color: #039;
+}
+#tables_domains tbody
+{
+	background: #e8edff;
+}
+#tables_domains td
+{
+	padding: 10px;
+	color: #669;
+	border-top: 1px dashed #fff;
+}
+.nowrap {
+	white-space: nowrap;
+}
+#tables_domains tbody tr:hover td[menu_action]:hover
+{
+	background: #b3c3fd;
+}
+#tables_domains tbody tr:hover td
+{
+	color: #339;
+	background: #d0dafd;
+}
+#tables_domains ul li { display: inline; list-style: none; padding: 0 5px;}
+#tables_domains ul li span{ color: red; padding:0 10px;}
+#tables_domains ul li a { text-decoration: none; text-align: center }
+#navigation { padding :0 10px; margin-bottom: 10px; }

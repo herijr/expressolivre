@@ -1,0 +1,13 @@
+<div style="width:630px;">
+	<select style="width:627px; height:330px" size="12">
+		<% for( var i in obj ) { %>
+			<% if( $.type(obj[i]) != null && $.isNumeric(i) ) { %>
+				<option value='"<%= obj[i].cn %>" <<%= obj[i].mail%>>'> <%= obj[i].cn %> ( <%= obj[i].mail %> ) - <%= obj[i].phone %></option>
+			<% } %>
+		<% } %>
+	</select>
+</div>
+<div style="text-align:left;margin-top:10px;width:580px;">
+	<button class="add-button"></button>
+	<button class="close-button"></button>
+</div>

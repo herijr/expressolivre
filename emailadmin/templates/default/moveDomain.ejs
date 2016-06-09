@@ -1,0 +1,19 @@
+<div>
+	<fieldset>
+		<div>
+			<label class="add_domain">Perfil</label>
+			<input type="text" size="50" name="input_search_domain" value="<%=name_perfil%>"readonly>
+		</div>
+
+		<div>
+			<label class="add_domain">Mover para o perfil</label>
+			<div>
+				<select>
+					<% for(var i in profiles){ %>
+						<option value="<%=profiles[i]['profileid']%>"> <%=profiles[i]['description']%> </option>
+					<% } %>
+				</select>
+			</div>
+		</div>
+	</fieldset>
+</div>

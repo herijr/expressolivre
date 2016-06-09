@@ -1,0 +1,123 @@
+# Errors from -32000 to -32099 => Server error: Reserved for implementation-defined server-errors.
+
+-32700		E_PARSE_ERROR					Parse error
+-32600		E_INVALID_REQUEST				Invalid Request
+-32601		E_METHOD_NOT_FOUND				Method not found
+-32602		E_INVALID_PARAMS				Invalid params
+-32603		E_INTERNAL_ERROR				Internal error
+-32604		E_LOAD_EXTENSION				Extension '%1' is not loaded
+404			E_HTTP_NOT_FOUND				A resource matching URI '%1' was not found
+500			E_UNKNOWN_ERROR					HTTP Unknown error
+
+# Errors inherited from Expresso Application.
+1			LOGIN_SUCCESS_LOGOUT			You have been successfully logged out
+2			LOGIN_SESSION_EXPIRED			Sorry, your login has expired
+3			LOGIN_NOT_LOGGED_IN				You are not logged in
+4			LOGIN_COOKIES_REQUIRED			Cookies are required to login to this site.
+5			LOGIN_BADLOGIN					bad login or password
+6			LOGIN_PASSWORD_EXPIRED			Your password has expired, and you do not have access to change it
+7			LOGIN_AUTH_INVALID				Your auth is invalid
+10			LOGIN_SESSION_NOT_VERIFIED		Your session could not be verified.
+98			LOGIN_ACCOUNT_EXPIRED			Account is expired
+99			LOGIN_LOGIN_BLOCKED				Blocked, too many attempts!
+200			LOGIN_INVALID_LOGIN				Bad login or password
+
+1000		API_INVALID_VERSION				API invalid version.
+1001		CATALOG_MIN_ARGUMENT_SEARCH		Your search argument must be longer than %1 characters.
+1002		MAIL_NOT_SENT					Your mail could not be sent.
+1003		MAIL_TRASH_NOT_CLEANED			Your trash folder could not be cleaned.
+1004		MAIL_MESSAGE_NOT_FOUND			Message not found in folder %1.
+1005		MAIL_INVALID_NEW_FOLDER_NAME	Invalid folder name.
+1006 		MAIL_INVALID_OLD_FOLDER			Invalid old folder.
+1007 		MAIL_INVALID_FOLDER				Invalid folder.
+1008		MAIL_CANNOT_DEL_DEFAULT_FOLDER	Cannot delete a default folder.
+1009		MAIL_FOLDER_NOT_EMPTY			The folder is not empty.
+1010		MAIL_FOLDER_NOT_RENAMED			The folder could not be renamed.
+1011		MAIL_FOLDER_NOT_ADDED			The folder could not be added.
+1012		MAIL_FOLDER_NOT_DELETED			The folder could not be deleted.
+1013		MAIL_FOLDER_LIMIT_REACHED		Folder limit has been reached.
+2032		MAIL_FOLDER_ID_EMPTY			FolderID empty
+2033		MAIL_MSG_ID_EMPTY				Message empty
+2034		MAIL_FLAGTYPE_EMPTY				Flag message empty
+
+1014		CALENDAR_INVALID_START_DATE		Invalid start date.
+1015		CALENDAR_INVALID_END_DATE		Invalid end date.
+1016		MAIL_INVALID_MESSAGE			Message does not exists.
+1017		MAIL_TRASH_FOLDER_NOT_EXISTS	Trash folder does not exists.
+1018		MAIL_NOT_SENT_LIMIT_EXCEEDED	The size of this message has exceeded  the limit (%1B).
+1019		CATALOG_NO_RESULTS				No results
+1052		CATALOG_EMAIL_EMPTY				Email empty
+1053		CATALOG_EMAIL_EXIST				Email exist
+1054		CATALOG_CONTACT_NOT_ADD			Contact not add
+1055		CATALOG_EMAIL_INVALID			Email invalid
+1056		CATALOG_ID_EMPTY				ID empty
+
+1020		ACCESS_NOT_PERMITTED			Access not permitted
+1021		ADMIN_LOGIN_EMPTY				Login empty
+1022		ADMIN_EMAIL_EMPTY				Email empty
+1023		ADMIN_NAME_EMPTY				Name empty
+1024		ADMIN_PASSWORD_EMPTY			Password empty
+1025		ADMIN_RE_PASSWORD_EMPTY			Re password empty
+1026		ADMIN_PASSWORD_REPASSWORD		Password and repassword are different
+1027		ADMIN_CPF_INVALID				CPF invalid
+1028		ADMIN_FIELDS_VALIDATE			%1
+1029		ADMIN_CREATE_USER				%1
+1030		ADMIN_PROFILE_USER_EMPTY		Profile user empty
+1031		ADMIN_SEARCH_USER_EMPTY			Search user empty
+1032		ADMIN_UID_EMPTY					UID empty
+1033		ADMIN_UIDNUMBER_EMPTY			UIDNumber empty
+1034		ADMIN_DELETE_USER				%1
+1035		ADMIN_UID_EMPTY					UID empty
+1036		ADMIN_NEW_UID_EMPTY				New UID empty
+1037		ADMIN_MINIMUM_CHARACTERS		%1
+1038		ADMIN_RG_UF_EMPTY				RG or RGUF empty
+1039		ADMIN_UPDATE_USER				%1
+1040		ADMIN_USER_NOT_FOUND			User not found
+1041		ADMIN_USERS_NOT_FOUND			User(s) not found
+
+1042 		CALENDAR_INVALID_EVENT_TYPE		Invalid Event Type
+1043 		CALENDAR_INVALID_EVENT_NAME		Invalid Event Name
+1044 		CALENDAR_INVALID_EVENT_DESC		Invalid Event Description
+1045		CALENDAR_INVALID_EVENT_PRIORITY	Ivalid Event Priority
+1045		CALENDAR_INVALID_START_TIME		Ivalid Start Time
+1045		CALENDAR_INVALID_END_TIME		Ivalid End Time
+1046		CALENDAR_EVENT_DELETE_ERROR		Could not Delete Event
+1047		CALENDAR_INVALID_EVENTID		Invalid Event ID.
+1048		CALENDAR_INVALID_EVENT_OWNER_IS_PARTICIPANT		Invalid Event Owner Is Participant.
+1049		CALENDAR_INVALID_EVENT_PARTICIPANTS		Invalid Event Participants.
+1050		CALENDAR_INVALID_CATEGORY				Invalid Category
+1051		CALENDAR_EVENT_UNKNOW_EXCEPTION			Unknow Exception
+
+1052		ADMIN_SEARCH_LDAP_VAR_IS_NULL	Variable is null
+1053		ADMIN_SEARCH_LDAP_CHARACTERS_NOT_ALLOWED	Characters not allowed		
+
+1054		EMPTY_CURRENT_PASSWORD			Empty current password
+1055		EMPTY_NEW_PASSWORD				Empty new password
+1056		NEW_PASSWORDS_DIFFERENT			New passwords are different
+1057		CURRENT_PASSWORD_DOES_NOT_MATCH	Current password does not match
+1058		WITHOUT_PERMISSION				Without permission
+1059		NEEDS_8_OR_MORE_LETTERS			Your password needs to contain 8 or more letters
+1060		NEEDS_2_NUMBERS_OR_SPECIAL_CHARACTERS	Your password must be at least 2 numbers or special characters
+1061		NO_SUPPORT_FOR_CERTIFICATE		No support for certificate
+
+1062		ADMIN_CPF_IS_NOT_VALID			CPF is not valid
+
+1300		EXPRESSO_INVALID_DATE			Invalid Date
+1301		EXPRESSO_INVALID_OBRIGATORY_FIELD			Invalid Obrigatory Field
+1302		EXPRESSO_INVALID_INTEGER		Invalid Integer
+
+
+2120		SMS_DISABLED					sms disabled
+2121		WS_SMS_ERROR					%1
+2122		UNKNOWN_OPTION					unknown option '%1'
+2123		SMS_CHECK_CODE_REACHED			sms daily limit reached
+2124		SMS_CHECK_CODE_INVALID			checking code invalid
+2125		SMS_CHECK_CODE_EXPIRED			checking code expired
+2126		SMS_CHECK_CODE_NOT_FOUND		checking code not found
+2127		SMS_RECV_DENIED					sms receive denied
+2128		MOBILE_INVALID					invalid phone number
+2129		SMS_SEND_DENIED					sms send denied
+2130		SMS_EMPTY_MESSAGE				sms empty message
+
+2031		ADMIN_MAIL_EMPTY				Mail empty
+

@@ -1,0 +1,114 @@
+added domain	emailadmin	pt-br	Domínio adicionado
+add profile	emailadmin	pt-br	Adicionar Perfil
+Add domain	emailadmin	pt-br	Adicionar domínio
+Add new profile Server Express	emailadmin	pt-br	Adicionar novo perfil para o servidor Expresso 
+admin dn	emailadmin	pt-br	dn do administrador
+admin password	emailadmin	pt-br	Senha do administrador
+admin username	emailadmin	pt-br	Usuário do administrador
+Administrator - Add domain	emailadmin	pt-br	Administrador - Adicionar domínio
+Administrator - Move domain	emailadmin	pt-br	Administrador - Mover domínio
+advanced options	emailadmin	pt-br	opções avançadas
+alternate email address	emailadmin	pt-br	endereço de correio eletrônico alternativo
+Configuration for the service Cyrus IMAP	emailadmin	pt-br	Configuração para o serviço Cyrus IMAP
+Configuration for the service IMAP	emailadmin	pt-br	Configuração para o serviço IMAP
+Configuration for the SMTP service	emailadmin	pt-br	Configuração para o serviço SMTP
+create spam folder	emailadmin	pt-br	Criar a pasta Spam ao criar usuário
+cyrus imap server administration	emailadmin	pt-br	Administração do Servidor Cyrus IMAP
+cyrus imap server	emailadmin	pt-br	Servidor Cyrus IMAP
+cyrus user post spam	emailadmin	pt-br	Usuário do cyrus que irá postar a mensagem na pasta Spam (Padrão:anonymous)
+default	emailadmin	pt-br	padrão
+Delimiter of the IMAP server folders: (points to the logins, use / as delimiter.)	emailadmin	pt-br	Delimitador das pastas do servidor IMAP: (para pontos nos logins, use / como delimitador.)
+Default Folders	emailadmin	pt-br	Pastas padrões
+deliver extern	emailadmin	pt-br	entrega externa
+domainname	emailadmin	pt-br	nome do domínio
+do you really want to delete this profile	emailadmin	pt-br	Tem certeza que deseja apagar esse perfil ?
+Do you really want to move this Domain	emailadmin	pt-br	Você realmente deseja mover este domínio ?
+Do you really want to delete this Domain	emailadmin	pt-br	Você realmente deseja excluir este domínio ?
+Delete	emailadmin	pt-br	Excluir
+Domain	emailadmin	pt-br	Domínio
+Domains assigned	emailadmin	pt-br	Domínios associados
+Domain name	emailadmin	pt-br	Nome do domínio
+Domain is already registered	emailadmin	pt-br	Domínio já encontra-se cadastrado
+Domain with more than %1 users	emailadmin	pt-br	Domínio com mais de %1 usuários
+domains found	emailadmin	pt-br	Domínios encontrados
+domain list	emailadmin	pt-br	Lista de Domínios
+domain switched profile successfully	emailadmin	pt-br	Domínio trocado de perfil com sucesso
+Drafts Folder	emailadmin	pt-br	Pasta dos rascunhos
+Edit	emailadmin	pt-br	Editar
+edit email settings	emailadmin	pt-br	editar configurações de correio eletrônico
+email account active	emailadmin	pt-br	conta de correio eletrônico ativa
+email address	emailadmin	pt-br	endrereço de correio eletrônico
+emailadmin	common	pt-br	Admin do E-mail
+enable cyrus imap server administration	emailadmin	pt-br	Habilitar administração do Servidor Cyrus IMAP
+enable sieve	emailadmin	pt-br	Habilitar Sieve
+enter a domain	emailadmin	pt-br	Informe um domínio
+enter your default mail domain (from: user@domain)	emailadmin	pt-br	Entre com o domínio de correio padrão (de: usario@dominio)
+Error moving domain	emailadmin	pt-br	Erro movendo domínio
+forward also to	emailadmin	pt-br	encaminhar também para
+forward email's to	emailadmin	pt-br	encaminhar mensagens para
+forward only	emailadmin	pt-br	encaminhar somente
+IMAP server	emailadmin	pt-br	Servidor IMAP
+imap admin password	admin	pt-br	Senha do administrador IMAP
+imap admin user	admin	pt-br	Usuário administrador do IMAP
+imap c-client version < 2001	emailadmin	pt-br	IMAP C-Cliente Versão < 2001
+imap/pop3 server name	emailadmin	pt-br	Nome do servidor IMAP/POP3
+imap server hostname or ip address	emailadmin	pt-br	Nome ou IP do servidor IMAP
+imap server logintype	emailadmin	pt-br	Tipo de login do servidor IMAP
+imap server port	emailadmin	pt-br	Porta do servidor IMAP
+in mbyte	emailadmin	pt-br	em Mbytes
+Invalid domain	emailadmin	pt-br	Domínio inválido
+ldap basedn	emailadmin	pt-br	DN Base do LDAP
+ldap server accounts dn	emailadmin	pt-br	Contas DN de servidores LDAP
+ldap server admin dn	emailadmin	pt-br	Administrador DN de servidor LDAP
+ldap server admin password	emailadmin	pt-br	Senha do administrador DN de servidor LDAP
+ldap server	emailadmin	pt-br	Servidor LDAP
+ldap server hostname or ip address	emailadmin	pt-br	Nome ou endereço IP do servidor LDAP
+ldap settings	emailadmin	pt-br	Configurações do LDAP
+leave empty for no quota	emailadmin	pt-br	deixe em branco para nenhuma quota
+mail settings	admin	pt-br	Configurações de Correio eletrônico
+manage domains	emailadmin	pt-br	Gerenciar Domínios
+manage profile	emailadmin	pt-br	Gerenciar Perfil
+move	emailadmin	pt-br	Mover
+move domain	emailadmin	pt-br	Mover domínio
+name of organisation	emailadmin	pt-br	Nome da organização
+no alternate email address	emailadmin	pt-br	sem conta de correio eletrônico alternativa
+no forwarding email address	emailadmin	pt-br	sem conta de correio eletrônico para encaminhar
+postfix with ldap	emailadmin	pt-br	Postfix com LDAP
+previous	emailadmin	pt-br	Anterior
+profile	emailadmin	pt-br	Perfil
+profile list	emailadmin	pt-br	Lista de perfis
+profile name	emailadmin	pt-br	Nome do perfil
+qmaildotmode	emailadmin	pt-br	modo dos arquivos qmail (.qmail)
+qouta size in mbyte	emailadmin	pt-br	tamanho da quota em MBytes
+quota settings	emailadmin	pt-br	configurações de cota
+Remove	emailadmin	pt-br	Remover
+remove	emailadmin	pt-br	remover
+Error same profile	emailadmin	pt-br	Erro mesmo perfil
+save	emailadmin	pt-br	Salvar
+spam settings	emailadmin	pt-br	Configurações de Spam
+select type of imap/pop3 server	emailadmin	pt-br	Selecione o tipo de servidor IMAP/POP3
+select type of smtp server	emailadmin	pt-br	Selecione o tipo de servidor SMTP
+Sent Folder	emailadmin	pt-br	Pasta das enviadas
+search	emailadmin	pt-br	Buscar
+search domain	emailadmin	pt-br	Procurar domínio
+Server SMTP	emailadmin	pt-br	Servidor SMTP
+sieve server hostname or ip address	emailadmin	pt-br	Nome ou endereço IP do servidor Sieve
+sieve server port	emailadmin	pt-br	Porta do Servidor Sieve
+sieve settings	emailadmin	pt-br	Configurações Sieve
+smtp-server hostname or ip address	emailadmin	pt-br	Nome ou endereço IP do servidor SMTP
+smtp server name	emailadmin	pt-br	Nome do Servidor SMTP
+smtp server port	emailadmin	pt-br	Porta do servidor SMTP
+SMTP Server Standard	emailadmin	pt-br	Servidor STMP Padrão
+Spam Folder	emailadmin	pt-br	Pasta dos spams
+standard	emailadmin	pt-br	Padrão
+standard imap server	emailadmin	pt-br	Servidor IMAP padrão
+standard smtp-server	emailadmin	pt-br	Servidor SMTP padrão
+The PROFILE NAME is blank	emailadmin	pt-br	O campo NOME DO PERFIL está em branco
+This operation will move all mailboxes in the domain	emailadmin	pt-br	Está operação irá mover todas as caixas postais do domínio
+Trash Folder	emailadmin	pt-br	Pasta da lixeira
+use ldap defaults	emailadmin	pt-br	Usar padrões LDAP
+use smtp auth	emailadmin	pt-br	Usar SMTP Autenticado
+use tls authentication	emailadmin	pt-br	Usar autenticação TLS
+use tls encryption	emailadmin	pt-br	Usar encriptação TLS
+virtual mail manager	emailadmin	pt-br	Gerenciador Virtual Mail
+organizations	emailadmin	pt-br	Organizações
