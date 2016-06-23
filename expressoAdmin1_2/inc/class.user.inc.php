@@ -1292,25 +1292,8 @@
 			//$defaultUserPassword = $this->auth->encrypt_password($this->current_config['expressoAdmin_defaultUserPassword']);
 			//$defaultUserPassword_plain = $this->current_config['expressoAdmin_defaultUserPassword'];
 			
+			// Get profile before rename on LDAP, solve replication problems
 			$profile = CreateObject('emailadmin.bo')->getProfile('uid', $uid);
-			
-			if ( $profile ) {
-				
-				//Verifica se está sendo usuado cyrus 2.2 ou superior
-				$sk = fsockopen ( $profile['imapServer'], $profile['imapPort'], $errno, $errstr );
-				if ( !$sk ) return array( 'status' => false, 'msg' => $errstr.': '.$errno.'.' );
-				$header = fread($sk, 1024);
-				fclose($sk);
-				
-				list($host, $server, $service, $version) = explode(" ", preg_filter(array("/^\* OK /","/\[.*\] /"), "", $header));
-				
-				$ver = 0;
-				if ( $server === 'Cyrus' && preg_match("/^v\d+\.\d+/", $version, $ver_tmp))
-					$ver = (int)preg_filter("/[^\d]/","",current($ver_tmp));
-				
-				if ( $ver < 22 ) return array( 'status' => false, 'msg' => $this->functions->lang('The rename user is only permitted with cyrus 2.2 or higher').'.' );
-				
-			}
 			
 			// Rename uid on ldap
 			$result = $this->ldap_functions->rename_uid( $uid, $new_uid );
