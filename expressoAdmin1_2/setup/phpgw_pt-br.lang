@@ -144,6 +144,9 @@ Expire	expressoAdmin1_2	pt-br	Expira
 expressoAdmin1_2	common	pt-br	ExpressoAdmin 1.2
 expressoadmin	expressoAdmin1_2	pt-br	ExpressoAdmin
 external email	expressoAdmin1_2	pt-br	Email externo
+external group	expressoAdmin1_2	pt-br	Grupo externo
+groupOfNames	expressoAdmin1_2	pt-br	groupOfNames
+groupOfUniqueNames	expressoAdmin1_2	pt-br	groupOfUniqueNames
 Fields blocked	expressoAdmin1_2	pt-br	Campos bloqueados
 Field CPF is invalid	expressoAdmin1_2	pt-br	Campo CPF é inválido
 Field CPF must be completed	expressoAdmin1_2	pt-br	Campo CPF é de preenchimento obrigatório
@@ -188,6 +191,7 @@ Institutional account successful saved	expressoAdmin1_2	pt-br	Conta Insticional 
 invalid external email	expressoAdmin1_2	pt-br	Email externo inválido
 ip address	expressoAdmin1_2	pt-br	Endereço IP
 is account active	expressoAdmin1_2	pt-br	Conta está ativa
+It was not possible to determine if the name or email is in use	expressoAdmin1_2	pt-br	Não foi possível determinar se o nome e-mail ou está em uso
 it is needed to create samba passwords	expressoAdmin1_2	pt-br	É necessário para criar senhas do samba
 It is not allow select all users from the root organization	expressoAdmin1_2	pt-br	Não é permitido selecionar todos os usuários da raiz
 it was not possible to change users mailbox quota	expressoAdmin1_2	pt-br	Não foi possível alterar a cota da caixa postal do usuário
@@ -434,6 +438,9 @@ unknown	expressoAdmin1_2	pt-br	desconhecido
 The name length must be between 1 and 32 characters	expressoAdmin1_2	pt-br	O comprimento do nome deve ter entre 1 e 32 caracteres
 The name must begin with a letter, without spaces	expressoAdmin1_2	pt-br	O nome deve começar com uma letra, sem espaços
 This name is in use	expressoAdmin1_2	pt-br	Este nome está em uso
+Type	expressoAdmin1_2	pt-br	Tipo
+expresso	expressoAdmin1_2	pt-br	expresso
+extern	expressoAdmin1_2	pt-br	externo
 Description must be non empty	expressoAdmin1_2	pt-br	A descrição não deve ser vazia
 Description has an invalid character	expressoAdmin1_2	pt-br	A descrição tem um carácter inválido
 description	expressoAdmin1_2	pt-br	descrição

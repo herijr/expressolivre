@@ -129,14 +129,16 @@
 					$var = Array(
 						'tr_color'    		=> $tr_color,
 						'row_cn'  			=> $group['cn'],
+						'row_type'          => lang( $group['type']? 'extern' : 'expresso' ),
 						'row_description'	=> $group['description'],
 						'row_mail'			=> $group['mail']
 					);
 					$p->set_var($var);
+					$id = base64_encode( $group['dn'] );
 
 					if ($can_edit)
 					{
-						$p->set_var('edit_link',$this->row_action('edit','groups',$group['gidnumber'],$group['cn']));
+						$p->set_var( 'edit_link',$this->row_action( 'edit', 'groups', array( 'id' => $id ) ) );
 					}
 					else
 					{
@@ -145,7 +147,7 @@
 
 					if ($can_copy)
 					{
-						$p->set_var('copy_link',"<a href='#' onClick='javascript:copy_group(\"".$group['gidnumber']."\");'>".lang('copy')."</a>");
+						$p->set_var('copy_link',"<a href='#' onClick='javascript:copy_group( \"".$id."\" );'>".lang('copy')."</a>");
 					}
 					else
 					{
@@ -154,7 +156,7 @@
 
 					if ($can_delete)
 					{
-						$p->set_var('delete_link',"<a href='#' onClick='javascript:delete_group(\"".$group['cn']."\",\"".$group['gidnumber']."\");'>".lang('to delete')."</a>");
+						$p->set_var('delete_link',"<a href='#' onClick='javascript:delete_group( this, \"".$id."\" );'>".lang('to delete')."</a>");
 					}
 					else
 					{
@@ -252,7 +254,10 @@
 				'sambadomainname_options'	=> $sambadomainname_options,
 				'back_url'					=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uigroups.list_groups'),
 				'combo_manager_org'			=> $combo_manager_org,
-				'combo_all_orgs'			=> $combo_all_orgs
+				'combo_all_orgs'			=> $combo_all_orgs,
+				'grp_of_names_value'        => '',
+				'grp_of_names_type_1_value' => 'checked',
+				'grp_of_names_type_2_value' => '',
 			);
 			$p->set_var($var);
 			$p->set_var($this->functions->make_dinamic_lang($p, 'list'));
@@ -275,7 +280,11 @@
 			}
 
 			// GET all infomations about the group.
-			$group_info = $this->group->get_info($_GET['gidnumber']);
+			$dn = base64_decode( $_GET['id'] );
+
+			$group_type = $this->group->get_type( $dn );
+			$group_type_check = ( $group_type['type'] === 0 );
+			$group_info = $group_type_check? $this->group->get_info( $group_type['gidnumber'] ) : $this->group->get_info_groupOfNames( $dn );
 
 			unset($GLOBALS['phpgw_info']['flags']['noheader']);
 			unset($GLOBALS['phpgw_info']['flags']['nonavbar']);
@@ -362,45 +371,51 @@
 			
 			// Seta variaveis utilizadas pelo tpl.
 			$var = Array(
-				'color_bg1'					=> "#E8F0F0",
-				'color_bg2'					=> "#D3DCE3",
-				'type'						=> 'edit_group',
-				'ldap_context'				=> $GLOBALS['phpgw_info']['server']['ldap_context'],
-				'gidnumber'					=> $group_info['gidnumber'],
-				'cn'						=> $group_info['cn'],
-				'user_count'				=> $user_count,
-				'email'						=> $group_info['email'],
-				'description'				=> $group_info['description'],
-				'apps'						=> $apps,
-				'personal_data_fields'		=> $personal_data_fields,
-				'use_attrs_samba_checked'	=> $group_info['sambaGroup'] ? 'CHECKED' : '',
-				'disabled_samba'			=> $group_info['sambaGroup'] ? '' : 'disabled',
-				'display_samba_options'		=> $this->current_config['expressoAdmin_samba_support'] == 'true' ? '' : '"display:none"',
-				'disable_email_groups'		=> $this->functions->check_acl($manager_lid,'edit_email_groups') ? '' : 'disabled',
-				'sambadomainname_options'	=> $sambadomainname_options,
-				'phpgwaccountvisible_checked'	=> $group_info['phpgwaccountvisible'] == '-1' ? 'CHECKED' : '',
-				'back_url'					=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uigroups.list_groups'),
-				'combo_manager_org'			=> $combo_manager_org,
-				'combo_all_orgs'			=> $combo_all_orgs,
-				'ea_select_usersInGroup'	=> $ea_select_usersInGroup,
-				'defaultDomain'				=> $this->current_config['expressoAdmin_defaultDomain'],
-				'accountRestrictive_checked'		=> $group_info['accountrestrictive'] == 'mailListRestriction' ? 'CHECKED' : '',
-				'participantCanSendMail_checked'	=> $group_info['participantcansendmail'] == 'TRUE' ? 'CHECKED' : '',
-				'ea_select_users_scm'				=> $senders_options,
+				'accountRestrictive_checked'        => $group_info['accountrestrictive'] == 'mailListRestriction' ? 'CHECKED' : '',
+				'apps'                              => $apps,
+				'back_url'                          => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uigroups.list_groups'),
+				'class_div_radio'                   => 'hide',
+				'class_form'                        => $group_type_check? '' : 'grp_of_names',
+				'cn'                                => $group_info['cn'],
+				'color_bg1'                         => "#E8F0F0",
+				'color_bg2'                         => "#D3DCE3",
+				'combo_all_orgs'                    => $combo_all_orgs,
+				'combo_manager_org'                 => $combo_manager_org,
+				'defaultDomain'                     => $this->current_config['expressoAdmin_defaultDomain'],
+				'description'                       => $group_info['description'],
+				'disable_email_groups'              => $this->functions->check_acl($manager_lid,'edit_email_groups') ? '' : 'disabled',
+				'disabled_samba'                    => $group_info['use_attrs_samba'] ? '' : 'disabled',
+				'display_posix_attrs'               => $group_type_check? '' : 'display:none',
+				'display_samba_options'             => $this->current_config['expressoAdmin_samba_support'] == 'true' && $group_type_check ? '' : '"display:none"',
+				'dn'                                => $dn,
+				'ea_select_usersInGroup'            => $ea_select_usersInGroup,
+				'ea_select_users_scm'               => $senders_options,
+				'email'                             => $group_info['email'],
+				'gidnumber'                         => $group_info['gidnumber'],
+				'ldap_context'                      => $GLOBALS['phpgw_info']['server']['ldap_context'],
+				'participantCanSendMail_checked'    => $group_info['participantcansendmail'] == 'TRUE' ? 'CHECKED' : '',
+				'personal_data_fields'              => $personal_data_fields,
+				'phpgwaccountvisible_checked'       => $group_info['phpgwaccountvisible'] == '-1' ? 'CHECKED' : '',
+				'sambadomainname_options'           => $sambadomainname_options,
+				'type'                              => 'edit_group',
+				'use_attrs_samba_checked'           => $group_info['use_attrs_samba'] ? 'CHECKED' : '',
+				'user_count'                        => $user_count,
+				'grp_of_names_value'                => ( $group_type['type'] === 0 )? '' : 'checked',
+				'grp_of_names_type_1_value'         => ( $group_type['type'] !== 2 )? 'checked' : '',
+				'grp_of_names_type_2_value'         => ( $group_type['type'] === 2 )? 'checked' : '',
 			);
 			
 			$p->set_var($var);
 			$p->set_var($this->functions->make_dinamic_lang($p, 'list'));
 			$p->pfp('out','create_group');
 		}
-				
-		function row_action($action,$type,$gidnumber,$group_name)
+
+		function row_action( $action, $type, $params )
 		{
-			return '<a href="'.$GLOBALS['phpgw']->link('/index.php',Array(
-				'menuaction'		=> 'expressoAdmin1_2.uigroups.'.$action.'_'.$type,
-				'gidnumber'		=> $gidnumber,
-				'group_name'	=> $group_name
-			)).'"> '.lang($action).' </a>';
+			return '<a href="'.$GLOBALS['phpgw']->link(
+				'/index.php',
+				array_merge( array( 'menuaction' => 'expressoAdmin1_2.uigroups.'.$action.'_'.$type ), $params )
+			).'"> '.lang( $action ).' </a>';
 		}
 		
 		function css()

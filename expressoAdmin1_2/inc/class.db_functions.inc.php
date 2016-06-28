@@ -138,7 +138,7 @@ class db_functions
 		
 		$current_config = $_SESSION['phpgw_info']['expresso']['expressoAdmin'];
 		
-		if ($current_config['expressoAdmin_nextid_db_host'] != '')
+		if ( isset( $current_config['expressoAdmin_nextid_db_host'] ) && $current_config['expressoAdmin_nextid_db_host'] != '' )
 		{
 			$this->db->disconnect();
 			$host = $current_config['expressoAdmin_nextid_db_host'];
@@ -212,6 +212,7 @@ class db_functions
 			$result['msg'] = lang('Error on function') . " db_functions->add_user2group.\n" . lang('Server returns') . ': ' . pg_last_error();
 			return $result;
 		}
+		$user_in_group = array();
 		while($this->db->next_record())
 			$user_in_group[] = $this->db->row();
 		
@@ -413,11 +414,12 @@ class db_functions
 		// Apps
 		$query = "SELECT acl_appname FROM phpgw_acl WHERE acl_account = '".$uidnumber."' AND acl_location = 'run'";
 		$this->db->query($query);
+		$user_apps = array();
 		while($this->db->next_record())
 			$user_apps[] = $this->db->row();
 			
-		if ($user_apps)
-		{			
+		if ( count( $user_apps ) )
+		{
 			foreach ($user_apps as $app)
 			{
 				$return['apps'][$app['acl_appname']] = '1';
@@ -432,16 +434,10 @@ class db_functions
 		// Apps
 		$query = "SELECT acl_appname FROM phpgw_acl WHERE acl_account = '".$gidnumber."' AND acl_location = 'run'";
 		$this->db->query($query);
-		while($this->db->next_record())
-			$group_apps[] = $this->db->row();
 		
-		if ($group_apps)
-		{			
-			foreach ($group_apps as $app)
-			{
-				$return['apps'][$app['acl_appname']] = '1';
-			}
-		}
+		$group_apps = array();
+		while( $this->db->next_record() ) $group_apps[] = $this->db->row();
+		foreach ( $group_apps as $app ) $return['apps'][$app['acl_appname']] = '1';
 		
 		// Members
 		$query = "SELECT acl_account FROM phpgw_acl WHERE acl_appname = 'phpgw_group' AND acl_location = '" . $gidnumber . "'";

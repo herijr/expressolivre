@@ -887,7 +887,7 @@
 			{
 				foreach ( $radius_conf->profiles as $radiuskey => $value )
 				{
-					if ( isset($value['radiusGroupName']) && !$this->functions->isMembership($value['radiusGroupName']) )
+					if ( isset($value['radiusGroupName']) && isset( $new_values['radius_option_selected'] ) && !$this->functions->isMembership($value['radiusGroupName']) )
 					{
 						$key = array_search( $radiuskey, $new_values['radius_option_selected'] );
 						if ( in_array( $radiuskey, $old_values[$radius_conf->groupname_attribute] ) )
@@ -1332,23 +1332,26 @@
 					return array( 'status' => true, 'msg' => $this->functions->lang("Can not login sieve").'.' );
 				
 				$sieve->sieve_listscripts();
-				$myactivescript = $sieve->response["ACTIVE"];
-				$sieve->sieve_getscript( $myactivescript );
 				
-				$script = '';
-				if ( !empty($sieve->response) ) foreach ( $sieve->response as $line ) $script .= $line;
-				
-				if ( !empty($script) ) {
+				if ( !$sieve->error ) {
+					$myactivescript = $sieve->response["ACTIVE"];
+					$sieve->sieve_getscript( $myactivescript );
 					
-					if ( !$sieve->sieve_sendscript( $new_uid, $script) )
-						return array( 'status' => true, 'msg' => $this->functions->lang('Problem saving sieve script').'.' );
+					$script = '';
+					if ( !empty($sieve->response) ) foreach ( $sieve->response as $line ) $script .= $line;
 					
-					if ( !$sieve->sieve_setactivescript( $new_uid ) )
-						return array( 'status' => true, 'msg' => $this->functions->lang('Problem activating sieve script').'.' );
-					
-					if ( !$sieve->sieve_deletescript( $myactivescript ) )
-						return array( 'status' => true, 'msg' => $this->functions->lang('Problem deleting old script').'.' );
-					
+					if ( !empty($script) ) {
+						
+						if ( !$sieve->sieve_sendscript( $new_uid, $script) )
+							return array( 'status' => true, 'msg' => $this->functions->lang('Problem saving sieve script').'.' );
+						
+						if ( !$sieve->sieve_setactivescript( $new_uid ) )
+							return array( 'status' => true, 'msg' => $this->functions->lang('Problem activating sieve script').'.' );
+						
+						if ( !$sieve->sieve_deletescript( $myactivescript ) )
+							return array( 'status' => true, 'msg' => $this->functions->lang('Problem deleting old script').'.' );
+						
+					}
 				}
 				$sieve->sieve_logout();
 			}

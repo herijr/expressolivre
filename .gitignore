@@ -2,6 +2,8 @@
 /.settings
 /.buildpath
 /.classpath
+/.htaccess
+/bootstrap.php
 /api/config/profileCreateUser.ini
 /api/config/profileHomeServer.ini
 /api/old_versions/*/config/profileCreateUser.ini

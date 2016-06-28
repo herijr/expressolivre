@@ -1,15 +1,37 @@
 <!-- BEGIN list -->
 <script src="prototype/plugins/jquery/jquery-latest.min.js"></script>
-
+<script>
+	function refresh_grp_of_names() {
+		if ( $('input[name=grp_of_names]')[0].checked ) {
+			$('form').addClass('grp_of_names');
+			$('#grp_of_names_type').show();
+		} else {
+			$('form').removeClass('grp_of_names')
+			$('#grp_of_names_type').hide();
+		}
+	}
+</script>
+<style>
+	.hide, form.grp_of_names table.grp_of_names th, form.grp_of_names div.grp_of_names {
+		display: none;
+	}
+	form.grp_of_names table.grp_of_names th:first-child {
+		display: block !important;
+	}
+	div.align-middle input, div.align-middle spam {
+		vertical-align: middle;
+	}
+</style>
 
 <center>
-<form action="{form_action}" method="POST" name="app_form">
-<input type="hidden" name="gidnumber"			value="{gidnumber}">
-<input type="hidden" name="defaultDomain"		value="{defaultDomain}">
-<input type="hidden" name="manager_context"		value="{manager_context}">
-<input type="hidden" name="ldap_context" value="{ldap_context}">
+<form action="{form_action}" method="POST" name="app_form" class="{class_form}">
+<input type="hidden" name="defaultDomain"       value="{defaultDomain}">
+<input type="hidden" name="dn"                  value="{dn}">
+<input type="hidden" name="gidnumber"           value="{gidnumber}">
+<input type="hidden" name="ldap_context"        value="{ldap_context}">
+<input type="hidden" name="manager_context"     value="{manager_context}">
 <br>
-<table width="90%" border="0" cellspacing="0" cellpading="0">
+<table width="90%" border="0" cellspacing="0" cellpading="0" class="grp_of_names">
 	<tr>
 		<th id="tab1" class="activetab" onclick="javascript:tab.display(1);">
 			<a href="#" tabindex="0" accesskey="1" onfocus="tab.display(1);" onclick="tab.display(1); return(false);">
@@ -47,9 +69,19 @@
 							
 				{lang_group_name}: <font color="blue">Ex: grupo-celepar-rh</font><br>
 				<input name="cn" size="35" value="{cn}" autocomplete="off" onblur="javascript:groupEmailSuggestion('{concatenateDomain}')"><br>
-							
-				{lang_email}:<br>
-				<input name="email" size="60" value="{email}" {disable_email_groups} autocomplete="off"><br>
+
+				<div class="align-middle {class_div_radio}">
+					<spam>{lang_external_group}? </spam>
+					<input type="checkbox" name="grp_of_names" onChange="refresh_grp_of_names()" {grp_of_names_value}>
+					<div id="grp_of_names_type" class="align-middle" style="display:none;">
+						<input type="radio" name="grp_of_names_type" value="groupOfNames" {grp_of_names_type_1_value}><spam>{lang_groupOfNames}</spam>
+						<input type="radio" name="grp_of_names_type" value="groupOfUniqueNames" {grp_of_names_type_2_value}><spam>{lang_groupOfUniqueNames}</spam>
+					</div>
+				</div>
+				<div class="grp_of_names">
+					{lang_email}:<br>
+					<input name="email" size="60" value="{email}" {disable_email_groups} autocomplete="off"><br>
+				</div>
 				{lang_description}:<br>
 				<input name="description" size="60" value="{description}" autocomplete="off"><br>
 							
@@ -71,9 +103,12 @@
 						</tr>
 					</table>
 				</div>
-							
-				{lang_do_not_show_this_group}? <input type="checkbox" {phpgwaccountvisible_checked} name="phpgwaccountvisible"><br>							
-							
+
+				<div class="grp_of_names align-middle">
+					<spam>{lang_do_not_show_this_group}? </spam>
+					<input type="checkbox" {phpgwaccountvisible_checked} name="phpgwaccountvisible">
+				</div>
+
 				<b>{lang_group_users} (<font color=red>{user_count}</font>):</b>
 				<button type="button" onClick="javascript:popup_group_info();">{lang_text}</button>
 				<br>
@@ -97,7 +132,10 @@
 				<select name="org_context" id="ea_combo_org_groups" onchange="javascript:get_available_users(this.value, ea_check_allUsers.checked);">{combo_all_orgs}</select>
 							
 				<br>
-				<input type="checkbox" name="ea_check_allUsers" id="ea_check_allUsers" onclick="javascript:get_available_users(document.forms[0].org_context[0].value, this.checked);">{lang_show_users_from_all_sub-organizations}.
+				<div class="align-middle">
+					<input type="checkbox" name="ea_check_allUsers" id="ea_check_allUsers" onclick="javascript:get_available_users(document.forms[0].org_context[0].value, this.checked);">
+					<spam>{lang_show_users_from_all_sub-organizations}.</spam>
+				</div>
 				<br><br>
 							
 				{lang_search_user}:<br>

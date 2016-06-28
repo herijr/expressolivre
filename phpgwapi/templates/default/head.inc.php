@@ -25,13 +25,14 @@
 		. $GLOBALS['phpgw_info']['theme']['alink'] . '" link="' . $GLOBALS['phpgw_info']['theme']['link'] . '" vlink="'
 		. $GLOBALS['phpgw_info']['theme']['vlink'] . '"';
 
-	if(!$GLOBALS['phpgw_info']['server']['htmlcompliant'])
+	if(!( isset( $GLOBALS['phpgw_info']['server']['htmlcompliant'] ) && $GLOBALS['phpgw_info']['server']['htmlcompliant'] ))
 	{
 		$bodyheader .= '';
 	}
 	$currentapp = $GLOBALS['phpgw_info']['flags']['currentapp'] ;
 	
 	#_debug_array($GLOBALS['phpgw_info']['user']['preferences']['common']);
+	if ( !isset( $GLOBALS['phpgw_info']['server']['webserver_url'] ) ) $GLOBALS['phpgw_info']['server']['webserver_url'] = '';
 
 	//pngfix defaults to yes
 	if(!$GLOBALS['phpgw_info']['user']['preferences']['common']['disable_pngfix'])
@@ -86,22 +87,22 @@
 		$webserver_url . $currentapp . '/templates/'.$tmpDefault.'/images/navbar.png' : 'favicon.ico';
 	
 	$var = Array(
-		'img_icon'          => $img_icon,
-		'img_shortcut'      => $img_icon,
-		'pngfix'        	=> $pngfix,
-		'slider_effects'	=> $slider_effects,
-		'simple_show_hide'	=> $simple_show_hide,
-		'lang_code'			=> $lang_code,
-		'charset'       	=> $GLOBALS['phpgw']->translation->charset(),
-		'font_family'   	=> $GLOBALS['phpgw_info']['theme']['font'],
-		'website_title' 	=> $GLOBALS['phpgw_info']['server']['site_title'].$app,
-		'body_tags'     	=> $bodyheader .' '. $GLOBALS['phpgw']->common->get_body_attribs(),
-		'css'           	=> $GLOBALS['phpgw']->common->get_css(),
-		'java_script'   	=> $GLOBALS['phpgw']->common->get_java_script(),
-		'cookie_manager'	=>	$cookie_manager,
-		'webserver_url'		=> $webserver_url
+		'img_icon'         => $img_icon,
+		'img_shortcut'     => $img_icon,
+		'pngfix'           => isset( $pngfix )? $pngfix : '',
+		'slider_effects'   => isset( $slider_effects )? $slider_effects : '',
+		'simple_show_hide' => isset( $simple_show_hide )? $simple_show_hide : '',
+		'lang_code'        => $lang_code,
+		'charset'          => $GLOBALS['phpgw']->translation->charset(),
+		'font_family'      => $GLOBALS['phpgw_info']['theme']['font'],
+		'website_title'    => $GLOBALS['phpgw_info']['server']['site_title'].$app,
+		'body_tags'        => $bodyheader .' '. $GLOBALS['phpgw']->common->get_body_attribs(),
+		'css'              => $GLOBALS['phpgw']->common->get_css(),
+		'java_script'      => $GLOBALS['phpgw']->common->get_java_script(),
+		'cookie_manager'   => $cookie_manager,
+		'webserver_url'    => $webserver_url
 	);
 	$tpl->set_var($var);
 	$tpl->pfp('out','head');
 	unset($tpl);
-?>
+

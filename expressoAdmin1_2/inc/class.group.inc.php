@@ -43,517 +43,435 @@
 		{
 			return $this->ldap_functions->validate_fields_group($params);
 		}
-		
-		function create($params)
+
+		function create( $params )
 		{
 			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'add_groups'))
-			{
-				$return['status'] = false;
-				$return['msg'] = lang('You do not have access to create new groups') . '.';
-				return $return;
-			}
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'add_groups' ) )
+				return array( 'status' => false, 'msg' => lang( 'You do not have access to create new groups' ).'.' );
 			
-			$return['status'] = true;
-
-			//Retira os uids duplicados se existir
-			$array_tmp = array();
-			$array_tmp = @array_unique($params['members']);
-			$params['members'] = $array_tmp;
-
-			// Leio o ID a ser usado na criação do objecto.
-			$next_id = ($this->db_functions->get_next_id('groups'));
-			if ((!is_numeric($next_id['id'])) || (!$next_id['status']))
-			{
-				$return['status'] = false;
-				$return['msg'] = lang('Problems getting  group ID') . ':' . $next_id['msg'];
-				return $return;
-			}
-			else
-			{
-				$id = $next_id['id'];
-			}
+			// Trim all fields
+			array_walk_recursive( $params, function( &$str ){ $str = trim( $str ); } );
+			
+			$result = $this->ldap_functions->validate_fields_group2( array( 'attributes' => serialize( array_merge( $params, array( 'type' => 'create_group' ) ) ) ) );
+			if ( !( isset( $result['status'] ) && $result['status'] ) ) return $result;
+			
+			$cn              = $params['cn'];
+			$dn              = 'cn='.$cn.','.$params['context'];
+			$isPhpgwAccount  = !isset( $params['grp_of_names'] );
+			$isUniqueMembers = isset( $params['grp_of_names_type'] ) && $params['grp_of_names_type'] === 'groupOfUniqueNames';
+			$member_attr     = $isPhpgwAccount? 'memberUid' : ( $isUniqueMembers? 'uniqueMember' : 'member' );
 			
 			// Cria array para incluir no LDAP
-			$dn = 'cn=' . $params['cn'] . ',' . $params['context'];
+			$group_info = array(
+				'objectClass' => array(
+					'top',
+					$isPhpgwAccount? 'posixGroup' : 'groupOf'.( $isUniqueMembers? 'Unique' : '' ).'Names',
+				),
+				'cn'          => $cn,
+				'description' => utf8_encode( $params['description'] ),
+			);
 			
-			$group_info = array();
-			$group_info['cn']					= $params['cn'];
-			$group_info['description']			= utf8_encode($params['description']);
-			$group_info['gidNumber']			= $id;
-			$group_info['objectClass'][]		= 'top';
-			$group_info['objectClass'][]		= 'posixGroup';
-			$group_info['objectClass'][]		= 'phpgwAccount';
-			$group_info['phpgwAccountExpires']	= '-1';
-			$group_info['phpgwAccountType']		= 'g';
-			$group_info['userPassword']			= '';
+			if ( isset( $params['members'] ) && is_array( $params['members'] ) && count( $params['members'] ) ) {
+				$uidnumber2method         = $isPhpgwAccount? 'uidnumber2uid' : 'uidnumber2dn';
+				$group_info[$member_attr] = $members= array();
+				foreach ( array_unique( $params['members'] ) as $uidnumber )
+					$group_info[$member_attr][] = $members[$uidnumber] = $this->ldap_functions->$uidnumber2method( $uidnumber );
+			} else if ( !$isPhpgwAccount ) $group_info[$member_attr] = null;
 			
-			// E-mail for groups
-			if ($params['email'] != '')
-				$group_info['mail'] = $params['email'];
-			
-			if ( (count($params['members'])) && (is_array($params['members'])) )
-			{
-				foreach ($params['members'] as $index => $uidnumber)
-				{
-					$uid = $this->ldap_functions->uidnumber2uid($uidnumber);
-					$group_info['memberuid'][] = $uid;
-					
-					// Chama funcao para incluir os uidnumbers dos usuarios no grupo
-					$result = $this->db_functions->add_user2group($id, $uidnumber);
-					
-					$this->db_functions->write_log("Added user to group on group criation", $group_info['cn'] . ": " . $uid);
+			if ( $isPhpgwAccount ) {
+				
+				// Leio o ID a ser usado na criação do objecto.
+				$result = $this->db_functions->get_next_id( 'groups' );
+				if ( !( is_numeric( $result['id'] ) && $result['status'] ) )
+					return array( 'status' => false, 'msg' => lang( 'Problems getting  group ID' ).':'.$result['msg'] );
+				
+				$group_info['gidNumber'] = $id     = $result['id'];
+				$group_info['objectClass'][]       = 'phpgwAccount';
+				$group_info['phpgwAccountExpires'] = '-1';
+				$group_info['phpgwAccountType']    = 'g';
+				$group_info['userPassword']        = '';
+				
+				if ( isset( $params['email'] ) && $params['email'] != '' ) $group_info['mail']                   = $params['email'];
+				if ( isset( $params['phpgwaccountvisible'] )             ) $group_info['phpgwaccountvisible']    = '-1';
+				if ( isset( $params['accountrestrictive'] )              ) $group_info['accountrestrictive']     = 'mailListRestriction';
+				if ( isset( $params['participantcansendmail'] )          ) $group_info['participantcansendmail'] = 'TRUE';
+				
+				// Suporte ao SAMBA
+				if ( ( $this->current_config['expressoAdmin_samba_support'] == 'true' ) && isset( $params['use_attrs_samba'] ) ) {
+					$group_info['objectClass'][]  = 'sambaGroupMapping';
+					$group_info['sambaSID']       = $params['sambasid'].'-'.( ( $id * 2 ) + 1001 );
+					$group_info['sambaGroupType'] = '2';
+				}
+				
+				// Sending Control Mail
+				if ( isset( $params['members_scm'] ) && is_array( $params['members_scm'] ) && count( $params['members_scm'] ) ) {
+					$group_info['mailsenderaddress'] = array();
+					foreach ( array_unique( $params['members_scm'] ) as $uidnumber )
+						$group_info['mailsenderaddress'][] = $this->ldap_functions->uidnumber2mail( $uidnumber );
 				}
 			}
 			
-			// Suporte ao SAMBA
-			if (($this->current_config['expressoAdmin_samba_support'] == 'true') && ($params['use_attrs_samba'] == 'on'))
-			{
-				$group_info['objectClass'][]  = 'sambaGroupMapping';
-				$group_info['sambaSID']		  = $params['sambasid'] . '-' . (($id * 2) + 1001);
-				$group_info['sambaGroupType'] = '2';
+			$result = $this->ldap_functions->ldap_add_entry( $dn, $group_info );
+			if ( !( isset( $result['status'] ) && $result['status'] ) ) {
+				return array( 'status' => false,
+					'msg' => ( $result['error_number'] !== 65 ) ? $result['msg'] :
+						lang( 'It was not possible create the group because the LDAP schemas are not update' )."\n".
+						lang( 'The administrator must update the directory /etc/ldap/schema/ and re-start LDAP' )."\n".
+						lang( 'A updated version of these files can be found here' ).":\n".
+						'www.expressolivre.org -> Downloads -> schema.tgz',
+				);
 			}
 			
-			// ADD ATTRIBUTES
-			if ($params['phpgwaccountvisible'] == 'on')
-			{
-				$group_info['phpgwaccountvisible'] = '-1';
-			}
-			// PERSONAL DATA FIELDS TO BLOCK.
-			if(is_array($params['acl_block_personal_data'])){
-				$acl_personal_data = 0;
-				foreach($params['acl_block_personal_data'] as $i => $data_field){
-					$acl_personal_data |= intval($data_field);
-				}
-				$this->db_functions->save_acl_personal_data($id, $acl_personal_data, 'add');
-			}
-			
-			// Sending Control Mail
-			if ($params['accountrestrictive'] == 'on')
-			{
-				$group_info['accountrestrictive'] = 'mailListRestriction';
-			}
-			if ($params['participantcansendmail'] == 'on')
-			{
-				$group_info['participantcansendmail'] = 'TRUE';
-			}
-			if ( (count($params['members_scm'])) && (is_array($params['members_scm'])) )
-			{
-				foreach ($params['members_scm'] as $index => $uidnumber)
-				{
-					$mail = $this->ldap_functions->uidnumber2mail($uidnumber);
-					$group_info['mailsenderaddress'][] = $mail;
-					
-					$this->db_functions->write_log("Allowed user to send e-mail to group", $group_info['cn'] . ": " . $mail);
+			if ( $isPhpgwAccount ) {
+				
+				// Sending control mail log
+				if ( isset( $group_info['mailsenderaddress'] ) )
+					foreach ( $group_info['mailsenderaddress'] as $mail )
+						$this->db_functions->write_log( 'Allowed user to send e-mail to group', $cn.': '.$mail );
+				
+				// Save personal acl on database
+				if ( isset( $params['acl_block_personal_data'] ) && is_array( $params['acl_block_personal_data'] ) && count( $params['acl_block_personal_data'] ) )
+					$this->db_functions->save_acl_personal_data( $id, array_reduce( $params['acl_block_personal_data'], function( $a, $b ) { return $a |= intval( $b ); } ), 'add' );
+				
+				// Chama funcao para incluir os aplicativos ao grupo
+				if ( isset( $params['apps'] ) && is_array( $params['apps'] ) && count( $params['apps'] ) )
+					$this->db_functions->add_id2apps( $id, $params['apps'] );
+				
+				// Save group members on database
+				if ( isset( $members ) ) {
+					foreach ( $members as $uidnumber => $uid ) {
+						$this->db_functions->add_user2group( $id, $uidnumber );
+						$this->db_functions->write_log( 'Added user to group on group criation', $cn.': '.$uid );
+					}
 				}
 			}
 			
-			$result = $this->ldap_functions->ldap_add_entry($dn, $group_info);
-			if (!$result['status'])
-			{
-				$return['status'] = false;
-				if ($result['error_number'] == '65')
-				{
-					$return['msg'] .= lang("It was not possible create the group because the LDAP schemas are not update") . "\n" .
-									  lang("The administrator must update the directory /etc/ldap/schema/ and re-start LDAP") . "\n" .
-									  lang("A updated version of these files can be found here") . ":\n" .
-										"www.expressolivre.org -> Downloads -> schema.tgz";
-				}
-				else
-					$return['msg'] .= $result['msg'];
-			}
-			
-			// Chama funcao para incluir os aplicativos ao grupo
-			$result = $this->db_functions->add_id2apps($id, $params['apps']);
-			if (!$result['status'])
-			{
-				$return['status'] = false;
-				$return['msg'] .= $result['msg'];
-			}
-			
-			if ($return['status'] == true)
-			{
-				$this->db_functions->write_log("Created group",$dn);
-			}
-			
-			return $return;
+			$this->db_functions->write_log( 'Created group', $dn );
+			return array( 'status' => true );
 		}
-		
-		function save($new_values)
+
+		function save( $new_values )
 		{
-			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_groups'))
-			{
-				$return['status'] = false;
-				$return['msg'] = lang('You do not have access to edit groups') . '.';
-				return $return;
+			// Check manager access
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'edit_groups' ) )
+				return array( 'status' => false, 'msg' => lang( 'You do not have access to edit groups' ).'.' );
+			
+			// Check valid DN
+			$dn = $new_values['dn'];
+			if ( ( $group_type = $this->get_type( $dn ) ) === false )
+				return array( 'status' => false, 'msg' => lang( 'Object not found' ).': '.$dn );
+			
+			// Trim all fields
+			array_walk_recursive( $new_values, function( &$str ){ $str = trim( $str ); } );
+			
+			$isPhpgwAccount  = $group_type['type'] === 0;
+			$member_attr     = $isPhpgwAccount? 'memberUid' : ( $group_type['type'] === 2? 'uniqueMember' : 'member' );
+			$old_values      = $isPhpgwAccount? $this->get_info( $group_type['gidnumber'] ) : $this->get_info_groupOfNames( $dn );
+			$diff            = array_diff( $new_values, $old_values );
+			
+			if ( $isPhpgwAccount && isset( $diff['email'] ) && ( !empty( $new_values['email'] ) &&
+				ldap_count_entries( $this->ldap_functions->ldap,
+					ldap_search( $this->ldap_functions->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], '(mail='.$new_values['email'].')', array() )
+				) > 0
+			) ) return array( 'status' => false, 'msg' => lang( 'E-mail already in use' ).'.' );
+			
+			/**
+			 * Rename group and/or move group in directory
+			 */
+			if ( ( strcasecmp( $old_values['cn'], $new_values['cn'] ) != 0 ) || ( strcasecmp( $old_values['context'], $new_values['context'] ) != 0 ) ) {
+				$result = $this->ldap_functions->change_user_context( $dn, 'cn='.$new_values['cn'], $new_values['context'] );
+				if ( !( isset( $result['status'] ) && $result['status'] ) )
+					return array( 'status' => false, 'msg' => $result['msg'] );
+				$dn = 'cn='.$new_values['cn'].','.$new_values['context'];
+				$this->db_functions->write_log( 'Renamed group', $old_values['cn'].' -> '.$dn );
 			}
 			
-			$return['status'] = true;
-
-			//Retira os uids duplicados se existir
-			if ($new_values['members'])
-			{
-				$array_tmp = array();
-				$array_tmp = array_unique($new_values['members']);
-				$new_values['members'] = $array_tmp;
-			}
-						
-			$old_values = $this->get_info($new_values['gidnumber'], $new_values['manager_context']);
-			echo '<pre>';
-			print_r($old_values);
+			//==========================================================================================================
+			//= EDIT ATTRIBUTES ========================================================================================
+			//==========================================================================================================
 			
-			$diff = array_diff($new_values, $old_values);
+			$ldap_mod_add = $ldap_mod_del = $ldap_mod_replace = array();
 			
-			if ($diff['email'])
-			{
-				$search = ldap_search($this->ldap_functions->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], "(mail=".$new_values['email'].")", array("1.1"));
-				$count_entries = ldap_count_entries($this->ldap_functions->ldap,$search);
-				if ($count_entries > 0)
-				{
-					$return['status'] = false;
-					if (function_exists(lang))
-						$return['msg'] = lang('E-mail already in use') . '.';
-					else
-						$return['msg'] = 'E-mail already in use' . '.';
-					
-					return $return;
-				}	
+			/**
+			 * Description changes
+			 */
+			if ( $new_values['description'] != $old_values['description'] ) {
+				$ldap_mod_replace['description'] = utf8_encode( $new_values['description'] );
+				$this->db_functions->write_log( 'modified group description', $dn.': '.$old_values['description'].'->'.$new_values['description'] );
 			}
 			
-			$dn = 'cn=' . $old_values['cn'] . ',' . $old_values['context'];
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// RENAME
-			if ( (strcasecmp($old_values['cn'], $new_values['cn']) != 0) || (strcasecmp($old_values['context'], $new_values['context']) != 0) )
-			{
-				$newrdn = 'cn=' . $new_values['cn'];
-				$newparent = $new_values['context'];
-				$result =  $this->ldap_functions->change_user_context($dn, $newrdn, $newparent);
-				if (!$result['status'])
-				{
-					$return['status'] = false;
-					$return['msg'] .= $result['msg'];
-				}
-				else
-				{
-					$dn = $newrdn . ',' . $newparent;
-					$this->db_functions->write_log('Renamed group', $old_values['cn'] . '->' . $dn);
-				}
-			}
-			
-			$ldap_mod_replace = array();
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// REPLACE SAMBASID OF SAMBA
-			if ( ($this->current_config['expressoAdmin_samba_support'] == 'true') && ($diff['sambasid']) && ($old_values['sambasid']))
-			{
-				$ldap_mod_replace['sambasid'] = $new_values['sambasid'] . '-' . ((2 * $new_values['gidnumber'])+1001);
-				$this->db_functions->write_log('modified group samba domain', $dn . ': ' . $old_values['sambasid'] . '->' . $new_values['sambasid']);
+			/**
+			 * Members changes
+			 */
+			// Normalize members arrays
+			$new_members = array_unique( (array)$new_values['members'] );
+			$old_members = array_unique( (array)array_map( function( $n ) { return $n['uidnumber']; }, $old_values['memberuid_info'] ) );
+			sort( $new_members );
+			sort( $old_members );
+			if ( $new_members !== $old_members ) {
+				$uidnumber2method = $isPhpgwAccount? 'uidnumber2uid' : 'uidnumber2dn';
 				
-			}
-			
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// REPLACE DESCRIPTION
-			if ($new_values['description'] != $old_values['description'])
-			{
-				$ldap_mod_replace['description'] = utf8_encode($new_values['description']);
-				$this->db_functions->write_log('modified group description',$dn . ': ' . $old_values['description'] . '->' . $new_values['description'] );
-			}
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// REPLACE E-Mail
-			if ((($old_values['email']) && ($diff['email'])) && 
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_email_groups'))
-			{
-				$ldap_mod_replace['mail'] = $new_values['email'];
-				$this->db_functions->write_log('modified group email', $dn . ': ' . $old_values['email'] . '->' . $new_values['email']);
-			}
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// REPLACE SCM USERs: always
-			if ( (count($new_values['members_scm'])) && (is_array($new_values['members_scm'])) )
-			{
-				foreach ($new_values['members_scm'] as $index => $uidnumber)
-				{
-					$mail = $this->ldap_functions->uidnumber2mail($uidnumber);
-					$ldap_mod_replace['mailsenderaddress'][] = $mail;
-					
-					$this->db_functions->write_log("Allowed user to send e-mail to group", $group_info['cn'] . ": " . $mail);
+				// Make add member array
+				$add_diff = array_diff( $new_members, $old_members );
+				if ( count( $add_diff ) ) {
+					$add_members = array();
+					foreach ( $add_diff as $uidnumber )
+						$add_members[$uidnumber] = $this->ldap_functions->$uidnumber2method( $uidnumber );
+					// If the member is empty, use mod replace instead mod add
+					if ( count( $old_members ) ) $ldap_mod_add[$member_attr] = array_values( $add_members );
+					else $ldap_mod_replace[$member_attr] = array_values( $add_members );
 				}
-			}
-			else
-			{
-				$ldap_mod_replace['mailsenderaddress'] = array();
-			}
-			
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// CALL LDAP_REPLACE FUNCTION
-			if (count($ldap_mod_replace))
-			{
-				$result = $this->ldap_functions->replace_user_attributes($dn, $ldap_mod_replace);
-				if (!$result['status'])
-				{
-					$return['status'] = false;
-					if ($result['error_number'] == '65')
-					{
-						$return['msg'] .= lang("It was not possible create the group because the LDAP schemas are not update") . "\n" .
-										  lang("The administrator must update the directory /etc/ldap/schema/ and re-start LDAP") . "\n" .
-										  lang("A updated version of these files can be found here") . ":\n" .
-											"www.expressolivre.org -> Downloads -> schema.tgz";
-					}
-					else
-						$return['msg'] .= $result['msg'];
-				}
-			}			
-			
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// REMOVE ATTRS OF SAMBA
-			if (($this->current_config['expressoAdmin_samba_support'] == 'true') && ($old_values['sambaGroup']) && ($new_values['use_attrs_samba'] != 'on'))
-			{
-				$ldap_remove['objectclass'] 	= 'sambaGroupMapping';	
-				$ldap_remove['sambagrouptype']	= array();
-				$ldap_remove['sambaSID']		= array();
 				
-				$result = $this->ldap_functions->remove_user_attributes($dn, $ldap_remove);
-				if (!$result['status'])
-				{
-					$return['status'] = false;
-					$return['msg'] .= $result['msg'];
+				// Make remove member array
+				$rem_diff = array_diff( $old_members, $new_members );
+				if ( count( $rem_diff ) ) {
+					$rem_members = array();
+					foreach ( $rem_diff as $uidnumber )
+						$rem_members[$uidnumber] = $this->ldap_functions->$uidnumber2method( $uidnumber );
+					// If the member is empty, use mod replace instead mod del
+					if ( count( $new_members ) ) $ldap_mod_del[$member_attr] = array_values( $rem_members );
+					else $ldap_mod_replace[$member_attr] = $isPhpgwAccount? array() : null;
 				}
-				else
-					$this->db_functions->write_log('removed group samba attributes',$dn);
-			}
-
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// ADD ATTRS OF SAMBA
-			if (($this->current_config['expressoAdmin_samba_support'] == 'true') && (!$old_values['sambaGroup']) && ($new_values['use_attrs_samba'] == 'on'))
-			{
-				$ldap_add['objectClass'][] 		= 'sambaGroupMapping';
-				$ldap_add['sambagrouptype']		= '2';
-				$ldap_add['sambasid']			= $new_values['sambasid'] . '-' . ((2 * $new_values['gidnumber'])+1001);
-					
-				$result = $this->ldap_functions->add_user_attributes($dn, $ldap_add);
-				if (!$result['status'])
-				{
-					$return['status'] = false;
-					$return['msg'] .= $result['msg'];
-				}
-				else
-					$this->db_functions->write_log('Added samba attibutes to group',$dn);
 			}
 			
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// ADD ATTRIBUTES
-			$ldap_add = array();
-			if (($new_values['phpgwaccountvisible'] == 'on') && ($old_values['phpgwaccountvisible'] != '-1'))
-			{
-				$ldap_add['phpgwaccountvisible'] = '-1';
-				$this->db_functions->write_log("added attribute phpgwAccountVisible to group",$dn);
-			}
-			if ((($new_values['email']) && (!$old_values['email'])) &&
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_email_groups'))
-			{
-				$ldap_add['mail'] = $new_values['email'];
-				$this->db_functions->write_log("added attribute mail to group",$dn);
-			}
-			
-			if ((($new_values['accountrestrictive'] == 'on') && ($old_values['accountrestrictive'] == '')) && 
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_groups'))
-			{
-				$ldap_add['accountrestrictive'] = 'mailListRestriction';
-				$this->db_functions->write_log("added Sending Control Mail restriction",$dn);
-			}
-
-			if ((($new_values['participantcansendmail'] == 'on') && ($old_values['participantcansendmail'] == '')) && 
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_groups'))
-			{
-				$ldap_add['participantcansendmail'] = 'TRUE';
-				$this->db_functions->write_log("added participantCanSendmail restriction",$dn);
-			}
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// CALL LDAP_ADD FUNCTION			
-			if (count($ldap_add))
-			{
-				$result = $this->ldap_functions->add_user_attributes($dn, $ldap_add);
-				if (!$result['status'])
-				{
-					$return['status'] = false;
-					if ($result['error_number'] == '65')
-					{
-						$return['msg'] .= lang("It was not possible create the group because the LDAP schemas are not update") . "\n" .
-										  lang("The administrator must update the directory /etc/ldap/schema/ and re-start LDAP") . "\n" .
-										  lang("A updated version of these files can be found here") . ":\n" .
-											   "www.expressolivre.org -> Downloads -> schema.tgz";
-					}									
-					else
-						$return['msg'] .= $result['msg'];
-				}
-			}
-						
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// REMOVE ATTRIBUTES
-			$ldap_remove = array();
-			if (($new_values['phpgwaccountvisible'] != 'on') && ($old_values['phpgwaccountvisible'] == '-1'))
-			{
-				$ldap_remove['phpgwaccountvisible'] = array();
-				$this->db_functions->write_log("removed attribute phpgwAccountVisible from group",$dn);
-			}
-			if (((!$new_values['email']) && ($old_values['email'])) &&
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_email_groups'))
-			{
-				$ldap_remove['mail'] = array();
-				$this->db_functions->write_log("removed attribute mail from group",$dn);
-			}
-
-			if ((($new_values['accountrestrictive'] != 'on') && ($old_values['accountrestrictive'] == 'mailListRestriction')) && 
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_groups'))
-			{
-				$ldap_remove['accountrestrictive'] = array();
-				$this->db_functions->write_log("removed Sending Control mail restriction",$dn);
-			}
-
-			if ((($new_values['participantcansendmail'] != 'on') && ($old_values['participantcansendmail'] == 'TRUE')) && 
-				$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],'edit_groups'))
-			{
-				$ldap_remove['participantcansendmail'] = array();
-				$this->db_functions->write_log("removed participantCanSendmail restriction",$dn);
-			}
-			
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// CALL LDAP_REMOVED FUNCTION			
-			if (count($ldap_remove))
-			{
-				$result = $this->ldap_functions->remove_user_attributes($dn, $ldap_remove);
-				if (!$result['status'])
-				{
-					$return['status'] = false;
-					$return['msg'] .= $result['msg'];
-				}
-			}
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// USERS
-
-			if (!$new_values['members'])
-				$new_values['members'] = array();
-			if (!$old_values['members'])
-				$old_values['members'] = array();
-
-			$add_users = array_diff($new_values['members'], $old_values['members']);
-			$remove_users = array_diff($old_values['members'], $new_values['members']);
-
-			if (count($add_users)>0)
-			{
-				$array_memberUids_add = array();
-				foreach($add_users as $uidnumber)
-				{
-					if (is_numeric($uidnumber) && ($uidnumber != -1))
-					{
-						$this->db_functions->add_user2group($new_values['gidnumber'], $uidnumber);
-						$user = $this->ldap_functions->uidnumber2uid($uidnumber);
-						$array_memberUids_add[] = $user;
-						$this->db_functions->write_log("included user to group","dn:$dn -> uid:$user");
+			if ( $isPhpgwAccount ) {
+				
+				// Edit email ------------------------------------------------------------------------------------------
+				if (
+					$new_values['email'] != $old_values['email'] &&
+					$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'edit_email_groups' )
+				) $ldap_mod_replace['mail'] = ( empty( $new_values['email'] ) )? array() : $new_values['email'];
+				
+				// Edit SAMBA ------------------------------------------------------------------------------------------
+				if (
+					// Check config is enabled
+					$this->current_config['expressoAdmin_samba_support'] == 'true' &&
+					(
+						// Check sambaSID changed
+						( $chgSID = ( isset( $new_values['sambasid'] ) && isset( $old_values['sambasid'] ) && $new_values['sambasid'] != $old_values['sambasid'] ) ) ||
+						// Check use samba attributes chenged
+						( isset( $new_values['use_attrs_samba'] ) !== isset( $old_values['sambasid'] ) )
+					)
+				) {
+					$sambaSID = isset( $new_values['sambasid'] )? $new_values['sambasid'].'-'.( ( 2 * $new_values['gidnumber'] ) + 1001 ) : false;
+					// Change SID
+					if ( $chgSID ) $ldap_mod_replace['sambaSID'] = $sambaSID;
+					else {
+						if ( isset( $new_values['use_attrs_samba'] ) ) {
+							// Enable SAMBA
+							$ldap_mod_add['objectClass'][]  = 'sambaGroupMapping';
+							$ldap_mod_add['sambaSID']       = $sambaSID;
+							$ldap_mod_add['sambaGroupType'] = '2';
+						} else {
+							// Disable SAMBA
+							$ldap_mod_del['objectClass'][]  = 'sambaGroupMapping';
+							$ldap_mod_del['sambaSID']       = array();
+							$ldap_mod_del['sambaGroupType'] = array();
+						}
 					}
 				}
-				if (count($array_memberUids_add) > 0)
-					$this->ldap_functions->add_user2group($new_values['gidnumber'], $array_memberUids_add);
-			}
-			if (count($remove_users)>0)
-			{
-				$array_memberUids_remove = array();
-				foreach($remove_users as $uidnumber)
-				{
-					if ($uidnumber != -1)
-					{
-						$this->db_functions->remove_user2group($new_values['gidnumber'], $uidnumber);
-						$user = $this->ldap_functions->uidnumber2uid($uidnumber);
-						$array_memberUids_remove[] = $user;
-						$this->db_functions->write_log("removed user from group","$dn: $user");
+				
+				$checkboxes = array(
+					'phpgwAccountVisible'    => '-1',
+					'accountrestrictive'     => 'mailListRestriction',
+					'participantcansendmail' => 'TRUE',
+				);
+				foreach ( $checkboxes as $key => $value )
+					if ( isset( $new_values[strtolower( $key )] ) === is_null( $old_values[strtolower( $key )] ) )
+						$ldap_mod_replace[$key] = isset( $new_values[strtolower( $key )] )? $value : array();
+				
+				/**
+				 * Members scm changes
+				 */
+				$new_members_scm = array_unique( isset( $new_values['members_scm'] )? (array)$new_values['members_scm'] : array() );
+				$old_members_scm = array_unique( (array)array_map( function( $n ) { return $n['uidnumber']; }, $old_values['memberuid_scm_info'] ) );
+				sort( $new_members_scm );
+				sort( $old_members_scm );
+				if ( $new_members_scm !== $old_members_scm ) {
+					
+					// Make add member scm array
+					$add_diff = array_diff( $new_members_scm, $old_members_scm );
+					if ( count( $add_diff ) ) {
+						$add_members_scm = array();
+						foreach ( $add_diff as $uidnumber )
+							$add_members_scm[$uidnumber] = $this->ldap_functions->uidnumber2mail( $uidnumber );
+						// If the member is empty, use mod replace instead mod add
+						if ( count( $old_members_scm ) ) $ldap_mod_add['mailsenderaddress'] = array_values( $add_members_scm );
+						else $ldap_mod_replace['mailsenderaddress'] = array_values( $add_members_scm );
+					}
+					
+					// Make remove member scm array
+					$rem_diff = array_diff( $old_members_scm, $new_members_scm );
+					if ( count( $rem_diff ) ) {
+						$rem_members_scm = array();
+						foreach ( $rem_diff as $uidnumber )
+							$rem_members_scm[$uidnumber] = $this->ldap_functions->uidnumber2mail( $uidnumber );
+						// If the member is empty, use mod replace instead mod del
+						if ( count( $new_members_scm ) ) $ldap_mod_del['mailsenderaddress'] = array_values( $rem_members_scm );
+						else $ldap_mod_replace['mailsenderaddress'] = array();
 					}
 				}
-				if (count($array_memberUids_remove)>0)
-					$this->ldap_functions->remove_user2group($new_values['gidnumber'], $array_memberUids_remove);
 			}
-			
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// APPS
-			$new_values2 = array();
-			$old_values2 = array();
-			if (count($new_values['apps'])>0)
-			{
-				foreach ($new_values['apps'] as $app=>$tmp)
-				{
-					$new_values2[] = $app;
+			//==========================================================================================================
+			//= LDAP COMMIT ============================================================================================
+			//==========================================================================================================
+			/**
+			 * Call LDAP mod add
+			 */
+			$r_status = true;
+			if ( $r_status && count( $ldap_mod_add ) ) {
+				$result = $this->ldap_functions->add_user_attributes( $dn, $ldap_mod_add );
+				if ( $r_status = ( isset( $result['status'] ) && $result['status'] ) ) {
+					
+					if ( isset( $ldap_mod_add[$member_attr] ) ) {
+						foreach ( $add_members as $uidnumber => $user ) {
+							if ( $isPhpgwAccount ) $this->db_functions->add_user2group( $new_values['gidnumber'], $uidnumber );
+							$this->db_functions->write_log( 'included user to group', $dn.': '.$user );
+						}
+					}
+					
+					if ( isset( $ldap_mod_add['mailsenderaddress'] ) )
+						foreach ( $add_members_scm as $uidnumber => $user )
+							$this->db_functions->write_log( 'included user scm to group', $dn.': '.$user );
+					
+					if ( isset( $ldap_mod_add['objectClass'] ) && in_array( 'sambaGroupMapping', $ldap_mod_add['objectClass'] ) )
+						$this->db_functions->write_log( 'Added samba attibutes to group', $dn.': '.$new_values['sambasid'] );
 				}
 			}
-			if (count($old_values['apps'])>0)
-			{
-				foreach ($old_values['apps'] as $app=>$tmp)
-				{
-					$old_values2[] = $app;
+			
+			/**
+			 * Call LDAP mod del
+			 */
+			if ( $r_status && count( $ldap_mod_del ) ) {
+				$result = $this->ldap_functions->remove_user_attributes( $dn, $ldap_mod_del );
+				if ( $r_status = ( isset( $result['status'] ) && $result['status'] ) ) {
+					
+					if ( isset( $ldap_mod_del[$member_attr] ) ) {
+						foreach ( $rem_members as $uidnumber => $user ) {
+							if ( $isPhpgwAccount ) $this->db_functions->remove_user2group( $new_values['gidnumber'], $uidnumber );
+							$this->db_functions->write_log( 'removed user from group', $dn.': '.$user );
+						}
+					}
+					
+					if ( isset( $ldap_mod_del['mailsenderaddress'] ) )
+						foreach ( $rem_members_scm as $uidnumber => $user )
+							$this->db_functions->write_log( 'removed user scm from group', $dn.': '.$user );
+					
+					if ( isset( $ldap_mod_del['objectClass'] ) && in_array( 'sambaGroupMapping', $ldap_mod_del['objectClass'] ) )
+						$this->db_functions->write_log( 'removed group samba attributes', $dn );
 				}
 			}
 			
-			$add_apps    = array_flip(array_diff($new_values2, $old_values2));
-			$remove_apps = array_flip(array_diff($old_values2, $new_values2));
-
-			if (count($add_apps)>0)
-			{
-				$this->db_functions->add_id2apps($new_values['gidnumber'], $add_apps);
+			/**
+			 * Call LDAP mod replace
+			 */
+			if ( $r_status && count( $ldap_mod_replace ) ) {
+				$result = $this->ldap_functions->replace_user_attributes( $dn, $ldap_mod_replace );
+				$r_status = ( isset( $result['status'] ) && $result['status'] );
+			}
+			
+			//==========================================================================================================
+			//==========================================================================================================
+			//==========================================================================================================
+			
+			/**
+			 * Check error message
+			 */
+			if ( !$r_status ) {
+				return array( 'status' => false,
+					'msg' => ( $result['error_number'] !== 65 ) ? $result['msg'] :
+						lang( 'It was not possible create the group because the LDAP schemas are not update' )."\n".
+						lang( 'The administrator must update the directory /etc/ldap/schema/ and re-start LDAP' )."\n".
+						lang( 'A updated version of these files can be found here' ).":\n".
+						'www.expressolivre.org -> Downloads -> schema.tgz',
+				);
+			}
+			
+			/**
+			 * Log messages from mod replace
+			 */
+			if ( isset( $ldap_mod_replace[$member_attr] ) ) {
 				
-				foreach ($add_apps as $app => $index)
-					$this->db_functions->write_log("added application to group","$app: $dn");
-			}
-			
-			if (count($remove_apps)>0)
-			{
-				//Verifica se o gerente tem acesso a aplicação antes de remove-la do usuario.
-				$manager_apps = $this->db_functions->get_apps($_SESSION['phpgw_session']['session_lid']);
-					
-				foreach ($remove_apps as $app => $app_index)
-				{
-					if ($manager_apps[$app] == 'run')
-						$remove_apps2[$app] = $app_index;
+				foreach ( $add_members as $user ) {
+					if ( $isPhpgwAccount ) $this->db_functions->add_user2group( $new_values['gidnumber'], $uidnumber );
+					$this->db_functions->write_log( 'included user to group', $dn.': '.$user );
 				}
-				$this->db_functions->remove_id2apps($new_values['gidnumber'], $remove_apps2);
-					
-				foreach ($remove_apps2 as $app => $access)
-					$this->db_functions->write_log("removed application from group","$app: $dn");
-			}
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// PERSONAL DATA FIELDS TO BLOCK.
-			$old_acl_personal_data = intval($old_values['acl_block_personal_data']);
-			$new_acl_personal_data = 0;
-			if(is_array($new_values['acl_block_personal_data'])){				
-				foreach($new_values['acl_block_personal_data'] as $i => $data_field){
-					$new_acl_personal_data |= intval($data_field);
-				}
-			}
-			if($new_acl_personal_data != $old_acl_personal_data){
-				if($new_acl_personal_data > 0 && $old_acl_personal_data == 0) {
-					$this->db_functions->save_acl_personal_data($new_values['gidnumber'], $new_acl_personal_data, 'add');
-					$this->db_functions->write_log("added ACL block personal data to group","dn:$dn -> acl: $new_acl_personal_data");
-				}
-				elseif($new_acl_personal_data == 0 && $old_acl_personal_data > 0){
-					$this->db_functions->save_acl_personal_data($new_values['gidnumber'], $new_acl_personal_data, 'remove');
-					$this->db_functions->write_log("removed ACL block personal data to group","dn:$dn");
-				}
-				else{
-					$this->db_functions->save_acl_personal_data($new_values['gidnumber'], $new_acl_personal_data);
-					$this->db_functions->write_log("changed ACL block personal data to group","dn:$dn ->  acl: $old_acl_personal_data => $new_acl_personal_data");
+				
+				foreach ( $rem_members as $user ) {
+					if ( $isPhpgwAccount ) $this->db_functions->remove_user2group( $new_values['gidnumber'], $uidnumber );
+					$this->db_functions->write_log( 'removed user from group', $dn.': '.$user );
 				}
 			}
 			
-			return $return;
-		}		
-		
-		
+			if ( $isPhpgwAccount ) {
+				
+				if ( isset( $ldap_mod_replace['mail'] ) ) {
+					if ( empty( $old_values['email'] ) ) $this->db_functions->write_log( 'added attribute mail to group', $dn );
+					else if ( empty( $new_values['email'] ) ) $this->db_functions->write_log( 'removed attribute mail from group', $dn );
+					else $this->db_functions->write_log( 'modified group email', $dn.': '.$old_values['email'].' -> '.$new_values['email'] );
+				}
+				
+				if ( isset( $ldap_mod_replace['sambaSID'] ) )
+					$this->db_functions->write_log( 'modified group samba domain', $dn.': '.$old_values['sambasid'].' -> '.$new_values['sambasid'] );
+				
+				foreach ( $checkboxes as $key => $value )
+					if ( isset( $ldap_mod_replace[$key] ) )
+						$this->db_functions->write_log( 'changed attribute '.$key.' to group', $dn.': '.( $ldap_mod_replace[$key] == $value? 'enabled' : 'disabled' ) );
+				
+				// Change ACL personal fields on database
+				$old_acl = isset( $old_values['acl_block_personal_data'] )? intval( $old_values['acl_block_personal_data'] ) : 0;
+				$new_acl = array_reduce(
+					isset( $new_values['acl_block_personal_data'] )? (array)$new_values['acl_block_personal_data'] : array(),
+					function( $i, $v ){ return $i |= $v; }, 0
+				);
+				if ( $new_acl != $old_acl ) {
+					$this->db_functions->save_acl_personal_data( $new_values['gidnumber'], $new_acl, $old_acl? ( $new_acl? '' : 'remove' ) : 'add' ) ;
+					$this->db_functions->write_log( 'changed ACL block personal data to group', $dn.': '.$old_acl.' -> '.$new_acl );
+				}
+				
+				// Change applications on database
+				$manager_apps = array_keys( $this->db_functions->get_apps( $_SESSION['phpgw_session']['session_lid'] ) );
+				$new_values['apps'] = array_intersect( array_keys( isset( $new_values['apps'] )? $new_values['apps'] : array() ), $manager_apps );
+				$old_values['apps'] = array_intersect( array_keys( isset( $old_values['apps'] )? $old_values['apps'] : array() ), $manager_apps );
+				sort( $new_values['apps'] );
+				sort( $old_values['apps'] );
+				if ( $new_values['apps'] != $old_values['apps'] ) {
+					
+					// Add applications
+					$add_apps = array_diff( $new_values['apps'], $old_values['apps'] );
+					$this->db_functions->add_id2apps( $new_values['gidnumber'], array_flip( $add_apps ) );
+					
+					// Remove applications
+					$rem_apps = array_diff( $old_values['apps'], $new_values['apps'] );
+					$this->db_functions->remove_id2apps( $new_values['gidnumber'], array_flip( $rem_apps ) );
+				}
+				
+			}
+			return array( 'status' => true );
+		}
+
+		function get_type( $dn )
+		{
+			return $this->ldap_functions->get_group_type( $dn );
+		}
+
+		function get_info_groupOfNames( $dn )
+		{
+			$entry = $this->ldap_functions->get_object( $dn );
+			$members = isset( $entry[0]['member'] )? $entry[0]['member'] : ( isset( $entry[0]['uniquemember'] )? $entry[0]['uniquemember'] : array() );
+			array_walk( $members, function( &$it ){ $it = array_pop( explode( '=', array_shift( explode( ',', $it ) ) ) ); } );
+			$result['cn']             = $entry[0]['cn'][0];
+			$result['context']        = implode( ',', array_splice( explode( ',', $dn ), 1 ) );
+			$result['description']    = utf8_decode( $entry[0]['description'][0] );
+			$result['memberuid_info'] = $this->ldap_functions->get_group_members( $members );
+			return $result;
+		}
+
 		function get_info($gidnumber)
 		{
 			$group_info_ldap = $this->ldap_functions->get_group_info($gidnumber);
 			$group_info_db = $this->db_functions->get_group_info($gidnumber);
-			
 			$group_info = array_merge($group_info_ldap, $group_info_db);
 			return $group_info;
 		}
@@ -570,74 +488,68 @@
 			
 			$return['status'] = true;
 			
-			$gidnumber = $params['gidnumber'];
-			$cn = $params['cn'];
+			$dn = base64_decode( $params['id'] );
 			
-			//LDAP
-			$result_ldap = $this->ldap_functions->delete_group($gidnumber);
-			if (!$result_ldap['status'])
-			{
-				$return['status'] = false;
-				$return['msg'] .= $result_ldap['msg'];
+			$group_type = $this->get_type( $dn );
+			if ( $group_type['type'] === 0 ) {
+				
+				//LDAP
+				$result_ldap = $this->ldap_functions->delete_group( $group_type['gidnumber'] );
+				if (!$result_ldap['status'])
+				{
+					$return['status'] = false;
+					$return['msg'] .= $result_ldap['msg'];
+				}
+				
+				//DB
+				$result_db = $this->db_functions->delete_group( $group_type['gidnumber'] );
+				if (!$result_db['status'])
+				{
+					$return['status'] = false;
+					$return['msg'] .= $result_db['msg'];
+				}
+			} else {
+				//LDAP
+				$result_ldap = $this->ldap_functions->delete_groupOfNames( $dn );
+				if ( !$result_ldap['status'] )
+					$return = array( 'status' => false, 'msg' => $result_ldap['msg'] );
 			}
 			
-			//DB
-			$result_db = $this->db_functions->delete_group($gidnumber);
-			if (!$result_db['status'])
-			{
-				$return['status'] = false;
-				$return['msg'] .= $result_ldap['msg'];
-			}
+			if ( $return['status'] == true )
+				$this->db_functions->write_log( 'deleted group', array_pop( explode( '=', array_shift( explode( ',', $dn ) ) ) ) );
 			
-			if ($return['status'] == true)
-			{
-				$this->db_functions->write_log("deleted group","$cn");
-			}
-			
-			return $return;	
+			return $return;
 		}
 		
-		function copy($params)
+		function copy( $params )
 		{
-			$result['status'] = true;
-
-			$gidnumber = $params['gidnumber'];
-			$cn = $params['cn'];
+			// Verifica o acesso do gerente
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'add_groups' ) )
+				return array( 'status' => false, 'msg' => lang( 'You do not have access to create new groups' ).'.' );
 			
-			$this->db_functions->write_log("Started group copy","From: $gidnumber to $cn");
+			// Check valid DN
+			$dn = base64_decode( $params['gidnumber'] );
+			if ( ( $group_type = $this->get_type( $dn ) ) === false )
+				return array( 'status' => false, 'msg' => lang( 'Object not found' ).': '.$dn );
 			
-			$response_validation = $this->validate_fields($params);
-			if (!$response_validation['status'])
-			{
-				$this->db_functions->write_log("Group copy FAILED. Validation. ","From: $gidnumber to $cn. " . $response_validation['msg']);
-				return $response_validation;
+			$isPhpgwAccount  = $group_type['type'] === 0;
+			$old_values      = $isPhpgwAccount? $this->get_info( $group_type['gidnumber'] ) : $this->get_info_groupOfNames( $dn );
+			
+			$old_cn                  = $old_values['cn'];
+			$old_values['cn']        = trim( $params['cn'] );
+			$old_values['gidnumber'] = '';
+			$old_values['email']     = '';
+			$old_values['members']   = array_unique( (array)array_map( function( $n ) { return $n['uidnumber']; }, $old_values['memberuid_info'] ) );
+			
+			if ( !$isPhpgwAccount ) {
+				$old_values['grp_of_names']      = 'on';
+				$old_values['grp_of_names_type'] = $group_type['type'] === 1? 'groupOfNames' : 'groupOfUniqueNames';
 			}
 			
-			$new_info = $this->get_info($gidnumber);
-			$new_info['cn'] = $cn;
-			$new_info['gidnumber'] = '';
-			$new_info['email'] = '';
+			$result = $this->create( $old_values );
+			if ( !$result['status'] ) $this->db_functions->write_log( 'Group copy FAILED. Creation.', 'From: '.$old_cn.' to '.$old_values['cn'].' ('.$result['msg'].')' );
+			else $this->db_functions->write_log( 'Finished group copy.', 'From: '.$old_cn.' to '.$old_values['cn'] );
 			
-			if (count($new_info['memberuid_info']))
-			{
-				$members = array();
-				foreach ($new_info['memberuid_info'] as $uid => $uid_info)
-				{
-					$members[] = $uid_info['uidnumber'];
-				}
-				$new_info['members'] = $members;
-			}			
-
-			$response_create = $this->create($new_info);
-			if (!$response_create['status'])
-			{
-				$this->db_functions->write_log("Group copy FAILED. Creation. ","From: $gidnumber to $cn. " . $response_create['msg']);
-				return $response_create;
-			}
-			
-			$this->db_functions->write_log("Finished group copy. ","From: $gidnumber to $cn.");
-
 			return $result;
 		}
 	}
-?>

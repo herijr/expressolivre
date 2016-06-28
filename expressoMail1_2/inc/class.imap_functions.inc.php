@@ -251,7 +251,7 @@ class imap_functions
 			$head_array['from']['name'] = $head_array['from']['email'];
 		$to = $header->to;
 		$head_array['to'] = array();
-		if( isset($to[1]) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que não possuem o campo "para", vêm com o recipiente preenchido, porém com um recipiente a mais alegando erro de sintaxe.
+		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que não possuem o campo "para", vêm com o recipiente preenchido, porém com um recipiente a mais alegando erro de sintaxe.
 			$head_array['to']['name'] = $head_array['to']['email'] = NULL;
 		}
 		else {

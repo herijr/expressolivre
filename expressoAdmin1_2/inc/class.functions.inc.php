@@ -332,7 +332,8 @@
 			elseif($type == 'groups')
 			{
 				$filter="(&(phpgwAccountType=g)(|(cn=*$query*)(mail=$query*)))";
-				$justthese = array("gidnumber", "cn", "description", "mail");
+				$filter="(&(|(phpgwAccountType=g)(objectclass=groupOfNames)(objectclass=groupOfUniqueNames))(|(cn=*$query*)(mail=$query*)))";
+				$justthese = array("gidnumber", "cn", "description", "mail", "objectclass");
 
 				$tmp = array();
 				foreach ($contexts as $index=>$context)
@@ -344,11 +345,13 @@
 						if ( $this->denied( $info[$i]['dn'] ) )
 							continue;
 
-						$tmp[$info[$i]['cn'][0]]['cn']= $info[$i]['cn'][0];
-						$tmp[$info[$i]['cn'][0]]['description']= utf8_decode($info[$i]['description'][0]);
-						$tmp[$info[$i]['cn'][0]]['mail']= $info[$i]['mail'][0];
-						$tmp[$info[$i]['cn'][0]]['gidnumber']= $info[$i]['gidnumber'][0];
-						$sort[] = $info[$i]['cn'][0];
+						$cn = $sort[] = $info[$i]['cn'][0];
+						$tmp[$cn]['cn']          = $cn;
+						$tmp[$cn]['dn']          = $info[$i]['dn'];
+						$tmp[$cn]['mail']        = $info[$i]['mail'][0];
+						$tmp[$cn]['gidnumber']   = $info[$i]['gidnumber'][0];
+						$tmp[$cn]['description'] = utf8_decode( $info[$i]['description'][0] );
+						$tmp[$cn]['type']        = in_array( 'posixGroup', $info[$i]['objectclass'] )? 0 : ( in_array( 'groupOfNames', $info[$i]['objectclass'] )? 1 : 2 );
 					}
 				}
 				ldap_close($ldap_conn);

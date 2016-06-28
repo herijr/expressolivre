@@ -208,16 +208,22 @@
 					$GLOBALS[ 'phpgw' ] = new stdClass;
 					$GLOBALS[ 'phpgw' ]->ADOdb = NULL;
 				}
-
-				if (!is_object($GLOBALS['phpgw']->ADOdb) ||	// we have no connection so far
-					( isset($GLOBALS['phpgw']->db) && is_object($GLOBALS['phpgw']->db) &&	// we connect to a different db, then the global one
-						($this->Type != $GLOBALS['phpgw']->db->Type ||
-						$this->Database != $GLOBALS['phpgw']->db->Database ||
-						$this->User != $GLOBALS['phpgw']->db->User ||
-						$this->Host != $GLOBALS['phpgw']->db->Host ||
-						$this->Port != $GLOBALS['phpgw']->db->Port)))
-				{
-					if (!is_object($GLOBALS['phpgw']->ADOdb))	// use the global object to store the connection
+				
+				if (
+					// we have no connection so far
+					( !( isset( $GLOBALS['phpgw']->ADOdb ) && is_object( $GLOBALS['phpgw']->ADOdb ) ) ) || (
+						// we connect to a different db, then the global one
+						isset( $GLOBALS['phpgw']->db ) &&
+						is_object( $GLOBALS['phpgw']->db ) && (
+							$this->Type     != $GLOBALS['phpgw']->db->Type     ||
+							$this->Database != $GLOBALS['phpgw']->db->Database ||
+							$this->User     != $GLOBALS['phpgw']->db->User     ||
+							$this->Host     != $GLOBALS['phpgw']->db->Host     ||
+							$this->Port     != $GLOBALS['phpgw']->db->Port
+						)
+					)
+				) {
+					if ( !( isset( $GLOBALS['phpgw']->ADOdb ) && is_object( $GLOBALS['phpgw']->ADOdb ) ) )	// use the global object to store the connection
 					{
 						$this->Link_ID = &$GLOBALS['phpgw']->ADOdb;
 					}

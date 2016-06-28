@@ -411,14 +411,16 @@ class ldap_functions
 		return $result;
 	}
 	
-	function validate_fields_group2($params)
+	function validate_fields_group2( $params )
 	{
 		$params = unserialize($params['attributes']);
 		
-		$type = $params['type'];
-		$cn = $params['cn'];
-		$mail = $params['mail'];
-		$gidnumber = $params['gidnumber'];
+		$cn         = $params['cn'];
+		$mail       = $params['email'];
+		$type       = $params['type'];
+		$grp_type   = isset( $params['grp_of_names'] );
+		$gidnumber  = $params['gidnumber'];
+		$in_context = $params['context'];
 		
 		/* ldap connection following referals and using Contac Center config*/
 		if (is_array($_SESSION['phpgw_info']['expresso']['cc_ldap_server']))
@@ -454,26 +456,25 @@ class ldap_functions
 			ldap_bind($ldap_connection, $GLOBALS['phpgw_info']['server']['ldap_root_dn'], $GLOBALS['phpgw_info']['server']['ldap_root_pw']);
 			$context = $GLOBALS['phpgw_info']['server']['ldap_context'];
 		}
-
-		if ($mail != "")
-		{
-			$mail_filter = "(mail=$mail)";
-		}
-
-		if ($type == 'create_group')
-		{
-			// CN & UID & MAIL
-			$filter = "( | (&(phpgwAccountType=g)(cn=$cn))  (&(|(phpgwAccountType=u)(phpgwAccountType=l))(uid=$cn)) $mail_filter )";
+		
+		if ( $type == 'create_group' ) {
 			
-			$justthese = array("1.1");
-			$search = ldap_search($ldap_connection, $context, $filter, $justthese);
-			$count_entries = ldap_count_entries($ldap_connection,$search);
-			if ($count_entries > 0)
-			{
-				$result['status'] = false;
-				$result['msg'] = $this->functions->lang('This group name or group mail is already used') . ".";
-				return $result;
+			if ( $grp_type ) $search = ldap_list( $ldap_connection, $in_context, '(objectclass='.$cn.')', array() );
+			else {
+				// CN & UID & MAIL
+				$filter = '(|'.
+					'(&(phpgwAccountType=g)(cn='.$cn.'))'.
+					'(&(|(phpgwAccountType=u)(phpgwAccountType=l))(uid='.$cn.'))'.
+					(($mail != '')? '(mail='.$mail.')' : '').
+				')';
+				
+				$search = ldap_search( $ldap_connection, $context, $filter, array() );
 			}
+			if ( !is_resource( $search ) )
+				return array( 'status' => false, 'msg' => $this->functions->lang( 'It was not possible to determine if the name or email is in use' ).'.' );
+			
+			if ( ldap_count_entries( $ldap_connection, $search ) > 0 )
+				return array( 'status' => false, 'msg' => $this->functions->lang( 'This group name or group mail is already used' ).'.' );
 		}
 		else if ($type == 'edit_group')
 		{
@@ -515,11 +516,7 @@ class ldap_functions
 			{
 				$filter = $cn_filter;
 			}
-			else
-			{
-				$result['status'] = true;
-				return $result;
-			}
+			else return array( 'status' => true );
 			
 			$justthese = array("1.1");
 			$search = ldap_search($ldap_connection, $context, $filter, $justthese);
@@ -531,8 +528,7 @@ class ldap_functions
 				return $result;
 			}
 		}
-		$result['status'] = true;
-		return $result;
+		return array( 'status' => true );
 	}
 	
 	function validate_fields_group($params)
@@ -856,11 +852,11 @@ class ldap_functions
 	function ldap_add_entry($dn, $entry)
 	{
 		$result = array();
-		if (!@ldap_add ( $this->ldap, $dn, $entry ))
+		if (!ldap_add ( $this->ldap, $dn, $entry ))
 		{
 			$result['status']		= false;
 			$result['error_number']	= ldap_errno($this->ldap);
-			$result['msg']			= $this->functions->lang('Error on function') . " ldap_functions->ldap_add_entry ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_errno($this->ldap) . ldap_error($this->ldap);
+			$result['msg']			= $this->functions->lang('Error on function') . " ldap_functions->ldap_add_entry ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ('.ldap_errno($this->ldap).') '.ldap_error($this->ldap);
 		}
 		else
 			$result['status'] = true;
@@ -1164,7 +1160,7 @@ class ldap_functions
 					$result['homedirectory'] = $entry[0]['homedirectory'][0];
 				}
 				
-				if ($raduis_config->enabled && $result[$raduis_config->profileClass])
+				if ( $raduis_config->enabled && isset( $result[$raduis_config->profileClass] ) && $result[$raduis_config->profileClass] )
 				{
 					$result[$raduis_config->groupname_attribute] = array();
 					for ( $i = 0; $i < $entry[0][strtolower($raduis_config->groupname_attribute)]['count']; $i++ )
@@ -1249,6 +1245,36 @@ class ldap_functions
 		return $return;
 	}
 	
+	function get_object( $base_dn, $attributes = array() )
+	{
+		foreach ( $this->manager_contexts as $context )
+			if ( preg_match( '/'.preg_quote( $context ).'$/', $base_dn ) )
+				return ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $base_dn, '(objectClass=*)', $attributes ) );
+		return false;
+	}
+	
+	function get_group_type( $dn )
+	{
+		$result = $this->get_object( $dn, array( 'objectclass', 'gidnumber' ) );
+		if ( !is_array( $result[0]['objectclass'] ) ) return false;
+		if ( in_array( 'posixGroup', $result[0]['objectclass'] ) ) return array( 'type' => 0, 'gidnumber' => $result[0]['gidnumber'][0] );
+		if ( in_array( 'groupOfNames', $result[0]['objectclass'] ) ) return array( 'type' => 1 );
+		if ( in_array( 'groupOfUniqueNames', $result[0]['objectclass'] ) ) return array( 'type' => 2 );
+		return false;
+	}
+	
+	function get_group_members( $members, $attr = 'uid' ) {
+		$result = array();
+		unset( $members['count'] );
+		while ( count( $members ) ) {
+			$filter = '(&(phpgwAccountType=u)(|('.$attr.'='.implode( ')('.$attr.'=', array_splice( $members, 0, 10 ) ).')))';
+			$user_entry = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, array( 'cn', 'uid', 'uidnumber' ) ) );
+			unset( $user_entry['count'] );
+			foreach ( $user_entry as $entry ) $result[$entry['uid'][0]] = array( 'cn' => $entry['cn'][0], 'uidnumber' => $entry['uidnumber'][0], 'type' => 'u' );
+		}
+		return $result;
+	}
+	
 	function get_group_info($gidnumber)
 	{
 		foreach ($this->manager_contexts as $index=>$context)
@@ -1259,76 +1285,17 @@ class ldap_functions
 			
 			if ($entry['count'])
 			{
-				//Pega o dn do setor do grupo.
-				$entry[0]['dn'] = strtolower($entry[0]['dn']);
-				$sector_dn_array = explode(",", $entry[0]['dn']);
-				for($i=1; $i<count($sector_dn_array); $i++)
-					$sector_dn .= $sector_dn_array[$i] . ',';
-				//Retira ultimo pipe.
-				$sector_dn = substr($sector_dn,0,(strlen($sector_dn) - 1));
+				$result['context']                = implode( ',', array_splice( explode( ',', $entry[0]['dn'] ), 1 ) );
+				$result['cn']                     = $entry[0]['cn'][0];
+				$result['description']            = utf8_decode($entry[0]['description'][0]);
+				$result['gidnumber']              = $entry[0]['gidnumber'][0];
+				$result['memberuid_info']         = $this->get_group_members( isset( $entry[0]['memberuid'] )? $entry[0]['memberuid'] : array() );
+				$result['memberuid_scm_info']     = $this->get_group_members( isset( $entry[0]['mailsenderaddress'] )? $entry[0]['mailsenderaddress'] : array(), 'mail' );
+				if ( isset( $entry[0]['phpgwaccountvisible'][0] )    ) $result['phpgwaccountvisible']    = $entry[0]['phpgwaccountvisible'][0];
+				if ( isset( $entry[0]['mail'][0] )                   ) $result['email']                  = $entry[0]['mail'][0];
+				if ( isset( $entry[0]['accountrestrictive'][0] )     ) $result['accountrestrictive']     = $entry[0]['accountrestrictive'][0];
+				if ( isset( $entry[0]['participantcansendmail'][0] ) ) $result['participantcansendmail'] = $entry[0]['participantcansendmail'][0];
 				
-				$result['context']				= $sector_dn;
-				$result['cn']					= $entry[0]['cn'][0];
-				$result['description']			= utf8_decode($entry[0]['description'][0]);
-				$result['gidnumber']			= $entry[0]['gidnumber'][0];
-				$result['phpgwaccountvisible']	= $entry[0]['phpgwaccountvisible'][0];
-				$result['email']				= $entry[0]['mail'][0];
-				$result['accountrestrictive']	= $entry[0]['accountrestrictive'][0];
-				$result['participantcansendmail']	= $entry[0]['participantcansendmail'][0];
-				
-		
-				//MemberUid
-				for ($i=0; $i<$entry[0]['memberuid']['count']; $i++)
-				{
-					$justthese = array("cn","uid","uidnumber");
-			
-					// Montagem dinamica do filtro
-					$filter="(&(phpgwAccountType=u)(|";
-					for ($k=0; (($k<10) && ($i<$entry[0]['memberuid']['count'])); $k++)
-					{
-						$filter .= "(uid=".$entry[0]['memberuid'][$i].")";
-						$i++;
-					}
-					$i--;
-					$filter .= "))";
-			
-					$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
-					$user_entry = ldap_get_entries($this->ldap, $search);
-
-					for ($j=0; $j<$user_entry['count']; $j++)
-					{
-						$result['memberuid_info'][$user_entry[$j]['uid'][0]]['cn'] = $user_entry[$j]['cn'][0];
-						$result['memberuid_info'][$user_entry[$j]['uid'][0]]['uidnumber'] = $user_entry[$j]['uidnumber'][0];
-						$result['memberuid_info'][$user_entry[$j]['uid'][0]]['type'] = 'u';
-					}
-				}
-		
-				//mailsenderaddress
-				for ($i=0; $i<$entry[0]['mailsenderaddress']['count']; $i++)
-				{
-					$justthese = array("cn","uid","uidnumber");
-			
-					// Montagem dinamica do filtro
-					$filter="(&(phpgwAccountType=u)(|";
-					for ($k=0; (($k<10) && ($i<$entry[0]['mailsenderaddress']['count'])); $k++)
-					{
-						$filter .= "(mail=".$entry[0]['mailsenderaddress'][$i].")";
-						$i++;
-					}
-					$i--;
-					$filter .= "))";
-			
-					$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
-					$user_entry = ldap_get_entries($this->ldap, $search);
-
-					for ($j=0; $j<$user_entry['count']; $j++)
-					{
-						$result['memberuid_scm_info'][$user_entry[$j]['uid'][0]]['cn'] = $user_entry[$j]['cn'][0];
-						$result['memberuid_scm_info'][$user_entry[$j]['uid'][0]]['uidnumber'] = $user_entry[$j]['uidnumber'][0];
-						$result['memberuid_scm_info'][$user_entry[$j]['uid'][0]]['type'] = 'u';
-					}
-				}
-
 				// Checamos e-mails que não fazem parte do expresso.
 				// Criamos um array temporario
 				$tmp_array = array();
@@ -1351,15 +1318,11 @@ class ldap_functions
 				}
 		
 				// Samba
-				for ($i=0; $i<$entry[0]['objectclass']['count']; $i++)
-				{
-					if ($entry[0]['objectclass'][$i] == 'sambaGroupMapping')
-						$result['sambaGroup'] = true;
-
-					$a_tmp = explode("-", $entry[0]['sambasid'][0]);
-					array_pop($a_tmp);
-					$result['sambasid'] = implode("-", $a_tmp);
+				if ( in_array( 'sambaGroupMapping', $entry[0]['objectclass'] ) ) {
+					$result['use_attrs_samba'] = true;
+					$result['sambasid']        = preg_filter( '/-[^-]*$/', '', $entry[0]['sambasid'][0] );
 				}
+				
 				return $result;
 			}
 		}
@@ -1557,6 +1520,14 @@ class ldap_functions
 		return $result;
 	}
 
+	function uidnumber2dn($uidnumber)
+	{
+		$filter ='(&(|(phpgwAccountType=u)(phpgwAccountType=l))(uidNumber='.$uidnumber.'))';
+		$search = ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, array() );
+		$entry  = ldap_get_entries( $this->ldap, $search );
+		return $entry[0]['dn'];
+	}
+
 	function uidnumber2uid($uidnumber)
 	{
 		$justthese = array("uid");
@@ -1575,17 +1546,29 @@ class ldap_functions
 		return $entry[0]['mail'][0];
 	}
 	
-	function change_user_context($dn, $newrdn, $newparent)
+	function change_user_context($old_dn, $newrdn, $newparent)
 	{
-		if (!ldap_rename ( $this->ldap, $dn, $newrdn, $newparent, true ))
-		{
-			$return['status'] = false;
-			$return['msg'] = $this->functions->lang('Error on function') . " ldap_functions->change_user_context ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($this->ldap);
-		}
-		else
-			$return['status'] = true;
+		if ( !ldap_rename ( $this->ldap, $old_dn, $newrdn, $newparent, true ) )
+			return array(
+				'status' => false,
+				'msg'    => $this->functions->lang('Error on function') . " ldap_functions->change_user_context ($old_dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($this->ldap),
+			);
 		
-		return $return;
+		// Update user from groupOfNames and groupOfUniqueNames
+		$new_dn = $newrdn.','.$newparent;
+		$params = array(
+			'groupOfNames'       => array( 'old_val' => $old_dn,  'new_val' => $new_dn,  'attr' => 'member' ),
+			'groupOfUniqueNames' => array( 'old_val' => $old_dn,  'new_val' => $new_dn,  'attr' => 'uniqueMember' ),
+		);
+		foreach ( $params as $obj => $attrs ) {
+			$filter  = '(&(objectclass='.$obj.')('.$attrs['attr'].'='.$attrs['old_val'].'))';
+			$entries = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, array( 'dn' ) ) );
+			for ( $i = 0; $i < $entries['count']; $i++ ) {
+				ldap_mod_del( $this->ldap, $entries[$i]['dn'], array( $attrs['attr'] => array( $attrs['old_val'] ) ) );
+				ldap_mod_add( $this->ldap, $entries[$i]['dn'], array( $attrs['attr'] => array( $attrs['new_val'] ) ) );
+			}
+		}
+		return array( 'status' => true );
 	}
 	
 	function replace_user_attributes($dn, $ldap_mod_replace)
@@ -1663,28 +1646,20 @@ class ldap_functions
 		
 		$return['status'] = true;
 		$return['msg'] = "";
-				
-		// GROUPS
-		$attrs = array();
-		$attrs['memberuid'] = $user_info['uid'];
 		
-		if (count($user_info['groups_info']))
-		{
-			foreach ($user_info['groups_info'] as $group_info)
-			{
-				$gidnumber = $group_info['gidnumber'];
-				$justthese = array("dn");
-				$filter="(&(phpgwAccountType=g)(gidnumber=".$gidnumber."))";
-				$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
-	    		$entry = ldap_get_entries($this->ldap, $search);
-				$dn = $entry[0]['dn'];
-
-				if (!@ldap_mod_del($this->ldap, $dn, $attrs))
-				{
-					$return['status'] = false;
-					$return['msg'] = $this->functions->lang('Error on function') . " ldap_functions->delete_user from group ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($this->ldap);
-					return $return;
-				}
+		// Remove user from posixGroup, groupOfNames and groupOfUniqueNames
+		$uid = $user_info['uid'];
+		$udn = 'uid='.$uid.','.$user_info['context'];
+		$params = array(
+			'posixGroup'         => array( 'value' => $uid, 'attr' => 'memberUid',    'filter' => '(phpgwAccountType=g)' ),
+			'groupOfNames'       => array( 'value' => $udn, 'attr' => 'member',       'filter' => '' ),
+			'groupOfUniqueNames' => array( 'value' => $udn, 'attr' => 'uniqueMember', 'filter' => '' ),
+		);
+		foreach ( $params as $obj => $attrs ) {
+			$filter  = '(&(objectclass='.$obj.')'.$attrs['filter'].'('.$attrs['attr'].'='.$attrs['value'].'))';
+			$entries = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, array( 'dn' ) ) );
+			for ( $i = 0; $i < $entries['count']; $i++ ) {
+				ldap_mod_del( $this->ldap, $entries[$i]['dn'], array( $attrs['attr'] => array( $attrs['value'] ) ) );
 			}
 		}
 		
@@ -1750,11 +1725,10 @@ class ldap_functions
 		}
 			
 		// UID
-		$dn = "uid=" . $user_info['uid'] . "," . $user_info['context'];
-		if (!@ldap_delete($this->ldap, $dn))
+		if (!@ldap_delete($this->ldap, $udn))
 		{
 			$return['status'] = false;
-			$return['msg'] = $this->functions->lang('Error on function') . " ldap_functions->delete_user, email lists ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($ldapMasterConnect);
+			$return['msg'] = $this->functions->lang('Error on function') . " ldap_functions->delete_user, email lists ($udn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($ldapMasterConnect);
 			return $return;
 		}
 		/* jakjr */
@@ -1811,6 +1785,22 @@ class ldap_functions
 		return $return;
 	}
 
+	function delete_groupOfNames( $dn )
+	{
+		$return = array( 'status' => true );
+		if ( ldap_count_entries( $this->ldap, ldap_read( $this->ldap, $dn, '(|(objectclass=groupOfNames)(objectclass=groupOfUniqueNames))', array( 'dn' ) ) ) !== 1 )
+			$return = array(
+				'status' => false,
+				'msg' => $this->functions->lang('Error on function').' ldap_functions->delete_group ('.$dn.').'."\n".$this->functions->lang('group not found'),
+			);
+		else if ( !ldap_delete( $this->ldap, $dn ) )
+			$return = array(
+				'status' => false,
+				'msg' => $this->functions->lang('Error on function') . " ldap_functions->delete_group ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($this->ldap),
+			);
+		return $return;
+	}
+
 	function check_access_to_renamed($uid)
 	{
 		$justthese = array("dn");
@@ -1843,47 +1833,36 @@ class ldap_functions
 		return true;
 	}
 	
-	function rename_uid($uid, $new_uid)
+	function rename_uid( $old_uid, $new_uid )
 	{
-		$return['status'] = true;
+		$filter  = '(&(phpgwAccountType=u)(uid='.$old_uid.'))';
+		$entry   = ldap_get_entries($this->ldap, ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, array( 'dn' ) ) );
+		$old_dn  = $entry[0]['dn'];
+		$context = preg_replace( '/^[^,]*,/', '', $old_dn );
+		$new_dn  = 'uid='.$new_uid.','.$context;
 		
-		$justthese = array("dn");
-		$filter="(&(phpgwAccountType=u)(uid=".$uid."))";
-		$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
-	    $entry = ldap_get_entries($this->ldap, $search);
-		$dn = $entry[0]['dn'];
+		// Rename object
+		if ( !ldap_rename( $this->ldap, $old_dn, 'uid='.$new_uid, $context, true ) )
+			return array(
+				'status' => false,
+				'msg'    => $this->functions->lang('Error on function')." ldap_functions->rename_uid ($old_dn)".".\n".$this->functions->lang( 'Server returns' ).': '.ldap_error( $this->ldap ),
+			);
 		
-		$explode_dn = ldap_explode_dn($dn, 0);
-		$rdn = "uid=" . $new_uid;
-
-		$parent = array();
-		for ($j=1; $j<(count($explode_dn)-1); $j++)
-			$parent[] = $explode_dn[$j];
-		$parent = implode(",", $parent);
-		
-		$return['new_dn'] = $rdn . ',' . $parent;
-			
-		if (!@ldap_rename($this->ldap, $dn, $rdn, $parent, true))
-		{
-			$return['status'] = false;
-			$return['msg'] = $this->functions->lang('Error on function') . " ldap_functions->rename_uid ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($this->ldap);
+		// Update user from posixGroup, groupOfNames and groupOfUniqueNames
+		$params = array(
+			'posixGroup'         => array( 'old_val' => $old_uid, 'new_val' => $new_uid, 'attr' => 'memberUid',    'filter' => '(phpgwAccountType=g)' ),
+			'groupOfNames'       => array( 'old_val' => $old_dn,  'new_val' => $new_dn,  'attr' => 'member',       'filter' => '' ),
+			'groupOfUniqueNames' => array( 'old_val' => $old_dn,  'new_val' => $new_dn,  'attr' => 'uniqueMember', 'filter' => '' ),
+		);
+		foreach ( $params as $obj => $attrs ) {
+			$filter  = '(&(objectclass='.$obj.')'.$attrs['filter'].'('.$attrs['attr'].'='.$attrs['old_val'].'))';
+			$entries = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, array( 'dn' ) ) );
+			for ( $i = 0; $i < $entries['count']; $i++ ) {
+				ldap_mod_del( $this->ldap, $entries[$i]['dn'], array( $attrs['attr'] => array( $attrs['old_val'] ) ) );
+				ldap_mod_add( $this->ldap, $entries[$i]['dn'], array( $attrs['attr'] => array( $attrs['new_val'] ) ) );
+			}
 		}
-		
-		//Grupos
-		$justthese = array("dn");
-		$filter="(&(phpgwAccountType=g)(memberuid=".$uid."))";
-		$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
-	    $entry = ldap_get_entries($this->ldap, $search);
-    	$array_mod_add['memberUid'] = $new_uid;
-    	$array_mod_del['memberUid'] = $uid;
-
-	    for ($i=0; $i<=$entry['count']; $i++)
-	    {
-	    	$dn = $entry[$i]['dn'];
-	    	@ldap_mod_add ( $this->ldap, $dn,  $array_mod_add);
-	    	@ldap_mod_del ( $this->ldap, $dn,  $array_mod_del);
-	    }
-		return $return;
+		return array( 'status' => true, 'new_dn' => $new_dn );
 	}
 
 	function rename_cn($cn, $new_cn)

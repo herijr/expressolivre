@@ -28,22 +28,14 @@ function validate_fields(type, restrictionsOnGroup)
 	}
 	
 	var reCn = /^([a-zA-Z0-9_\-])+$/;
-	var reDesc = /^([a-zA-Z0-9_\- .])+$/;
-	
 	if(!reCn.test(document.forms[0].cn.value)){
 		alert(get_lang('NAME field contains characters not allowed') + '.');
 		document.forms[0].cn.focus();
 		return;
 	}
 
-	/*if(!reDesc.test(document.forms[0].description.value)){
-		alert(get_lang('DESCRIPTION field contains characters not allowed') + '.');
-		document.forms[0].description.focus();
-		return;
-	}*/
-	
 	var reEmail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-	if ( (document.forms[0].email.value != '') && (!reEmail.test(document.forms[0].email.value)) )
+	if ( (!$('input[name=grp_of_names]')[0].checked) && (document.forms[0].email.value != '') && (!reEmail.test(document.forms[0].email.value)) )
 	{
 		alert(get_lang('EMAIL field is empty') + '.');
 		return false;
@@ -51,8 +43,8 @@ function validate_fields(type, restrictionsOnGroup)
 	
 	var handler_validate_fields = function(data)
 	{
-		if (!data.status)
-			alert(data.msg);
+		if ( !( data && data.status ) )
+			alert( (data && data.msg)? data.msg : 'Error' );
 		else
 		{
 			if (type == 'create_group')
@@ -73,10 +65,12 @@ function validate_fields(type, restrictionsOnGroup)
 	
 	// Uid, Mail and CPF exist?
 	var attrs_array = new Array();
-	attrs_array['type']	= type;
-	attrs_array['cn']	= document.forms[0].cn.value;
-	attrs_array['mail']	= document.forms[0].email.value;
-	attrs_array['gidnumber'] = document.forms[0].gidnumber.value;
+	attrs_array['cn']           = document.forms[0].cn.value;
+	attrs_array['type']         = type;
+	attrs_array['email']        = document.forms[0].email.value;
+	attrs_array['context']      = $('select[name=context]').val();
+	attrs_array['gidnumber']    = document.forms[0].gidnumber.value;
+	attrs_array['grp_of_names'] = $('input[name=grp_of_names]')[0].checked? 'on' : '';
 	var attributes = connector.serialize(attrs_array);
 	
 	// Validate some datas on PHP side.
@@ -279,9 +273,9 @@ function optionFinder(id) {
 	oWait.innerHTML = '&nbsp;';
 }			
 
-function delete_group(cn, gidnumber)
+function delete_group(obj, dn)
 {
-	if (confirm(get_lang('Do you really want delete the group') + ' ' + cn + " ??"))
+	if (confirm(get_lang('Do you really want delete the group') + ' ' + $(obj).parents('tr:first').find('td:first').html() + " ?"))
 	{
 		var handler_delete_group = function(data)
 		{
@@ -289,11 +283,10 @@ function delete_group(cn, gidnumber)
 				alert(data.msg);
 			else
 				alert(get_lang('Group successful deleted') + '.');
-			
-			location.href="./index.php?menuaction=expressoAdmin1_2.uigroups.list_groups";
+			window.location.reload();
 			return;
 		}
-		cExecute ('$this.group.delete&gidnumber='+gidnumber+'&cn='+cn, handler_delete_group);
+		cExecute ('$this.group.delete&id='+dn, handler_delete_group);
 	}
 }
 

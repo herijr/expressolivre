@@ -1138,6 +1138,7 @@
 		{
 			//echo "<p>session::link(url='".print_r($url,True)."',extravars='".print_r($extravars,True)."')";
 			/* first we process the $url to build the full scriptname */
+			if ( !isset( $GLOBALS['phpgw_info']['server']['webserver_url'] ) ) $GLOBALS['phpgw_info']['server']['webserver_url'] = '';
 			$full_scriptname = True;
 
 			$url_firstchar = substr($url ,0,1);

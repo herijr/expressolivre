@@ -40,12 +40,12 @@ class imap_functions
 		
 		$this->_imap = imap_open('{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'/novalidate-cert}', $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
 		
-		return $this->profile;
+		return $this->_profile;
 	}
 	
 	function reset_profile( $uid )
 	{
-		if ( $uid == $this->_uid ) return $this->profile;
+		if ( $uid == $this->_uid ) return $this->_profile;
 		
 		return $this->set_profile( $this->boemailadmin->getProfile('uid', $uid), $uid );
 	}

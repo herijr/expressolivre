@@ -67,6 +67,7 @@
 		*/
 		function javascript()
 		{
+			$this->body = array( 'onLoad' => '', 'onUnLoad' => '', 'onResize' => '' );
 			//$this->t = CreateObject('phpgwapi.Template', ExecMethod('phpgwapi.phpgw.common.get_tpl_dir','phpgwapi'));
 			//not currently used, but will be soon - I hope :)
 		}

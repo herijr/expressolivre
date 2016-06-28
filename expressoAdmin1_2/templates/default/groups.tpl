@@ -1,4 +1,5 @@
 <!-- BEGIN list -->
+<script src="prototype/plugins/jquery/jquery-latest.min.js"></script>
 <p>
   <div align="center">
    <table border="0" width="90%">
@@ -23,7 +24,7 @@
 							<input type="text" name="query" autocomplete="off" value="{query}">
 						</td>
 						<td>
-							<img style="cursor:pointer" src="./expressoAdmin1_2/templates/default/images/search.gif" border="0" onclick="javascript:form_query.submit();"> 
+							<img style="cursor:pointer" src="./expressoAdmin1_2/templates/default/images/search.gif" border="0" onclick="javascript:form_query.submit();">
 						</td>
      				</tr>
      			</table>
@@ -32,11 +33,12 @@
     </tr>
    </table>
   </div>
- 
+
  <div align="center">
   <table border="0" width="90%">
    <tr bgcolor="{th_bg}">
-    <td width="20%">{lang_groups_names}</td>
+    <td width="15%">{lang_groups_names}</td>
+    <td width="5%">{lang_type}</td>
     <td width="30%">{lang_description}</td>
 	<td width="30%">{lang_mail}</td>
     <td width="5%"  align="center">{lang_edit}</td>
@@ -52,7 +54,8 @@
 
 <!-- BEGIN row -->
    <tr bgcolor="{tr_color}">
-    <td width="20%">{row_cn}</td>
+    <td width="15%">{row_cn}</td>
+    <td width="5%">{row_type}</td>
     <td width="30%">{row_description}</td>
 	<td width="30%">{row_mail}</td>
     <td width="5%" align="center">{edit_link}</td>
