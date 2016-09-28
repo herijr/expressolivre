@@ -4,6 +4,9 @@ DocumentationResource = /core/DocumentationResource.php
 [/ExpressoVersion]
 ExpressoVersionResource = /core/ExpressoVersionResource.php
 
+[/ExpressoBanner]
+ExpressoBannerResource = /core/ExpressoBannerResource.php
+
 [/Login]
 LoginResource = /core/LoginResource.php
 

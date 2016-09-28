@@ -17,7 +17,7 @@ class AvailableServersResource extends ExpressoAdapter {
 	function get($request){
 
 		$error = null;		
-		parse_str($request->data, &$data);
+		parse_str($request->data, $data);
 				
 		if( file_exists(API_DIRECTORY.'/../../config/REST.ini') )
 		{
