@@ -1248,7 +1248,7 @@ class ldap_functions
 	function get_object( $base_dn, $attributes = array() )
 	{
 		foreach ( $this->manager_contexts as $context )
-			if ( preg_match( '/'.preg_quote( $context ).'$/', $base_dn ) )
+			if ( preg_match( '/'.preg_quote( strtolower( $context ) ).'$/', strtolower( $base_dn ) ) )
 				return ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $base_dn, '(objectClass=*)', $attributes ) );
 		return false;
 	}
