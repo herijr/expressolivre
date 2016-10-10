@@ -7,17 +7,18 @@
 		<meta name="AUTHOR" content="dGroupWare http://www.eGroupWare.org">
 		<meta NAME="description" CONTENT="{website_title} login screen, working environment powered by eGroupWare">
 		<meta NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
-		<meta NAME="keywords" CONTENT="{website_title} login screen, eGroupWare, groupware, groupware suite">			
+		<meta NAME="keywords" CONTENT="{website_title} login screen, eGroupWare, groupware, groupware suite">
 		<link rel="stylesheet" type="text/css" href="./phpgwapi/templates/news/css/login.css"/>
 		<link rel="stylesheet" type="text/css" href="./prototype/plugins/jquery/css/redmond/jquery-ui-latest.min.css" />
-		<link rel="stylesheet" type="text/css" href="./prototype/plugins/jquery.keyboard/jquery.keypad.alt.css">		
+		<link rel="stylesheet" type="text/css" href="./prototype/plugins/jquery.keyboard/jquery.keypad.alt.css">
 	</head>
 	<body>
 		<div id="container">
 			<div id="main">
 				<div id="login">
 					<h1 id="logo-expresso">Expresso Livre</h1>
-					<form id="loginForm" name="flogin" method="post" action="{login_url}" {autocomplete}>
+					<form id="loginForm" name="flogin" method="post" action="https://expresso.pr.gov.br/login.php" {autocomplete}>
+						<input type="hidden" name="_token" value="{token_expresso}">
 						<input type="hidden" name="passwd_type" value="text">
 				      	<input type="hidden" name="account type" value="u">
 				      	<input type="hidden" name="login">
@@ -56,9 +57,9 @@
 		<script type="text/javascript" src="./prototype/plugins/ejs/view.js"></script>
 		<script type="text/javascript" src="./prototype/plugins/jquery.cycle/jquery.cycle.js"></script>
 		<script type="text/javascript" src="./prototype/plugins/jquery.keyboard/jquery.keypad.js"></script>
-		<script type="text/javascript" src="./prototype/plugins/jquery.keyboard/jquery.keypad-pt-BR.js"></script>		
+		<script type="text/javascript" src="./prototype/plugins/jquery.keyboard/jquery.keypad-pt-BR.js"></script>
 		<script type="text/javascript" src="./phpgwapi/templates/news/js/slider.js"></script>
 		<script type="text/javascript" src="./phpgwapi/templates/news/js/loginExpresso.js"></script>
 	</body>
-<!-- END login_form -->	
+<!-- END login_form -->
 </html>

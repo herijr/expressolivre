@@ -10,7 +10,7 @@
       var msgType = divMsgLogin.html();
 
       if( $.trim(msgType) != "" )
-      {  
+      {
         divMsgLogin.css("display","block");
 
         if( msgType.indexOf("color=\"FF0000\"") > -1 )
@@ -40,38 +40,38 @@
   function loginExpresso()
   {
     $(document).ready(function()
-    {   
+    {
       //Set Focus
       $("form[name=flogin]").find("input[name=user]").focus();
 
       // Element Form
       formLogin = $("form[name=flogin]");
 
-      // Msg Expresso  
+      // Msg Expresso
       msgLogin();
 
-      // KeyBoard Virtual   
+      // KeyBoard Virtual
       var keyBoardV = formLogin.find("input[name=show_kbd]").val();
-    
+
       if( $.trim(keyBoardV) != "" && keyBoardV == "True" )
       {
         // Keyboard virtual
         $('#passwd').keypad({
              keypadOnly: false,
-             showOn: 'button', 
+             showOn: 'button',
              layout: $.keypad.qwertyLayoutWithOutEnter,
              buttonImageOnly: true,
              buttonImage: './prototype/plugins/jquery.keyboard/keypad.png'
         });
       }
 
-      // Captcha      
+      // Captcha
       var captcha = $("#captcha");
           captcha.css("position","absolute");
           captcha.css("left","115px");
 
       if( $.trim(keyBoardV) != "" && keyBoardV == "True" )
-      {  
+      {
         captcha.css("top","272px");
 
         if( $("#organizacao").parent().css('display') == "block" )
@@ -81,7 +81,7 @@
       }
       else
       {
-        captcha.css("top","263px");
+        captcha.css("top","269px");
 
         if( $("#organizacao").parent().css('display') == "block" )
         {
@@ -100,7 +100,7 @@
 
 jQuery(document).ready(function($)
 {
-  $(window).bind('resize', function() 
+  $(window).bind('resize', function()
   {
     var _mainDiv = $('.keypad-popup');
 

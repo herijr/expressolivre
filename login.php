@@ -12,7 +12,7 @@
 	\**************************************************************************/
 
 	if( file_exists('mobile.php') ){ include 'mobile.php'; }
-	
+
 	$phpgw_info = array();
 	$submit = False;			// set to some initial value
 
@@ -35,7 +35,7 @@
 				$GLOBALS['phpgw']->redirect_link('/home.php');
 			}
 		}
-		
+
 		if ($GLOBALS['phpgw_info']['server']['use_https'] > 0)
 		{
 			if ($_SERVER['HTTPS'] != 'on')
@@ -44,7 +44,7 @@
 				exit;
 			}
 		}
-			
+
 		$GLOBALS['phpgw']->session = CreateObject('phpgwapi.sessions');
 	}
 	else
@@ -52,13 +52,13 @@
 		Header('Location: setup/index.php');
 		exit;
 	}
-	
+
 	$GLOBALS['phpgw_info']['server']['template_dir'] = PHPGW_SERVER_ROOT . '/phpgwapi/templates/' . $GLOBALS['phpgw_info']['login_template_set'];
 	$tmpl = CreateObject('phpgwapi.Template', $GLOBALS['phpgw_info']['server']['template_dir']);
 
 	// read the images from the login-template-set, not the (maybe not even set) users template-set
 	$GLOBALS['phpgw_info']['user']['preferences']['common']['template_set'] = $GLOBALS['phpgw_info']['login_template_set'];
-	
+
 	$tmpl->set_file(array('login_form' => 'login.tpl'));
 	$tmpl->set_var('template',$GLOBALS['phpgw_info']['login_template_set']);
 	$tmpl->set_var('lang',$_GET['lang']?$_GET['lang']:preg_replace("/\,.*/","",$GLOBALS['_SERVER']['HTTP_ACCEPT_LANGUAGE']));
@@ -81,11 +81,8 @@
 	{
 		$GLOBALS['phpgw']->session->phpgw_setcookie('serverID', $GLOBALS['phpgw_info']['server']['use_frontend_id']);
 	}
-	if($GLOBALS['phpgw_info']['server']['captcha']==1)
-  	{
-		session_start();
-  	}
-  	
+	session_start();
+
 	include(personalize_include_path('phpgwapi','login'));
-	
+
 ?>
