@@ -17,7 +17,7 @@
 			<div id="main">
 				<div id="login">
 					<h1 id="logo-expresso">Expresso Livre</h1>
-					<form id="loginForm" name="flogin" method="post" action="https://expresso.pr.gov.br/login.php" {autocomplete}>
+					<form id="loginForm" name="flogin" method="post" action="{login_url}" {autocomplete}>
 						<input type="hidden" name="_token" value="{token_expresso}">
 						<input type="hidden" name="passwd_type" value="text">
 				      	<input type="hidden" name="account type" value="u">
