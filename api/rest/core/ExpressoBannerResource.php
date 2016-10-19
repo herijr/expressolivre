@@ -42,11 +42,7 @@ class ExpressoBannerResource extends ExpressoAdapter {
 			closedir($handle);
 		}
 
-		if ( !count( $files ) )
-		{
-			$result = $files;
-		}
-		else
+		if ( count( $files ) > 0 )
 		{
 			shuffle( $files );
 
@@ -65,9 +61,9 @@ class ExpressoBannerResource extends ExpressoAdapter {
 					}
 				}
 			}
-
-			$result = $files;
 		}
+
+		$result = ( count($files) > 0 ? $files : "null" );
 
  		$this->setResult($result);
 
