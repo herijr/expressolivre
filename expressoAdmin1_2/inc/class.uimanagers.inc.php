@@ -9,6 +9,8 @@
 	*  option) any later version.														*
 	\************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uimanagers
 	{
 		var $public_functions = array
@@ -273,7 +275,7 @@
 				//Pego ACL do gerente
 				$manager = $this->functions->read_acl($_GET['manager_lid']);
 				//Cria vetor da ACL
-				$manager_acl = $this->functions->make_array_acl($manager['acl']);
+				$manager_acl = array_flip( ACL_Managers::getPerms( $manager['acl'] ) );
 				//Pesquisa no Banco e pega os valores dos apps.
 				$query = "SELECT * FROM phpgw_expressoadmin_apps WHERE manager_lid = '" . $_GET['manager_lid'] . "' AND context = '" . $_GET['context'] . "'";
 				$GLOBALS['phpgw']->db->query($query);
@@ -311,6 +313,96 @@
 				$input_context_fields .= '<div><input disabled type="text" value="'.$context.'" size=60></input><span onclick="this.parentNode.parentNode.removeChild(this.parentNode);" style="cursor:pointer"> -</span></div>';
 			$options_context = $this->functions->get_organizations($GLOBALS['phpgw_info']['server']['ldap_context'], '', false, true, false, true);
 
+			$acl_control_fields = array(
+				array(
+					ACL_Managers::ACL_ADD_USERS,
+					ACL_Managers::ACL_MOD_USERS,
+					ACL_Managers::ACL_DEL_USERS,
+					ACL_Managers::ACL_REN_USERS,
+					ACL_Managers::ACL_MOD_USERS_CORPORATIVE,
+					ACL_Managers::ACL_VW_USERS,
+					ACL_Managers::ACL_MOD_USERS_PICTURE,
+					ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER,
+					ACL_Managers::ACL_MOD_USERS_PASSWORD,
+					ACL_Managers::ACL_MOD_USERS_QUOTA,
+					ACL_Managers::ACL_SET_USERS_DEFAULT_PASSWORD,
+					ACL_Managers::ACL_SET_USERS_EMPTY_INBOX,
+					ACL_Managers::ACL_MOD_USERS_RADIUS,
+				),
+				array(
+					ACL_Managers::ACL_ADD_GROUPS,
+					ACL_Managers::ACL_MOD_GROUPS,
+					ACL_Managers::ACL_DEL_GROUPS,
+					ACL_Managers::ACL_MOD_GROUPS_EMAIL,
+					NULL,
+					ACL_Managers::ACL_ADD_INSTITUTIONAL_ACCOUNTS,
+					ACL_Managers::ACL_MOD_INSTITUTIONAL_ACCOUNTS,
+					ACL_Managers::ACL_DEL_INSTITUTIONAL_ACCOUNTS,
+					NULL,
+					ACL_Managers::ACL_ADD_EMAIL_LISTS,
+					ACL_Managers::ACL_MOD_EMAIL_LISTS,
+					ACL_Managers::ACL_DEL_EMAIL_LISTS,
+					ACL_Managers::ACL_MOD_EMAIL_LISTS_SCL,
+					ACL_Managers::ACL_MOD_EMAIL_LISTS_ADD_EXTERNAL,
+				),
+				array(
+					ACL_Managers::ACL_ADD_SECTORS,
+					ACL_Managers::ACL_MOD_SECTORS,
+					ACL_Managers::ACL_DEL_SECTORS,
+					NULL,
+					ACL_Managers::ACL_VW_GLOBAL_SESSIONS,
+					ACL_Managers::ACL_VW_LOGS,
+				),
+			);
+
+			if ( $this->config['expressoAdmin_samba_support'] == 'true' ) {
+				$acl_control_fields[0][] = ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES;
+				$acl_control_fields[2][] = NULL;
+				$acl_control_fields[2][] = ACL_Managers::ACL_ADD_COMPUTERS;
+				$acl_control_fields[2][] = ACL_Managers::ACL_MOD_COMPUTERS;
+				$acl_control_fields[2][] = ACL_Managers::ACL_DEL_COMPUTERS;
+				$acl_control_fields[2][] = NULL;
+				$acl_control_fields[2][] = ACL_Managers::ACL_MOD_SAMBA_DOMAINS;
+			}
+
+			$acl_label_fields = array(
+				ACL_Managers::ACL_VW_USERS                     => 'view_user',
+				ACL_Managers::ACL_SET_USERS_DEFAULT_PASSWORD   => 'set_default_users_password',
+				ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES   => 'edit_SAMBA_users_attributes',
+				ACL_Managers::ACL_MOD_USERS_RADIUS             => 'radius_filter',
+				ACL_Managers::ACL_MOD_GROUPS_EMAIL             => 'edit_email_attribute_from_the_groups',
+				ACL_Managers::ACL_ADD_EMAIL_LISTS              => 'add_email_lists',
+				ACL_Managers::ACL_MOD_EMAIL_LISTS              => 'edit_email_lists',
+				ACL_Managers::ACL_DEL_EMAIL_LISTS              => 'delete_email_lists',
+				ACL_Managers::ACL_MOD_EMAIL_LISTS_SCL          => 'edit_SCL_email_lists',
+				ACL_Managers::ACL_MOD_EMAIL_LISTS_ADD_EXTERNAL => 'add_external_emails',
+				ACL_Managers::ACL_ADD_SECTORS                  => 'create_organizations',
+				ACL_Managers::ACL_MOD_SECTORS                  => 'edit_organizations',
+				ACL_Managers::ACL_DEL_SECTORS                  => 'delete_organizations',
+				ACL_Managers::ACL_MOD_SAMBA_DOMAINS            => 'edit_SAMBA_domains',
+				ACL_Managers::ACL_VW_GLOBAL_SESSIONS           => 'show_sessions',
+			);
+
+			$rows = max( array_map( 'count', $acl_control_fields ) );
+			$cols = count( $acl_control_fields );
+			$acl_control_list = '<table id="ea_table_acl" style="margin: auto;">';
+			for ( $j = 0; $j < $rows; $j++ ) {
+				$acl_control_list .= '<tr bgcolor="{color_font'.($j%2?2:1).'}" align="right" style="height: 20px;">';
+				for ( $i = 0; $i < $cols; $i++ ) {
+					if ( is_null( $acl_control_fields[$i][$j] ) ) $acl_control_list .= '<td></td><td></td>';
+					else {
+						$name = $acl_control_fields[$i][$j];
+						$label = $this->make_lang( 'lang_' . ( isset($acl_label_fields[$name])?$acl_label_fields[$name]:$name ) );
+						$checked = $first_time? isset( $manager_acl[$name] ) : isset ($_POST['acl'][$name] );
+						$acl_control_list .= '<td width="250px">'.$label
+							.':</td><td width="25px"><input type="checkbox" name="acl['.$name.']" '.($checked?'checked':'').'></td>';
+					}
+				}
+				$acl_control_list .= '</tr>';
+			}
+			$acl_control_list .= '</table>';
+			$p->set_var('template_control_list', $acl_control_list);
+
 			$var = Array(
 				'scripts_java'				=> $scripts_java,
 				'action'					=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimanagers.validate'),
@@ -331,29 +423,14 @@
 				'options_contexts'			=> $options_context,
 				
 				'hidden_manager_lid'		=> $hidden_manager_lid,
-				'app_list'					=> $applications_list
+				'app_list'					=> $applications_list,
 			);
 			$p->set_var($var);
 			
 			// Cria dinamicamente os langs e seta acls
-			foreach ($tpl_vars as $atribute)
-			{
-				$acl  = strstr($atribute, 'acl_');
-				$lang = strstr($atribute, 'lang_');
-				// Recuperar os valores das ACLS
-				if ($acl !== false)
-				{
-					if ($first_time)
-						$p->set_var($atribute, $manager_acl[$atribute] === '1' ? 'checked' : '');
-					else
-						$p->set_var($atribute, $_POST[$atribute] === '1' ? 'checked' : ''); 
-				}
-				// Setar os langs do tpl.
-				elseif($lang !== false)
-				{
-					$p->set_var($atribute, $this->make_lang($atribute));
-				}
-			}
+			foreach ( $tpl_vars as $atribute )
+				if ( strstr( $atribute, 'lang_' ) )
+					$p->set_var( $atribute, $this->make_lang( $atribute ) );
 			
 			echo $p->fp('out','form');
 		}

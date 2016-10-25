@@ -3,6 +3,7 @@ define('PHPGW_INCLUDE_ROOT','../');
 define('PHPGW_API_INC','../phpgwapi/inc');	
 include_once(PHPGW_API_INC.'/class.common.inc.php');
 include_once('class.functions.inc.php');
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 function ldapRebind($ldap_connection, $ldap_url)
 {
@@ -179,7 +180,7 @@ class ldap_functions
 				}
 
 				// Verifica o acesso do gerente aos atributos corporativos
-				if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'manipulate_corporative_information'))
+				if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE ))
 				{
 					$result['corporative_information_employeenumber']= $entry[0]['employeenumber'][0];
 					$result['corporative_information_cpf']			= $entry[0]['cpf'][0];

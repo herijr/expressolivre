@@ -9,6 +9,8 @@
 	*  option) any later version.											            *
 	\***********************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uigroups
 	{
 		var $public_functions = array
@@ -59,7 +61,7 @@
 			}
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($account_lid,'list_groups'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::GRP_VIEW_GROUPS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -88,7 +90,7 @@
 				'th_bg'					=> $GLOBALS['phpgw_info']['theme']['th_bg'],
 				'back_url'				=> $GLOBALS['phpgw']->link('/expressoAdmin1_2/index.php'),
 				'add_action'			=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uigroups.add_groups'),
-				'add_group_disabled'	=> $this->functions->check_acl($account_lid,'add_groups') ? '' : 'disabled',
+				'add_group_disabled'	=> $this->functions->check_acl( $account_lid, ACL_Managers::ACL_ADD_GROUPS ) ? '' : 'disabled',
 				'context_display'		=> $context_display
 			);
 			$p->set_var($var);
@@ -110,15 +112,15 @@
 			}
 			else if ($total)
 			{
-				if ($this->functions->check_acl($account_lid,'edit_groups'))
+				if ($this->functions->check_acl( $account_lid, ACL_Managers::ACL_MOD_GROUPS ))
 				{
 					$can_edit = True;
 				}
-				if ($this->functions->check_acl($account_lid,'add_groups'))
+				if ($this->functions->check_acl( $account_lid, ACL_Managers::ACL_ADD_GROUPS ))
 				{
 					$can_copy = True;
 				}
-				if ($this->functions->check_acl($account_lid,'delete_groups'))
+				if ($this->functions->check_acl( $account_lid, ACL_Managers::ACL_DEL_GROUPS ))
 				{
 					$can_delete = True;
 				}
@@ -191,7 +193,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'add_groups'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_GROUPS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -250,7 +252,7 @@
 				'use_attrs_samba_checked'	=> '',
 				'disabled_samba'			=> 'disabled',
 				'display_samba_options'		=> $this->current_config['expressoAdmin_samba_support'] == 'true' ? '' : '"display:none"',
-				'disable_email_groups'		=> $this->functions->check_acl($manager_lid,'edit_email_groups') ? '' : 'disabled',
+				'disable_email_groups'		=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_GROUPS_EMAIL ) ? '' : 'disabled',
 				'sambadomainname_options'	=> $sambadomainname_options,
 				'back_url'					=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uigroups.list_groups'),
 				'combo_manager_org'			=> $combo_manager_org,
@@ -274,7 +276,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'edit_groups'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_GROUPS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -383,7 +385,7 @@
 				'combo_manager_org'                 => $combo_manager_org,
 				'defaultDomain'                     => $this->current_config['expressoAdmin_defaultDomain'],
 				'description'                       => $group_info['description'],
-				'disable_email_groups'              => $this->functions->check_acl($manager_lid,'edit_email_groups') ? '' : 'disabled',
+				'disable_email_groups'              => $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_GROUPS_EMAIL ) ? '' : 'disabled',
 				'disabled_samba'                    => $group_info['use_attrs_samba'] ? '' : 'disabled',
 				'display_posix_attrs'               => $group_type_check? '' : 'display:none',
 				'display_samba_options'             => $this->current_config['expressoAdmin_samba_support'] == 'true' && $group_type_check ? '' : '"display:none"',

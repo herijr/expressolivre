@@ -9,6 +9,8 @@
 *  option) any later version.														 *
 \************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 class uilogs
 {
 	var $public_functions = array(
@@ -25,7 +27,7 @@ class uilogs
 	
 	function list_logs()
 	{
-		if ( !$this->functions->check_acl( $GLOBALS['phpgw']->accounts->data['account_lid'], 'view_logs' ) )
+		if ( !$this->functions->check_acl( $GLOBALS['phpgw']->accounts->data['account_lid'], ACL_Managers::ACL_VW_LOGS ) )
 			$GLOBALS['phpgw']->redirect( $GLOBALS['phpgw']->link( '/expressoAdmin1_2/inc/access_denied.php' ) );
 		
 		unset( $GLOBALS['phpgw_info']['flags']['noheader'] );

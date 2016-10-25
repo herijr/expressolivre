@@ -60,17 +60,9 @@
 
 		function make_manager_acl($array_post)
 		{
-			$total_manager_acl = 0;
-			foreach ($array_post as $atribute=>$value)
-			{
-				$acl  = strstr($atribute, 'acl_');
-
-				if ($acl !== false)
-				{
-					$total_manager_acl += $value;
-				}
-			}
-			return $total_manager_acl;
+			include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+			return ( isset( $array_post['acl'] ) && count( $array_post['acl'] )  )?
+				ACL_Managers::getValue( array_keys( $array_post['acl'] ) ) : 0;
 		}
 
 		function validate($params)

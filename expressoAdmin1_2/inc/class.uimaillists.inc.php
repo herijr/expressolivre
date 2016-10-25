@@ -9,6 +9,8 @@
 	*  option) any later version.														 *
 	\*************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uimaillists
 	{
 		var $public_functions = array
@@ -54,7 +56,7 @@
 			}
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'list_maillists'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::GRP_VIEW_EMAIL_LISTS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -83,7 +85,7 @@
 				'th_bg'						=> $GLOBALS['phpgw_info']['theme']['th_bg'],
 				'back_url'					=> $GLOBALS['phpgw']->link('/expressoAdmin1_2/index.php'),
 				'add_action'				=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimaillists.add_maillists'),
-				'add_email_lists_disabled'	=> $this->functions->check_acl($manager_lid,'add_maillists') ? '' : 'disabled',
+				'add_email_lists_disabled'	=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_EMAIL_LISTS ) ? '' : 'disabled',
 				'context_display'			=> $context_display
 			);
 			$p->set_var($var);
@@ -105,19 +107,6 @@
 			}
 			else if ($total)
 			{
-				if ($this->functions->check_acl($manager_lid,'edit_maillists'))
-				{
-					$can_edit = True;
-				}
-				if ($this->functions->check_acl($manager_lid,'delete_maillists'))
-				{
-					$can_delete = True;
-				}
-				if ($this->functions->check_acl($manager_lid,'edit_scl_email_lists'))
-				{
-					$can_edit_scl = True;
-				}
-
 
 				foreach($maillists_info as $maillist)
 				{
@@ -130,7 +119,7 @@
 					);
 					$p->set_var($var);
 
-					if ($can_edit)
+					if ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_EMAIL_LISTS ))
 					{
 						$p->set_var('edit_link',$this->row_action('edit','maillists',$maillist['uidnumber'],$maillist['uid']));
 					}
@@ -139,7 +128,7 @@
 						$p->set_var('edit_link','&nbsp;');
 					}
 
-					if ( ($can_edit_scl) && ($this->current_config['expressoAdmin_scl']) )
+					if ( ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_EMAIL_LISTS_SCL )) && ($this->current_config['expressoAdmin_scl']) )
 					{
 						$p->set_var('scl_link',$this->row_action('scl','maillists',$maillist['uidnumber'],$maillist['uid']));
 					}
@@ -148,7 +137,7 @@
 						$p->set_var('scl_link','&nbsp;');
 					}
 
-					if ($can_delete)
+					if ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_DEL_EMAIL_LISTS ))
 					{
 						$p->set_var('delete_link',"<a href='#' onClick='javascript:delete_maillist(\"".$maillist['uid']."\",\"".$maillist['uidnumber']."\");'>".lang('to delete')."</a>");
 					}
@@ -172,7 +161,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'add_maillists'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_EMAIL_LISTS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -207,7 +196,7 @@
 				'combo_manager_org'			=> $combo_manager_org,
 				'combo_all_orgs'			=> $combo_all_orgs,
 				'defaultDomain'				=> $this->current_config['expressoAdmin_defaultDomain'],
-				'display_externalEmail_form'=> $this->functions->check_acl($manager_lid,'add_externalEmail') ? '' : 'none',
+				'display_externalEmail_form'=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_EMAIL_LISTS_ADD_EXTERNAL ) ? '' : 'none',
 			);
 			$p->set_var($var);
 			$p->set_var($this->functions->make_dinamic_lang($p, 'body'));
@@ -223,7 +212,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'edit_maillists'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_EMAIL_LISTS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -309,7 +298,7 @@
 				'phpgwAccountVisible_checked'	=> $maillist_info['phpgwAccountVisible'] == '-1' ? 'CHECKED' : '',
 				'ea_select_usersInMaillist'		=> $ea_select_usersInMaillist,
 				'defaultDomain'					=> $this->current_config['expressoAdmin_defaultDomain'],
-				'display_externalEmail_form'	=> $this->functions->check_acl($manager_lid,'add_externalEmail') ? '' : 'none',
+				'display_externalEmail_form'	=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_EMAIL_LISTS_ADD_EXTERNAL ) ? '' : 'none',
 			);
 			$p->set_var($var);
 			$p->set_var($this->functions->make_dinamic_lang($p, 'body'));
@@ -326,7 +315,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 						
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'edit_maillists'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_EMAIL_LISTS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}

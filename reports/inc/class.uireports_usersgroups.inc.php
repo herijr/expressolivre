@@ -9,6 +9,8 @@
 	*  option) any later version.														 *
 	*************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uireports_usersgroups
 	{
 		var $public_functions = array
@@ -59,7 +61,7 @@
 			}
 
 
-			if (!$this->functions->check_acl($account_lid,'list_groups'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::GRP_VIEW_GROUPS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/reports/inc/access_denied.php'));
 			}
@@ -155,7 +157,7 @@
 			}
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($account_lid,'list_sectors'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::GRP_VIEW_SECTORS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/reports/inc/access_denied.php'));
 			}
@@ -329,7 +331,7 @@
 				$context_display .= $tmp_context;
 			}
 			// Verifica se o administrador tem acesso.
-			if (!$this->functions->check_acl($account_lid,'list_groups'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::GRP_VIEW_GROUPS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/reports/inc/access_denied.php'));
 			}

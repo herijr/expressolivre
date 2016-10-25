@@ -9,6 +9,8 @@
 	*  option) any later version.													   *
 	\***********************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uicomputers
 	{
 		var $public_functions = array
@@ -58,7 +60,7 @@
 			}
 	
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'list_computers'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::GRP_VIEW_COMPUTERS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -88,7 +90,7 @@
 			$var = Array(
 				'th_bg'						=> $GLOBALS['phpgw_info']['theme']['th_bg'],
 				'add_action'				=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uicomputers.add_computer'),
-				'add_computers_disabled'	=> $this->functions->check_acl($manager_lid,'create_computers') ? '' : 'display:none',
+				'add_computers_disabled'	=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_COMPUTERS ) ? '' : 'display:none',
 				'back_url'					=> $GLOBALS['phpgw']->link('/expressoAdmin1_2/index.php'),
 				'context_display'			=> $context_display,
 			);
@@ -111,14 +113,6 @@
 			}
 			else if (count($computers_info))
 			{
-				if ($this->functions->check_acl($manager_lid,'edit_computers'))
-				{
-					$can_edit = True;
-				}
-				if ($this->functions->check_acl($manager_lid,'delete_computers'))
-				{
-					$can_delete = True;
-				}
 
 				foreach($computers_info as $computer)
 				{
@@ -130,7 +124,7 @@
 					);
 					$p->set_var($var);
 
-					if ($can_edit)
+					if ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_COMPUTERS ))
 					{
 						$p->set_var('edit_link',$this->row_action('edit','computer',$computer['uidNumber']));
 					}
@@ -139,7 +133,7 @@
 						$p->set_var('edit_link','&nbsp;');
 					}
 
-					if ($can_delete)
+					if ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_DEL_COMPUTERS ))
 					{
 						$p->set_var('delete_link',$this->row_action('delete','computer',$computer['uidNumber']));
 					}
@@ -162,7 +156,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'create_computers'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_COMPUTERS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -293,7 +287,7 @@
 			$manager_contexts = $manager_acl['contexts'];
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'edit_computers'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_COMPUTERS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -482,7 +476,7 @@
 			$manager_context = $acl[0]['context'];
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($account_lid,'delete_computers'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::ACL_DEL_COMPUTERS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}

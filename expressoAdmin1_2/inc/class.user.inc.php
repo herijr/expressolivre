@@ -14,6 +14,7 @@
 	include_once('class.db_functions.inc.php');
 	include_once('class.imap_functions.inc.php');
 	include_once('class.functions.inc.php');
+	include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 		
 	class user
 	{
@@ -45,7 +46,7 @@
 					$params[$key] = trim( $params[$key] );
 			
 			// Verifica o acesso do gerente
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'add_users'))
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_ADD_USERS ))
 			{
 				$profile = CreateObject('emailadmin.bo')->getProfile('mail', $params['mail']);
 				
@@ -150,7 +151,7 @@
 					
 					// Qualquer um que crie um usuário, deve ter permissão para adicionar a senha samba.
 					// Verifica o acesso do gerente aos atributos samba
-					//if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_sambausers_attributes'))
+					//if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES ))
 					//{
 						//Verifica se o binario para criar as senhas do samba exite.
 						if (!is_file('/home/expressolivre/mkntpwd'))
@@ -187,7 +188,7 @@
 				}
 				
 				// Verifica o acesso do gerente aos atributos corporativos
-				if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'manipulate_corporative_information'))
+				if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE ))
 				{
 					//retira caracteres que não são números.
 					$params['corporative_information_cpf'] = preg_replace("/[^0-9]/", "", $params['corporative_information_cpf']);
@@ -209,7 +210,7 @@
 
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// RADIUS
-				$radius = $this -> functions -> check_acl( $_SESSION[ 'phpgw_session' ][ 'session_lid' ], 'edit_radius' );
+				$radius = $this->functions->check_acl( $_SESSION[ 'phpgw_session' ][ 'session_lid' ], ACL_Managers::ACL_MOD_USERS_RADIUS );
 				$radius_conf = $this->ldap_functions->getRadiusConf();
 				if ( $radius && $radius_conf->enabled )
 				{
@@ -237,7 +238,7 @@
 				}
 				
 				// Chama funcao para salvar foto no OpenLDAP.
-				if ( $_FILES['photo']['name'] != '' && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'edit_users_picture' ) ) {
+				if ( $_FILES['photo']['name'] != '' && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PICTURE ) ) {
 					if ( $_FILES['photo']['size'] > 10000 ) {
 						$return['status'] = false;
 						$return['msg']   .= $this->functions->lang( 'User photo could not be save because is bigger the 10 kb' ).'.';
@@ -352,11 +353,11 @@
 			$diff = array_diff($new_values, $old_values);
 			
 			$manager_account_lid = $_SESSION['phpgw_session']['session_lid'];
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) &&
-				(!$this->functions->check_acl($manager_account_lid,'change_users_password')) &&
-				(!$this->functions->check_acl($manager_account_lid,'edit_sambausers_attributes')) &&
-				(!$this->functions->check_acl($manager_account_lid,'manipulate_corporative_information')) &&
-				(!$this->functions->check_acl($manager_account_lid,'edit_users_phonenumber'))
+			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) &&
+				(!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PASSWORD )) &&
+				(!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )) &&
+				(!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_CORPORATIVE )) &&
+				(!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER ))
 				)
 			{
 				$return['status'] = false;
@@ -365,7 +366,7 @@
 			}
 
 			// Check manager access
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users'))
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS ))
 			{
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// Change user organization
@@ -454,8 +455,8 @@
 				}
 			}
 			
-			if ( ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) || 
-			     ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'change_users_password')) )
+			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) || 
+			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PASSWORD )) )
 			{
 				if (isset($diff['password1']) && $diff['password1'])
 				{
@@ -509,8 +510,8 @@
 				}
 			}
 			
-			if ( ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) || 
-			     ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users_phonenumber')) )
+			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) || 
+			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER )) )
 			{
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// TELEPHONE
@@ -557,8 +558,8 @@
 			// REPLACE, ADD & REMOVE COPORATIVEs ATRIBUTES
 			// Verifica o acesso do gerente aos atributos corporativos
 			
-			if ( ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) || 
-			     ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'manipulate_corporative_information')) )
+			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) || 
+			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE )) )
 			{
 				foreach ($new_values as $atribute=>$value)
 				{
@@ -590,8 +591,8 @@
 			}
 			
 			//Suporte ao SAMBA
-			if ( ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) || 
-			     ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_sambausers_attributes')) )
+			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) || 
+			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )) )
 			{
 				
 				if (isset($diff['gidnumber']) && $diff['gidnumber'])
@@ -646,7 +647,7 @@
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// PHOTO
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users_picture'))
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PICTURE ))
 			{
 				if (isset($new_values['delete_photo']) && $new_values['delete_photo'])
 				{
@@ -678,7 +679,7 @@
 			}
 			
 			// Verifica o acesso para adicionar ou remover tais atributos
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users'))
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS ))
 			{
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// PREF_CHANGEPASSWORD
@@ -818,8 +819,8 @@
 				}
 			}
 			
-			if ( ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) && 
-			     ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_sambausers_attributes')) )
+			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) && 
+			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )) )
 			{
 				if ( $new_values['sambahomedirectory'] == '' )
 				{
@@ -881,7 +882,7 @@
 
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// RADIUS
-			$radius = $this -> functions -> check_acl( $_SESSION[ 'phpgw_session' ][ 'session_lid' ], 'edit_radius' );
+			$radius = $this->functions->check_acl( $_SESSION[ 'phpgw_session' ][ 'session_lid' ], ACL_Managers::ACL_MOD_USERS_RADIUS );
 			$radius_conf = $this->ldap_functions->getRadiusConf();
 			if ( $radius  && $radius_conf->enabled )
 			{
@@ -938,7 +939,7 @@
 			
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// GROUPS
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_groups')) 
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_GROUPS )) 
 			{
 				// If the manager does not have the suficient access, the new_values.uid is empty. 
 				if (empty($new_values['uid']))
@@ -1034,8 +1035,8 @@
 				}
 			}
 			
-			if ( ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) && 
-			     ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'change_users_quote')) &&
+			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) && 
+			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_QUOTA )) &&
 			     (!$mbox_migrate) )
 			{
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1056,7 +1057,7 @@
 				}
 			}
 			
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users')) 
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) 
 			{
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// MAILLISTS
@@ -1208,7 +1209,7 @@
 			$this->db_functions->write_log('delete user: start', $params['uid']);
 			
 			// Verifica o acesso do gerente
-			if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'delete_users'))
+			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_DEL_USERS ))
 			{
 				$uidnumber = $params['uidnumber'];
 				if (!$user_info = $this->get_user_info($uidnumber))
@@ -1286,7 +1287,7 @@
 				return array( 'status' => false, 'msg' => $this->functions->lang('New login already in use').'.' );
 			
 			// Verifica o acesso do gerente
-			if ( !$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'rename_users'))
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_REN_USERS ))
 				return array( 'status' => false, 'msg' => $this->functions->lang('Permission denied').'.' );
 			
 			//$defaultUserPassword = $this->auth->encrypt_password($this->current_config['expressoAdmin_defaultUserPassword']);

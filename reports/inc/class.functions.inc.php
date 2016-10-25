@@ -16,7 +16,6 @@
 	{
 		var $public_functions = array
 		(
-			'make_array_acl' 			=> True,
 			'check_acl'					=> True,
 			'read_acl'					=> True,
 			'exist_account_lid'			=> True,
@@ -51,64 +50,11 @@
 		// Account and type of access. Return: Have access ? (true/false)
 		function check_acl($account_lid, $access)
 		{
+			include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$acl = $this->read_acl($account_lid);
-			$array_acl = $this->make_array_acl($acl['acl']);
-			
-			switch($access)
-			{
-				case list_users:
-					if ($array_acl[acl_add_users] || $array_acl[acl_edit_users] || $array_acl[acl_delete_users] || $array_acl[acl_change_users_password] || $array_acl[acl_change_users_quote] || $array_acl[acl_edit_sambausers_attributes] || $array_acl[acl_view_users] || $array_acl[acl_manipulate_corporative_information] || $array_acl[acl_edit_users_phonenumber] )
-						return true;
-					break;
-				case report_users:
-					if ($array_acl[acl_change_users_quote] || $array_acl[acl_view_users])
-						return true;
-					break;
-				case list_groups:
-					if ($array_acl[acl_add_groups] || $array_acl[acl_edit_groups] || $array_acl[acl_delete_groups])
-						return true;
-					break;
-				case list_maillists:
-					if ($array_acl[acl_add_maillists] || $array_acl[acl_edit_maillists] || $array_acl[acl_delete_maillists])
-						return true;
-					break;
-				case list_sectors:
-//					if ($array_acl[acl_create_sectors] || $array_acl[acl_edit_sectors] || $array_acl[acl_delete_sectors])
-					if ($array_acl[acl_view_users])
-						return true;
-					break;
-				case list_computers:
-					if ($array_acl[acl_create_computers] || $array_acl[acl_edit_computers] || $array_acl[acl_delete_computers])
-						return true;
-					break;
-
-				case display_groups:
-					if ( $array_acl[acl_edit_users] || $array_acl[acl_view_users] || ($array_acl[acl_edit_sambausers_attributes] && ($this->current_config['expressoAdmin_samba_support'] == 'true')) )
-						return true;
-					break;
-				case display_emailconfig:
-					if ($array_acl[acl_edit_users] || $array_acl[acl_view_users])
-						return true;
-					break;
-				case display_applications:
-					if ($array_acl[acl_edit_users] || $array_acl[acl_view_users])
-						return true;
-					break;
-				case display_emaillists:
-					if ($array_acl[acl_edit_users] || $array_acl[acl_view_users])
-						return true;
-					break;
-
-				case list_institutional_accounts:
-					if ($array_acl[acl_add_institutional_accounts] || $array_acl[acl_edit_institutional_accounts] || $array_acl[acl_delete_institutional_accounts])
-						return true;
-					break;
-
-
-				default:
-					return $array_acl["acl_$access"];
-			}
-			return false;
+			$params = func_get_args();
+			$params[0] = $acl['acl'];
+			return call_user_func_array( array( 'ACL_Managers', 'isAllow' ), $params );
 		}
 
 		
@@ -129,60 +75,6 @@
 			}
 			
 			return $result;
-		}
-		
-		function make_array_acl($acl)
-		{
-			$array_acl_tmp = array();
-			$tmp = array(		"acl_add_users",
-							 	"acl_edit_users",
-							 	"acl_delete_users",
-							 	"acl_EMPTY1",
-							 	"acl_add_groups",
-							 	"acl_edit_groups",
-							 	"acl_delete_groups",
-							 	"acl_change_users_password",
-							 	"acl_add_maillists",
-							 	"acl_edit_maillists",
-							 	"acl_delete_maillists",
-							 	"acl_EMPTY2",
-							 	"acl_create_sectors",
-							 	"acl_edit_sectors",
-							 	"acl_delete_sectors",
-							 	"acl_edit_sambausers_attributes",
-							 	"acl_view_global_sessions",
-							 	"acl_view_logs",
-							 	"acl_change_users_quote",
-							 	"acl_set_user_default_password",
-							 	"acl_create_computers",
-							 	"acl_edit_computers",
-							 	"acl_delete_computers",
-							 	"acl_rename_users",
-							 	"acl_edit_sambadomains",
-							 	"acl_view_users",
-							 	"acl_edit_email_groups",
-							 	"acl_empty_user_inbox",
-							 	"acl_manipulate_corporative_information",
-							 	"acl_edit_users_picture",
-							 	"acl_edit_scl_email_lists",
-							 	"acl_edit_users_phonenumber",
-							 	"acl_add_institutional_accounts",
-							 	"acl_edit_institutional_accounts",
-							 	"acl_remove_institutional_accounts"
-							 	);
-			
-			foreach ($tmp as $index => $right)
-			{
-				$bin = '';
-				for ($i=0; $i<$index; $i++)
-				{
-					$bin .= '0';
-				}
-				$bin = '1' . $bin;
-				
-				$array_acl[$right] = $this->safeBitCheck(bindec($bin), $acl);
-			}
-			return $array_acl;
 		}
 		
 		function get_inactive_users($contexts)
@@ -214,22 +106,6 @@
 			return $retorno;
 		}
 
-		function safeBitCheck($number,$comparison)
-		{
-        	$binNumber = base_convert($number,10,2);
-	        $binComparison = strrev(base_convert($comparison,10,2));
-			$str = strlen($binNumber);
-	        
-	        if ( ($str <= strlen($binComparison)) && ($binComparison{$str-1}==="1") )
-        	{
-				return '1';
-	        }
-			else
-	        {
-				return '0';
-			}
-		}
-		
 		function get_list_all($type, $query, $contexts,$sizelimit)
 		{
 			$dn			= $GLOBALS['phpgw_info']['server']['ldap_root_dn'];
@@ -1962,12 +1838,13 @@
 
 		function show_access_log($account_id)
 		{	
+			include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$manager_account_lid = $GLOBALS['phpgw']->accounts->data['account_lid'];
 			$tmp = $this->read_acl($manager_account_lid);
 			$manager_context = $tmp[0]['context'];
 			
 			// Verifica se tem acesso a este modulo
-			if ((!$this->check_acl($manager_account_lid,'edit_users')) && (!$this->check_acl($manager_account_lid,'change_users_password')))
+			if ((!$this->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && (!$this->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PASSWORD )))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/reports/inc/access_denied.php'));
 			}

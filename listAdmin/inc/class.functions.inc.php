@@ -16,7 +16,6 @@
 		
 		var $public_functions = array
 		(
-			'make_array_acl' 	=> True,
 			'check_acl'		=> True,
 			'read_acl'		=> True,
 			'exist_account_lid'	=> True,
@@ -36,148 +35,11 @@
 		// Account and type of access. Return: Have access ? (true/false)
 		function check_acl($account_lid, $access)
 		{
+			include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$acl = $this->read_acl($account_lid);
-			$array_acl = $this->make_array_acl($acl[0][acl]);
-			
-			//What access ?? In the IF, verify if have access.
-			switch($access)
-			{
-				case list_users:
-					if ($array_acl[add_users] || $array_acl[edit_users] || $array_acl[delete_users] || $array_acl[change_users_password] || $array_acl[change_users_quote] || $array_acl[edit_sambausers_attributes] || $array_acl[view_users])
-						return true;
-					break;
-				case add_users:
-					if ($array_acl[add_users])
-						return true;
-					break;
-				case edit_users:
-					if ($array_acl[edit_users])
-						return true;
-					break;
-				case delete_users:
-					if ($array_acl[delete_users])
-						return true;
-					break;
-				case rename_users:
-					if ($array_acl[rename_users])
-						return true;
-					break;
-				case view_users:
-					if ($array_acl[view_users])
-						return true;
-					break;
-				case change_users_password:
-					if ($array_acl[change_users_password])
-						return true;
-					break;
-				case change_users_quote:
-					if ($array_acl[change_users_quote])
-						return true;
-					break;
-				case set_user_default_password:
-					if ($array_acl[set_user_default_password])
-						return true;
-					break;
-				case edit_sambausers_attributes:
-					if ($array_acl[edit_sambausers_attributes])
-						return true;
-					break;
-				case edit_sambadomains:
-					if ($array_acl[edit_sambadomains])
-						return true;
-					break;
-				
-				case list_groups:
-					if ($array_acl[add_groups] || $array_acl[edit_groups] || $array_acl[delete_groups])
-						return true;
-					break;
-				case add_groups:
-					if ($array_acl[add_groups])
-						return true;
-					break;
-				case edit_groups:
-					if ($array_acl[edit_groups])
-						return true;
-					break;
-				case delete_groups:
-					if ($array_acl[delete_groups])
-						return true;
-					break;
-				case edit_email_groups:
-					if ($array_acl[edit_email_groups])
-						return true;
-					break;
-				
-				case list_maillists:
-					if ($array_acl[add_maillists] || $array_acl[edit_maillists] || $array_acl[adm_maillists] || $array_acl[delete_maillists])
-						return true;
-					break;
-				case add_maillists:
-					if ($array_acl[add_maillists])
-						return true;
-					break;
-				case edit_maillists:
-					if ($array_acl[edit_maillists])
-						return true;
-					break;
-				case adm_maillists:
-					if ($array_acl[adm_maillists])
-						return true;
-					break;
-				case delete_maillists:
-					if ($array_acl[delete_maillists])
-						return true;
-					break;
-
-				case list_sectors:
-					if ($array_acl[create_sectors] || $array_acl[edit_sectors] || $array_acl[delete_sectors])
-						return true;
-					break;
-				case create_sectors:
-					if ($array_acl[create_sectors])
-						return true;
-					break;
-				case edit_sectors:
-					if ($array_acl[edit_sectors])
-						return true;
-					break;
-				case delete_sectors:
-					if ($array_acl[delete_sectors])
-						return true;
-					break;
-
-				case view_global_sessions:
-					if ($array_acl[view_global_sessions])
-						return true;
-					break;
-
-				case list_computers:
-					if ($array_acl[create_computers] || $array_acl[edit_computers] || $array_acl[delete_computers])
-						return true;
-					break;
-				case create_computers:
-					if ($array_acl[create_computers])
-						return true;
-					break;
-				case edit_computers:
-					if ($array_acl[edit_computers])
-						return true;
-					break;
-				case delete_computers:
-					if ($array_acl[delete_computers])
-						return true;
-					break;
-
-				case view_logs:
-					if ($array_acl[view_logs])
-						return true;
-					break;
-
-				default:
-					return false; 	
-			}
-			
-			return false;
+			$params = func_get_args();
+			$params[0] = $acl['acl'];
+			return call_user_func_array( array( 'ACL_Managers', 'isAllow' ), $params );
 		}
 		
 		// Read acl from db
@@ -189,39 +51,6 @@
 			return $result;
 		}
 		
-		// Make a array read humam
-		// Last acl:	33.554.432, 67.108.864
-		function make_array_acl($acl)
-		{
-			$array_acl['add_users'] = $acl & 1;
-			$array_acl['edit_users'] = $acl & 2;
-			$array_acl['delete_users'] = $acl & 4;
-			$array_acl['rename_users'] = $acl & 8388608;
-			$array_acl['view_users'] = $acl & 33554432;
-			$array_acl['add_groups'] = $acl & 16;
-			$array_acl['edit_groups'] = $acl & 32;
-			$array_acl['delete_groups'] = $acl & 64;
-			$array_acl['edit_email_groups'] = $acl & 67108864;
-			$array_acl['change_users_password'] = $acl & 128;
-			$array_acl['change_users_quote'] = $acl & 262144;
-			$array_acl['set_user_default_password'] = $acl & 524288;
-			$array_acl['edit_sambausers_attributes'] = $acl & 32768;
-			$array_acl['edit_sambadomains'] = $acl & 16777216;
-			$array_acl['add_maillists'] = $acl & 256;
-			$array_acl['edit_maillists'] = $acl & 512;
-			$array_acl['delete_maillists'] = $acl & 1024;
-			$array_acl['adm_maillists'] = $acl & 2048;
-			$array_acl['create_sectors'] = $acl & 4096;
-			$array_acl['edit_sectors'] = $acl & 8192;
-			$array_acl['delete_sectors'] = $acl & 16384;
-			$array_acl['view_global_sessions'] = $acl & 65536;
-			$array_acl['view_logs'] = $acl & 131072;
-			$array_acl['create_computers'] = $acl & 1048576;
-			$array_acl['edit_computers'] = $acl & 2097152;
-			$array_acl['delete_computers'] = $acl & 4194304;
-			return $array_acl;
-		}
-
 		function auto_list($type, $context, $admlista)
 		{
 			$common = new common();

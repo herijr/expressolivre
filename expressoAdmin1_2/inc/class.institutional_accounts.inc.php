@@ -10,6 +10,7 @@
 	\***********************************************************************************/
 
 	define('PHPGW_API_INC','../phpgwapi/inc');
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 	class institutional_accounts
 	{
@@ -47,7 +48,7 @@
 				$context_display .= '<br>'.$tmp_context;
 			}
 			
-			if (!$this->functions->check_acl($account_lid,'list_institutional_accounts')) {
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::GRP_VIEW_INSTITUTIONAL_ACCOUNTS )) {
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
 			/* End: Check manager access */

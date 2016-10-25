@@ -2,6 +2,7 @@
 defined('PHPGW_INCLUDE_ROOT') || define('PHPGW_INCLUDE_ROOT','../');
 defined('PHPGW_API_INC') || define('PHPGW_API_INC','../phpgwapi/inc');	
 include_once(PHPGW_API_INC.'/class.common.inc.php');
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 include_once('class.functions.inc.php');
 
 function ldapRebind($ldap_connection, $ldap_url)
@@ -348,7 +349,7 @@ class ldap_functions
 		}
 		
 		//Begin: Check CPF, only if the manager has access to this field.
-		if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'manipulate_corporative_information'))
+		if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE ))
 		{
 			if (!empty($cpf))
 			{
@@ -1168,7 +1169,7 @@ class ldap_functions
 				}
 
 				// Verifica o acesso do gerente aos atributos corporativos
-				if ($this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'manipulate_corporative_information'))
+				if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE ))
 				{
 					$result['corporative_information_employeenumber']	= isset($entry[0]['employeenumber'][0])? $entry[0]['employeenumber'][0] : '';
 					$result['corporative_information_cpf']				= isset($entry[0]['cpf'][0])? $entry[0]['cpf'][0] : '';
@@ -2038,7 +2039,7 @@ class ldap_functions
 	function create_institutional_accounts($params)
 	{
 		/* Begin: Access verification */
-		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], 'add_institutional_accounts'))
+		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_ADD_INSTITUTIONAL_ACCOUNTS ))
 		{
 			$return['status'] = false;
 			$return['msg'] = $this->functions->lang('You do not have right to create institutional accounts') . ".";
@@ -2138,7 +2139,7 @@ class ldap_functions
 	function save_institutional_accounts($params)
 	{
 		/* Begin: Access verification */
-		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], 'edit_institutional_accounts'))
+		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_MOD_INSTITUTIONAL_ACCOUNTS ))
 		{
 			$return['status'] = false;
 			$return['msg'] = $this->functions->lang('You do not have right to edit institutional accounts') . ".";
@@ -2251,7 +2252,7 @@ class ldap_functions
 	
 	function get_institutional_accounts($params)
 	{
-		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], 'list_institutional_accounts'))
+		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::GRP_VIEW_INSTITUTIONAL_ACCOUNTS ))
 		{
 			$return['status'] = false;
 			$return['msg'] = $this->functions->lang('You do not have right to list institutional accounts') . ".";
@@ -2291,7 +2292,7 @@ class ldap_functions
 	
 	function get_institutional_account_data($params)
 	{
-		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], 'edit_institutional_accounts'))
+		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_MOD_INSTITUTIONAL_ACCOUNTS ))
 		{
 			$return['status'] = false;
 			$return['msg'] = $this->functions->lang('You do not have right to list institutional accounts') . ".";
@@ -2361,7 +2362,7 @@ class ldap_functions
 	
 	function delete_institutional_account_data($params)
 	{
-		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], 'remove_institutional_accounts'))
+		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_DEL_INSTITUTIONAL_ACCOUNTS ))
 		{
 			$return['status'] = false;
 			$return['msg'] = $this->functions->lang('You do not have right to delete institutional accounts') . ".";

@@ -9,6 +9,8 @@
 	*  option) any later version.														  *
 	\**************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class bocomputers
 	{
 		var $public_functions = array(
@@ -30,7 +32,7 @@
 
 		function create_computer()
 		{
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'create_computers'))
+			if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_ADD_COMPUTERS ))
 			{
 				return false;
 			}
@@ -193,7 +195,7 @@
 		{
 			$return['status'] = true;
 			
-			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'delete_computers' ) ) {
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_DEL_COMPUTERS ) ) {
 				$return['status'] = false;
 				$return['msg'] = lang( 'You do not have access to delete computers' ) . '.';
 				return $return;

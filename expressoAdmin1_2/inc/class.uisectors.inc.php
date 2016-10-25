@@ -9,6 +9,8 @@
 *  option) any later version.                                                        *
 \************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 class uisectors
 {
 	var $public_functions = array
@@ -37,7 +39,7 @@ class uisectors
 		$manager_lid = $GLOBALS['phpgw']->accounts->data['account_lid'];
 		
 		// Verifica se o administrador tem acesso.
-		if ( !$this->functions->check_acl( $manager_lid,'list_sectors' ) ) {
+		if ( !$this->functions->check_acl( $manager_lid, ACL_Managers::GRP_VIEW_SECTORS ) ) {
 			$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 		}
 		
@@ -69,8 +71,8 @@ class uisectors
 			
 		} else {
 			
-			$can_edit   = $this->functions->check_acl( $manager_lid,'edit_sectors' );
-			$can_delete = $this->functions->check_acl( $manager_lid,'delete_sectors' );
+			$can_edit   = $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_SECTORS );
+			$can_delete = $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_DEL_SECTORS );
 			
 			foreach( $acl['contexts_display'] as $key => $context_name ) {
 				$context = $acl['contexts'][$key];
@@ -124,7 +126,7 @@ class uisectors
 		
 		// Check access to create and context permission
 		if ( !(
-			$this->functions->check_acl( $manager_lid, 'create_sectors' ) &&
+			$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_SECTORS ) &&
 			$this->so->check_context( $manager_lid, $context )
 		) ) {
 			$GLOBALS['phpgw']->redirect( $GLOBALS['phpgw']->link( '/expressoAdmin1_2/inc/access_denied.php' ) );
@@ -198,7 +200,7 @@ class uisectors
 		
 		// Check access to edit and context permission
 		if ( !(
-			$this->functions->check_acl( $manager_lid, 'edit_sectors' ) &&
+			$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_SECTORS ) &&
 			$this->so->check_context( $manager_lid, $context, true )
 		) ) {
 			$GLOBALS['phpgw']->redirect( $GLOBALS['phpgw']->link( '/expressoAdmin1_2/inc/access_denied.php' ) );
@@ -268,7 +270,7 @@ class uisectors
 		
 		// Check access to delete and context permission
 		if ( !(
-			$this->functions->check_acl( $manager_lid, 'delete_sectors' ) &&
+			$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_DEL_SECTORS ) &&
 			$this->so->check_context( $manager_lid, $context, true ) &&
 			!$this->so->sectors->denied( $context )
 		) ) {

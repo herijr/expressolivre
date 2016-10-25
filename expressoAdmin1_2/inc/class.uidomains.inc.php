@@ -9,6 +9,8 @@
 	*  option) any later version.														 *
 	\************************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uidomains
 	{
 		var $public_functions = array
@@ -40,7 +42,7 @@
 			$context_display = $tmp[0]['context_display'];
 			
 			// Verifica se o administrador tem acesso.
-			if (!$this->functions->check_acl($account_lid,'edit_sambadomains'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::ACL_MOD_SAMBA_DOMAINS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -107,7 +109,7 @@
 			$context = $_GET['context'];
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($account_lid,'edit_sambadomains'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::ACL_MOD_SAMBA_DOMAINS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -199,7 +201,7 @@
 		function delete_domain( $sambadomainname )
 		{
 			// Check edit/delete domain acl
-			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'edit_sambadomains' ) )
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_SAMBA_DOMAINS ) )
 				$GLOBALS['phpgw']->redirect( $GLOBALS['phpgw']->link( '/expressoAdmin1_2/inc/access_denied.php' ) );
 			
 			// Remove LDAP samba domain

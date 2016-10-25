@@ -13,6 +13,7 @@
 	include_once('class.db_functions.inc.php');
 	include_once('class.imap_functions.inc.php');
 	include_once('class.functions.inc.php');
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 	
 	class maillist
 	{
@@ -47,7 +48,7 @@
 		function create($params)
 		{
 			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'add_maillists'))
+			if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_ADD_EMAIL_LISTS ))
 			{
 				$return['status'] = false;
 				$return['msg'] = lang('You do not have access to add email lists') . '.';
@@ -136,7 +137,7 @@
 		function save($new_values)
 		{
 			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_maillists'))
+			if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_EMAIL_LISTS ))
 			{
 				$return['status'] = false;
 				$return['msg'] = lang('You do not have access to edit email lists') . '.';
@@ -299,7 +300,7 @@
 		function save_scl($new_values)
 		{
 			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_scl_email_lists'))
+			if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_EMAIL_LISTS_SCL ))
 			{
 				$return['status'] = false;
 				$return['msg'] = lang('You do not have access to edit email lists SCL') . '.';
@@ -437,7 +438,7 @@
 		function delete($params)
 		{
 			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'delete_maillists'))
+			if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_DEL_EMAIL_LISTS ))
 			{
 				$return['status'] = false;
 				$return['msg'] = lang('You do not have access to delete email lists') . '.';

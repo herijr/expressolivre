@@ -46,6 +46,8 @@
 		
 		function list_maillists()
 		{
+			include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+			
 			$account_lid = $GLOBALS['phpgw']->accounts->data['account_lid'];
 			//$acl = $this->functions->read_acl($account_lid);
 			$context = $GLOBALS['phpgw_info']['server']['ldap_context']; //$acl[0]['context'];
@@ -99,7 +101,7 @@
 				'th_bg'					=> $GLOBALS['phpgw_info']['theme']['th_bg'],
 				'back_url'				=> $GLOBALS['phpgw']->link('/listAdmin/index.php'),
 				'add_action'				=> $GLOBALS['phpgw']->link('/index.php','menuaction=listAdmin.uimaillists.add_maillists'),
-				'add_email_lists_disabled'		=> $this->functions->check_acl($account_lid,'add_maillists') ? '' : 'disabled',
+				'add_email_lists_disabled'		=> $this->functions->check_acl( $account_lid, ACL_Managers::ACL_ADD_EMAIL_LISTS ) ? '' : 'disabled',
 				'context'				=> $context,
 				'context_display'			=> $context_display,
 				'desabilitado'				=> $desabilitado,

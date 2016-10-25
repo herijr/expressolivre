@@ -13,6 +13,7 @@
 	include_once('class.db_functions.inc.php');
 	include_once('class.imap_functions.inc.php');
 	include_once('class.functions.inc.php');
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 	
 	class group
 	{
@@ -47,7 +48,7 @@
 		function create( $params )
 		{
 			// Verifica o acesso do gerente
-			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'add_groups' ) )
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_ADD_GROUPS ) )
 				return array( 'status' => false, 'msg' => lang( 'You do not have access to create new groups' ).'.' );
 			
 			// Trim all fields
@@ -154,7 +155,7 @@
 		function save( $new_values )
 		{
 			// Check manager access
-			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'edit_groups' ) )
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_GROUPS ) )
 				return array( 'status' => false, 'msg' => lang( 'You do not have access to edit groups' ).'.' );
 			
 			// Check valid DN
@@ -240,7 +241,7 @@
 				// Edit email ------------------------------------------------------------------------------------------
 				if (
 					$new_values['email'] != $old_values['email'] &&
-					$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'edit_email_groups' )
+					$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_GROUPS_EMAIL )
 				) $ldap_mod_replace['mail'] = ( empty( $new_values['email'] ) )? array() : $new_values['email'];
 				
 				// Edit SAMBA ------------------------------------------------------------------------------------------
@@ -479,7 +480,7 @@
 		function delete($params)
 		{
 			// Verifica o acesso do gerente
-			if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'delete_groups'))
+			if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_DEL_GROUPS ))
 			{
 				$return['status'] = false;
 				$return['msg'] = lang('You do not have acces to remove groups') . '.';
@@ -524,7 +525,7 @@
 		function copy( $params )
 		{
 			// Verifica o acesso do gerente
-			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], 'add_groups' ) )
+			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_ADD_GROUPS ) )
 				return array( 'status' => false, 'msg' => lang( 'You do not have access to create new groups' ).'.' );
 			
 			// Check valid DN

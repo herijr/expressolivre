@@ -2,6 +2,7 @@
 include_once('class.functions.inc.php');
 include_once('class.imap.inc.php');
 include_once('class.sieve_functions.inc.php');
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 class imap_functions
 {
@@ -320,7 +321,7 @@ class imap_functions
 		$this->reset_profile($params['uid']);
 		
 		// Verifica o acesso do gerente
-		if (!$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'empty_user_inbox'))
+		if (!$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_SET_USERS_EMPTY_INBOX ))
 		{
 			$result['status'] = false;
 			$result['msg'] = $this->functions->lang('You do not have access to clean an user inbox');
@@ -378,7 +379,7 @@ class imap_functions
 	{
 		$result = array('status' => true);
 		
-		if ($isEdit && !$this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'edit_users'))
+		if ($isEdit && !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS ))
 		{
 			$result['status'] = false;
 			$result['msg'] = $this->functions->lang('You do not have access to create an user inbox');
@@ -388,7 +389,7 @@ class imap_functions
 		$quota = isset($_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'])?
 			(int) $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] : 20;
 		
-		if (isset($params['mailquota']) && $this->functions->check_acl($_SESSION['phpgw_session']['session_lid'], 'change_users_quote'))
+		if (isset($params['mailquota']) && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_QUOTA ))
 			$quota = $params['mailquota'];
 		
 		$result = $this->create($params['uid'], $quota);

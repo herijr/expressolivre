@@ -9,6 +9,8 @@
 	*  option) any later version.														*
 	\***********************************************************************************/
 
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+
 	class uiaccounts
 	{
 		var $public_functions = array
@@ -63,7 +65,7 @@
 				$context_display .= '<br>'.$tmp_context;
 			}
 			// Verifica se o administrador tem acesso.
-			if (!$this->functions->check_acl($account_lid,'list_users'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::GRP_VIEW_USERS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -94,7 +96,7 @@
 				'accounts_url'				=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uiaccounts.list_users'),
 				'back_url'					=> $GLOBALS['phpgw']->link('/expressoAdmin1_2/index.php'),
 				'add_action'				=> $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uiaccounts.add_users'),
-				'create_user_disabled'		=> $this->functions->check_acl($account_lid,'add_users') ? '' : 'disabled',
+				'create_user_disabled'		=> $this->functions->check_acl( $account_lid, ACL_Managers::ACL_ADD_USERS ) ? '' : 'disabled',
 				'context'					=> $raw_context,
 				'context_display'			=> $context_display,
 			);
@@ -116,20 +118,17 @@
 			}
 			else if (count($account_info))
 			{  // Can edit, delete or rename users ??
-				if (($this->functions->check_acl($account_lid,'edit_users')) ||
-					($this->functions->check_acl($account_lid,'change_users_password')) ||
-					($this->functions->check_acl($account_lid,'edit_sambausers_attributes')) ||  
-					($this->functions->check_acl($account_lid,'change_users_quote')) ||
-					($this->functions->check_acl($account_lid,'manipulate_corporative_information')) ||
-					($this->functions->check_acl($account_lid,'edit_users_phonenumber'))
-					) 
-					$can_edit = True;
-				elseif ($this->functions->check_acl($account_lid,'view_users'))
-					$can_view = True;
-				if ($this->functions->check_acl($account_lid,'delete_users'))
-					$can_delete = True;
-				if ($this->functions->check_acl($account_lid,'rename_users'))
-					$can_rename = True;
+				$can_edit = $this->functions->check_acl( $account_lid,
+					ACL_Managers::ACL_MOD_USERS,
+					ACL_Managers::ACL_MOD_USERS_PASSWORD,
+					ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES,
+					ACL_Managers::ACL_MOD_USERS_QUOTA,
+					ACL_Managers::ACL_MOD_USERS_CORPORATIVE,
+					ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER
+				);
+				$can_view   = $this->functions->check_acl( $account_lid, ACL_Managers::ACL_VW_USERS );
+				$can_delete = $this->functions->check_acl( $account_lid, ACL_Managers::ACL_DEL_USERS );
+				$can_rename = $this->functions->check_acl( $account_lid, ACL_Managers::ACL_REN_USERS );
 
 				while (list($null,$account) = each($account_info))
 				{
@@ -238,7 +237,7 @@
 			$manager_contexts = $acl['contexts'];
 			
 			// Verifica se tem acesso a este modulo
-			if (!$this->functions->check_acl($manager_lid,'add_users'))
+			if (!$this->functions->check_acl( $manager_lid, ACL_Managers::ACL_ADD_USERS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
@@ -316,7 +315,7 @@
 				'changepassword_checked'		=> 'CHECKED',
 				'phpgwaccountstatus_checked'	=> 'CHECKED',
 				'photo_bin'						=> $GLOBALS['phpgw_info']['server']['webserver_url'].'/expressoAdmin1_2/templates/default/images/photo_celepar.png',
-				'display_picture'				=> $this->functions->check_acl($manager_lid,'edit_users_picture') ? '' : 'none', 
+				'display_picture'				=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_USERS_PICTURE ) ? '' : 'none', 
 				'display_tr_default_password'	=> 'none',
 				'minimumSizeLogin'				=> $this->current_config['expressoAdmin_minimumSizeLogin'],
 				'defaultDomain'					=> $this->current_config['expressoAdmin_defaultDomain'],
@@ -328,7 +327,7 @@
 				'ldap_context'					=> ldap_dn2ufn($GLOBALS['phpgw_info']['server']['ldap_context']),
 				
 				// Corporative Information
-				'display_corporative_information' => $this->functions->check_acl($manager_lid,'manipulate_corporative_information') ? '' : 'none',
+				'display_corporative_information' => $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_USERS_CORPORATIVE ) ? '' : 'none',
 				
 				// MIGRATE MAILBOX
 				'isMigrateMB'	=> 0,
@@ -336,7 +335,7 @@
 				//MAIL
 				'accountstatus_checked'			=> 'CHECKED',
 				'mailquota'				=> $this->current_config['expressoAdmin_defaultUserQuota'],
-				'changequote_disabled'			=> $this->functions->check_acl($manager_lid,'change_users_quote') ? '' : 'readonly',
+				'changequote_disabled'			=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_USERS_QUOTA ) ? '' : 'readonly',
 				'imapDelimiter'				=> $_SESSION['phpgw_info']['expresso']['email_server']['imapDelimiter'],
 				'input_mailalternateaddress_fields' 	=> '<input type="text" name="mailalternateaddress[]" id="mailalternateaddress" autocomplete="off" value="{mailalternateaddress}" {disabled} size=50>',
 				'input_mailforwardingaddress_fields'	=> '<input type="text" name="mailforwardingaddress[]" id="mailforwardingaddress" autocomplete="off" value="{mailforwardingaddress}" {disabled} size=50>',
@@ -357,13 +356,13 @@
 			);
 
 			// Should we show SAMBA tab SAMBA ??
-			if ( ($this->current_config['expressoAdmin_samba_support'] == 'true') && ($this->functions->check_acl($manager_lid,'edit_sambausers_attributes')) )
+			if ( ($this->current_config['expressoAdmin_samba_support'] == 'true') && ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )) )
 				$t->set_var('display_samba_suport', '');
 			else
 				$t->set_var('display_samba_suport', 'none');
 			
 			// Is Radius enabled and has the manager privileges to it?
-			if ( $radius_conf->enabled && ($this->functions->check_acl($manager_lid,'edit_radius')) )
+			if ( $radius_conf->enabled && ($this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_USERS_RADIUS )) )
 				$t->set_var('display_radius_suport', '');
 			else
 				$t->set_var('display_radius_suport', 'none');
@@ -397,42 +396,40 @@
 			$disabled_group = 'disabled';
 			
 			$display_picture = 'none';
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) &&
-				(!$this->functions->check_acl($manager_account_lid,'change_users_password')) &&
-				(!$this->functions->check_acl($manager_account_lid,'edit_sambausers_attributes')) &&
-				(!$this->functions->check_acl($manager_account_lid,'view_users')) &&
-				(!$this->functions->check_acl($manager_account_lid,'manipulate_corporative_information')) &&
-				(!$this->functions->check_acl($manager_account_lid,'edit_users_phonenumber'))
-				)
-			{
-				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
-			}
+			if ( !$this->functions->check_acl( $manager_account_lid,
+				ACL_Managers::ACL_VW_USERS,
+				ACL_Managers::ACL_MOD_USERS,
+				ACL_Managers::ACL_MOD_USERS_PASSWORD,
+				ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES,
+				ACL_Managers::ACL_MOD_USERS_CORPORATIVE,
+				ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER
+			) ) $GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			// SOMENTE ALTERAÇÃO DE SENHA
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) && ($this->functions->check_acl($manager_account_lid,'change_users_password')))
+			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PASSWORD )))
 			{
 				$disabled = 'disabled';
 				$disabled_password = '';
 			}
 			// SOMENTE ALTERAÇÃO DOS ATRIBUTOS SAMBA
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) && ($this->functions->check_acl($manager_account_lid,'edit_sambausers_attributes')))
+			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )))
 			{
 				$disabled = 'disabled';
 				$disabled_samba = '';
 			}
 			// SOMENTE ALTERAÇÃO DE TELEFONE
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) && ($this->functions->check_acl($manager_account_lid,'edit_users_phonenumber')))
+			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER )))
 			{
 				$disabled = 'disabled';
 				$disabled_phonenumber = '';
 			}
 			// SOMENTE GRUPOS
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) && ($this->functions->check_acl($manager_account_lid,'edit_groups')))
+			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_GROUPS )))
 			{
 				$disabled = 'disabled';
 				$disabled_group = '';
 			}
 			// TOTAIS MENOS O SAMBA
-			if (($this->functions->check_acl($manager_account_lid,'edit_users')) && (!$this->functions->check_acl($manager_account_lid,'edit_sambausers_attributes')))
+			if (($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && (!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )))
 			{
 				$disabled = '';
 				$disabled_password = '';
@@ -441,7 +438,7 @@
 				$disabled_group = '';
 			}
 			// TOTAIS
-			elseif ($this->functions->check_acl($manager_account_lid,'edit_users'))
+			elseif ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS ))
 			{
 				$disabled = '';
 				$disabled_password = '';
@@ -450,10 +447,10 @@
 				$disabled_group = '';
 			}
 			
-			if (!$this->functions->check_acl($manager_account_lid,'change_users_quote'))
+			if (!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_QUOTA ))
 				$disabled_quote = 'readonly';
 			
-			if ($this->functions->check_acl($manager_account_lid,'edit_users_picture'))
+			if ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PICTURE ))
 			{
 				$disabled_edit_photo = '';
 				$display_picture = '';
@@ -698,11 +695,11 @@
 				'ldap_context'					=> ldap_dn2ufn($GLOBALS['phpgw_info']['server']['ldap_context']),
 				
 				// Display ABAS
-				'display_corporative_information'=> $this->functions->check_acl($manager_account_lid,'manipulate_corporative_information') ? '' : 'none',
-				'display_applications'		=> $this->functions->check_acl($manager_account_lid,'display_applications') ? '' : 'none',
-				'display_emaillists'		=> $this->functions->check_acl($manager_account_lid,'display_emaillists') ? '' : 'none',
-				'display_groups'			=> $this->functions->check_acl($manager_account_lid,'display_groups') ? '' : 'none',
-				'display_emailconfig'		=> $this->functions->check_acl($manager_account_lid,'display_emailconfig') ? '' : 'none',
+				'display_corporative_information'=> $this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_CORPORATIVE ) ? '' : 'none',
+				'display_applications'		=> $this->functions->check_acl( $manager_account_lid, ACL_Managers::GRP_DISPLAY_APPLICATIONS ) ? '' : 'none',
+				'display_emaillists'		=> $this->functions->check_acl( $manager_account_lid, ACL_Managers::GRP_DISPLAY_EMAIL_LISTS ) ? '' : 'none',
+				'display_groups'			=> $this->functions->check_acl( $manager_account_lid, ACL_Managers::GRP_DISPLAY_GROUPS ) ? '' : 'none',
+				'display_emailconfig'		=> $this->functions->check_acl( $manager_account_lid, ACL_Managers::GRP_DISPLAY_EMAIL_CONFIG ) ? '' : 'none',
 				
 				// First ABA
 				'alert_warning'					=> "$alert_warning",
@@ -717,7 +714,7 @@
 				'photo_bin'						=> $photo_bin,
 				'disabled_edit_photo'			=> $disabled_edit_photo,
 				'display_picture'				=> $display_picture,
-				'display_tr_default_password'	=> $this->functions->check_acl($manager_account_lid,'set_user_default_password') ? '' : 'none',
+				'display_tr_default_password'	=> $this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_SET_USERS_DEFAULT_PASSWORD ) ? '' : 'none',
 				
 				'passwd_expired_checked'		=> $user_info['passwd_expired'] === 0 ? 'CHECKED' : '',
 				'password_expiration_message'	=> $password_expiration_message,
@@ -793,13 +790,13 @@
 			$t->set_var($this->functions->make_dinamic_lang($t, 'main'));
 			
 			// Should we show SAMBA tab SAMBA ??
-			if ( ($this->current_config['expressoAdmin_samba_support'] == 'true') && ($this->functions->check_acl($manager_account_lid,'edit_sambausers_attributes')) )
+			if ( ($this->current_config['expressoAdmin_samba_support'] == 'true') && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )) )
 				$t->set_var('display_samba_suport', '');
 			else
 				$t->set_var('display_samba_suport', 'none');
 			
 			// Is Radius enabled and has the manager privileges to it?
-			if ( $radius_conf->enabled && ($this->functions->check_acl($manager_account_lid,'edit_radius')) )
+			if ( $radius_conf->enabled && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_RADIUS )) )
 				$t->set_var('display_radius_suport', '');
 			else
 				$t->set_var('display_radius_suport', 'none');
@@ -896,7 +893,7 @@
 			$manager_context = $tmp[0]['context'];
 			
 			// Verifica se tem acesso a este modulo
-			if ((!$this->functions->check_acl($manager_account_lid,'edit_users')) && (!$this->functions->check_acl($manager_account_lid,'change_users_password')))
+			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && (!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PASSWORD )))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}

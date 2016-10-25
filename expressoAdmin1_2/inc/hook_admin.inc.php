@@ -13,10 +13,11 @@
 	{
 		$file = Array(
 			'Global Configuration' => $GLOBALS['phpgw']->link('/index.php','menuaction=admin.uiconfig.index&appname=' . $appname),
-			'Managers' => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimanagers.list_managers'),
-			'Radius' => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uiradius.edit'),
-			'Site configuration Expresso Messenger' => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimessenger.edit')
+			'Managers'             => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimanagers.list_managers'),
+			'Radius'               => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uiradius.edit'),
+			'Expresso Messenger'   => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimessenger.edit'),
 		);
+		ksort( $file );
 	}
 	/* Do not modify below this line */
 	display_section($appname,$file);

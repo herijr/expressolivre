@@ -8,6 +8,8 @@
 	*  Free Software Foundation; either version 2 of the License, or (at your			 *
 	*  option) any later version.														 *
 	\*************************************************************************************/
+
+include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 	
 	class totalsessions
 	{
@@ -23,7 +25,7 @@
 			$tmp = $this->functions->read_acl($account_lid);
 			$manager_context = $tmp[0]['context'];
 			// Verifica se o administrador tem acesso.
-			if (!$this->functions->check_acl($account_lid,'view_global_sessions'))
+			if (!$this->functions->check_acl( $account_lid, ACL_Managers::ACL_VW_GLOBAL_SESSIONS ))
 			{
 				$GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
 			}
