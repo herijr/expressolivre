@@ -164,6 +164,17 @@ function test_db_connection()
 			</select>			
 		</td>
 	</tr>
+
+	<tr class="row_off">
+		<td>{lang_deny_user_accounts_with_the_same_cpf}?</td>
+		<td>
+			<select name="newsettings[expressoAdmin_deny_same_cpf]">
+				<option value="false" {selected_expressoAdmin_deny_same_cpf_false}>{lang_no}</option>
+				<option value="true" {selected_expressoAdmin_deny_same_cpf_true}>{lang_yes}</option>
+			</select>
+		</td>
+	</tr>
+
 	<tr class="row_on">
 		<td>{lang_Only_allow_access_to_these_networks}:</td>
 		<td>

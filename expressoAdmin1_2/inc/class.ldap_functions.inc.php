@@ -379,24 +379,41 @@ class ldap_functions
 					}
 				
 					$filter = "(&(phpgwAccountType=u)(cpf=$cpf))";
-					$justthese = array("cn","uid");
+					$justthese = array("cn","uid","mail");
 					$search = ldap_search($local_ldap_connection, $context, $filter, $justthese);
 					$entries = ldap_get_entries($local_ldap_connection,$search);
-				
-					if ( ($entries['count'] != 1) && (strcasecmp($uid, $entries[0]['uid'][0]) != 0) )
-					{
-						if ($entries['count'] > 0)
-						{
-							$result['question'] = $this->functions->lang('Field CPF used by') . ":\n";
-							for ($i=0; $i<$entries['count']; $i++)
-							{
-								if (strcasecmp($uid, $entries[$i]['uid'][0]) != 0)
-									$result['question'] .= "- " . $entries[$i]['cn'][0] . "\n";
-							}
-							$result['question'] .= $this->functions->lang("Do you want to continue anyway") . "?";
-							return $result;
-						}
-					}
+
+                    if( ($entries['count'] > 0 ) && (strcasecmp($uid, $entries[0]['uid'][0]) != 0) )
+                    {
+                        if ($entries['count'] > 0)
+                        {
+                            $entries_text = "";
+                            for ($i=0; $i<$entries['count']; $i++)
+                            {
+                                if (strcasecmp($uid, $entries[$i]['uid'][0]) != 0)
+                                {
+                                    $entries_text .= $entries[$i]['cn'][0] ." - ".$entries[0]['uid'][0] ." - ".$entries[$i]['mail'][0]."\n";
+                                }
+                            }
+
+                            if ($this->current_config['expressoAdmin_deny_same_cpf'] == 'false' )
+                            {
+                                $result['question']  = $this->functions->lang('Field CPF used by') . ":\n";
+                                $result['question'] .= $entries_text;
+                                $result['question'] .= $this->functions->lang("Do you want to continue anyway") . "?";
+                                return $result;
+                            }
+                            else
+                            {
+                                $result['status'] = false;
+                                $result['msg']  = $this->functions->lang('Field CPF cannot be duplicated') . ".\n";
+                                $result['msg'] .= $this->functions->lang('Field CPF used by') . ":\n";
+                                $result['msg'] .= $entries_text;
+                                return $result;
+                            }
+                        }
+                    }
+
 					ldap_close($local_ldap_connection);
 				}
 			}
