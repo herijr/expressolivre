@@ -165,7 +165,7 @@ function test_db_connection()
 		</td>
 	</tr>
 
-	<tr class="row_off">
+	<tr class="row_on">
 		<td>{lang_deny_user_accounts_with_the_same_cpf}?</td>
 		<td>
 			<select name="newsettings[expressoAdmin_deny_same_cpf]">
@@ -175,6 +175,12 @@ function test_db_connection()
 		</td>
 	</tr>
 
+	<tr class="row_off">
+		<td>{lang_maximum_length_of_photo_archive__(default_10240_=_10_kb)}:</td>
+		<td><input name="newsettings[expressoAdmin_photo_length]" value="{value_expressoAdmin_photo_length}" size="15" /></td>
+
+	</tr>
+	
 	<tr class="row_on">
 		<td>{lang_Only_allow_access_to_these_networks}:</td>
 		<td>

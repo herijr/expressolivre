@@ -238,8 +238,12 @@
 				}
 				
 				// Chama funcao para salvar foto no OpenLDAP.
-				if ( $_FILES['photo']['name'] != '' && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PICTURE ) ) {
-					if ( $_FILES['photo']['size'] > 10000 ) {
+				if ( $_FILES['photo']['name'] != '' && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PICTURE ) )
+				{
+					$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10000 : $this->current_config['expressoAdmin_photo_length'];
+					
+					if( $_FILES['photo']['size'] > $size_conf )
+					{
 						$return['status'] = false;
 						$return['msg']   .= $this->functions->lang( 'User photo could not be save because is bigger the 10 kb' ).'.';
 					} else {
@@ -656,10 +660,12 @@
 				}
 				elseif ($_FILES['photo']['name'] != '')
 				{
-					if ($_FILES['photo']['size'] > 10000)
+					$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10000 : $this->current_config['expressoAdmin_photo_length'];
+
+					if( $_FILES['photo']['size'] > $size_conf )
 					{
 						$return['status'] = false;
-						$return['msg'] .= $this->functions->lang('User photo could not be save because is bigger the 10 kb') . '.';
+						$return['msg']   .= $this->functions->lang('User photo could not be save because is bigger the').' '.($size_conf/1024).' kb.';
 					}
 					else
 					{
