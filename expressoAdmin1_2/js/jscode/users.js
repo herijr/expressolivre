@@ -59,7 +59,7 @@ function validate_fields(type)
 		alert(get_lang('Email field is empty') + '.');
 		return;
 	}
-	var RegExp_mail = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z]{2,4})+$/;
+	var RegExp_mail = /^([a-zA-Z0-9_\-])+(\.[a-zA-Z0-9_\-]+)*\@([a-zA-Z0-9_\-])+(\.[a-zA-Z0-9_\-]+)*$/;
 	if(!RegExp_mail.test(document.forms[0].mail.value)){
 		alert(get_lang('Email field is not valid') + '.');
 		return false;
