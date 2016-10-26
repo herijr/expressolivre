@@ -171,11 +171,11 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$p->parse('rows','row_empty',True);
 			$p->set_var($var);
 
-			if (! $GLOBALS['phpgw']->acl->check('group_access',4,'admin'))
+			if (! $GLOBALS['phpgw']->acl->check('run',4,'admin'))
 			{
 				$p->set_var('input_add','<input type="submit" value="' . lang('Add') . '">');
 			}
-			if (! $GLOBALS['phpgw']->acl->check('group_access',2,'admin'))
+			if (! $GLOBALS['phpgw']->acl->check('run',2,'admin'))
 			{
 				$p->set_var('input_search',lang('Search') . '&nbsp;<input name="query" value="'.htmlspecialchars(stripslashes($GLOBALS['query'])).'">');
 			}
