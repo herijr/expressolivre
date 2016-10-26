@@ -30,13 +30,13 @@ function validate_fields(type)
 			return;
 		}
 		if (document.forms[0].password2.value == ''){
-			alert(get_lang('re-password field is empty') + '.');
+			alert(get_lang('repassword field is empty') + '.');
 			return;
 		}
 	}
 
 	if (document.forms[0].password1.value != document.forms[0].password2.value){
-		alert(get_lang('password and re-password are different') + '.');
+		alert(get_lang('password and repassword are different') + '.');
 		return;
 	}
 	

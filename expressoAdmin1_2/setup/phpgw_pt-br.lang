@@ -271,8 +271,7 @@ Remove Users	expressoAdmin1_2	pt-br	Remover Usuários
 Rename users	expressoAdmin1_2	pt-br	Renomear usuários
 Rename users login from	expressoAdmin1_2	pt-br	Renomear login do usuário de
 Re-Password	expressoAdmin1_2	pt-br	Re-Senha
-re-password field is empty	expressoAdmin1_2	pt-br	Campo re-senha está vazio
-re-password field is empty	expressoAdmin1_2	pt-br	Campo re-senha está vazio
+repassword field is empty	expressoAdmin1_2	pt-br	Campo re-senha está vazio
 return user password	expressoAdmin1_2	pt-br	Retornar senha do usuário
 rg	expressoAdmin1_2	pt-br	RG
 rguf	expressoAdmin1_2	pt-br	rgUF
