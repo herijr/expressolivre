@@ -205,13 +205,18 @@ function get_institutional_accounts(input)
 {
 	var handler_get_institutional_accounts = function(data)
 	{
-		if (data.status == 'true')
+		if( data.status && data.status.toLowerCase() === 'true' )
 		{
 			var table = '<table border="0" width="90%"><tr bgcolor="#d3dce3"><td width="30%">'+get_lang("full name")+'</td><td width="30%">'+get_lang("mail")+'</td><td width="5%" align="center">'+get_lang("delete")+'</td></tr>'+data.trs+'</table>';
 			Element('institutional_accounts_content').innerHTML = table;
 		}
 		else
-			write_msg(data.msg, 'error');
+		{
+			if( data.msg && data.msg.length > 0 )
+			{
+				write_msg(data.msg, 'error');
+			}
+		}
 	}
 	cExecute ('$this.ldap_functions.get_institutional_accounts&input='+input, handler_get_institutional_accounts);
 }
@@ -220,7 +225,7 @@ function edit_institutional_account(uid)
 {
 	var handle_edit_institutional_account = function(data)
 	{
-		if (data.status == 'true')
+		if( data.status && data.status.toLowerCase() === 'true' )
 		{
 			modal('institutional_accounts_modal','save');
 			
@@ -251,7 +256,12 @@ function edit_institutional_account(uid)
 			sinc_combos_org(data.user_context);
 		}
 		else
-			write_msg(data.msg, 'error');
+		{
+			if( data.msg && data.msg.length > 0 )
+			{
+				write_msg(data.msg, 'error');
+			}
+		}
 	}
 	cExecute ('$this.ldap_functions.get_institutional_account_data&uid='+uid, handle_edit_institutional_account);
 }
@@ -279,7 +289,7 @@ function handler_save_institutional_accounts(data_return)
 }
 function handler_save_institutional_accounts2(data_return)
 {
-	if (!data_return.status)
+	if ( data_return.msg && data_return.msg.length > 0 )
 	{
 		write_msg(data_return.msg, 'error');
 	}
