@@ -28,6 +28,7 @@
 	// Opcoes exclusivas a partir da versão 2.0 :: Configurar via setup/header
 	$GLOBALS['phpgw_info']['server']['captcha'] = {CAPTCHA};
 	$GLOBALS['phpgw_info']['server']['num_badlogin'] = {NUM_BADLOGIN};
+	$GLOBALS['phpgw_info']['server']['use_token_login'] = {USE_TOKEN_EXPRESSO};
     $GLOBALS['phpgw_info']['server']['atributoexpiracao'] = '{ATRIBUTOEXPIRACAO}';
     $GLOBALS['phpgw_info']['server']['atributousuarios'] = '{ATRIBUTOUSUARIOS}';
 	$GLOBALS['phpgw_info']['server']['certificado'] = {CERTIFICADO};

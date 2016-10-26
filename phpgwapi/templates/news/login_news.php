@@ -67,8 +67,27 @@
 
 	if( isset($passwd_type) || $_POST['submitit_x'] || $_POST['submitit_y'] || $submit )
 	{
-	   if( isset($_POST['_token']) && trim($_POST['_token']) === $_SESSION['token_expresso'] )
-	   {
+		$tokenIsValid = false;
+
+		if( isset($GLOBALS['phpgw_info']['server']['use_token_login']) &&
+				intval($GLOBALS['phpgw_info']['server']['use_token_login']) == 1 )
+		{
+			if( isset($_POST['_token']) && trim($_POST['_token']) === $_SESSION['token_expresso'] )
+			{
+				$tokenIsValid = true;
+			}
+			else
+			{
+				$tokenIsValid = false;
+			}
+		}
+		else
+		{
+			$tokenIsValid = true;
+		}
+
+		if( $tokenIsValid )
+		{
 		    // Primeiro testa o captcha....se houver......
 		    if( isset($GLOBALS['phpgw_info']['server']['captcha']) && $GLOBALS['phpgw_info']['server']['captcha'] == 1 )
 			{
