@@ -2179,14 +2179,14 @@ class ldap_functions
 
 		$uid = 'institutional_account_' . $params['mail'];
 		$dn = strtolower("uid=$uid," . $params['context']);
-		$anchor = strtolower($params['anchor']);
+		$anchor = trim(strtolower($params['anchor']));
 
 		$filter = "(mail=".$params['mail'].")";
 		$justthese = array("cn");
 		$search = @ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
 		$entries = @ldap_get_entries($this->ldap,$search);
 		
-		if ( ($entries['count'] > 1) || (($entries['count'] == 1) && ($entries[0]['dn'] != $anchor)) )
+		if ( ($entries['count'] > 1) || (($entries['count'] == 1) && ( trim(strtolower($entries[0]['dn'])) != $anchor)) )
 		{
 			$return['status'] = false;
 			$return['msg'] = $this->functions->lang('Field mail already in use.');
