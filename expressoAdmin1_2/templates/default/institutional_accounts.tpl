@@ -26,7 +26,7 @@
 			<tr bgcolor="{th_bg}">
 				<td width="30%">{lang_full_name}</td>
 				<td width="30%">{lang_mail}</td>
-				<td width="5%" align="center">{lang_delete}</td>
+				<td width="5%" align="center">{lang_remove}</td>
 			</tr>
 		</table>
 	</div>	

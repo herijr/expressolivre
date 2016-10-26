@@ -1,4 +1,5 @@
 <!-- BEGIN body -->
+<script src="prototype/plugins/jquery/jquery-latest.min.js"></script>
 <table width="90%" border="0" cellspacing="10" cellpadding="0" align="center"> 
 	<tr>
 		<td width="1%" align="center">

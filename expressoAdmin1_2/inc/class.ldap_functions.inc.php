@@ -2094,10 +2094,11 @@ class ldap_functions
 		/* End: Validation */
 						
 		$info = array();
-		$info['cn']					= $params['cn'];
-		$info['sn']					= $params['cn'];
+		$info['cn']					= iconv("ISO-8859-1","UTF-8//TRANSLIT",$params['cn']);
+		$info['sn']					= iconv("ISO-8859-1","UTF-8//TRANSLIT",$params['cn']);
 		$info['uid']				= $uid;
 		$info['mail']				= $params['mail'];
+		$info['description']		= iconv("ISO-8859-1","UTF-8//TRANSLIT",$params['desc']);
 		$info['phpgwAccountType']	= 'i';
 		$info['objectClass'][]		= 'inetOrgPerson';
 		$info['objectClass'][]		= 'phpgwAccount';
@@ -2222,9 +2223,9 @@ class ldap_functions
 			$info['phpgwAccountVisible'] = '-1';
 		else
 			$info['phpgwAccountVisible'] = array();
-		
-		if ($params['description'] != '')
-			$info['description'] = utf8_encode($params['description']);
+
+		if ($params['desc'] != '')
+			$info['description'] = utf8_encode($params['desc']);
 		else
 			$info['description'] = array();
 		

@@ -6,7 +6,7 @@
 <input type="hidden" id="{modal_id}_save_action" value="save_institutional_accounts()">
 <input type="hidden" id="{modal_id}_onload_action" value="set_onload({manager_context})">
 
-<form enctype="multipart/form-data" name="institutional_accounts_form" method="post">
+<form enctype="multipart/form-data" name="institutional_accounts_form_template" method="post">
 <input type="hidden" id="anchor" name="anchor">
 
 <table border="0" width="80%" cellspacing="4">
@@ -25,7 +25,7 @@
 			<input id="mail" name="mail" size="35" autocomplete="off"><br>
 
 			{lang_description}:<br>
-			<input id="description" name="description" size="60" autocomplete="off"><br>
+			<input id="description" name="desc" size="60" autocomplete="off"><br>
 							
 			{lang_is_account_active}: <input type="checkbox" id="accountStatus" name="accountStatus" checked><br>
 			{lang_omit_account_from_the_catalog}: <input type="checkbox" id="phpgwAccountVisible" name="phpgwAccountVisible"><br>
