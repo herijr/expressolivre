@@ -1,3 +1,4 @@
+<script src="../../../prototype/plugins/jquery.mask-phone/jquery.mask-phone.js"></script>
 <input type="hidden" name="sms_enabled" value="{sms_enabled}"/>
 <input type="hidden" name="sms_send_number" value="{sms_send_number}"/>
 <input type="hidden" name="sms_list_checked" value="{sms_list_checked}"/>
@@ -12,7 +13,7 @@
 					type="text"
 					name="datanascimento"
 					title="{lang_birthday}"
-					size="12"
+					size="13"
 					maxlength="10"
 					style="text-align: center;"
 					value="{datanascimento}"
@@ -26,12 +27,12 @@
 				<input
 					type="input"
 					name="telephonenumber"
+					id="telephonenumber"
 					title="{lang_commercial_telephonenumber}"
-					size=12
-					maxlength="13"
+					size=13
+					maxlength="14"
 					autocomplete="off"
 					value="{telephonenumber}"
-					onkeyUp="FormatTelephoneNumber(event, this);"
 				>
 				(xx)xxxx-xxxx
 			</td>
@@ -49,11 +50,11 @@
 					type="input"
 					name="homephone"
 					title="{lang_homephone_telephonenumber}"
-					size=12
+					size=13
 					maxlength="13"
 					autocomplete="off"
 					value="{homephone}"
-					onkeyUp="FormatTelephoneNumber(event, this);"
+					onkeyUp="FormatTelephoneNumber(event, this, 8);"
 				>
 				(xx)xxxx-xxxx
 			</td>
@@ -65,13 +66,13 @@
 					type="input"
 					name="mobile"
 					title="{lang_mobile_telephonenumber}"
-					size=12
-					maxlength="13"
+					size=13
+					maxlength="14"
 					autocomplete="off"
 					value="{mobile}"
-					onkeyUp="FormatTelephoneNumber(event, this);"
+					onkeyUp="FormatTelephoneNumber(event, this, 9);"
 				>
-				(xx)xxxx-xxxx
+				(xx)xxxxx-xxxx
 			</td>
 			<td id="use_chk_code" style="display: none;">
 				<style>
@@ -114,5 +115,8 @@
 		</tr>
 	</table>
 </form>
+<script type="text/javascript">
+    $("#telephonenumber").off("blur").on("blur", function(){ $(this).maskPhone(); })
+</script>
 <br>
 <pre>{sql_message}</pre>

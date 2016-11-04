@@ -90,17 +90,6 @@ function validate_fields(type)
 		return false;
 	}
 	
-	//TELEPHONENUMBER
-	if (document.forms[0].telephonenumber.value != '')
-	{
-		reg_tel = /\(\d{2}\)\d{4}-\d{4}$/;
-		if (!reg_tel.exec(document.forms[0].telephonenumber.value))
-		{
-			alert(get_lang('Phone field is incorrect') + '.');
-			return;
-		}
-	}
-	
 	// ALTERNATE AND FORWARD MAIL
 	var count_mail = { 'mailalternateaddress': 0, 'mailforwardingaddress': 0 };
 	var arr_mail = [ $('input[name=mail]').val() ];

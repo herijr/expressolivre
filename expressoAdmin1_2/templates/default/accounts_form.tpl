@@ -1,5 +1,6 @@
 <!-- BEGIN main -->
 <script src="prototype/plugins/jquery/jquery-latest.min.js"></script>
+<script type="text/javascript" src="prototype/plugins/jquery.mask-phone/jquery.mask-phone.js"></script>
 <script type="text/javascript" src="expressoAdmin1_2/js/jscode/profile.js"></script>
 <script type="text/javascript" src="expressoAdmin1_2/js/jscode/domain.js"></script>
 <script type="text/javascript" src="expressoAdmin1_2/js/jscode/ready.js"></script>
@@ -69,7 +70,7 @@
 
 		<tr bgcolor={row_on}>
 			<td width="15%">{lang_phone}:</td>
-			<td width="35%"><input type="text" name="telephonenumber" id="telephonenumber" value="{telephonenumber}" autocomplete="off" {disable_phonenumber} size=20 maxlength=13 onkeyUp="FormataValor(event, this);"></input>&nbsp;</td>
+			<td width="35%"><input type="text" name="telephonenumber" id="telephonenumber" value="{telephonenumber}" autocomplete="off" {disable_phonenumber} size=20 maxlength="14"></input>&nbsp;</td>
 			<!--td>Ramal SIP:</td>
 			<td><input type="text" name="sipnumber" size=20 maxlength=13></td-->
 		</tr>
@@ -484,6 +485,8 @@
 <script type="text/javascript">
 	
 	var tab = new Tabs(8,'activetab','inactivetab','tab','tabcontent','','','tabpage');
+
+    $("#telephonenumber").off("blur").on("blur", function(){ $(this).maskPhone(); });
 	
 	function initAll()
 	{
