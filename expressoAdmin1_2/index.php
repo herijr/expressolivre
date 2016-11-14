@@ -35,6 +35,7 @@
 	
 	$var = Array(
 		'lang_user_accounts'	=> lang('User Accounts'),
+		'lang_shared_accounts'  => lang('Shared Accounts'),		
 		'lang_institutional_accounts'=> lang('Institutional Accounts'),
 		'lang_user_groups'		=> lang('User Groups'),
 		'lang_email_lists'		=> lang('Email Lists'),

@@ -58,7 +58,7 @@ class bo
 					ldap_search(
 						$this->ldap,
 						$GLOBALS['phpgw_info']['server']['ldap_context'],
-						"(&(|(phpgwAccountType=u)(phpgwAccountType=l))(uid=".$value."))",
+						"(&(|(phpgwAccountType=u)(phpgwAccountType=l)(phpgwAccountType=s))(uid=".$value."))",
 						array("mail")
 					)
 				);

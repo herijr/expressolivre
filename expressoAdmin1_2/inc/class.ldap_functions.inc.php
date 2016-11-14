@@ -58,6 +58,100 @@ class ldap_functions
 	{
 		return $this->radius->getRadiusConf();
 	}
+
+	function create_shared_accounts($params)
+	{
+		/* Begin: Access verification */
+		if( !$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_ADD_SHARED_ACCOUNTS ))
+		{
+			$return['status'] = false;
+			$return['msg'] = $this->functions->lang('You do not have right to create shared accounts') . ".";
+			return $return;
+		}
+		
+		$access_granted = false;
+		foreach ($this->manager_contexts as $idx=>$manager_context)
+		{
+			if (stristr($params['context'], $manager_context))
+			{
+				$access_granted = true;
+				break;
+			}
+		}
+		
+		if (!$access_granted)
+		{
+			$return['status'] = false;				
+			$return['msg'] = $this->functions->lang('You do not have access to this organization') . ".";							
+			return $return;
+		}			
+		/* End: Access verification */
+
+			
+		/* Begin: Validation */
+		if ( (empty($params['cn'])) || (empty($params['mail'])) )
+		{
+			$result['status'] = false;
+			$result['msg']  = $this->functions->lang('Field mail or name is empty');	return $result;
+		}
+
+		if (! preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)+$/i", $params['mail']) )
+		{
+			$result['status'] = false;
+			$result['msg']  = $this->functions->lang('Field mail is not formed correcty') . '.';
+			return $result;
+		}			                  
+		$dn = "uid=$params[uid]," . $params['context'];
+                       $filter = "(mail=".$params['mail'].")";
+		$justthese = array("cn");
+		$search = @ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
+		$entries = @ldap_get_entries($this->ldap,$search);
+		if ($entries['count'] != 0)
+		{
+			$result['status'] = false;
+			$result['msg'] = $this->functions->lang('Field mail already in use');
+			return $result;
+		}
+		/* End: Validation */
+						
+		$info = array();
+		$info['cn']					= $params['cn'];
+		$info['sn']					= $params['cn'];
+		$info['uid']				= $params['uid'];
+		$info['mail']				= $params['mail'];
+		$info['description'] 		= utf8_encode($params['description']);			
+		$info['phpgwAccountType']	= 's';
+		$info['objectClass'][]		= 'inetOrgPerson';
+		$info['objectClass'][]		= 'phpgwAccount';
+		$info['objectClass'][]		= 'top';
+		$info['objectClass'][]		= 'person';
+		$info['objectClass'][]		= 'qmailUser';
+		$info['objectClass'][]		= 'organizationalPerson';
+		
+		if ($params['accountStatus'] == 'on')
+		{
+			$info['accountStatus'] = 'active';
+		}
+		if ($params['phpgwAccountVisible'] == 'on')
+		{
+			$info['phpgwAccountVisible'] = '-1';
+		}
+		
+		$result = array();
+
+		if (!@ldap_add ( $this->ldap, $dn, $info ))
+		{
+			$result['status'] = false;
+			$result['msg']  = $this->functions->lang('Error on function') . ' ldap_functions->create_shared_accounts';
+			$result['msg'] .= "\n" . $this->functions->lang('Server return') . ': ' . ldap_error($this->ldap);
+		}
+		else{
+			$result['status'] = true;							
+		}
+
+		return $result;
+	}
+
 	/* expressoAdmin: email lists : deve utilizar o ldap Host Master com o usuario e senha do CC*/
 	/* ldap connection following referrals and using Master config, from setup */
 	function ldapMasterConnect()
@@ -720,6 +814,35 @@ class ldap_functions
 		}
 
     	return $options;
+	}
+
+	//Busca usuarios de um contexto e ja retorna as options do select;
+	function get_available_users2($params)
+	{
+		$context= $params['context'];
+		$justthese = array("cn", "uid");
+		$filter = "(&(phpgwaccounttype=u)(!(phpgwaccountvisible=-1)))";
+	    if ($this->ldap)
+	    {
+			$sr=ldap_search($this->ldap, $context, $filter, $justthese);
+			$entries = ldap_get_entries($this->ldap, $sr);			
+			for( $i=0; $i<$entries["count"]; $i++)
+			{
+				$u_tmp[$entries[$i]["uid"][0]] = $entries[$i]["cn"][0];
+			}
+			natcasesort($u_tmp);
+			$i = 0;
+			$users = array();
+			if (count($u_tmp))
+			{
+				foreach ($u_tmp as $uidnumber => $cn)
+				{
+					$options .= "<option value=$uidnumber>$cn</option>";
+				}
+				unset($u_tmp);
+			}			
+	   		return $options;
+		}
 	}
 
 	//Busca usuários e listas de um contexto e já retorna as options do select;
@@ -1555,6 +1678,15 @@ class ldap_functions
 		return $entry[0]['uid'][0];
 	}
 
+	function uid2cn($uid)
+	{
+		$justthese = array("cn");
+		$filter="(&(|(phpgwAccountType=u)(phpgwAccountType=l)(phpgwAccountType=s))(uid=".$uid."))";
+		$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
+		$entry = ldap_get_entries($this->ldap, $search);
+		return $entry[0]['cn'][0];
+	}
+
 	function uidnumber2mail($uidnumber)
 	{
 		$justthese = array("mail");
@@ -2313,7 +2445,7 @@ class ldap_functions
 		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_MOD_INSTITUTIONAL_ACCOUNTS ))
 		{
 			$return['status'] = false;
-			$return['msg'] = $this->functions->lang('You do not have right to list institutional accounts') . ".";
+			$return['msg'] = $this->functions->lang('You do not have right to edit institutional accounts') . ".";
 			return $return;
 		}
 		
@@ -2362,7 +2494,185 @@ class ldap_functions
 		
 		return $return;
 	}
-	
+
+	function get_shared_accounts($params)
+	{
+		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::GRP_VIEW_SHARED_ACCOUNTS ))
+		{
+			$return['status'] = false;
+			$return['msg'] = $this->functions->lang('You do not have right to list shared accounts') . ".";
+			return $return;
+		}
+
+		$input = $params['input'];
+		$justthese = array("cn", "mail", "uid");
+		$trs = array();
+				
+		foreach ($this->manager_contexts as $idx=>$context)
+		{
+			$institutional_accounts = ldap_search($this->ldap, $context, ("(&(phpgwAccountType=s)(|(mail=$input*)(cn=*$input*)))"), $justthese);
+				$entries = ldap_get_entries($this->ldap, $institutional_accounts);
+			    	
+			for ($i=0; $i<$entries['count']; $i++)
+			{
+				$tr = "<tr class='normal' onMouseOver=this.className='selected' onMouseOut=this.className='normal'><td onClick=sharedAccounts.edit('".$entries[$i]['uid'][0]."')>" . $entries[$i]['cn'][0] . "</td><td onClick=sharedAccounts.edit('".$entries[$i]['uid'][0]."')>" . $entries[$i]['mail'][0] . "</td><td align='center' onClick=sharedAccounts.remove('".$entries[$i]['uid'][0]."')><img HEIGHT='16' WIDTH='16' src=./expressoAdmin1_2/templates/default/images/delete.png></td></tr>";
+				$trs[$tr] = $entries[$i]['cn'][0];
+			}
+		}
+		
+		$trs_string = '';
+		if (count($trs))
+		{
+			natcasesort($trs);
+			foreach ($trs as $tr=>$cn)
+			{
+				$trs_string .= $tr;
+			}
+		}
+		
+		$return['status'] = 'true';
+		$return['trs'] = $trs_string;
+		return $return;
+	}
+
+	function save_shared_accounts($params)
+	{
+		/* Begin: Access verification */
+		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_MOD_SHARED_ACCOUNTS ))
+		{
+			$return['status'] = false;
+			$return['msg'] = $this->functions->lang('You do not have right to edit shared accounts') . ".";
+			return $return;
+		}
+		$access_granted = false;
+		foreach ($this->manager_contexts as $idx=>$manager_context)
+		{
+			if (stristr($params['context'], $manager_context))
+			{
+				$access_granted = true;
+				break;
+			}
+		}
+		if (!$access_granted)
+		{
+			$return['status'] = false;
+			$return['msg'] = $this->functions->lang('You do not have access to this organization') . ".";
+			return $return;
+		}
+		/* End: Access verification */
+		
+		/* Begin: Validation */
+		if ( (empty($params['cn'])) || (empty($params['mail'])) )
+		{
+			$result['status'] = false;
+			$result['msg']  = $this->functions->lang('Field mail or name is empty') . '.';
+			return $result;
+		}
+
+		if (! eregi("^([a-zA-Z0-9_\-])+(\.[a-zA-Z0-9_\-]+)*\@([a-zA-Z0-9_\-])+(\.[a-zA-Z0-9_\-]+)*$", $params['mail']) )
+		{
+			$result['status'] = false;
+			$result['msg']  = $this->functions->lang('Field mail is not formed correcty') . '.';
+			return $result;
+		}			
+		
+		$dn = strtolower("uid=$params[uid]," . $params['context']);
+		$anchor = strtolower($params['anchor']);
+                       
+		$filter = "(mail=".$params['mail'].")";
+		$justthese = array("cn");
+		$search = @ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
+		$entries = @ldap_get_entries($this->ldap,$search);
+		
+		if ( ($entries['count'] > 1) || (($entries['count'] == 1) && ($entries[0]['dn'] != $anchor)) )
+		{
+			$result['status'] = false;
+			$result['msg'] = $this->functions->lang('Field mail already in use.');
+			return $result;
+		}
+		/* End: Validation */
+		$result = array();
+		$result['status'] = true;
+		
+		if ($anchor != $dn)
+		{
+			if (!@ldap_rename($this->ldap, $anchor, "uid=$params[uid]", $params['context'], true))
+			{
+				$result['status'] = false;
+				$result['msg']  = $this->functions->lang('Error on function') . ' ldap_functions->save_shared_accounts: ldap_rename';
+				$result['msg'] .= "\n" . $this->functions->lang('Server return') . ': ' . ldap_error($this->ldap);
+			}
+		}
+		
+		$info = array();
+		$info['cn']					= $params['cn'];
+		$info['sn']					= $params['cn'];
+		$info['uid']				= $params['uid'];
+		$info['mail']				= $params['mail'];
+		
+		if ($params['accountStatus'] == 'on')
+			$info['accountStatus'] = 'active';
+		else
+			$info['accountStatus'] = array();
+		
+		if ($params['phpgwAccountVisible'] == 'on')
+			$info['phpgwAccountVisible'] = '-1';
+		else
+			$info['phpgwAccountVisible'] = array();
+		
+		if ($params['description'] != '')
+			$info['description'] = utf8_encode($params['description']);
+		else
+			$info['description'] = array();
+		
+		if (!@ldap_modify ( $this->ldap, $dn, $info ))
+		{
+			$result['status'] = false;
+			$result['msg']  = $this->functions->lang('Error on function') . ' ldap_functions->save_shared_accounts: ldap_modify';
+			$result['msg'] .= "\n" . $this->functions->lang('Server return') . ': ' . ldap_error($this->ldap);
+		}
+
+		return $result;
+	}	
+
+	function get_shared_account_data($params)
+	{
+		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_managers::ACL_MOD_SHARED_ACCOUNTS))
+		{
+			$return['status'] = false;
+			$return['msg'] = $this->functions->lang('You do not have right to edit an shared accounts') . ".";
+			return $return;
+		}
+		
+		$uid = $params['uid'];
+
+	   	$shared_accounts = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], ("(&(phpgwAccountType=s)(uid=$uid))"));
+	   	$entrie = ldap_get_entries($this->ldap, $shared_accounts);
+		
+		if ($entrie['count'] != 1)
+		{
+			$return['status'] = 'false';
+			$result['msg'] = $this->functions->lang('Problems loading datas') . '.';
+		}
+		else
+		{
+			$tmp_user_context = split(",", $entrie[0]['dn']);
+			$tmp_reverse_user_context = array_reverse($tmp_user_context);
+			array_pop($tmp_reverse_user_context);
+			$return['user_context'] = implode(",", array_reverse($tmp_reverse_user_context));
+			
+			$return['status'] = 'true';
+			$return['accountStatus']		= $entrie[0]['accountstatus'][0];
+			$return['phpgwAccountVisible']	= $entrie[0]['phpgwaccountvisible'][0];
+			$return['cn']					= $entrie[0]['cn'][0];
+			$return['mail']					= $entrie[0]['mail'][0];
+			$return['description']			= utf8_decode($entrie[0]['description'][0]);
+			
+		}
+		
+		return $return;
+	}		
+
 	function mailforwardingaddress2uidnumber($mail)
 	{
 		$justthese = array("uidnumber","cn");
@@ -2377,7 +2687,44 @@ class ldap_functions
 			return $return;
 		}
 	}
-	
+
+	function delete_shared_account_data($params)
+	{
+		if (!$this->functions->check_acl($_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_DEL_SHARED_ACCOUNTS ))
+		{
+			$return['status'] = false;
+			$return['msg'] = $this->functions->lang('You do not have right to delete shared accounts') . ".";
+			return $return;
+		}                
+		$uid = $params['uid'];
+		$return['status'] = true;
+		$justthese = array("cn");
+	   	$search = ldap_search($this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], "(&(phpgwAccountType=s)(uid=$uid))", $justthese);
+	   	$entrie = ldap_get_entries($this->ldap, $search);
+	       
+		if ($entrie['count'] > 1)
+		{
+			$return['status'] = false;
+			$return['msg']  = $this->functions->lang('More then one uid was found');
+			return $return;
+		}
+		if ($entrie['count'] == 0)
+		{
+			$return['status'] = false;
+			$return['msg']  = $this->functions->lang('No uid was found');
+			return $return;
+		}
+		$dn = $entrie[0]['dn'];
+		if (!@ldap_delete($this->ldap, $dn))
+		{
+			$return['status'] = false;
+			$return['msg']  = $this->functions->lang('Error on function') . " ldap_functions->delete_shared_accounts: ldap_delete";
+			$return['msg'] .= "\n" . $this->functions->lang('Server return') . ': ' . ldap_error($this->ldap);
+			return $return;
+		}
+		return $return;
+	}
+
 	function delete_institutional_account_data($params)
 	{
 		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_DEL_INSTITUTIONAL_ACCOUNTS ))

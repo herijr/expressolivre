@@ -17,6 +17,16 @@
   			<a href="../index.php?menuaction=expressoAdmin1_2.institutional_accounts.index">{lang_institutional_accounts}</a>
   		</td>
   	</tr> 
+
+	<tr>
+		<td width="1%" align="center">
+			<img src='./templates/default/images/mail_share.png'>
+  		</td>
+  		<td>
+  			<a href="../index.php?menuaction=expressoAdmin1_2.uishared_accounts.index">{lang_shared_accounts}</a>
+  		</td>
+  	</tr> 
+
 	<tr>
 		<td width="1%" align="center">
 			<img src='./templates/default/images/group.png'>

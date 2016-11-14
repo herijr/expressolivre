@@ -68,8 +68,9 @@ class imap
 	 */
 	private function _throw_error()
 	{
-		if ( $error = imap_errors() )
+		if ( ( $error = imap_errors() ) && ( $error = array_filter( $error, function( $v ){ return !preg_match( '/^SECURITY PROBLEM/i', $v ); } ) ) ) {
 			throw new ImapException( $this, implode( ', ', (array)$error ) );
+		}
 	}
 	
 	/**
@@ -516,7 +517,18 @@ class imap
 			}
 		}
 	}
-	
+
+	public function empty_inbox()
+	{
+		$this->set_mailbox( 'INBOX' );
+		$result = imap_delete( $this->_get_conn(), "1:*" );
+		$this->_debug( 'empty_inbox:delete', array( 'INBOX', $this->_user ), $result );
+		$this->_throw_error();
+		$result = imap_expunge( $this->_get_conn() );
+		$this->_debug( 'empty_inbox:expunge', array( 'INBOX', $this->_user ), $result );
+		$this->_throw_error();
+	}
+
 	function __destruct() {
 		if ( $this->_adm_conn ) imap_close( $this->_adm_conn );
 		if ( $this->_user_conn ) imap_close( $this->_user_conn );

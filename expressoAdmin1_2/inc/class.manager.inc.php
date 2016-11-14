@@ -1,4 +1,4 @@
-<?
+<?php
 	/***********************************************************************************\
 	* Expresso Administração                 										   *
 	* by Joao Alfredo Knopik Junior (joao.alfredo@gmail.com, jakjr@celepar.pr.gov.br)  *

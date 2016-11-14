@@ -365,6 +365,16 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				$acl_control_fields[2][] = ACL_Managers::ACL_MOD_SAMBA_DOMAINS;
 			}
 
+			if ( $this->config['expressoAdmin_shared_accounts'] === 'true' )
+			{
+				$acl_control_fields[3][] = ACL_Managers::ACL_ADD_SHARED_ACCOUNTS;
+				$acl_control_fields[3][] = ACL_Managers::ACL_MOD_SHARED_ACCOUNTS;
+				$acl_control_fields[3][] = ACL_Managers::ACL_MOD_SHARED_ACCOUNTS_ACL;
+				$acl_control_fields[3][] = ACL_Managers::ACL_MOD_SHARED_ACCOUNTS_QUOTA;
+				$acl_control_fields[3][] = ACL_Managers::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY;
+				$acl_control_fields[3][] = ACL_Managers::ACL_DEL_SHARED_ACCOUNTS;
+			}
+
 			$acl_label_fields = array(
 				ACL_Managers::ACL_VW_USERS                     => 'view_user',
 				ACL_Managers::ACL_SET_USERS_DEFAULT_PASSWORD   => 'set_default_users_password',
@@ -381,6 +391,12 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				ACL_Managers::ACL_DEL_SECTORS                  => 'delete_organizations',
 				ACL_Managers::ACL_MOD_SAMBA_DOMAINS            => 'edit_SAMBA_domains',
 				ACL_Managers::ACL_VW_GLOBAL_SESSIONS           => 'show_sessions',
+				ACL_Managers::ACL_ADD_SHARED_ACCOUNTS            => 'acl_add_shared_accounts',
+				ACL_Managers::ACL_MOD_SHARED_ACCOUNTS            => 'acl_edit_shared_accounts',
+				ACL_Managers::ACL_MOD_SHARED_ACCOUNTS_ACL        => 'acl_edit_shared_accounts_acl',
+				ACL_Managers::ACL_MOD_SHARED_ACCOUNTS_QUOTA      => 'acl_edit_shared_accounts_quote',
+				ACL_Managers::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY  => 'acl_empty_shared_accounts_inbox',
+				ACL_Managers::ACL_DEL_SHARED_ACCOUNTS            => 'acl_delete_shared_accounts',
 			);
 
 			$rows = max( array_map( 'count', $acl_control_fields ) );

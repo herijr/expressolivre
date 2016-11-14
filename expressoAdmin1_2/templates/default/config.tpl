@@ -67,6 +67,16 @@ function test_db_connection()
 		</td>
 	</tr>
 
+	<tr class="rown_on">
+		<td>{lang_Manage_SHARED_accounts}</td>
+		<td>
+			<select name="newsettings[expressoAdmin_shared_accounts]">
+				<option value="false" {selected_expressoAdmin_shared_accounts_false}>{lang_no}</option>
+				<option value="true"  {selected_expressoAdmin_shared_accounts_true}>{lang_yes}</option>
+			</select>			
+		</td>
+	</tr>
+
 	<tr class="row_on">
 		<td>{lang_Manage_SAMBA_attributes}:</td>
 		<td>

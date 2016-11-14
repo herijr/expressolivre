@@ -34,6 +34,7 @@ applications	expressoAdmin1_2	pt-br	Aplicações
 Applications for this group	expressoAdmin1_2	pt-br	Aplicações para este grupo
 apply send control list to this list	expressoAdmin1_2	pt-br	Aplicar controle de envio à esta lista de e-mail
 Are you sure that you want to delete this institutional account	expressoAdmin1_2	pt-br	Você tem certeza que deseja apagar esta conta institucional
+Are you sure that you want to delete this shared account	expressoAdmin1_2	pt-br	Você tem certeza que deseja excluir esta conta compartilhada
 available groups	expressoAdmin1_2	pt-br	Grupos disponíveis
 available mail lists	expressoAdmin1_2	pt-br	Listas de e-mail disponíveis
 Available filter	common	pt-br	Filtor disponível
@@ -195,7 +196,7 @@ It was not possible to determine if the name or email is in use	expressoAdmin1_2
 it is needed to create samba passwords	expressoAdmin1_2	pt-br	É necessário para criar senhas do samba
 It is not allow select all users from the root organization	expressoAdmin1_2	pt-br	Não é permitido selecionar todos os usuários da raiz
 it was not possible to change users mailbox quota	expressoAdmin1_2	pt-br	Não foi possível alterar a cota da caixa postal do usuário
-it was not possible to delete users mailbox	expressoAdmin1_2	pt-br	Não foi possível deletar a caixa postal do usuário
+it was not possible to delete mailbox	expressoAdmin1_2	pt-br	Não foi possível deletar a caixa postal do usuário
 It was not possible create the group because the LDAP schemas are not update	expressoAdmin1_2	pt-br	Não foi possível criar o grupo poruqe os esquemas do LDAP não estão atualizados
 The surname field contains characters not allowed	expressoAdmin1_2	pt-br	O campo sobrenome contém caracteres não permitidos
 The surname field must contain letters or numbers	expressoAdmin1_2	pt-br	O campo de sobrenome deve conter letras ou números
@@ -223,6 +224,7 @@ Maillist users	expressoAdmin1_2	pt-br	Usuários da Lista de Email
 manager already exist	expressoAdmin1_2	pt-br	Gerente já existe
 manager	expressoAdmin1_2	pt-br	Gerente
 Manage RADIUS attributes	common	pt-br	Gerenciar atributos RADIUS
+Manage SHARED accounts	common	pt-br	Gerenciar CONTAS compartilhadas
 Manager LID	expressoAdmin1_2	pt-br	Login do Gerente
 Manager Login	expressoAdmin1_2	pt-br	Login do Gerente
 Manager name	expressoAdmin1_2	pt-br	Nome do Gerente
@@ -482,4 +484,46 @@ is not valid or duplicate	expressoAdmin1_2	pt-br	não é válido ou duplicado
 Displaying	expressoAdmin1_2	pt-br	Mostrando
 of	expressoAdmin1_2	pt-br	de
 save	expressoAdmin1_2	pt-br	Salvar
-
+acl add shared accounts	expressoAdmin1_2	pt-br	Criar contas compartilhadas
+acl edit shared accounts	expressoAdmin1_2	pt-br	Editar contas compartilhadas
+acl edit shared accounts acl	expressoAdmin1_2	pt-br	Editar ACL de contas compartilhadas
+acl edit shared accounts quote	expressoAdmin1_2	pt-br	Editar COTA de contas compartilhadas
+acl empty shared accounts inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX de contas compartilhadas
+acl delete shared accounts	expressoAdmin1_2	pt-br	Deletar contas compartilhadas
+Shared Accounts	expressoAdmin1_2	pt-br	Contas compartilhadas
+Add institutional accounts	expressoAdmin1_2	pt-br	Criar contas institucionais
+Cleanned user mailbox	expressoAdmin1_2	pt-br	Caixa de email esvaziada
+Emptied	expressoAdmin1_2	pt-br	Esvaziado
+Shared account successful created	expressoAdmin1_2	pt-br	Conta compartilhada criada com sucesso
+select an user	expressoAdmin1_2	pt-br	Selecione um usuário
+Shared account successful deleted	expressoAdmin1_2	pt-br	Conta compartilhada deletada com sucesso
+Shared account successful saved	expressoAdmin1_2	pt-br	Conta compartilhada salva com sucesso
+Shared Account	expressoAdmin1_2	pt-br	Conta Compartilhada
+create shared account	expressoAdmin1_2	pt-br	Criar conta compartilhada
+You do not have access to clean an inbox	expressoAdmin1_2	pt-br	Você não tem permissão para limpar está caixa postal
+It was not possible clean the inbox	expressoAdmin1_2	pt-br	Não foi possível limpar a caixa postal
+You do not have access to clean an user inbox	expressoAdmin1_2	pt-br	Você não tem acesso para limpar a caixa de entrda do usuário
+You do not have right to empty an shared account inbox	expressoAdmin1_2	pt-br	Você não tem permissão para limpar a caixa da conta compartilhada
+Add owner	expressoAdmin1_2	pt-br	Adicionar dono
+Add shared accounts	expressoAdmin1_2	pt-br	Cria Contas Compartilhadas
+Create Shared Account	expressoAdmin1_2	pt-br	Criar Conta Compartilhada
+Creation of Shared Accounts	expressoAdmin1_2	pt-br	Criação de Conta Compartilhada
+Delete shared accounts	expressoAdmin1_2	pt-br	Deletar Contas Compartilhadas
+Edit Shared Accounts	expressoAdmin1_2	pt-br	Editar Contas Compartilhadas
+Edit Shared Accounts Acl	expressoAdmin1_2	pt-br	Editar ACL de Contas Compartilhadas
+Edit Shared Accounts Quote	expressoAdmin1_2	pt-br	Editar Cota de Contas Compartilhadas
+empty inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX
+empty shared accounts inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX de Contas Compartilhadas
+it was not possible to clean the users mailbox	expressoAdmin1_2	pt-br	Não foi possível limpar a caixa postal do usuário
+it was not possible to clean the mailbox	expressoAdmin1_2	pt-br	Não foi possível limpar a caixa postal
+MB from user inbox	expressoAdmin1_2	pt-br	MB da caixa de entrada do usuário
+MB from inbox	expressoAdmin1_2	pt-br	MB da caixa de entrada
+Shared Accounts	expressoAdmin1_2	pt-br	Contas Compartilhadas
+You do not have right to create shared accounts	expressoAdmin1_2	pt-br	Você não tem acesso para criar contas compartilhadas
+You do not have right to delete shared accounts	expressoAdmin1_2	pt-br	Você não tem acesso para deletar contas compartilhadas
+You do not have right to edit an shared accounts	expressoAdmin1_2	pt-br	Você não tem acesso para editar contas compartilhadas
+You do not have right to edit an shared accounts quota	expressoAdmin1_2	pt-br	Você não tem acesso para editar a cota de  contas compartilhadas
+You do not have right to edit an shared accounts acl	expressoAdmin1_2	pt-br	Você não tem acesso para editar acl de contas compartilhadas
+You do not have right to empty an shared accounts inbox	expressoAdmin1_2	pt-br	Você não tem acesso para esvaziar uma conta compartilhada
+you do not have right to list shared accounts	expressoAdmin1_2	pt-br	Você não tem acesso para listar contas compartilhadas
+select only one	expressoAdmin1_2	pt-br	Selecione apenas um
