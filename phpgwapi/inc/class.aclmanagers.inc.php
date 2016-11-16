@@ -43,6 +43,13 @@ class ACL_Managers
 	const ACL_MOD_SECTORS                  = 'edit_sectors';
 	const ACL_DEL_SECTORS                  = 'delete_sectors';
 
+	const ACL_ADD_SHARED_ACCOUNTS             = 'acl_add_shared_accounts';
+	const ACL_MOD_SHARED_ACCOUNTS             = 'acl_edit_shared_accounts';
+	const ACL_MOD_SHARED_ACCOUNTS_ACL         = 'acl_edit_shared_accounts_acl';
+	const ACL_MOD_SHARED_ACCOUNTS_QUOTA       = 'acl_edit_shared_accounts_quote';	
+	const ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY   = 'acl_empty_shared_accounts_inbox';
+	const ACL_DEL_SHARED_ACCOUNTS             = 'acl_delete_shared_accounts';
+
 	const ACL_VW_GLOBAL_SESSIONS           = 'view_global_sessions';
 	const ACL_VW_LOGS                      = 'view_logs';
 
@@ -52,6 +59,7 @@ class ACL_Managers
 	const GRP_VIEW_EMAIL_LISTS             = 'list_maillists';
 	const GRP_VIEW_COMPUTERS               = 'list_computers';
 	const GRP_VIEW_SECTORS                 = 'list_sectors';
+	const GRP_VIEW_SHARED_ACCOUNTS         = 'list_shared_accounts';
 
 	const GRP_DISPLAY_GROUPS               = 'display_groups';
 	const GRP_DISPLAY_APPLICATIONS         = 'display_applications';
@@ -98,6 +106,12 @@ class ACL_Managers
 		self::ACL_DEL_INSTITUTIONAL_ACCOUNTS,
 		self::ACL_MOD_EMAIL_LISTS_ADD_EXTERNAL,
 		self::ACL_MOD_USERS_RADIUS,
+		self::ACL_ADD_SHARED_ACCOUNTS,
+		self::ACL_MOD_SHARED_ACCOUNTS,
+		self::ACL_MOD_SHARED_ACCOUNTS_ACL,
+		self::ACL_MOD_SHARED_ACCOUNTS_QUOTA,
+		self::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY,
+		self::ACL_DEL_SHARED_ACCOUNTS,
 	);
 
 	private static $_bits_grp = array(
@@ -153,6 +167,14 @@ class ACL_Managers
 		self::GRP_DISPLAY_EMAIL_CONFIG => array(
 			self::ACL_MOD_USERS,
 			self::ACL_VW_USERS,
+		),
+		self::GRP_VIEW_SHARED_ACCOUNTS => array(
+			self::ACL_ADD_SHARED_ACCOUNTS,
+			self::ACL_MOD_SHARED_ACCOUNTS,
+			self::ACL_MOD_SHARED_ACCOUNTS_ACL,
+			self::ACL_MOD_SHARED_ACCOUNTS_QUOTA,
+			self::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY,
+			self::ACL_DEL_SHARED_ACCOUNTS,
 		),
 	);
 
