@@ -12,7 +12,7 @@
 	$setup_info['expressoAdmin1_2']['name']      	= 'expressoAdmin1_2';
 	$setup_info['expressoAdmin1_2']['title']     	= 'ExpressoAdmin 1.2';
 	/* Ao incrementar versão, não esquecer de declarar função do tables_update.inc.php*/
-	$setup_info['expressoAdmin1_2']['version']   	= '1.261';
+	$setup_info['expressoAdmin1_2']['version']   	= '2.2.8';
 	$setup_info['expressoAdmin1_2']['app_order']	= 1;
 	$setup_info['expressoAdmin1_2']['tables'][]		= 'phpgw_expressoadmin';
 	$setup_info['expressoAdmin1_2']['tables'][]		= 'phpgw_expressoadmin_apps';
@@ -34,6 +34,6 @@
 	/* Dependencies for this app to work */
 	$setup_info['expressoAdmin1_2']['depends'][] = array(
 		'appname' => 'phpgwapi',
-		'versions' => Array('0.9.14','0.9.15','1.0.0','2.0','2.2')
+		'versions' => array('2.0','2.2')
 	);
 ?>
