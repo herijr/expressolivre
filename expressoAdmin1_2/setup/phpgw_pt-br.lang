@@ -152,6 +152,7 @@ Fields blocked	expressoAdmin1_2	pt-br	Campos bloqueados
 Field CPF is invalid	expressoAdmin1_2	pt-br	Campo CPF é inválido
 Field CPF must be completed	expressoAdmin1_2	pt-br	Campo CPF é de preenchimento obrigatório
 Field CPF used by	expressoAdmin1_2	pt-br	Campo CPF está em uso por
+Field CPF cannot be duplicated	expressoAdmin1_2	pt-br	Campo CPF não pode ser duplicado
 Field mail already in use	expressoAdmin1_2	pt-br	Campo e-mail já está em uso
 Field mailAlternateAddress is not formed correcty	expressoAdmin1_2	pt-br	Campo E-mail Alternativo não está formado corretamente
 Field mail is not formed correcty	expressoAdmin1_2	pt-br	Campo E-mail não está formado corretamente
