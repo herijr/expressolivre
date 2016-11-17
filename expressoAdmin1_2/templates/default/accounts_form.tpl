@@ -127,7 +127,7 @@
 				{lang_password_expired}:<br>
 				<p style="display:nona;color:red">{password_expiration_message}</p>
 			</td>
-			<td><input type="checkbox" {passwd_expired_checked} {disabled} {disabled_passwd_expired} name="passwd_expired" id="passwd_expired" value="1"</td>
+			<td><input type="checkbox" {passwd_expired_checked} {disabled} {disabled_passwd_expired} name="passwd_expired" id="passwd_expired" value="1"></td>
 			<td rowspan="4" width="35%" style="display:{display_picture}">
 				<img align="center" src="{photo_bin}" id="ea_img_photo" border="0">
 				<input type="file" id="ea_input_photo" name="photo" {disabled_edit_photo} size=20><br>
@@ -137,17 +137,17 @@
 		
 		<tr bgcolor={row_on}>
 			<td colspan="2">{lang_change_password}:</td>
-			<td><input type="checkbox" {changepassword_checked} {disabled} name="changepassword" id="changepassword" value="1"</td>
+			<td><input type="checkbox" {changepassword_checked} {disabled} name="changepassword" id="changepassword" value="1"></td>
 		</tr>
 
 		<tr bgcolor={row_off}>
 			<td colspan="2">{lang_account_active}:</td>
-			<td><input type="checkbox" {phpgwaccountstatus_checked} {disabled} name="phpgwaccountstatus" id="phpgwaccountstatus" value="1"</td>
+			<td><input type="checkbox" {phpgwaccountstatus_checked} {disabled} name="phpgwaccountstatus" id="phpgwaccountstatus" value="1"></td>
 		</tr>
 
 		<tr bgcolor={row_on}>
 			<td colspan="2">{lang_do_not_show_this_account_in_the_contact_center}:</td>
-			<td><input type="checkbox" {phpgwaccountvisible_checked} {disabled} name="phpgwaccountvisible" id="phpgwaccountvisible" value="1"</td>
+			<td><input type="checkbox" {phpgwaccountvisible_checked} {disabled} name="phpgwaccountvisible" id="phpgwaccountvisible" value="1"></td>
 		</tr>		
 
 		<tr bgcolor={row_off} style="display:{display_access_log_button}">
@@ -214,7 +214,7 @@
 		
 		<tr bgcolor={row_on} class="w-mx">
 			<td>{lang_active_email_account}:</td>
-			<td><input type="checkbox" {accountstatus_checked} {disabled} {disabled_is_migrate} name="accountstatus" id="accountstatus" value="1"</td>
+			<td><input type="checkbox" {accountstatus_checked} {disabled} {disabled_is_migrate} name="accountstatus" id="accountstatus" value="1"></td>
 		</tr>
 		
 		<tr bgcolor={row_off} class="w-mx">
@@ -237,7 +237,7 @@
 
 		<tr bgcolor={row_off} class="w-mx">
 			<td>{lang_only_forwarding}:</td>
-			<td><input type="checkbox" {deliverymode_checked} {disabled} {disabled_is_migrate} name="deliverymode" id="deliverymode" value="1"</td>
+			<td><input type="checkbox" {deliverymode_checked} {disabled} {disabled_is_migrate} name="deliverymode" id="deliverymode" value="1"></td>
 		</tr>
 
 		<tr bgcolor={row_on} id="display_quota" style="display:{display_quota}" class="w-mx">
