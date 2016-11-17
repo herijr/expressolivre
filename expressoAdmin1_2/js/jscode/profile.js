@@ -58,7 +58,7 @@ var Profile = new function() {
 	};
 	
 	this.parseMail = function(input) {
-		var result	= /^([\w\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z]{2,4})+$/.test($(input).val());
+		var result	= /^([a-zA-Z0-9_\-])+(\.[a-zA-Z0-9_\-]+)*\@([a-zA-Z0-9_\-])+(\.[a-zA-Z0-9_\-]+)*$/.test($(input).val());
 		$(input).css('color',result?'':'#FF0000');
 		return result;
 	};
