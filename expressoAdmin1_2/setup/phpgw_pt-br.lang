@@ -527,3 +527,4 @@ You do not have right to edit an shared accounts acl	expressoAdmin1_2	pt-br	Você
 You do not have right to empty an shared accounts inbox	expressoAdmin1_2	pt-br	Você não tem acesso para esvaziar uma conta compartilhada
 you do not have right to list shared accounts	expressoAdmin1_2	pt-br	Você não tem acesso para listar contas compartilhadas
 select only one	expressoAdmin1_2	pt-br	Selecione apenas um
+User photo could not be saved because is bigger than	expressoAdmin1_2	pt-br	A foto do usuário não pode ser salva porque é maior que
