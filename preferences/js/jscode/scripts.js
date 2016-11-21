@@ -128,34 +128,6 @@ function adicionaLista() {
 	window.close();
 }
 
-function FormatTelephoneNumber(event, campo)
-{
-	separador1 = '(';
-	separador2 = ')';
-	separador3 = '-';
-	
-	vr = campo.value;
-	tam = vr.length;
-	
-	if ((tam == 1) && (( event.keyCode != 8 ) || ( event.keyCode != 46 )))
-		campo.value = '';
-	
-	if ((tam == 3) && (( event.keyCode != 8 ) || ( event.keyCode != 46 )))
-		campo.value = vr.substr( 0, tam - 1 );
-	
-	if (( tam == 1 ) && ( event.keyCode != 8 ) && ( event.keyCode != 46 ))
-		campo.value = separador1 + vr;
-	
-	if (( tam == 3 ) && ( event.keyCode != 8 ) && ( event.keyCode != 46 ))
-		campo.value = vr + separador2;
-		
-	if (( tam == 8 ) && (( event.keyCode != 8 ) && ( event.keyCode != 46 )))
-		campo.value = vr + separador3;
-	
-	if ((( tam == 9 ) || ( tam == 8 )) && (( event.keyCode == 8 ) || ( event.keyCode == 46 )))
-		campo.value = vr.substr( 0, tam - 1 );
-}
-
 /*Função que padroniza DATA*/
 function formatDate(obj){
 	obj.value = obj.value.replace(/\D/g, "");

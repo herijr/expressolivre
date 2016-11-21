@@ -49,12 +49,12 @@
 				<input
 					type="input"
 					name="homephone"
+					id="homephone"
 					title="{lang_homephone_telephonenumber}"
 					size=13
 					maxlength="13"
 					autocomplete="off"
 					value="{homephone}"
-					onkeyUp="FormatTelephoneNumber(event, this, 8);"
 				>
 				(xx)xxxx-xxxx
 			</td>
@@ -65,12 +65,12 @@
 				<input
 					type="input"
 					name="mobile"
+					id="mobile"
 					title="{lang_mobile_telephonenumber}"
 					size=13
 					maxlength="14"
 					autocomplete="off"
 					value="{mobile}"
-					onkeyUp="FormatTelephoneNumber(event, this, 9);"
 				>
 				(xx)xxxxx-xxxx
 			</td>
@@ -116,7 +116,14 @@
 	</table>
 </form>
 <script type="text/javascript">
-    $("#telephonenumber").off("blur").on("blur", function(){ $(this).maskPhone(); })
+	$(document).ready(function()
+	{
+		$("#telephonenumber").maskPhone();
+
+		$("#homephone").maskPhone();
+
+		$("#mobile").maskPhone();
+	});
 </script>
 <br>
 <pre>{sql_message}</pre>

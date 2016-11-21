@@ -34,6 +34,7 @@
 	if(!@is_object($GLOBALS['phpgw']->sms)) $GLOBALS['phpgw']->sms = CreateObject('phpgwapi.sms');
 	
 	$GLOBALS['phpgw']->js->add('src','../prototype/plugins/jquery/jquery-latest.min.js');
+	$GLOBALS['phpgw']->js->add('src','../prototype/plugins/jquery/jquery-migrate.min.js');
 	$GLOBALS['phpgw']->js->add('src','../prototype/plugins/expressoAPI/expressoAjax.js');
 	$GLOBALS['phpgw']->js->validate_file('jscode','scripts','preferences');#diretorio, arquivo.js, aplicacao
 

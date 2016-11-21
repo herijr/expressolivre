@@ -55,6 +55,7 @@
 	echo '<script type="text/javascript" src="../prototype/plugins/scrollto/jquery.scrollTo-min.js"></script>';
 	echo '<script type="text/javascript" src="../prototype/plugins/datejs/sugarpak.js"></script>';
 	echo '<script type="text/javascript" src="../prototype/plugins/datejs/date-pt-BR.js"></script>';
+	echo '<script type="text/javascript" src="../prototype/plugins/jquery.mask-phone/jquery.mask-phone.js"></script>';
 
 	// Jquery - Expresso Messenger
 	echo '<script type="text/javascript" src="../prototype/plugins/jquery-xmpp/APIAjax.js"></script>';

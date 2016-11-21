@@ -26,28 +26,6 @@
  		}
 	}
 
- 	emQuickAddTelephone.prototype.FormatTelephoneNumber = function (event, campo)	{
- 		event = is_ie ? window.event : event; 		
- 		var code = (event.keyCode ? event.keyCode :event.which); 		
-		separador1 = '(';
-		separador2 = ')';
-		separador3 = '-';		
-		vr = campo.value;
-		tam = vr.length;
-		if ((tam == 1) && (( code != 8 ) || ( code != 46 )))
-			campo.value = '';
-		if ((tam == 3) && (( code != 8 ) || ( code != 46 )))
-			campo.value = vr.substr( 0, tam - 1 );	
-		if (( tam <= 1 ) && ( code != 8 ) && ( code != 46 ))
-			campo.value = separador1 + vr;		
-		if (( tam == 3 ) && ( code != 8 ) && ( code != 46 ))
-			campo.value = vr + separador2;			
-		if (( tam == 8 ) && (( code != 8 ) && ( code != 46 )))
-			campo.value = vr + separador3;
-		if ((( tam == 9 ) || ( tam == 8 )) && (( code == 8 ) || ( code == 46 )))
-			campo.value = vr.substr( 0, tam - 1 );
-	}
-
  	emQuickAddTelephone.prototype.update_telephonenumber = function (spanID){
 		var span = document.getElementById(spanID);
 		var input  = document.createElement("INPUT");
@@ -71,7 +49,7 @@
 			}else if(code == '27'){
 				QuickAddTelephone.load_telephonenumber(this);					
 			}else {
-				QuickAddTelephone.FormatTelephoneNumber(event, this);
+				$(this).maskPhone();
 			} 
 		}; 
 		input.onblur = function() { 
@@ -95,15 +73,20 @@
 		input.parentNode.replaceChild(span, input);	
 	}
  	
- 	emQuickAddTelephone.prototype.save_telephonenumber = function(input){
+ 	emQuickAddTelephone.prototype.save_telephonenumber = function(input)
+ 	{
 		var handler_save = function(data){			
-			if(data && data['error']){
+
+			if( data && data['error'] )
+			{
 				alert(data['error']);
-				return;
+				return false;
 			}
 			else
+			{
 				write_msg(get_lang("Telephone number updated with success."));
-			input.oldvalue = input.value;
+			}
+			input.oldvalue = (data['number'] ? data['number'] : input.value );
 			QuickAddTelephone.load_telephonenumber(input);
 		}
 		cExecute ("$this.ldap_functions.save_telephoneNumber&number="+input.value+"&id="+input.id, handler_save);

@@ -1,5 +1,6 @@
 <!-- BEGIN main -->
 <script src="prototype/plugins/jquery/jquery-latest.min.js"></script>
+<script src="prototype/plugins/jquery/jquery-migrate.min.js"></script>
 <script type="text/javascript" src="prototype/plugins/jquery.mask-phone/jquery.mask-phone.js"></script>
 <script type="text/javascript" src="expressoAdmin1_2/js/jscode/profile.js"></script>
 <script type="text/javascript" src="expressoAdmin1_2/js/jscode/domain.js"></script>
@@ -483,10 +484,9 @@
 </table>
 
 <script type="text/javascript">
-	
-	var tab = new Tabs(8,'activetab','inactivetab','tab','tabcontent','','','tabpage');
+	$(document).ready( function(){ $("#telephonenumber").maskPhone(); });
 
-    $("#telephonenumber").off("blur").on("blur", function(){ $(this).maskPhone(); });
+	var tab = new Tabs(8,'activetab','inactivetab','tab','tabcontent','','','tabpage');
 	
 	function initAll()
 	{
@@ -513,7 +513,6 @@
 		// Input
 		$("#mailforwardingaddress").attr('readonly','readonly');
 	}
-
 </script>
 
 </form>

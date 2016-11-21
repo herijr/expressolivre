@@ -529,3 +529,4 @@ You do not have right to empty an shared accounts inbox	expressoAdmin1_2	pt-br	V
 you do not have right to list shared accounts	expressoAdmin1_2	pt-br	Você não tem acesso para listar contas compartilhadas
 select only one	expressoAdmin1_2	pt-br	Selecione apenas um
 User photo could not be saved because is bigger than	expressoAdmin1_2	pt-br	A foto do usuário não pode ser salva porque é maior que
+The number of the phone is invalid	expressoAdmin1_2	pt-br	O número do telefone está inválido

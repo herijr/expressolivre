@@ -1,6 +1,8 @@
 countFiles = 1;
 function validate_fields(type)
 {
+
+
 	var attrs_array = new Array();
 	
 	if (type == 'create_user')
@@ -88,6 +90,18 @@ function validate_fields(type)
 	} else if ( !reSn2.test( document.forms[0].sn.value ) ) {
 		alert( get_lang( 'The surname field contains characters not allowed' )+'.' );
 		return false;
+	}
+
+	//Phone
+	if( $("#telephonenumber").length > 0 )
+	{
+		var _telephoneNumber = $.trim( $("#telephonenumber").val() );
+
+		var _return = false;
+
+		if( _telephoneNumber.length >= 10 && _telephoneNumber.length <= 11 ){ _return = true; }
+
+		if( !_return ){ tab.display(1); alert( get_lang('The number of the phone is invalid') ); return false; }	
 	}
 	
 	// ALTERNATE AND FORWARD MAIL

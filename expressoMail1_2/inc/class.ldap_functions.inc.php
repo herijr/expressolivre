@@ -1040,7 +1040,22 @@ class ldap_functions
 			return $return; 
 		}
 		$old_telephone = 0;
-		$pattern = '/\([0-9]{2,3}\)[0-9]{4}-[0-9]{4}$/';		
+
+  		$params['number'] = preg_replace("/[^0-9]/", "", $params['number']);
+  
+		$length = strlen($params['number']);
+		  
+		switch($length)
+		{
+			case 10:
+				$params['number'] = preg_replace("/([0-9]{2})([0-9]{4})([0-9]{4})/", "($1)$2-$3", $params['number']);
+				break;
+			case 11:
+				$params['number'] = preg_replace("/([0-9]{2})([0-9]{5})([0-9]{4})/", "($1)$2-$3", $params['number']);
+				break;	
+		}
+
+		$pattern = '/\([0-9]{2,3}\)[0-9]{4,5}-[0-9]{4}$/';		
 		if ((strlen($params['number']) != 0) && (!preg_match($pattern, $params['number'])))
 		{
 			$return['error'] = $this->functions->getLang('The format of telephone number is invalid');
@@ -1064,7 +1079,7 @@ class ldap_functions
 			$db_functions->write_log('modified user telephone',"User changed its own telephone number in preferences $old_telephone => ".$info['telephonenumber']);			
 			unset($info['telephonenumber']);			
 		}
-		return $return['ok'] = true;
+		return array( 'ok' => true, 'number' => $params['number'] );
 	}
 	
 	function simpleSearch( $params ) {
