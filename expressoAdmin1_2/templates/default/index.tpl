@@ -1,5 +1,4 @@
 <!-- BEGIN body -->
-<script src="prototype/plugins/jquery/jquery-latest.min.js"></script>
 <table width="90%" border="0" cellspacing="10" cellpadding="0" align="center"> 
 	<tr>
 		<td width="1%" align="center">
@@ -18,7 +17,7 @@
   		</td>
   	</tr> 
 
-	<tr>
+	<tr style="{display_shared_accounts}">
 		<td width="1%" align="center">
 			<img src='./templates/default/images/mail_share.png'>
   		</td>
@@ -43,7 +42,7 @@
 			<a href="../index.php?menuaction=expressoAdmin1_2.uimaillists.list_maillists">{lang_email_lists}</a>
 		</td>
 	</tr> 
-	<tr style={display_samba_suport}>
+	<tr style="{display_samba_suport}">
 		<td width="1%" align="center">
 			<img src='./templates/default/images/computer.png'>
 		</td>
@@ -51,7 +50,7 @@
 			<a href="../index.php?menuaction=expressoAdmin1_2.uicomputers.list_computers">{lang_computers}</a>
 		</td>
 	</tr> 
-	<tr style={display_samba_suport}>
+	<tr style="{display_samba_suport}">
 		<td width="1%" align="center">
 			<img src='./templates/default/images/samba.png'>
 		</td>

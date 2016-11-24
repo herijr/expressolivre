@@ -530,3 +530,13 @@ you do not have right to list shared accounts	expressoAdmin1_2	pt-br	Você não te
 select only one	expressoAdmin1_2	pt-br	Selecione apenas um
 User photo could not be saved because is bigger than	expressoAdmin1_2	pt-br	A foto do usuário não pode ser salva porque é maior que
 The number of the phone is invalid	expressoAdmin1_2	pt-br	O número do telefone está inválido
+Organizations and users	expressoAdmin1_2	pt-br	Organizações e usuários
+Reading	expressoAdmin1_2	pt-br	Leitura
+Exclusion	expressoAdmin1_2	pt-br	Exclusão
+Creation	expressoAdmin1_2	pt-br	Criação
+To send	expressoAdmin1_2	pt-br	Enviar
+Description	expressoAdmin1_2	pt-br	Descrição
+The owner can read the messages	expressoAdmin1_2	pt-br	O dono pode ler as mensagens
+The owner can delete or move the message	expressoAdmin1_2	pt-br	O dono pode excluir ou mover a mensagem
+The owner can create or add new message	expressoAdmin1_2	pt-br	O dono pode criar ou adicionar nova mensagem
+The owner can send message	expressoAdmin1_2	pt-br	O dono pode enviar mensagem

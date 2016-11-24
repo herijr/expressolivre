@@ -90,10 +90,17 @@ class shared_accounts
 
 					$_result['status'] &= $_imap->set_quota( intval( $_mailQuota) );
 
-			    	if( isset($params['owners_acl']) && count($params['owners_acl']) > 0 )
-			    	{
-			    		$_result['status'] &= $this->setACLMailbox( $_imap, $params, "SAVE" );
-			    	}
+					if( count($params['owners_acl']) > 0 )
+					{	
+				    	if( isset($params['owners_acl']) && count($params['owners_acl']) > 0 )
+				    	{
+				    		$_result['status'] &= $this->setACLMailbox( $_imap, $params, "SAVE" );
+				    	}
+				    }
+				    else
+				    {
+				    	$_result['status'] &= $this->setACLMailbox( $_imap, array( "owners_acl" => "", "uid" => $params['uid'] ), "SAVE" );
+				    }
 			    }
 			    else
 			    {
@@ -139,43 +146,56 @@ class shared_accounts
 	{
 		$_result = true;
 
-		$owners_acl = $params['owners_acl'];
+		$owners_acl = ( isset( $params['owners_acl'] ) ? $params['owners_acl'] : $params );
 
 		if( $type == "CREATE" )
 		{
 			foreach( $owners_acl as $value )
 			{
-				if( trim($value['acl']) !== "" )
-				{	
-					$_result &= $imap->set_acl( 'INBOX', array( trim($value['user']) => trim($value['acl']) ) );
-				}
+				$_result &= $imap->set_acl( 'INBOX', array( trim($value['user']) => trim($value['acl']) ) );
 			}
 		}
 		else
 		{
 			$_acls_old	= $imap->get_acl( 'INBOX' );
 
-			unset( $_acls_old[ $params['uid'] ] );
-
-			$_acls_new = array();
-
-			foreach( $owners_acl as $value )
+			if( is_array($owners_acl) && count($owners_acl) > 0 )
 			{
-				$_acls_new[$value['user'] ] = $value['acl'];
+				unset( $_acls_old[ $params['uid'] ] );
+
+				$_acls_new = array();
+
+				foreach( $owners_acl as $value )
+				{
+					$_acls_new[$value['user'] ] = $value['acl'];
+				}
+
+				$_acls_remove = array_diff_assoc( $_acls_old, $_acls_new );
+
+				/* Remove ACLs */
+				foreach( $_acls_remove as $owner => $acl )
+				{
+					$_result &= $imap->set_acl( 'INBOX', array( trim($owner) => '' ) );
+				}
+
+				/* Add ACLs */
+				foreach( $_acls_new as $owner => $acl )
+				{
+					$_result &= $imap->set_acl( 'INBOX', array( trim($owner) => trim($acl) ) );
+				}
 			}
-
-			$_acls_remove = array_diff_assoc( $_acls_old, $_acls_new );
-
-			/* Remove ACLs */
-			foreach( $_acls_remove as $owner => $acl )
+			else
 			{
-				$_result &= $imap->set_acl( 'INBOX', array( trim($owner) => '' ) );
-			}
+				$_acl_owner = $_acls_old[ $params['uid'] ];
 
-			/* Add ACLs */
-			foreach( $_acls_new as $owner => $acl )
-			{
-				$_result &= $imap->set_acl( 'INBOX', array( trim($owner) => trim($acl) ) );
+				/* Remove ACLs */
+				foreach( $_acls_old as $owner => $acl )
+				{
+					$_result &= $imap->set_acl( 'INBOX', array( trim($owner) => '' ) );
+				}
+
+				/* Add ACL only owner*/
+				$_result &= $imap->set_acl( 'INBOX', array( $params['uid'] => $_acl_owner ) );
 			}
 		}
 
@@ -244,9 +264,9 @@ class shared_accounts
         	'owners'         	=> array(),
         	'owners_acl'     	=> array(),
         	'mailquota'      	=> ( $_imap->get_quota() / 1024 ),
-        	'display_empty_inbox' => $this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],ACL_Managers::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY) ? 'block' : 'none',
+        	'display_empty_inbox' 			=> $this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],ACL_Managers::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY) ? 'visible' : 'hidden',
 		    'allow_edit_shared_account_acl' => $this->functions->check_acl($_SESSION['phpgw_session']['session_lid'],ACL_Managers::ACL_MOD_SHARED_ACCOUNTS_ACL),
-		    'mailquota_used' 		=> $_inboxSize
+		    'mailquota_used' 				=> $_inboxSize
         );
 
         foreach( $_acl as $key => $value )

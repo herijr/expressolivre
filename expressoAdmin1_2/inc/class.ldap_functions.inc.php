@@ -819,30 +819,36 @@ class ldap_functions
 	//Busca usuarios de um contexto e ja retorna as options do select;
 	function get_available_users2($params)
 	{
-		$context= $params['context'];
-		$justthese = array("cn", "uid");
-		$filter = "(&(phpgwaccounttype=u)(!(phpgwaccountvisible=-1)))";
-	    if ($this->ldap)
-	    {
-			$sr=ldap_search($this->ldap, $context, $filter, $justthese);
-			$entries = ldap_get_entries($this->ldap, $sr);			
-			for( $i=0; $i<$entries["count"]; $i++)
-			{
-				$u_tmp[$entries[$i]["uid"][0]] = $entries[$i]["cn"][0];
-			}
-			natcasesort($u_tmp);
-			$i = 0;
-			$users = array();
-			if (count($u_tmp))
-			{
-				foreach ($u_tmp as $uidnumber => $cn)
+		if( $params['context'] !== $GLOBALS['phpgw_info']['server']['ldap_context'] )
+		{	
+			$context= $params['context'];
+			$justthese = array("cn", "uid");
+			$filter = "(&(phpgwaccounttype=u)(!(phpgwaccountvisible=-1)))";
+		    if ($this->ldap)
+		    {
+				$sr=ldap_search($this->ldap, $context, $filter, $justthese);
+				$entries = ldap_get_entries($this->ldap, $sr);			
+				for( $i=0; $i<$entries["count"]; $i++)
 				{
-					$options .= "<option value=$uidnumber>$cn</option>";
+					$u_tmp[$entries[$i]["uid"][0]] = $entries[$i]["cn"][0];
 				}
-				unset($u_tmp);
-			}			
-	   		return $options;
+				natcasesort($u_tmp);
+				$i = 0;
+				$users = array();
+				if (count($u_tmp))
+				{
+					foreach ($u_tmp as $uidnumber => $cn)
+					{
+						$options .= "<option value=$uidnumber>$cn</option>";
+					}
+					unset($u_tmp);
+				}			
+		   		return $options;
+			}
 		}
+		else
+			return false;
+
 	}
 
 	//Busca usuários e listas de um contexto e já retorna as options do select;

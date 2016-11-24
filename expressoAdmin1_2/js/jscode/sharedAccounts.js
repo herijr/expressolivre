@@ -111,13 +111,15 @@ var sharedAccounts = new function()
 
 				$("#cn").val( $.trim(data.cn) );
 				$("#mail").val( $.trim(data.mail) );
+				$("#mail").attr( "disabled", "disabled" );
 				$("#mailquota").val( $.trim(data.mailquota) );
 	            $("#mailquota").val( $.trim(data.mailquota) );
 	            $("#mailquota_used").val( $.trim(data.mailquota_used));
 	            $("#quota_used_field").css("display", "inline");
 				$("#description").val( $.trim(data.description));
 				$("#ea_select_owners").html( data.owners_options && data.owners_options.length > 0  ? data.owners_options : "" );
-				$("#display_empty_inbox").css("display", data.display_empty_inbox ); 
+				$("#display_empty_inbox").css("visibility", data.display_empty_inbox ); 
+				$("#quota_used_field").css("visibility", "visible" ); 
 
 				if( (data.owners && data.owners.length > 0 ) && ( data.owners_acl && data.owners_acl.length > 0 ) )
 	 			{	

@@ -32,20 +32,21 @@
 	$template = CreateObject('phpgwapi.Template',PHPGW_APP_TPL);
 	$template->set_file(Array('expressoAdmin' => 'index.tpl'));
 	$template->set_block('expressoAdmin','body');
-	
-	$var = Array(
+
+	$var = array(
 		'lang_user_accounts'	=> lang('User Accounts'),
 		'lang_shared_accounts'  => lang('Shared Accounts'),		
 		'lang_institutional_accounts'=> lang('Institutional Accounts'),
-		'lang_user_groups'		=> lang('User Groups'),
-		'lang_email_lists'		=> lang('Email Lists'),
-		'lang_computers'		=> lang('Computers'),
-		'lang_organizations'	=> lang('Organizations'),
-		'lang_sambadomains'		=> lang('Samba Domains'),
-		'lang_sectors'			=> lang('Sectors'),
-		'lang_show_sessions'	=> lang('Show Sessions'),
-		'display_samba_suport'	=> $current_config['expressoAdmin_samba_support'] == 'true' ? '' : 'display:none',
-		'lang_logs'				=> lang('Logs')
+		'lang_user_groups'		     => lang('User Groups'),
+		'lang_email_lists'		     => lang('Email Lists'),
+		'lang_computers'		     => lang('Computers'),
+		'lang_organizations'	     => lang('Organizations'),
+		'lang_sambadomains'		     => lang('Samba Domains'),
+		'lang_sectors'			     => lang('Sectors'),
+		'lang_show_sessions'	     => lang('Show Sessions'),
+		'display_samba_suport'		 => strtolower(trim($current_config['expressoAdmin_samba_support'])) === 'true' ? 'display:table-row' : 'display:none',
+		'display_shared_accounts'	 => strtolower(trim($current_config['expressoAdmin_shared_accounts'])) === 'true' ? 'display:table-row' : 'display:none',
+		'lang_logs'					 => lang('Logs')
 	);
 	$template->set_var($var);
 	$template->pfp('out','body');
