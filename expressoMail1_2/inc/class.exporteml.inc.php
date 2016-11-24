@@ -124,10 +124,28 @@ class ExportEml
 				// Lazy make temporary directory
 				if ( $dir_exp === false ) $dir_exp = $this->_makeTmpDir();
 				
-				file_put_contents (
-					$dir_exp.'/'.$this->_utf8Encode( trim( str_replace('\\', '/', $attch['name']), '/' ) ),
-					$this->_getAttachmentContent( $msg_number, $attch['pid'], $attch['encoding'] )
-				);
+				$nameAttachment = $this->_utf8Encode( trim( str_replace('\\', '/', $attch['name']), '/' ) );
+				
+				$_count = 1;
+
+				if( !file_exists( $dir_exp.'/'.$nameAttachment ) )
+				{	
+					file_put_contents (
+						$dir_exp.'/'.$nameAttachment,
+						$this->_getAttachmentContent( $msg_number, $attch['pid'], $attch['encoding'] )
+					);
+				}
+				else
+				{
+					$infoFile = pathinfo( $nameAttachment );
+
+					file_put_contents (
+						$dir_exp.'/'.$infoFile['filename'].'_'.$_count.'.'.$infoFile['extension'],
+						$this->_getAttachmentContent( $msg_number, $attch['pid'], $attch['encoding'] )
+					);
+
+					$_count++;
+				}
 			}
 			
 			if ( $dir_exp === false ) return $this->_resultNotFound();
