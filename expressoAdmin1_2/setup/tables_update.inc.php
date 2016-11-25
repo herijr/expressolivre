@@ -47,10 +47,6 @@
 	$test[] = '1.261';
 	function expressoAdmin1_2_upgrade1_261()
 	{
-		$GLOBALS['phpgw_setup']->oProc->DropColumn('phpgw_expressoadmin_log','','appinfo');
-		$GLOBALS['phpgw_setup']->oProc->DropColumn('phpgw_expressoadmin_log','','groupinfo');
-		$GLOBALS['phpgw_setup']->oProc->DropColumn('phpgw_expressoadmin_log','','msg');
-		
 		$GLOBALS['setup_info']['expressoAdmin1_2']['currentver'] = '2.0.000';
 		return $GLOBALS['setup_info']['expressoAdmin1_2']['currentver'];
 	}
