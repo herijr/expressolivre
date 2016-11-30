@@ -67,6 +67,10 @@
 			include(dirname( __FILE__ ).'/../../../expressoAdmin1_2/inc/class.db_functions.inc.php');
 			$db_functions = new db_functions();
 			$db_functions->write_log('modified user password','User change its own password in preferences');
+			
+			require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
+			ActiveDirectory::getInstance()->passwd( $GLOBALS['phpgw_info']['user']['account_lid'], $n_passwd );
+			
 			$GLOBALS['hook_values']['uid']        = $GLOBALS['phpgw_info']['user']['account_lid'];
 			$GLOBALS['hook_values']['account_id'] = $GLOBALS['phpgw_info']['user']['account_id'];
 			$GLOBALS['hook_values']['old_passwd'] = $o_passwd;

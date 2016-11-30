@@ -540,3 +540,22 @@ The owner can read the messages	expressoAdmin1_2	pt-br	O dono pode ler as mensag
 The owner can delete or move the message	expressoAdmin1_2	pt-br	O dono pode excluir ou mover a mensagem
 The owner can create or add new message	expressoAdmin1_2	pt-br	O dono pode criar ou adicionar nova mensagem
 The owner can send message	expressoAdmin1_2	pt-br	O dono pode enviar mensagem
+default	expressoAdmin1_2	pt-br	Padrão
+radius filter	expressoAdmin1_2	pt-br	Radius
+AD Servers information	expressoAdmin1_2	pt-br	Informações de Servidores AD
+Department	expressoAdmin1_2	pt-br	Departamento
+Organizational Unit	expressoAdmin1_2	pt-br	Unidade organizacional
+Last update	expressoAdmin1_2	pt-br	Última atualização
+Last password update	expressoAdmin1_2	pt-br	Última atualização de senha
+Active Directory information	expressoAdmin1_2	pt-br	Informações do Active Directory
+create the account in the oraganization unit	expressoAdmin1_2	pt-br	Criar a conta na unidade de organização
+enable account on active directory	expressoAdmin1_2	pt-br	Ativar conta no Active Directory
+active directory enable	expressoAdmin1_2	pt-br	Ativar Active Directory
+Active Directory Settings	expressoAdmin1_2	pt-br	Configurações do Active Directory
+Enable Active Directory	expressoAdmin1_2	pt-br	Ativar o Active Directory
+URL soap wsdl	expressoAdmin1_2	pt-br	URL soap wsdl
+Administrator username	expressoAdmin1_2	pt-br	Nome de usuário do administrador
+Administrator password	expressoAdmin1_2	pt-br	Senha do administrador
+Organization Unit List	expressoAdmin1_2	pt-br	Lista de Unidade Organizacional
+Organization name	expressoAdmin1_2	pt-br	Nome da organização
+Organization dn	expressoAdmin1_2	pt-br	DN da organização

@@ -1,6 +1,8 @@
 <?php
 
-class Messenger
+include_once('class.configserial.inc.php');
+
+class Messenger extends ConfigSerial
 {
 	const CONFIG_ENABLED        = 'b_IM_enabled';
 	const CONFIG_DOMAIN         = 's_IM_domain';
@@ -11,83 +13,13 @@ class Messenger
 	const CONFIG_GROUPFILTER    = 's_IM_group_filter';
 	const CLIENT_NAME           = 'Expresso';
 	
-	var $_ref                   = null;
-	var $_auth                  = null;
-	var $_has_auth              = null;
-	var $_data                  = null;
-	var $_ldap_conn             = null;
-	var $_cache_configs         = null;
-	var $_config                = null;
-	
-	function __construct()
-	{
-		$this->_ref = new ReflectionClass( $this );
-		$this->_config = CreateObject('phpgwapi.config','phpgwapi');
-		$this->_config->read_repository();
-		$this->_data = isset( $this->_config->config_data[$this->_ref->getShortName()] )?
-			$this->_config->config_data[$this->_ref->getShortName()] : array();
-		if ( is_string( $this->_data ) ) $this->_data = unserialize( $this->_data );
-	}
-	
-	public function __get( $name )
-	{
-		$const = 'CONFIG_'.strtoupper( $name );
-		return $this->_ref->hasConstant( $const ) && isset( $this->_data[$this->_ref->getConstant( $const )] )?
-			$this->_data[$this->_ref->getConstant( $const )] : false;
-	}
+	protected $_auth            = null;
+	protected $_has_auth        = null;
+	protected $_ldap_conn       = null;
 	
 	//------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------
-	
-	public function getConfigs()
-	{
-		if ( is_null( $this->_cache_configs ) ) {
-			$this->_cache_configs = array();
-			foreach ( $this->_ref->getConstants() as $key => $val )
-				if ( preg_match('/^CONFIG_(.+)$/', $key, $matches) )
-					$this->_cache_configs[$matches[1]] = $val;
-		}
-		return $this->_cache_configs;
-	}
-	
-	public function setConfig( $const, $value )
-	{
-		$const = strtoupper( $const );
-		if ( is_null( $this->_cache_configs ) ) $this->getConfigs();
-		if ( !isset( $this->_cache_configs[$const] ) ) return 'Config unknown: '.$const;
-		$idx = $this->_cache_configs[$const];
-		if ( is_null( $value ) ) {
-			if ( isset($this->_data[$idx]) ) { unset( $this->_data[$idx] ); return 'changed'; }
-			return 'skipped';
-		}
-		$value = $this->_castConfig( $idx, $value );
-		if ( $this->_data[$idx] === $value ) return 'skipped';
-		if ( !$value ) unset( $this->_data[$idx] );
-		else $this->_data[$idx] = $value;
-		return 'changed';
-	}
-	
-	public function listConfigFunc( $type )
-	{
-		if ( !( is_string( $type ) && !empty( $type ) ) ) return false;
-		$result = array();
-		foreach ( $this->_ref->getMethods( ReflectionMethod::IS_PRIVATE ) as $obj )
-			if ( preg_match( '/^_conf'.preg_quote( $type ).'_(.+)$/', $obj->name, $matches ) )
-				$result[$matches[1]] = $obj;
-		return $result;
-	}
-	
-	/**
-	 * Commit data to persistent storage
-	 * 
-	 * @return unknown
-	 */
-	public function commit()
-	{
-		$this->_config->config_data[$this->_ref->getShortName()] = ( $this->_data );
-		return $this->_config->save_repository();
-	}
 	
 	/**
 	 * Check if user connection is fully functional with jabber server.
@@ -201,15 +133,6 @@ class Messenger
 		$obj->user   = $info['account_lid'];
 		$obj->auth   = base64_encode( $obj->user.'@'.$obj->domain."\0".$obj->user."\0".$this->_encrypt( $info['passwd'] ) );
 		return $obj;
-	}
-	
-	private function _castConfig( $type, $value )
-	{
-		switch( strtoupper( substr( $type, 0, 1 ) ) ) {
-			case 'S': return (string)$value;
-			case 'B': return (bool)$value;
-		}
-		return $value;
 	}
 	
 	private function _encrypt( $passwd )

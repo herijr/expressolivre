@@ -16,6 +16,7 @@
 			'Managers'             => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimanagers.list_managers'),
 			'Radius'               => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uiradius.edit'),
 			'Expresso Messenger'   => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uimessenger.edit'),
+			'Active Directory'     => $GLOBALS['phpgw']->link('/index.php','menuaction=expressoAdmin1_2.uiad.edit'),
 		);
 		ksort( $file );
 	}

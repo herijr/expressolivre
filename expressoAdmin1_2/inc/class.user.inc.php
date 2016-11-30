@@ -324,8 +324,22 @@
 						$return['msg'] .= $result['msg'];
 					}
 				}
-
 				$this->db_functions->write_log("created user",$dn);
+
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				// Active Directory
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
+				$result = $this->ad_functions( 'add', $params['uid'], array(
+					'gn'  => $params['givenname'],
+					'sn'  => $params['sn'],
+					'dep' => $params['context'],
+					'pwd' => $params['password1'],
+				) );
+				if ( is_string( $result ) ) {
+					$return['status'] = true;
+					$return['msg']   .= $this->functions->lang( $result );
+				}
+				////////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 
 			return $return;
@@ -490,6 +504,10 @@
 					
 					$ldap_mod_replace['phpgwlastpasswdchange'] = time();
 					$this->db_functions->write_log("modified user password",$dn);
+					
+					require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
+					ActiveDirectory::getInstance()->passwd( $old_values['uid'], $new_values['password1'] );
+					
 					$GLOBALS['hook_values']['uid']        = $old_values['uid'];
 					$GLOBALS['hook_values']['account_id'] = $old_values['uidnumber'];
 					$GLOBALS['hook_values']['new_passwd'] = $new_values['password1'];
@@ -1133,11 +1151,46 @@
 					}
 					$this->db_functions->remove_id2apps($new_values['uidnumber'], $remove_apps2);
 					
-					foreach ($remove_apps2 as $app => $access)
+					if ( is_array( $remove_apps2 ) ) foreach ($remove_apps2 as $app => $access)
 						$this->db_functions->write_log("removed application to user","$dn: $app");
 				}
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Active Directory
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			$result = false;
+			if ( isset( $new_values['ad_enabled'] ) != ( $new_values['ad_status'] === '1' ) ) {
+				$result = $this->ad_functions(
+					($new_values['ad_status'] === '0')? 'add' : ( ($new_values['ad_status'] === '1')? 'dis' : 'en' ),
+					$old_values['uid'], array(
+						'gn'  => isset( $new_values['givenname'] )? $new_values['givenname'] : $old_values['givenname'],
+						'sn'  => isset( $new_values['sn']        )? $new_values['sn']        : $old_values['sn'],
+						'dep' => isset( $new_values['context']   )? $new_values['context']   : $old_values['context'],
+						'pwd' => (isset( $diff['password1'] ) && $diff['password1'])? $new_values['password1'] : false,
+					)
+				);
+			} else {
+				if ( isset( $diff['givenname'] ) || isset( $diff['sn'] ) || isset( $diff['context'] ) ) {
+					$result = $this->ad_functions(
+						'upd',
+						$old_values['uid'], array(
+							'gn'  => isset( $new_values['givenname'] )? $new_values['givenname'] : $old_values['givenname'],
+							'sn'  => isset( $new_values['sn']        )? $new_values['sn']        : $old_values['sn'],
+							'dep' => isset( $new_values['context']   )? $new_values['context']   : $old_values['context'],
+						), false
+					);
+				}
+				if ( ( !is_string( $result ) ) && isset( $diff['password1'] ) && $diff['password1'] ) {
+					$result = $this->ad_functions( 'pass', $old_values['uid'], array( 'pwd' => $new_values['password1'] ), false );
+				}
+			}
+			if ( is_string( $result ) ) {
+				$return['status'] = false;
+				$return['msg']   .= $this->functions->lang( $result );
+			}
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			return $return;
 		}		
 		
@@ -1262,6 +1315,13 @@
 						$this->db_functions->write_log("deleted users data from IMAP", $user_info['uid']);
 					}
 					
+					////////////////////////////////////////////////////////////////////////////////////////////////////
+					// Active Directory
+					////////////////////////////////////////////////////////////////////////////////////////////////////
+					$result = $this->ad_functions( 'dis', $user_info['uid'], array(), false );
+					if ( is_string( $result ) ) return array( 'status' => true, 'msg' => $this->functions->lang( $result ) );
+					////////////////////////////////////////////////////////////////////////////////////////////////////
+					
 				}
 			}
 			else
@@ -1321,6 +1381,13 @@
 			
 			// In this point, not revert ldap or mailbox 
 			$this->db_functions->write_log("renamed user", "$uid -> $new_uid");
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Active Directory
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			$result = $this->ad_functions( 'rn', $uid, array( 'login' => $new_uid ), false );
+			if ( is_string( $result ) ) return array( 'status' => true, 'msg' => $this->functions->lang( $result ) );
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			// Rename script on sieve
 			if ( $profile && $profile['imapEnableSieve'] === 'yes' ) {
@@ -1415,6 +1482,47 @@
 			// Update migration status
 			$this->db_functions->setMBoxMigrateStatus( $id, $result? 'success' : 'error' );
 			
+		}
+		
+		function ad_functions( $action, $login, $params = array(), $check_admin = true )
+		{
+			if ( $check_admin && !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_SET_USERS_ACTIVE_DIRECTORY ) ) return false;
+			
+			require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
+			$ad = ActiveDirectory::getInstance();
+			if ( !$ad->enabled ) return false;
+			
+			$sync = false;
+			switch( $action ) {
+				case 'add':
+					if ( ( !$ad->create( $login, $params['gn'], $params['sn'], $params['dep'], $params['pwd'], $params['ou'] ) ) && $ad->getError() ) return $ad->getError();
+					$sync = ( strlen( $params['pwd'] ) == 0 );
+					break;
+				case 'en':
+					if ( ( !$ad->enable( $login ) ) && $ad->getError() ) return $ad->getError();
+					if ( ( !$ad->update( $login, $params['gn'], $params['sn'], $params['dep'], $params['pwd'] ) ) && $ad->getError() ) return $ad->getError();
+					$sync = ( strlen( $params['pwd'] ) == 0 );
+					break;
+				case 'dis':
+					if ( ( !$ad->disable( $login ) ) && $ad->getError() ) return $ad->getError();
+					break;
+				case 'upd':
+					if ( ( !$ad->update( $login, $params['gn'], $params['sn'], $params['dep'] ) ) && $ad->getError() ) return $ad->getError();
+					break;
+				case 'pass':
+					if ( ( !$ad->passwd( $login, $params['pwd'] ) ) && $ad->getError() ) return $ad->getError();
+					break;
+				case 'rn':
+					if ( ( !$ad->rename( $login, $params['login'] ) ) && $ad->getError() ) return $ad->getError();
+					break;
+			}
+			if ( $sync ) {
+				$pref = CreateObject( 'phpgwapi.preferences', $login );
+				$pref->read_repository();
+				$pref->add( 'common', 'ad_sync_on_auth' );
+				$pref->save_repository();
+			}
+			return true;
 		}
 	}
 ?>

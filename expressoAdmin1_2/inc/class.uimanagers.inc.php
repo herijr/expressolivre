@@ -375,6 +375,11 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				$acl_control_fields[3][] = ACL_Managers::ACL_DEL_SHARED_ACCOUNTS;
 			}
 
+			require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
+			if ( ActiveDirectory::getInstance()->enabled ) {
+				$acl_control_fields[0][] = ACL_Managers::ACL_SET_USERS_ACTIVE_DIRECTORY;
+			}
+
 			$acl_label_fields = array(
 				ACL_Managers::ACL_VW_USERS                     => 'view_user',
 				ACL_Managers::ACL_SET_USERS_DEFAULT_PASSWORD   => 'set_default_users_password',

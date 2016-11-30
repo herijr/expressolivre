@@ -31,6 +31,7 @@
 		<th id="tab6" class="activetab" style="display:{display_applications}"	onclick="javascript:tab.display(6);"><a href="#" tabindex="0" accesskey="6" onfocus="tab.display(6);" onclick="tab.display(6); return(false);">{lang_aplication}</a></th>
 		<th id="tab7" class="activetab" style="display:{display_samba_suport}"	onclick="javascript:tab.display(7);"><a href="#" tabindex="0" accesskey="7" onfocus="tab.display(7);" onclick="tab.display(7); return(false);">{lang_samba}</a></th>
 		<th id="tab8" class="activetab" style="display:{display_radius_suport}"	onclick="javascript:tab.display(8);"><a href="#" tabindex="0" accesskey="8" onfocus="tab.display(8);" onclick="tab.display(8); return(false);">{lang_radius}</a></th>
+		<th id="tab9" class="activetab" style="display:{display_ad_suport}"     onclick="javascript:tab.display(9);"><a href="#" tabindex="0" accesskey="9" onfocus="tab.display(9);" onclick="tab.display(9); return(false);">{lang_active_directory}</a></th>
 	</tr>
 </table>
 <br>
@@ -469,6 +470,22 @@
 		</tr>
 	</table>
 </div>
+<!-- The code for AD -->
+<div id="tabcontent9" class="inactivetab">
+	<table width="60%" border="0" cellspacing="2" cellpading="0">
+		<tr bgcolor={row_on}>
+			<td style="width: 25%;">{lang_enable_account_on_active_directory}:</td>
+			<td>
+				<input type="checkbox" name="ad_enabled" {ad_enabled_checked}>
+				<input type="hidden" name="ad_status" value="{ad_status}">
+			</td>
+		</tr>
+		<tr bgcolor={row_off}>
+			<td>{lang_active_directory_info}:</td>
+			<td>{active_directory_info}</td>
+		</tr>
+	</table>
+</div>
 <!-- End Tabs -->
 
 <br><br>
@@ -486,7 +503,7 @@
 <script type="text/javascript">
 	$(document).ready( function(){ $("#telephonenumber").maskPhone(); });
 
-	var tab = new Tabs(8,'activetab','inactivetab','tab','tabcontent','','','tabpage');
+	var tab = new Tabs(9,'activetab','inactivetab','tab','tabcontent','','','tabpage');
 	
 	function initAll()
 	{

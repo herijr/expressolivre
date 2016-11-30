@@ -367,6 +367,21 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			else
 				$t->set_var('display_radius_suport', 'none');
 			
+			require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
+			if ( ActiveDirectory::getInstance()->enabled && $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_SET_USERS_ACTIVE_DIRECTORY ) ) {
+				$dlist = '<select name="ad_ou"><option value="">'.lang( 'default' ).'</option>';
+				foreach ( ActiveDirectory::getInstance()->ou_list as $key => $value )
+					$dlist .= '<option value="'.$value.'">'.$key.'</option>';
+				$dlist .= '</select>';
+				$t->set_var( array(
+					'ad_status'                  => 0,
+					'lang_active_directory_info' => lang( 'create the account in the oraganization unit ' ),
+					'active_directory_info'      => $dlist,
+					'display_ad_suport'          => '',
+				) );
+			} else
+				$t->set_var( 'display_ad_suport', 'none' );
+			
 			$t->set_var($var);
 			$t->set_var($this->functions->make_dinamic_lang($t, 'main'));
 			$t->pfp('out','main');
@@ -618,6 +633,59 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 						$radius_options .= $opt;
 				}
 			}
+			
+			require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
+			if (
+				$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_SET_USERS_ACTIVE_DIRECTORY ) &&
+				( $ad = ActiveDirectory::getInstance() ) &&
+				$ad->enabled
+			) {
+				$ad_status = 0;
+				if ( $info = $ad->info( $user_info['uid'] ) ) {
+					$ad_status = $info->Enabled? 1 : 2;
+					$label = lang( 'Active Directory information' );
+					$msg = '<table width="100%">';
+					foreach ( array(
+						'Enabled'            => 'Status',
+						'Logon'              => 'Username',
+						'Name'               => 'Name',
+						'Department'         => 'Department',
+						'OU'                 => 'Organizational Unit',
+						'LastUpdateExpresso' => 'Last update',
+						'pwdLastSet'         => 'Last password update',
+					) as $key => $label ) {
+						$msg .= '<tr bgcolor="#'.(($c = !$c)?'DDDDDD':'EEEEEE').'"><td>'.lang( $label ).':</td><td>'.( $key === 'Enabled'? lang( $info->{$key}? 'active': 'inactive' ) : $info->{$key} ).'</td></tr>';
+					}
+					$msg .= '<tr bgcolor="#'.(($c = !$c)?'DDDDDD':'EEEEEE').'"><td>'.lang( 'AD Servers information' ).':</td><td>';
+					$msg_tmp1 = '';
+					foreach ( $info->DomainsInfo->UserDomainInfo as $obj ) {
+						$msg_tmp2 = '';
+						foreach ( array( 'LastLogon', 'LogonCount', 'LastLogonFail', 'badPwdCount' ) as $key ) {
+							if ( isset( $obj->{$key} ) )
+								$msg_tmp2 .= '<tr><td>'.$key.':</td><td>'.$obj->{$key}.'</td></tr>';
+						}
+						if ( $msg_tmp2 !== '' ) $msg_tmp1 .= '<tr bgcolor="#'.(($c = !$c)?'DDDDDD':'EEEEEE').'"><td>'.$obj->DnsHostName.':</td><td><table width="100%">'.$msg_tmp2.'</table></td></tr>';
+					}
+					$msg .= ( $msg_tmp1 === '' ) ? lang( 'none' ): '<table width="100%">'.$msg_tmp1.'</table>';
+					$msg .= '</td></tr></table>';
+				} else {
+					$label = lang( 'create the account in the oraganization unit ' );
+					$msg   = '<select name="ad_ou"><option value="">'.lang( 'default' ).'</option>';
+					foreach ( $ad->ou_list as $key => $value )
+						$msg .= '<option value="'.$value.'">'.$key.'</option>';
+					$msg .= '</select>';
+					if ( !preg_match( '/User not found/', $ad->getError() ) ) $msg .= '<br>'.$ad->getError();
+				}
+				
+				$t->set_var( array(
+					'ad_status'                  => $ad_status,
+					'lang_active_directory_info' => $label,
+					'active_directory_info'      => $msg,
+					'ad_enabled_checked'         => ($ad_status === 1)? 'checked' : '',
+					'display_ad_suport'          => '',
+				) );
+			} else
+				$t->set_var( 'display_ad_suport', 'none' );
 			
 			// Mail Alternate & Forwarding
 			if (is_array($user_info['mailalternateaddress']))
