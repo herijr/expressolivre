@@ -629,9 +629,11 @@
 			// Com restricao na edicao do Tel. Comercial e Celular	=> $acl=3;
 
 			$personal_data_fields = array(
-					array("text" => lang("%1 telephone number", lang("Commercial"))	, "acl" => 1),
-					array("text" => lang("%1 telephone number", lang("Mobile"))		, "acl" => 2),
-					array("text" => lang("%1 telephone number", lang("Home"))		, "acl" => 4));
+				array( 'text' => lang( '%1 telephone number', lang( 'Commercial' ) ), 'acl' => 1 ),
+				array( 'text' => lang( '%1 telephone number', lang( 'Mobile' ) ),     'acl' => 2 ),
+				array( 'text' => lang( '%1 telephone number', lang( 'Home' ) ),       'acl' => 4 ),
+				array( 'text' => lang( 'Birthdate' ),                                 'acl' => 8 ),
+			);
 			$list_personal_data = "<tr>";
 
 			foreach($personal_data_fields as $i => $data_field)	{

@@ -101,7 +101,7 @@
 	$GLOBALS['phpgw']->template->set_var('telephonenumber',($_POST['telephonenumber'] ? $_POST['telephonenumber'] : $entrie[0]['telephonenumber'][0]).$disabledTelephoneNumber);
 	$GLOBALS['phpgw']->template->set_var('mobile',($_POST['mobile'] ? $_POST['mobile'] : $entrie[0]['mobile'][0]).$disabledMobile);
 	$GLOBALS['phpgw']->template->set_var('homephone',($_POST['homephone'] ? $_POST['homephone'] : $entrie[0]['homephone'][0]).$disabledHomePhone);
-	$GLOBALS['phpgw']->template->set_var('datanascimento',$_POST['datanascimento'] ? $_POST['datanascimento'] : $entrie[0]['datanascimento'][0] != '' ? $entrie[0]['datanascimento'][0] : '');
+	$GLOBALS['phpgw']->template->set_var('datanascimento',($_POST['datanascimento'] ? $_POST['datanascimento'] : $entrie[0]['datanascimento'][0] != '' ? $entrie[0]['datanascimento'][0] : '').$disableBirthday);
 
 	ldap_close($ldap_conn);
 
