@@ -472,7 +472,12 @@
 </div>
 <!-- The code for AD -->
 <div id="tabcontent9" class="inactivetab">
-	<table width="60%" border="0" cellspacing="2" cellpading="0">
+	<div id="ad_loading">
+		<h1>{lang_ad_loading}</h1>
+		<img alt="loadding" src="./prototype/plugins/messenger/images/ajax-loader.gif">
+		<input type="hidden" name="ad_loading" value="{ad_loading}">
+	</div>
+	<table id="ad_loaded" width="60%" border="0" cellspacing="2" cellpading="0">
 		<tr bgcolor={row_on}>
 			<td style="width: 25%;">{lang_enable_account_on_active_directory}:</td>
 			<td>
@@ -481,8 +486,8 @@
 			</td>
 		</tr>
 		<tr bgcolor={row_off}>
-			<td>{lang_active_directory_info}:</td>
-			<td>{active_directory_info}</td>
+			<td id="label_active_directory_info">{lang_active_directory_info}:</td>
+			<td id="active_directory_info">{active_directory_info}</td>
 		</tr>
 	</table>
 </div>
@@ -530,6 +535,33 @@
 		// Input
 		$("#mailforwardingaddress").attr('readonly','readonly');
 	}
+	
+	if ( $('input[name=ad_loading]').val() ) {
+		$('#ad_loaded').hide();
+		$('#tab9 a').on('mousedown.ad',function(){
+			$(this).off('mousedown.ad');
+			$.ajax({
+				url: '/index.php?menuaction=expressoAdmin1_2.uiaccounts.get_ad_info',
+				type: 'GET',
+				data: { uid: $('input[name=uid]').val() },
+				dataType: 'json'
+			}).fail( function( jqXHR, textStatus ){
+				$('#ad_loading h1').html( textStatus );
+			}).done( function( data ){
+				if ( data && data.status ) {
+					$('input[name=ad_enabled]').prop( 'checked', data.ad_status === 1 );
+					$('input[name=ad_status]').val( data.ad_status );
+					$('#label_active_directory_info').html( data.active_directory_info );
+					$('#active_directory_info').html( data.html );
+					$('#ad_loaded').show();
+					$('#ad_loading').hide();
+				} else $('#ad_loading h1').html( ( data && data.html )? data.html : 'error unknown' );
+			}).always( function( data ){
+				$('img[alt=loadding]').hide();
+			});
+	
+		});
+	} else $('#ad_loading').hide();
 </script>
 
 </form>

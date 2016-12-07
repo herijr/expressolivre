@@ -81,7 +81,6 @@ class ActiveDirectory extends ConfigSerial
 	{
 		if ( !( $this->_conn() && $info = $this->_soap->GetUser( $username ) ) ) return false;
 		$this->_error = $info->GetUserResult->Success? false : $info->GetUserResult->Error;
-		error_log(html_entity_decode(Zend_Debug::dump($info,'$info',false)).PHP_EOL,3,'/tmp/log');
 		return $info->GetUserResult->Success? $info->GetUserResult->Content->enc_value : false;
 	}
 
