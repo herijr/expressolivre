@@ -922,34 +922,43 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 		function show_photo()
 		{
-			$uidNumber = $_GET['uidNumber'];
-			$photo = $this->get_photo($uidNumber); 
-			
-        	if ($photo)
+			if( isset( $_GET['uidNumber']) )
 			{
-        		header("Content-Type: image/jpeg");
-				$width = imagesx($photo);
-				$height = imagesy($photo);
-        	    $twidth = 80;
-            	$theight = 106;
-				$small_photo = imagecreatetruecolor ($twidth, $theight);
-				imagecopyresampled($small_photo, $photo, 0, 0, 0, 0,$twidth, $theight, $width, $height);
-				imagejpeg($small_photo,"",100);
-				return;
+				$photo = $this->get_photo( $_GET['uidNumber'] ); 
+
+				if( trim($photo) !== "" && $photo )
+				{	
+					header( "Content-Type: image/jpeg" );
+
+					$image = imagecreatefromstring( $photo );
+
+					$smallPhoto = imagecreatetruecolor ( 80, 106 );
+
+					imagecopyresampled( $smallPhoto, $image, 0, 0, 0, 0, 80 , 106 , imagesx($image), imagesy($image) );
+
+					imagejpeg( $smallPhoto ); 
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
 			}
 		}
 		
 		function get_photo($uidNumber)
 		{
-			$ldap_conn = $GLOBALS['phpgw']->common->ldapConnect();
-			$filter="(&(phpgwAccountType=u)(uidNumber=".$uidNumber."))";
-			$justthese = array("jpegphoto");
-
-			$search = ldap_search($ldap_conn, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
-			$entry = ldap_first_entry($ldap_conn, $search);
-			$jpeg_data = ldap_get_values_len($ldap_conn, $entry, "jpegphoto");
-			$jpegphoto = imagecreatefromstring($jpeg_data[0]);
-			return $jpegphoto;
+			$ldap_conn	= $GLOBALS['phpgw']->common->ldapConnect();
+			$filter		= "(&(phpgwAccountType=u)(uidNumber=".$uidNumber."))";
+			$justthese	= array("jpegphoto");
+			$search 	= ldap_search($ldap_conn, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
+			$entry 		= ldap_first_entry($ldap_conn, $search);
+			$jpeg_data 	= ldap_get_values_len($ldap_conn, $entry, "jpegphoto");
+			
+			return ( isset( $jpeg_data[0] ) ? $jpeg_data[0] : false );
 		}
 		
 		function show_access_log()

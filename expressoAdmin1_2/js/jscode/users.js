@@ -1,10 +1,13 @@
-countFiles = 1;
-function validate_fields(type)
+countFiles 	= 1;
+
+var typeForm 	= "";
+
+function validate_fields( type )
 {
-
-
 	var attrs_array = new Array();
 	
+	typeForm = type;
+
 	if (type == 'create_user')
 	{
 		//UID
@@ -170,51 +173,57 @@ function validate_fields(type)
 	attrs_array['cpf'] = document.forms[0].corporative_information_cpf.value;
 	
 	var attributes = connector.serialize(attrs_array);
+	
 	var handler_validate_fields = function(data)
 	{
-		if (!data.status)
+		console.log( "Validate Fields" );
+
+		var createUser = function()
 		{
-			alert(data.msg);
+			document.getElementById('passwd_expired').disabled = false;
+			
+			cExecuteForm ("$this.user.create", document.forms[0], callBackReturn );
+		};
+
+
+		var editUser = function()
+		{
+			//Turn enabled all checkboxes and inputs
+			document.getElementById('changepassword').disabled = false;
+			document.getElementById('passwd_expired').disabled = false;
+			document.getElementById('phpgwaccountstatus').disabled = false;
+			document.getElementById('phpgwaccountvisible').disabled = false;
+			document.getElementById('telephonenumber').disabled = false;
+			document.getElementById('mailforwardingaddress').disabled = false;
+			document.getElementById('mailalternateaddress').disabled = false;
+			document.getElementById('accountstatus').disabled = false;
+			document.getElementById('deliverymode').disabled = false;
+			document.getElementById('use_attrs_samba').disabled = false;
+			
+			table_apps = document.getElementById('ea_table_apps');
+			
+			var inputs = table_apps.getElementsByTagName("input");
+			
+			for (var i = 0; i < inputs.length; i++){ inputs[i].disabled = false; }
+			
+			//Necessario para lista de email, quando a edição ain
+			$("input[type=text][name=mail]").attr("disabled",false);
+
+			cExecuteForm("$this.user.save", document.forms[0], callBackReturn );
+		};
+
+		if( data.status && data.status == true )
+		{
+			switch( type )
+			{
+				case "create_user" 	: createUser(); break;
+				
+				case "edit_user"	: editUser(); break;
+			}
 		}
 		else
 		{
-			if ( (data.question) && (!confirm(data.question)) )
-			{
-				return false;
-			}
-
-			if (type == 'create_user')
-			{
-				document.getElementById('passwd_expired').disabled = false;
-				cExecuteForm ("$this.user.create", document.forms[0], handler_create);
-			}
-			else
-			{
-				//Turn enabled all checkboxes and inputs
-				document.getElementById('changepassword').disabled = false;
-				document.getElementById('passwd_expired').disabled = false;
-				document.getElementById('phpgwaccountstatus').disabled = false;
-				document.getElementById('phpgwaccountvisible').disabled = false;
-				document.getElementById('telephonenumber').disabled = false;
-				document.getElementById('mailforwardingaddress').disabled = false;
-				document.getElementById('mailalternateaddress').disabled = false;
-				document.getElementById('accountstatus').disabled = false;
-				document.getElementById('deliverymode').disabled = false;
-				document.getElementById('use_attrs_samba').disabled = false;
-				
-				table_apps = document.getElementById('ea_table_apps');
-				var inputs = table_apps.getElementsByTagName("input");
-				for (var i = 0; i < inputs.length; i++)
-				{
-					inputs[i].disabled = false;
-				}
-				
-				//Necessario para lista de email, quando a edição ain
-				
-				$("input[type=text][name=mail]").attr("disabled",false);
-
-				cExecuteForm ("$this.user.save", document.forms[0], handler_save);
-			}
+			if( data.msg ){ alert( data.msg ); }
 		}
 	}
 	
@@ -243,40 +252,33 @@ function validate_fields(type)
 	cExecute ('$this.ldap_functions.validate_fields&attributes='+attributes, handler_validate_fields);
 }
 
-// HANDLER CREATE
+// HANDLER CREATE / SAVE
 // É necessário 2 funcões de retorno por causa do cExecuteForm.
-function handler_create(data)
+function callBackReturn( data ){ _processReturn( data ); }
+
+function _processReturn( data )
 {
-	return_handler_create(data);
-}
-function return_handler_create(data)
-{
-	if (!data.status)
-		alert(data.msg);
+	console.log( "_process" );
+
+	if( data.status && $.trim(data.msg) === "" )
+	{
+		var _msg = get_lang('User successful created') + '.';
+	
+		if( typeForm == "edit_user" )
+		{	
+			_msg = get_lang('User successful saved') + '.';	
+		}
+
+		alert( _msg );
+
+		typeForm = "";
+
+		location.href = "./index.php?menuaction=expressoAdmin1_2.uiaccounts.list_users";
+	}
 	else
-		alert(get_lang('User successful created') + '.');
-
-	location.href="./index.php?menuaction=expressoAdmin1_2.uiaccounts.list_users";
-	return;
-}
-
-
-// HANDLER SAVE
-// É necessário 2 funcões de retorno por causa do cExecuteForm.
-function handler_save(data)
-{
-	return_handler_save(data);
-}
-function return_handler_save(data)
-{
-	if (!data.status){
-		alert(data.msg);
+	{
+		if( data.msg ){ alert(data.msg); }
 	}
-	else{
-		alert(get_lang('User successful saved') + '.');
-	}
-	location.href="./index.php?menuaction=expressoAdmin1_2.uiaccounts.list_users";
-	return;
 }
 
 function get_available_groups(context)

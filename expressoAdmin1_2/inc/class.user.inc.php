@@ -245,7 +245,7 @@
 					if( $_FILES['photo']['size'] > $size_conf )
 					{
 						$return['status'] = false;
-						$return['msg']   .= $this->functions->lang('User photo could not be saved because is bigger than').' '.($size_conf/1024).' kb.';
+						$return['msg']   .= $this->functions->lang('User photo could not be saved because is bigger than').' '.( $size_conf / 1024 ).' kb.';
 					} else {
 						$result = $this->ldap_functions->ldap_save_photo( $dn, $_FILES['photo']['tmp_name'] );
 						if ( !$result['status'] ) {
@@ -678,12 +678,12 @@
 				}
 				elseif ($_FILES['photo']['name'] != '')
 				{
-					$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10000 : $this->current_config['expressoAdmin_photo_length'];
+					$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10240 : $this->current_config['expressoAdmin_photo_length'];
 
 					if( $_FILES['photo']['size'] > $size_conf )
 					{
 						$return['status'] = false;
-						$return['msg']   .= $this->functions->lang('User photo could not be save because is bigger the').' '.($size_conf/1024).' kb.';
+						$return['msg']   .= $this->functions->lang('User photo could not be saved because is bigger than').' '.( $size_conf / 1024 ).' kb.';
 					}
 					else
 					{
