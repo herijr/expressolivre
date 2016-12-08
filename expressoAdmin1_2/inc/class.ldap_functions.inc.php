@@ -2233,6 +2233,14 @@ class ldap_functions
 			return $return;
 		}
 
+        if( empty($params['desc']) && trim($params['desc']) == "" ) 
+        {
+            $result['status'] = false; 
+            $result['msg']    = $this->functions->lang('Field description is empty') . '.'; 
+            
+            return $result; 
+        }
+
 		$uid = 'institutional_account_' . $params['mail'];
 		$dn = "uid=$uid," . $params['context'];
 
@@ -2332,6 +2340,13 @@ class ldap_functions
 			$return['msg']  = $this->functions->lang('Field mail is not formed correcty') . '.';
 			return $return;
 		}
+
+        if( empty($params['desc']) && trim($params['desc']) == "" ) 
+        {
+            $result['status'] = false; 
+            $result['msg']    = $this->functions->lang('Field description is empty') . '.'; 
+            return $result; 
+        }
 
 		$uid = 'institutional_account_' . $params['mail'];
 		$dn = strtolower("uid=$uid," . $params['context']);
