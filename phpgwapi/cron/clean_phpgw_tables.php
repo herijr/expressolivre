@@ -35,7 +35,7 @@ do {
 	$GLOBALS['phpgw']->db->query( '
 		SELECT DISTINCT loginid
 		FROM phpgw_access_log
-		WHERE lo = 0 AND loginid > \''.$login.'\'
+		WHERE lo = 0 AND loginid > \''.$login.'\' AND li > '.(strtotime("-1 day",gmmktime(0,0,0))).'
 		ORDER BY loginid
 		LIMIT 1000'
 	);
