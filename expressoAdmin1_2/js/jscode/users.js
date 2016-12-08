@@ -176,8 +176,6 @@ function validate_fields( type )
 	
 	var handler_validate_fields = function(data)
 	{
-		console.log( "Validate Fields" );
-
 		var createUser = function()
 		{
 			document.getElementById('passwd_expired').disabled = false;
@@ -185,31 +183,37 @@ function validate_fields( type )
 			cExecuteForm ("$this.user.create", document.forms[0], callBackReturn );
 		};
 
-
-		var editUser = function()
+		var editUser = function(data)
 		{
-			//Turn enabled all checkboxes and inputs
-			document.getElementById('changepassword').disabled = false;
-			document.getElementById('passwd_expired').disabled = false;
-			document.getElementById('phpgwaccountstatus').disabled = false;
-			document.getElementById('phpgwaccountvisible').disabled = false;
-			document.getElementById('telephonenumber').disabled = false;
-			document.getElementById('mailforwardingaddress').disabled = false;
-			document.getElementById('mailalternateaddress').disabled = false;
-			document.getElementById('accountstatus').disabled = false;
-			document.getElementById('deliverymode').disabled = false;
-			document.getElementById('use_attrs_samba').disabled = false;
-			
-			table_apps = document.getElementById('ea_table_apps');
-			
-			var inputs = table_apps.getElementsByTagName("input");
-			
-			for (var i = 0; i < inputs.length; i++){ inputs[i].disabled = false; }
-			
-			//Necessario para lista de email, quando a edição ain
-			$("input[type=text][name=mail]").attr("disabled",false);
+			if ( (data.question) && (!confirm(data.question)) )
+			{
+				return false;
+			}
+			else
+			{
+				//Turn enabled all checkboxes and inputs
+				document.getElementById('changepassword').disabled = false;
+				document.getElementById('passwd_expired').disabled = false;
+				document.getElementById('phpgwaccountstatus').disabled = false;
+				document.getElementById('phpgwaccountvisible').disabled = false;
+				document.getElementById('telephonenumber').disabled = false;
+				document.getElementById('mailforwardingaddress').disabled = false;
+				document.getElementById('mailalternateaddress').disabled = false;
+				document.getElementById('accountstatus').disabled = false;
+				document.getElementById('deliverymode').disabled = false;
+				document.getElementById('use_attrs_samba').disabled = false;
+				
+				table_apps = document.getElementById('ea_table_apps');
+				
+				var inputs = table_apps.getElementsByTagName("input");
+				
+				for (var i = 0; i < inputs.length; i++){ inputs[i].disabled = false; }
+				
+				//Necessario para lista de email, quando a edição ain
+				$("input[type=text][name=mail]").attr("disabled",false);
 
-			cExecuteForm("$this.user.save", document.forms[0], callBackReturn );
+				cExecuteForm("$this.user.save", document.forms[0], callBackReturn );
+			}
 		};
 
 		if( data.status && data.status == true )
@@ -218,7 +222,7 @@ function validate_fields( type )
 			{
 				case "create_user" 	: createUser(); break;
 				
-				case "edit_user"	: editUser(); break;
+				case "edit_user"	: editUser(data); break;
 			}
 		}
 		else
@@ -258,8 +262,6 @@ function callBackReturn( data ){ _processReturn( data ); }
 
 function _processReturn( data )
 {
-	console.log( "_process" );
-
 	if( data.status && $.trim(data.msg) === "" )
 	{
 		var _msg = get_lang('User successful created') + '.';
