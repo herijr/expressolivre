@@ -17,7 +17,7 @@ Add Samba Domain	expressoAdmin1_2	pt-br	Criar domínio Samba
 Add Samba Domains	expressoAdmin1_2	pt-br	Criar domínios Samba
 Add Sectores	expressoAdmin1_2	pt-br	Adicionar Setores
 Add Sectors	expressoAdmin1_2	pt-br	Criar Setor
-Add Sub Sectors	expressoAdmin1_2	pt-br	Criar Sub-Setore
+Add Sub Sectors	expressoAdmin1_2	pt-br	Criar Sub-Setores
 Add User	expressoAdmin1_2	pt-br	Adicionar Usuário
 Add users	expressoAdmin1_2	pt-br	Adicionar usuários
 alert your administrator about this	expressoAdmin1_2	pt-br	Alerte seu administrador sobre isto
@@ -198,7 +198,7 @@ it is needed to create samba passwords	expressoAdmin1_2	pt-br	É necessário para 
 It is not allow select all users from the root organization	expressoAdmin1_2	pt-br	Não é permitido selecionar todos os usuários da raiz
 it was not possible to change users mailbox quota	expressoAdmin1_2	pt-br	Não foi possível alterar a cota da caixa postal do usuário
 it was not possible to delete mailbox	expressoAdmin1_2	pt-br	Não foi possível deletar a caixa postal do usuário
-It was not possible create the group because the LDAP schemas are not update	expressoAdmin1_2	pt-br	Não foi possível criar o grupo poruqe os esquemas do LDAP não estão atualizados
+It was not possible create the group because the LDAP schemas are not update	expressoAdmin1_2	pt-br	Não foi possível criar o grupo porque os esquemas do LDAP não estão atualizados
 The surname field contains characters not allowed	expressoAdmin1_2	pt-br	O campo sobrenome contém caracteres não permitidos
 The surname field must contain letters or numbers	expressoAdmin1_2	pt-br	O campo de sobrenome deve conter letras ou números
 The surname field is empty	expressoAdmin1_2	pt-br	O campo sobrenome está vazio
