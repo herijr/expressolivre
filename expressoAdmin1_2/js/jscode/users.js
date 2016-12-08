@@ -102,9 +102,12 @@ function validate_fields( type )
 
 		var _return = false;
 
-		if( _telephoneNumber.length >= 10 && _telephoneNumber.length <= 11 ){ _return = true; }
+		if( _telephoneNumber.length > 0 )
+		{
+			if( _telephoneNumber.length >= 10 && _telephoneNumber.length <= 11 ){ _return = true; }
 
-		if( !_return ){ tab.display(1); alert( get_lang('The number of the phone is invalid') ); return false; }	
+			if( !_return ){ tab.display(1); alert( get_lang('The number of the phone is invalid') ); return false; }
+		}	
 	}
 	
 	// ALTERNATE AND FORWARD MAIL
