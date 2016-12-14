@@ -104,7 +104,7 @@ class Messenger extends ConfigSerial
 		if ( !( $result = ldap_search(
 			$this->_getLdapConn(),
 			$this->_getConfigFunct( 'GROUPBASE' ),
-			str_replace( '%u', $info['account_lid'], $this->groupfilter ),
+			$filter,
 			array( 'dn' )
 		) ) ) return false;
 		

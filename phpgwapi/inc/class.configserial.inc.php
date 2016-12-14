@@ -5,16 +5,17 @@ require_once( PHPGW_API_INC . '/class.singleton.inc.php' );
 class ConfigSerial extends Singleton
 {
 	protected $_ref                   = null;
-	private   $_data                  = null;
-	private   $_cache_configs         = null;
+	protected $_data                  = null;
+	protected $_cache_configs         = null;
+	protected $_config                = null;
 	
 	function __construct()
 	{
 		$this->_ref = new ReflectionClass( $this );
-		$config = CreateObject('phpgwapi.config','phpgwapi');
-		$config->read_repository();
-		$this->_data = isset( $config->config_data[$this->_ref->getShortName()] )?
-			$config->config_data[$this->_ref->getShortName()] : array();
+		$this->_config = CreateObject('phpgwapi.config','phpgwapi');
+		$this->_config->read_repository();
+		$this->_data = isset( $this->_config->config_data[$this->_ref->getShortName()] )?
+			$this->_config->config_data[$this->_ref->getShortName()] : array();
 		if ( is_string( $this->_data ) ) $this->_data = unserialize( $this->_data );
 	}
 	
