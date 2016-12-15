@@ -109,7 +109,7 @@ class CachedLDAP
 		$tmpLDAP =& Factory::getInstance('WorkflowLDAP');
 		$this->userContext  = $tmpLDAP->getUserContext();
 		$this->groupContext = $tmpLDAP->getGroupContext();
-		$this->dataSource =& Factory::getInstance('WorkflowObjects')->getLDAP();
+		$this->dataSource =& Factory::newInstance('WorkflowObjects')->getLDAP();
 	}
 
 	/**
@@ -154,12 +154,14 @@ class CachedLDAP
 		/* format the output */
 		$output = array();
 		foreach ($ldapfields as $attribute)
-			if ($attribute == 'dn' or $attribute == 'mobile' or $attribute == 'homePhone')
-				// Retrieve all occurrencies of mobile and homePhone
-				$output[$attribute] = $entries[0][$attribute];
-			else
-				// Retrieve first occurrence of other attributes
-				$output[$attribute] = $entries[0][$attribute][0];
+			if(!empty($entries[0][$attribute])) {
+				if ($attribute == 'dn' or $attribute == 'mobile' or strtolower($attribute) == 'homephone')
+					// Retrieve all occurrencies of mobile and homePhone
+					$output[$attribute] = $entries[0][$attribute];
+				else
+					// Retrieve first occurrence of other attributes
+					$output[$attribute] = $entries[0][$attribute][0];
+			}
 
 		/* insert the timestamp of the last update */
 		$output['last_update'] = time();

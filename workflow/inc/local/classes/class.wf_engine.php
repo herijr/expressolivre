@@ -186,7 +186,8 @@ class wf_engine
 	function getInstances($activities = null)
 	{
 		wf_warn_deprecated_method('wf_instance', 'getIdle');
-		return $this->getIdleInstances(0, $activities);
+		$WFInstance = &Factory::getInstance('wf_instance');
+		return $WFInstance->getIdle(0, $activities);
 	}
 
 	/**

@@ -1157,7 +1157,7 @@ class so_orgchart
 		/* here we need fresh information. Let's access ldap first */
 		$employeeEntry = $cachedLDAP->getEntryByID($employeeID);
 
-		if ($entry === false)
+		if ($employeeEntry === false)
 			return array('error' => 'Funcionário não encontrado.');
 
 		$employeeInfo				= $orgchart->getEmployee($employeeID);
@@ -1173,15 +1173,15 @@ class so_orgchart
 		 * This condition is true if the current user is the same user that's being retrieved
 		 */
 		$authorized_mobile = $this->acl->checkUserGroupAccessToResource('ORG', $account_id, (int) $organizationID, 1);
-		if (($account_id == $employeeID) || ($authorized_mobile)) {
+		if ((($account_id == $employeeID) || ($authorized_mobile)) && !empty($employeeEntry['mobile'])) {
 			$mobile = $employeeEntry['mobile'];
 		}
 		$authorized_home_phone = $this->acl->checkUserGroupAccessToResource('ORG', $account_id, (int) $organizationID, 2);
-		if (($account_id == $employeeID) || ($authorized_home_phone)) {
+		if ((($account_id == $employeeID) || ($authorized_home_phone)) && !empty($employeeEntry['homephone'])) {
 			$homePhone = $employeeEntry['homephone'];
 		}
 		$authorized_employee_number = $this->acl->checkUserGroupAccessToResource('ORG', $account_id, (int) $organizationID, 3);
-		if (($account_id == $employeeID) || ($authorized_employee_number)) {
+		if ((($account_id == $employeeID) || ($authorized_employee_number)) && !empty($employeeEntry['employeenumber'])) {
 			$employeeNumber = $employeeEntry['employeenumber'];
 		}
 

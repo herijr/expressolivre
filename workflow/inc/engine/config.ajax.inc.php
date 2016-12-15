@@ -169,11 +169,11 @@ if (!function_exists('galaxia_retrieve_user_groups'))
 	{
 		$memberships = array();
 
-		$loadGroups = ($user != $_SESSION['phpgw_info']['workflow']['account_id']) || (is_null($_SESSION['phpgw_info']['workflow']['user_groups']));
+		$loadGroups = (isset($_SESSION['phpgw_info']['workflow']['account_id']) && $user != $_SESSION['phpgw_info']['workflow']['account_id']) || (is_null($_SESSION['phpgw_info']['workflow']['user_groups']));
 		if ($loadGroups)
 		{
 			$memberships = Factory::getInstance('WorkflowLDAP')->getUserGroups($user);
-			if ($user == $_SESSION['phpgw_info']['workflow']['account_id'])
+			if (isset($_SESSION['phpgw_info']['workflow']['account_id']) && $user == $_SESSION['phpgw_info']['workflow']['account_id'])
 				$_SESSION['phpgw_info']['workflow']['user_groups'] = $memberships;
 		}
 		else

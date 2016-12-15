@@ -108,10 +108,11 @@
 		/**
 		 * Utilizado para substituir "\\" e "'" nos campos passados como parametro.
 		 * @param mixed (string ou array)
+		 * @param type declarado apenas para manter compatibilidade com o método da classe mãe
 		 * @return mixed (string ou array)
 		 * @access public
 		 */
-		function quote($fields){
+		function quote($fields, $type=false){
 		    if (is_array($fields)) {
 		        foreach($fields as $key => $value) {
 					$fields[$key] = str_replace("\\", "\\\\\\\\", str_replace("'", "''", $value));
@@ -137,10 +138,13 @@
 		 * Utilizado para executar queries com possibilidade de fazer bind dos valores.
 		 * @param string $sqlStatement Comando SQL
 		 * @param array $inputArray Array, seqüencial, com os valores que serão associados à query
+		 * @param file declarado apenas para manter compatibilidade com o método da classe mãe
+		 * @param offset declarado apenas para manter compatibilidade com o método da classe mãe
+		 * @param num_rows declarado apenas para manter compatibilidade com o método da classe mãe
 		 * @return mixed ResultSet em caso de sucesso ou false/null caso contrário
 		 * @access public
 		 */
-		function query($sqlStatement, $inputArray = false)
+		function query($sqlStatement, $inputArray = false, $file='', $offset=0, $num_rows=-1)
 		{
 			if (!is_array($inputArray))
 				return parent::query($sqlStatement);

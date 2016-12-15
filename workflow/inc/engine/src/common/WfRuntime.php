@@ -542,7 +542,7 @@ class WfRuntime extends Base
         // this is not done in the $instance->complete() to let
         // xxx_pos.php code be executed before sending the instance
 
-        $result['engine_info'] =& $this->instance->sendAutorouted($this->activity_id);
+        $result['engine_info'] = $this->instance->sendAutorouted($this->activity_id);
 
         // application should display completed page
         $result['action']='completed';

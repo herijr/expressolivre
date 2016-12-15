@@ -899,7 +899,7 @@ class WfSecurity extends Base {
     if ($_abort) $result['abort']=tra('Abort this instance');
     if ($_view) $result['view']=tra('View this instance');
     if ($_viewrun) $result['viewrun']= array('lang' => tra('View this instance'), 'link' => $view_activity);
-    if ($_iframe_height) $result['viewrun']['iframe_height'] = $_iframe_height;
+    if (!empty($_iframe_height)) $result['viewrun']['iframe_height'] = $_iframe_height;
     if ($_resume) $result['resume']=tra('Resume this exception instance');
     if ($_exception) $result['exception']=tra('Exception this instance');
     if ($_monitor) $result['monitor']=tra('Monitor this instance');   

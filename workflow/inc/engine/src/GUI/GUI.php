@@ -613,7 +613,7 @@ class GUI extends Base {
 
     /* add the read only column */
     $readOnlyColumn = '(SELECT MIN(gar.wf_readonly) FROM egw_wf_activity_roles gar, egw_wf_user_roles gur WHERE (gar.wf_activity_id = gia.wf_activity_id) AND (gur.wf_role_id=gar.wf_role_id) AND ((gur.wf_user = ? and gur.wf_account_type=\'u\')';
-    if ($groups)
+    if (!empty($groups))
     {
       $readOnlyColumn .= ' OR (gur.wf_user = ANY (?) AND gur.wf_account_type = \'g\')';
       /* add the groups to be the second element of the array (there's another 'array_unshift' in the next lines) */
@@ -1192,7 +1192,7 @@ class GUI extends Base {
     
     //now use the security object to get actions avaible, this object know the rules
     $view_activity = $this->gui_get_process_view_activity($pId);
-    $result =& $this->wf_security->getUserActions($user, $instanceId, $activityId, $readonly, $pId, $actType, $actInteractive, $actAutorouted, $actStatus, $instanceOwner, $instanceStatus, $currentUser, $view_activity);
+    $result = $this->wf_security->getUserActions($user, $instanceId, $activityId, $readonly, $pId, $actType, $actInteractive, $actAutorouted, $actStatus, $instanceOwner, $instanceStatus, $currentUser, $view_activity);
     return $result;
   }
 

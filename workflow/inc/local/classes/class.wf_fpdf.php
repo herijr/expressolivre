@@ -37,7 +37,7 @@ class wf_fpdf extends FPDF
 	 * @return string
 	 * @access public
 	 */
-	function Output()
+	function Output($name = '', $dest = '')
 	{
 		return parent::Output('', 'S');
 	}

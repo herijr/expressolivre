@@ -55,7 +55,7 @@ class ResourcesRedirector
 			$_SESSION['workflow']['ResourcesRedirector'] = array(0 => 'workflow');
 
 		$this->pid = isset($_GET['pid']) ? (int) $_GET['pid'] : 0;
-		$this->file = $_GET['file'];
+		$this->file = isset($_GET['file']) ? $_GET['file'] : '';
 		$this->processInfo = false;
 		if (!isset($_SESSION['workflow']['ResourcesRedirector'][$this->pid]))
 		{

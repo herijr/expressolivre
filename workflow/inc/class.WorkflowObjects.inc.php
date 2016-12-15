@@ -240,7 +240,22 @@ class WorkflowObjects
 
 			/* if  username and password are available, bind the connection */
 			if ((!empty($ldapConfigValues['ldap_user'])) && (!empty($ldapConfigValues['ldap_password'])))
-				ldap_bind($this->cache['ldap'], $ldapConfigValues['ldap_user'], $ldapConfigValues['ldap_password']);
+			{
+				$lbind = ldap_bind($this->cache['ldap'], $ldapConfigValues['ldap_user'], $ldapConfigValues['ldap_password']);
+
+				if(!$lbind)
+				{
+					// unbind & reconnect (trying ldap instead of ldaps) & rebind
+					ldap_unbind($this->cache['ldap']);
+					$this->cache['ldap'] = ldap_connect(str_replace('ldaps://', 'ldap://', $ldapConfigValues['ldap_host']));
+
+					/* configure the connection */
+					ldap_set_option($this->cache['ldap'], LDAP_OPT_PROTOCOL_VERSION, 3);
+					ldap_set_option($this->cache['ldap'], LDAP_OPT_REFERRALS, ($ldapConfigValues['ldap_follow_referrals'] == 1) ? 1 : 0);
+
+					$lbind = ldap_bind($this->cache['ldap'], $ldapConfigValues['ldap_user'], $ldapConfigValues['ldap_password']);
+				}
+			}
 		}
 
 		return $this->cache['ldap'];

@@ -140,7 +140,7 @@ class bo_adminsource extends bo_ajaxinterface
 		else
 			$where = ' wf_p_id = -1 ';
 
-		$processesInfo = &$process_manager->list_processes(0, -1, 'wf_name__asc', '', $where);
+		$processesInfo = $process_manager->list_processes(0, -1, 'wf_name__asc', '', $where);
 		$otherProcesses = array();
 		foreach ($processesInfo['data'] as $pi)
 			$otherProcesses[] = array("name" => $pi['wf_name'] . " (v" . $pi['wf_version'] . ")", "link" => $web_server_url . "/index.php?menuaction=workflow.ui_adminsource.form&p_id=" . $pi['wf_p_id'], "pid" => $pi['wf_p_id']);

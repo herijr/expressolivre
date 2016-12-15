@@ -1657,7 +1657,7 @@ class Instance extends Base {
   {
     $returned_data = Array();
     // Now execute the code for the activity (function defined in galaxia's config.php)
-    $returned_data =& galaxia_execute_activity($activityId, $iid , 1);
+    $returned_data = galaxia_execute_activity($activityId, $iid , 1);
 
     //we should have some info in $returned_data now. if it is false there's a problem
     if ((!(is_array($returned_data))) && (!($returned_data)) )

@@ -226,7 +226,7 @@ class bo_userinterface extends bo_ajaxinterface
 
 				$row['viewRunAction'] = false;
 				if (isset($availableActions['viewrun']))
-					$row['viewRunAction'] = array('viewActivityID' => $availableActions['viewrun']['link'], 'height' => $availableActions['viewrun']['iframe_height']);
+					$row['viewRunAction'] = array('viewActivityID' => ((!empty($availableActions['viewrun']['link'])) ? $availableActions['viewrun']['link'] : ''), 'height' => $availableActions['viewrun']['iframe_height']);
 
 				foreach ($actionKeys as $key)
 					$availableActions[$key] = (isset($availableActions[$key]));
@@ -681,7 +681,7 @@ class bo_userinterface extends bo_ajaxinterface
 					$viewActivitiesID[$row['wf_p_id']] = $GLOBALS['ajax']->gui->gui_get_process_view_activity($row['wf_p_id']);
 				if ($viewActivitiesID[$row['wf_p_id']] !== false)
 					if ($GLOBALS['ajax']->gui->wf_security->checkUserAction($viewActivitiesID[$row['wf_p_id']], $row['wf_instance_id'], 'viewrun'))
-						$row['viewRunAction'] = array('viewActivityID' => $viewActivitiesID[$row['wf_p_id']], 'height' => $GLOBALS['ajax']->gui->wf_security->processesConfig[$instance->pId]['iframe_view_height']);
+						$row['viewRunAction'] = array('viewActivityID' => $viewActivitiesID[$row['wf_p_id']], 'height' => $GLOBALS['ajax']->gui->wf_security->processesConfig[$row['wf_p_id']]['iframe_view_height']);
 
 				$output['instances'][] = $row;
 			}
@@ -705,7 +705,9 @@ class bo_userinterface extends bo_ajaxinterface
 
 			$processesInfo[$value['wf_p_id']] = array(
 				'name' => $value['wf_procname'] . ' (v' . $value['wf_version'] . ')',
-				'useHTTPS' => (($_SESSION['phpgw_info']['workflow']['server']['use_https'] > 0) ? $GLOBALS['ajax']->gui->wf_security->processesConfig[$value['wf_p_id']]['execute_activities_using_secure_connection'] : 0)
+				'useHTTPS' => (($_SESSION['phpgw_info']['workflow']['server']['use_https'] > 0) ?
+					(!empty($GLOBALS['ajax']->gui->wf_security->processesConfig[$value['wf_p_id']]['execute_activities_using_secure_connection'])) ? $GLOBALS['ajax']->gui->wf_security->processesConfig[$value['wf_p_id']]['execute_activities_using_secure_connection'] : 0
+					: 0)
 			);
 
 			if ($active)

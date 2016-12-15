@@ -264,7 +264,7 @@ class Process extends Base {
 		// if we have some not set value that we need to check in global conf
 		if (count($global_default_array) > 0)
 		{
-		  $global_array =& galaxia_get_config_values($global_default_array);
+		  $global_array = galaxia_get_config_values($global_default_array);
 		}
 		$result = (array)$local_array + (array)$global_array;
 		return $result;

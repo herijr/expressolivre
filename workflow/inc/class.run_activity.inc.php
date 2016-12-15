@@ -293,7 +293,7 @@
 			$this->instance_id = $instance->getInstanceId();
 
 			// load process
-			$this->process =& $this->runtime->getProcess();
+			$this->process = $this->runtime->getProcess();
 			if (!($this->process))
 			{
 				$result['failure'] = $this->runtime->fail(lang('Cannot run the activity without her process').$instance, true, _DEBUG, $auto);
@@ -450,7 +450,7 @@
 			$env['instance']      =& $instance;                        //process manager instance
 			$env['activity']      =& $activity;                        //activity manager instance
 			$security             =& Factory::newInstance('SecurityUtils');              //input sanitizer class
-			$env['request']       =& $security->process($_REQUEST);    //sanitizes input data from client
+			$env['request']       =  $security->process($_REQUEST);    //sanitizes input data from client
 			$env['factory']       =& Factory::getInstance('ProcessWrapperFactory');  //instantiation controller class
 			$env['natural']		  =& Factory::newInstance('wf_natural');   //data access object instance for mainframe
 			/* END WORKFLOW MVC SETTINGS */
@@ -663,7 +663,7 @@
 			$this->instance_id = $instance->getInstanceId();
 
 			// load process
-			$this->process =& $this->runtime->getProcess();
+			$this->process = $this->runtime->getProcess();
 			if (!($this->process))
 			{
 				$result['failure'] = $this->runtime->fail(lang('Cannot run the activity without her process').$instance, true, _DEBUG, $auto);
@@ -738,7 +738,7 @@
 			$env['instance']      =& $instance;                        //process manager instance
 			$env['activity']      =& $activity;                        //activity manager instance
 			$security             =& Factory::newInstance('SecurityUtils'); //input sanitizer class
-			$env['request']       =& $security->process($_REQUEST); //sanitizes input data from client
+			$env['request']       =  $security->process($_REQUEST); //sanitizes input data from client
 			$env['factory']       =& Factory::newInstance('ProcessWrapperFactory');  //instantiation controller class
 			$env['natural']		  =& Factory::newInstance('wf_natural');   //data access object instance for mainframe
 			/* END WORKFLOW MVC SETTINGS */

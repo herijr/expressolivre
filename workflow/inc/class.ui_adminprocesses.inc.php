@@ -251,9 +251,9 @@ class ui_adminprocesses extends bo_workflow_forms
 		if (isset($_POST['save']))
 		{
 			//retrieve config_values POSTed by the form
-			$config_yesno		=& get_var('config_yesno', 'POST', array());
-			$config_value 		=& get_var('config_value', 'POST', array());
-			$config_use_default 	=& get_var('config_use_default', 'POST', array());
+			$config_yesno		= get_var('config_yesno', 'POST', array());
+			$config_value 		= get_var('config_value', 'POST', array());
+			$config_use_default	= get_var('config_use_default', 'POST', array());
 			$global_config_array = array(
 				'known_items' 	=> &$known_config_items,
 				'yesno'		=> &$config_yesno,
@@ -298,7 +298,7 @@ class ui_adminprocesses extends bo_workflow_forms
 			$proc_info = $this->process_manager->get_process($this->wf_p_id);
 			$this->t->set_var('proc_bar', $this->fill_proc_bar($proc_info));
 			//retrieve config values
-			$this->process_config =& $this->process_manager->getConfigValues($this->wf_p_id);
+			$this->process_config = $this->process_manager->getConfigValues($this->wf_p_id);
 		}
 		else
 		{
@@ -314,7 +314,7 @@ class ui_adminprocesses extends bo_workflow_forms
 		}
 
 		// show list of processes
-		$items = &$this->process_manager->list_processes($this->start, $this->offset, $this->sort_mode, $search_str, $where_str);
+		$items = $this->process_manager->list_processes($this->start, $this->offset, $this->sort_mode, $search_str, $where_str);
 		//echo "list of processes: <pre>";print_r($items);echo "</pre>";
 		$this->show_list_processes($items['data'], $items['cant']);
 
@@ -429,14 +429,14 @@ class ui_adminprocesses extends bo_workflow_forms
 					unset($row_value);
 					$row_value = $this->process_config[$config_name];
 
-					reset($config_type);
-					for($i = 0; ($current =& each($config_type) != null); ++$i){
+					$i = 0;
+					foreach($config_type AS $current_key => $current_value){
 						$this->t->set_var(array(
-							'config_option_name'		=> $current['value'],
-							'config_option_value'		=> $current['key'],
-							'config_option_selected'	=> ($current['key'] == $row_value)? 'selected' : '',
+							'config_option_name'		=> $current_value,
+							'config_option_value'		=> $current_key,
+							'config_option_selected'	=> ($current_key == $row_value)? 'selected' : '',
 						));//DEBUG TODO selected value?
-						$this->t->parse('config_table_select_option', 'block_config_table_select_option', (($i == 0) ? false : true ));
+						$this->t->parse('config_table_select_option', 'block_config_table_select_option', (($i++ == 0) ? false : true ));
 					}
 
 					$this->t->set_var(array(

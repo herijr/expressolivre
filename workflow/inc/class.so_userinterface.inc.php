@@ -84,7 +84,7 @@ class so_userinterface
 	function getExternalApplications()
 	{
 		/* load the intranet subnetworks */
-		$oldDB = $GLOBALS['phpgw']->db;
+		$oldDB = isset($GLOBALS['phpgw']->db) ? $GLOBALS['phpgw']->db : null;
 		$GLOBALS['phpgw']->db = $GLOBALS['ajax']->db;
 		$config = &Factory::getInstance('config', 'workflow');
 		$configValues = $config->read_repository();
@@ -147,7 +147,7 @@ class so_userinterface
 		$query = "SELECT o.organizacao_id, o.nome, o.descricao, o.url_imagem, o.ativa FROM funcionario f, organizacao o WHERE (o.organizacao_id = f.organizacao_id) AND (f.funcionario_id = ?)";
 		$result = $this->db->query($query, array((int) $userID));
 
-		$output = $result->fetchRow(DB_FETCHMODE_ASSOC);
+		$output = $result->fetchRow(ADODB_FETCH_ASSOC);
 		if (!$output)
 			return false;
 
@@ -245,7 +245,7 @@ class so_userinterface
 		);
 
 		foreach ($output as &$row)
-			$row['contagem'] .= (isset($numerOfEmployees[$row['funcionario_categoria_id']]) ? $numerOfEmployees[$row['funcionario_categoria_id']] : 0);
+			$row['contagem'] = (isset($numerOfEmployees[$row['funcionario_categoria_id']]) ? $numerOfEmployees[$row['funcionario_categoria_id']] : 0);
 
 		return $output;
 	}

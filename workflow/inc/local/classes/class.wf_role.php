@@ -185,7 +185,7 @@ class wf_role
 		if (!is_array($users))
 			$users = array((int) $users);
 		$roleID = $this->roleManager->get_role_id($this->processID, $roleName);
-		$ldap = Factory::getInstance('WorkflowLDAP');
+		$ldap = Factory::newInstance('WorkflowLDAP');
 		foreach ($users as $user)
 		{
 			$user = str_replace('u', '', str_replace('g', '', $user));

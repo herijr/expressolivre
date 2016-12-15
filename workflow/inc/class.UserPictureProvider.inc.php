@@ -130,7 +130,7 @@ class UserPictureProvider
 				$filename = $baseDirectory . '/default.png';
 				if (!file_exists($filename))
 				{
-					$image = imagecreatefrompng(dirname(__FILE__) . '/../../expressoMail1_2/templates/default/images/photo.png');
+					$image = imagecreatefromjpeg(dirname(__FILE__) . '/../../expressoMail1_2/templates/default/images/photo.jpg');
 					$image = $this->resizeImage($image);
 					$success = @imagepng($image, $filename);
 				}

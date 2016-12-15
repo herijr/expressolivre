@@ -130,7 +130,7 @@ class ui_adminactivities extends WorkflowUtils
 		$this->t->set_block('admin_activities', 'block_default_roles', 'default_roles');
 		$this->t->set_block('admin_activities', 'block_select_agents', 'select_agents');
 	
-		$proc_info =& $this->process_manager->get_process($this->wf_p_id);
+		$proc_info = $this->process_manager->get_process($this->wf_p_id);
 	
 		$activity_id		= (int)get_var('activity_id', 'any', 0);
 		$name				= get_var('name', 'any', '');
@@ -278,9 +278,9 @@ class ui_adminactivities extends WorkflowUtils
 		else
 		{
 			$expandTable = true;
-			$activity_info =& $this->activity_manager->get_activity($activity_id);
-			$activity_roles =& $this->activity_manager->get_activity_roles($activity_id);
-			$activity_agents =& $this->activity_manager->get_activity_agents($activity_id);
+			$activity_info = $this->activity_manager->get_activity($activity_id);
+			$activity_roles = $this->activity_manager->get_activity_roles($activity_id);
+			$activity_agents = $this->activity_manager->get_activity_agents($activity_id);
 			//for all agents we create ui_agent object to handle admin agents displays
 			//this array can be already done by the save_activity function, in this case
 			// we will just actualize most of the records
@@ -332,15 +332,15 @@ class ui_adminactivities extends WorkflowUtils
 			$where = implode(' and ', $wheres);
 		}
 		
-		if (empty($process_activities)) $process_activities =& $this->activity_manager->list_activities($this->wf_p_id, 0, -1, $this->sort_mode, $find, $where);
-		$all_transition_activities_from =& $this->activity_manager->get_transition_activities($this->wf_p_id, 'end');
-		$all_transition_activities_to =& $this->activity_manager->get_transition_activities($this->wf_p_id, 'start');
+		if (empty($process_activities)) $process_activities = $this->activity_manager->list_activities($this->wf_p_id, 0, -1, $this->sort_mode, $find, $where);
+		$all_transition_activities_from = $this->activity_manager->get_transition_activities($this->wf_p_id, 'end');
+		$all_transition_activities_to = $this->activity_manager->get_transition_activities($this->wf_p_id, 'start');
 		if ($activity_id) $this->search_transitions_act($process_activities, $activity_id);
-		$process_roles =& $this->role_manager->list_roles($this->wf_p_id, 0, -1, 'wf_name__asc', '');
-		$agents_list =& $this->process_manager->get_agents();
-		$all_process_transitions =& $this->activity_manager->get_process_transitions($this->wf_p_id);
-		$process_transitions =& $this->activity_manager->get_process_transitions($this->wf_p_id, $filter_trans_from);
-		$process_activities_with_transitions =& $this->activity_manager->get_process_activities_with_transitions($this->wf_p_id);
+		$process_roles = $this->role_manager->list_roles($this->wf_p_id, 0, -1, 'wf_name__asc', '');
+		$agents_list = $this->process_manager->get_agents();
+		$all_process_transitions = $this->activity_manager->get_process_transitions($this->wf_p_id);
+		$process_transitions = $this->activity_manager->get_process_transitions($this->wf_p_id, $filter_trans_from);
+		$process_activities_with_transitions = $this->activity_manager->get_process_activities_with_transitions($this->wf_p_id);
 
 		// update activities
 		if (isset($_POST['update_act']))
@@ -937,7 +937,7 @@ class ui_adminactivities extends WorkflowUtils
 			$agents_conf =& $_POST['wf_agent'];
 			
 			//retrieve agents list
-			$activity_agents =& $this->activity_manager->get_activity_agents($activity_id);
+			$activity_agents = $this->activity_manager->get_activity_agents($activity_id);
 			//for all agents we create ui_agent object to handle admin agents displays and savings
 			foreach ($activity_agents as $agent)
 			{
