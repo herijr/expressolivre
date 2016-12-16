@@ -433,12 +433,19 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				$disabled = 'disabled';
 				$disabled_samba = '';
 			}
-			// SOMENTE ALTERAÇÃO DE TELEFONE
+			// CRUD E ALTERAÇÃO DE TELEFONE
 			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER )))
 			{
 				$disabled = 'disabled';
 				$disabled_phonenumber = '';
 			}
+			// SOMENTE ALTERAÇÃO DE TELEFONE
+			if (($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER )))
+			{
+				$disabled = 'disabled';
+				$disabled_phonenumber = '';
+			}
+
 			// SOMENTE GRUPOS
 			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_GROUPS )))
 			{
