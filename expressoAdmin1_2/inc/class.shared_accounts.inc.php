@@ -38,7 +38,7 @@ class shared_accounts
 		return $this->imap;
 	}
 
-	private function specialCharacters($value)
+	private function specialCharacters($param)
 	{
 		if( is_array($param) )
 		{
@@ -53,12 +53,17 @@ class shared_accounts
 		}
 		else
 		{
-
 		    $array1 = array( "á", "à", "â", "ã", "ä", "é", "è", "ê", "ë", "í", "ì", "î", "ï", "ó", "ò", "ô", "õ", "ö", "ú", "ù", "û", "ü", "ç", "Á", "À", "Â", "Ã", "Ä", "É", "È", "Ê", "Ë", "Í", "Ì", "Î", "Ï", "Ó", "Ò", "Ô", "Õ", "Ö", "Ú", "Ù", "Û", "Ü", "Ç" );
 
-		    $array2 = array( "a;", "a;", "a", "a", "a", "e", "e", "e", "e", "i;", "i", "i", "i", "o;", "o", "o", "o", "o", "u", "u", "u", "u", "c", "A", "A", "A", "A", "A", "E", "E", "E", "E", "I", "I", "I", "I", "O", "O", "O", "O", "O", "U", "U", "U", "U", "C;" );
+		    $array2 = array( "a", "a", "a", "a", "a", "e", "e", "e", "e", "i", "i", "i", "i", "o", "o", "o", "o", "o", "u", "u", "u", "u", "c", "A", "A", "A", "A", "A", "E", "E", "E", "E", "I", "I", "I", "I", "O", "O", "O", "O", "O", "U", "U", "U", "U", "C" );
 
-		    return str_replace( $array1, $array2, $value);
+		    $param = str_replace( $array1, $array2, $param);
+
+   			$param = trim(preg_replace("/(~|\\*|#|--|;|\\\\)/","", $param ));
+
+   			$param = mb_convert_encoding($param, "UTF-8", mb_detect_encoding($param, "UTF-8, ISO-8859-15, ISO-8859-1", true));
+
+			return $param;
 		}
 	} 
 

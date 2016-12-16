@@ -54,6 +54,36 @@ class ldap_functions
 		
 		$this->radius = CreateObject('expressoAdmin1_2.soradius');
 	}
+
+	private function specialCharacters($param)
+	{
+		if( is_array($param) )
+		{
+			foreach( $param as $key => $val )
+			{ 
+				if( is_object($val) ){ continue; } 
+
+				$param[$key] = $this->specialCharacters( $val );
+			}
+
+			return $param;
+		}
+		else
+		{
+		    $array1 = array( "á", "à", "â", "ã", "ä", "é", "è", "ê", "ë", "í", "ì", "î", "ï", "ó", "ò", "ô", "õ", "ö", "ú", "ù", "û", "ü", "ç", "Á", "À", "Â", "Ã", "Ä", "É", "È", "Ê", "Ë", "Í", "Ì", "Î", "Ï", "Ó", "Ò", "Ô", "Õ", "Ö", "Ú", "Ù", "Û", "Ü", "Ç" );
+
+		    $array2 = array( "a", "a", "a", "a", "a", "e", "e", "e", "e", "i", "i", "i", "i", "o", "o", "o", "o", "o", "u", "u", "u", "u", "c", "A", "A", "A", "A", "A", "E", "E", "E", "E", "I", "I", "I", "I", "O", "O", "O", "O", "O", "U", "U", "U", "U", "C" );
+
+		    $param = str_replace( $array1, $array2, $param);
+
+   			$param = trim(preg_replace("/(~|\\*|#|--|;|\\\\)/","", $param ));
+
+			$param = mb_convert_encoding($param, "UTF-8", mb_detect_encoding($param, "UTF-8, ISO-8859-15, ISO-8859-1", true));
+
+			return $param;
+		}
+	} 
+
 	function getRadiusConf()
 	{
 		return $this->radius->getRadiusConf();
@@ -2193,6 +2223,8 @@ class ldap_functions
 	
 	function create_institutional_accounts($params)
 	{
+		$params = $this->specialCharacters( $params );
+
 		/* Begin: Access verification */
 		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_ADD_INSTITUTIONAL_ACCOUNTS ))
 		{
@@ -2302,6 +2334,8 @@ class ldap_functions
 	
 	function save_institutional_accounts($params)
 	{
+		$params = $this->specialCharacters( $params );
+
 		/* Begin: Access verification */
 		if (!$this->functions->check_acl( $_SESSION['phpgw_info']['expresso']['user']['account_lid'], ACL_Managers::ACL_MOD_INSTITUTIONAL_ACCOUNTS ))
 		{

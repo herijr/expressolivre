@@ -218,7 +218,7 @@ function edit_institutional_account(uid)
 			if(data.phpgwAccountVisible == '-1'){ $('#phpgwAccountVisible').attr("checked","true"); }
 			$('#cn').val( data.cn);
 			$('#mail').val( data.mail );
-			$('#desc').val( data.description );
+			$('#description').val( data.description );
 
 			$("#ea_select_owners").html( data.owners );
 
