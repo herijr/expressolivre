@@ -86,9 +86,9 @@ class ldap_functions
 				return $result;
 			}
 		
-			// UID em outras organiza��es
-			//Quando tento retirar as organiza��es pelo expressoAdmin d� este erro.
-			$filter = "(ou=*)";
+			// UID em outras organizacoes
+			// Quando tento retirar as organizacoes pelo expressoAdmin de este erro.
+			$filter = "(objectClass=organizationalUnit)";
 			$justthese = array("ou");
 			$search = ldap_list($this->ldap, $context, $filter, $justthese);
 			$entries = ldap_get_entries($this->ldap,$search);

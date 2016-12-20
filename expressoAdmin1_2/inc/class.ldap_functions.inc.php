@@ -394,7 +394,7 @@ class ldap_functions
 				$uid_without_org = implode("-", $tmp_reverse_uid_without_org);
 				*/
 				
-				$filter = "(ou=*)";
+				$filter = "(objectClass=organizationalUnit)";
 				$justthese = array("ou");
 				$search = ldap_list($ldap_connection2, $context, $filter, $justthese);
 				$entries = ldap_get_entries($ldap_connection2	,$search);

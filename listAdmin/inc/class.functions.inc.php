@@ -219,125 +219,6 @@
 			}
 		}
 		
-		//Criado nova fun��o bem mais eficiente!
-		/*
-		function get_organizations($context, $selected='')
-		{
-			//echo $selected;
-			
-			$first_sector_ufn = ldap_dn2ufn($context);
-			$first_sector_string = explode(",", $first_sector_ufn);
-			
-			$s = CreateObject('phpgwapi.sector_search_ldap');
-			$sectors_info = $s->sector_search($context);
-			
-			$sector_select = "";
-			$sector_select .= "<option value='" .$context . "'";
-			$sector_select .= ">".strtoupper($first_sector_string[0])."</option>\n";
-			
-			foreach($sectors_info as $sector)
-			{
-				if ($sector->sector_level == 1)
-				{
-					$sector->sector_name = '+ '.$sector->sector_name;
-				}
-				else
-				{
-					$sector_space = '';
-					for ($i=1; $i < $sector->sector_level; $i++)
-						$sector_space = '---'.$sector_space;
-					$sector->sector_name = $sector_space.' '.$sector->sector_name;
-				}
-				$sector_select .= '<option value="' . strtolower($sector->sector_context) . '"';
-				
-				if (trim(strtolower($sector->sector_context)) == $selected)
-					$sector_select .= ' selected>' . $sector->sector_name . "</option>\n";
-				else
-					$sector_select .= '>' . $sector->sector_name . "</option>\n";
-			}
-			//$sector_select .= "</select>";
-			return $sector_select;	
-		}
-		*/
-		
-		/*
-		function get_organizations($context, $selected='', $show_invisible_ou=false)
-		{
-			$dn			= $GLOBALS['phpgw_info']['server']['ldap_root_dn'];
-			$passwd		= $GLOBALS['phpgw_info']['server']['ldap_root_pw'];
-			$ldap_conn	= ldap_connect($GLOBALS['phpgw_info']['server']['ldap_host']);
-			
-			ldap_set_option($ldap_conn, LDAP_OPT_PROTOCOL_VERSION, 3);
-			ldap_set_option($ldap_conn, LDAP_OPT_REFERRALS, 0);
-			ldap_bind($ldap_conn,$dn,$passwd);
-			
-			$justthese = array("dn");
-			$filter = $show_invisible_ou ? "(ou=*)" : "(& (ou=*) (!(phpgwAccountVisible=-1)) )";
-			$search=ldap_search($ldap_conn, $context, $filter, $justthese);
-        	
-        	ldap_sort($ldap_conn, $search, "ou");
-        	$info = ldap_get_entries($ldap_conn, $search);
-			ldap_close($ldap_conn);
-
-			// Retiro o count do array info e inverto o array para ordena��o.
-	        for ($i=0; $i<$info["count"]; $i++)
-    	    {
-				$dn = $info[$i]["dn"];
-				
-				// Necess�rio, pq em uma busca com ldapsearch ou=*, traz tb o pr�prio ou. 
-				if (strtolower($dn) == $context)
-					continue;
-
-				$array_dn = ldap_explode_dn ( $dn, 1 );
-
-                $array_dn_reverse  = array_reverse ( $array_dn, true );
-
-				array_pop ( $array_dn_reverse );
-
-				$inverted_dn[$dn] = implode ( ".", $array_dn_reverse );
-			}
-
-			// Ordena��o
-			natcasesort($inverted_dn);
-			
-			// Constru��o do select
-			$level = 0;
-			foreach ($inverted_dn as $dn=>$invert_ufn)
-			{
-                $display = '';
-
-                $array_dn_reverse = explode ( ".", $invert_ufn );
-                $array_dn  = array_reverse ( $array_dn_reverse, true );
-
-                $level = count( $array_dn ) - 4;
-
-                if ($level == 0)
-                        $display .= '+';
-                else {
-                        for ($i=0; $i<$level; $i++)
-                                $display .= '---';
-                }
-
-                reset ( $array_dn );
-                $display .= ' ' . (current ( $array_dn ) );
-				
-				$dn = trim(strtolower($dn));
-				if ( $dn == $selected )
-					$select = ' selected';
-				else
-					$select = '';
-                $options .= "<option value='$dn'$select>$display</option>";
-        	}
-
-			// Cria a primeira entrada na combo 
-			$first_sector_ufn = ldap_dn2ufn($context);
-			$first_sector_string = explode(",", $first_sector_ufn);
-			$options = "<option value='$context'>" . strtoupper($first_sector_string[0]) . "</option>" . $options;
-
-    	    return $options;
-		}
-		*/
-		
 		function get_organizations($context, $selected='', $referral=false, $show_invisible_ou=true)
 		{
 			$s = CreateObject('phpgwapi.sector_search_ldap');
@@ -351,65 +232,7 @@
 			$sectors_info = $s->get_sectors($selected, $referral, $show_invisible_ou);
 			return $sectors_info;
 		}		
- 
-		/*
-		function get_sectors($context, $selected='')
-		{
-			$query = "SELECT sector FROM phpgw_expressoadmin_sectors WHERE organization = '" . $context . "'";
-			$GLOBALS['phpgw']->db->query($query);
-			while($GLOBALS['phpgw']->db->next_record())
-			{
-				$query_result[] = $GLOBALS['phpgw']->db->row();
-			}
-			
-			if (count($query_result) > 0)
-			{
-				foreach ($query_result as $index=>$tmp)
-				{
-					$sector = $tmp['sector'];
-					if ($sector == $selected)
-						$sector_options .= "<option value='$sector' selected>$sector</option>";
-					else
-						$sector_options .= "<option value='$sector'>$sector</option>";
-				}
-				return $sector_options;
-			}
-			else
-				return false;
-		}
-		*/
-		
-		// Get list of all levels, this function is used for sectors module.
-		/*
-		function get_sectors_list($context)
-		{
-			$connection = $GLOBALS['phpgw']->common->ldapConnect();
-			ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
-			ldap_set_option($connection, LDAP_OPT_REFERRALS, 0);
 	
-			if ($connection)
-			{				
-				$bind=ldap_bind($connection);
-				$filter="ou=*";
-				$justthese = array("ou");
-				$search=ldap_list($connection, $context, $filter, $justthese);
-				ldap_sort($connection, $search, "ou");
-				$info = ldap_get_entries($connection, $search);
-				for ($i=0; $i<$info["count"]; $i++)
-				{
-					$this->level++;
-					$next_context[$i] = 'ou='.$info[$i]["ou"][0].','.$context;
-					$obj = new sectors_object($info[$i]["ou"][0], $next_context[$i], $this->level, 'False');
-					array_push($this->sectors_list, $obj);
-					$this->get_sectors_list($next_context[$i]);
-				}
-			}
-			ldap_close($connection);
-			$this->level--;
-			return $this->sectors_list;
-		}
-		*/
-		
 		// Get list of all levels, this function is used for sectors module.
 		function get_sectors_list($context, $selected='', $referral=false ,$show_invisible_ou=false)
 		{
@@ -427,7 +250,7 @@
 			ldap_bind($ldap_conn,$dn,$passwd);
 			
 			$justthese = array("dn");
-			$filter = "(ou=*)";
+			$filter = "(objectClass=organizationalUnit)";
 			$search=ldap_search($ldap_conn, $context, $filter, $justthese);
         	
         	ldap_sort($ldap_conn, $search, "ou");
@@ -439,7 +262,7 @@
     	    {
 				$dn = $info[$i]["dn"];
 				
-				// Necess�rio, pq em uma busca com ldapsearch ou=*, traz tb o pr�prio ou. 
+				// Necessario, pq em uma busca com ldapsearch objectClass=organizationalUnit, traz tb o proprio ou. 
 				if (strtolower($dn) == $context)
 					continue;
 
@@ -453,10 +276,10 @@
 				$inverted_dn[$dn] = implode ( "#", $array_dn_reverse );
 			}
 
-			// Ordena��o
+			// Ordenacao
 			natcasesort($inverted_dn);
 			
-			// Constru��o do select
+			// Construcao do select
 			$level = 0;
 			$options = array();
 			foreach ($inverted_dn as $dn=>$invert_ufn)

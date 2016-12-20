@@ -345,7 +345,7 @@
 			ldap_bind($ldap_conn,$dn,$passwd);
 
 			$justthese = array("dn");
-			$filter = "(ou=*)";
+			$filter = "(objectClass=organizationalUnit)";
 
 			$systemName = strtolower($GLOBALS['phpgw_info']['server']['system_name']);
 			if ($systemName != '')
