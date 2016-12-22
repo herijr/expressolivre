@@ -102,12 +102,8 @@ function modal(id, type)
 
 function close_lightbox()
 {
-	var objBody = document.getElementsByTagName("body").item(0);
-	var lightbox = document.getElementById('overlay');
-	lightbox_div = document.getElementById('lightbox');
-	objBody.removeChild(lightbox);
-	objBody.removeChild(lightbox_div);
-	return;
+	$("#overlay").remove();
+	$("#lightbox").remove();
 }
 
 function getPageSize(){
@@ -190,29 +186,6 @@ function add_css(){
 	headID.appendChild(cssNode);
 	return;
 }
-/*
-function load_lang(){
-	cExecute ('$this/js/modal/inc/load_lang', handler_load_lang);
-}
-
-var global_langs = new Array();
-function handler_load_lang(data)
-{
-	global_langs = eval(data);
-}
-
-function get_lang(key_raw)
-{
-	key = key_raw.replace(/ /g,"_");
-
-	try{
-		lang = eval("global_langs."+key.toLowerCase());
-		return lang;
-	}
-	catch(e){
-		return key_raw + '*';
-	}
-}*/
 
 function make_msg(msg, type)
 {

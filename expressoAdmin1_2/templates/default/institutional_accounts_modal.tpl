@@ -2,8 +2,8 @@
 <input type="hidden" id="{modal_id}_height" value="503">
 <input type="hidden" id="{modal_id}_width" value="930">
 <input type="hidden" id="{modal_id}_close_action" value="close_lightbox()">
-<input type="hidden" id="{modal_id}_create_action" value="create_institutional_accounts()">
-<input type="hidden" id="{modal_id}_save_action" value="save_institutional_accounts()">
+<input type="hidden" id="{modal_id}_create_action" value="save_accounts('create')">
+<input type="hidden" id="{modal_id}_save_action" value="save_accounts('save')">
 <input type="hidden" id="{modal_id}_onload_action" value="set_onload({manager_context})">
 
 <form enctype="multipart/form-data" name="institutional_accounts_form_template" method="post">

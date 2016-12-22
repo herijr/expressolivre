@@ -2,32 +2,25 @@ countFiles = 1;
 
 var available_users = null;
 
-function create_institutional_accounts()
-{
-	select_owners = Element('ea_select_owners');
-	for(var i = 0;i < select_owners.options.length; i++)
-		select_owners.options[i].selected = true;
-	cExecuteForm ("$this.ldap_functions.create_institutional_accounts", document.forms['institutional_accounts_form'], handler_create_institutional_accounts);
-}
+var _editAccount 	= true;
 
-function handler_create_institutional_accounts(data_return)
+function save_accounts( type )
 {
-	handler_create_institutional_accounts2(data_return);
-	return;
-}
+	$("#ea_select_owners").find("option").each(function()
+	{
+		$(this).prop( "selected", true );
+	});
 
-function handler_create_institutional_accounts2(data_return)
-{
-	if (!data_return.status)
+	var _functionLdap = "$this.ldap_functions.save_institutional_accounts";
+
+	if ( type === "create")
 	{
-		write_msg(data_return.msg, 'error');
+		_editAccount = false;
+
+		_functionLdap = "$this.ldap_functions.create_institutional_accounts";
 	}
-	else
-	{
-		close_lightbox();
-		write_msg(get_lang('Institutional account successful created') + '.', 'normal');
-	}
-	return;
+
+	cExecuteForm ( _functionLdap, document.forms['0'], callBackReturn );
 }
 
 function set_onload()
@@ -55,7 +48,7 @@ function get_available_users(context)
 		}
 	}
 
-	cExecute ('$this.ldap_functions.get_available_users&context='+context, handler_get_users);
+	cExecute( '$this.ldap_functions.get_available_users&context='+context, handler_get_users );
 }
 
 function search_organization(event, key, element)
@@ -94,6 +87,7 @@ function sinc_combos_org(context)
 }
 
 var finderTimeout = '';
+
 function optionFinderTimeout(obj)
 {
 	clearTimeout(finderTimeout);
@@ -101,6 +95,7 @@ function optionFinderTimeout(obj)
 	oWait.innerHTML = get_lang('searching') + '...';
 	finderTimeout = setTimeout("optionFinder('"+obj.id+"')",500);
 }
+
 function optionFinder( elementID )
 {
 	var _findUser = $("#"+elementID).val();
@@ -235,55 +230,57 @@ function edit_institutional_account(uid)
 	cExecute ('$this.ldap_functions.get_institutional_account_data&uid='+uid, handle_edit_institutional_account);
 }
 
-function save_institutional_accounts()
-{
-	$("#ea_select_owners").find("option").each(function()
-	{
-		$(this).prop( "selected", true );
-	});
+// HANDLER CREATE / SAVE
+// É necessário 2 funcões de retorno por causa do cExecuteForm.
+function callBackReturn( data ){ _processReturn( data );  }
 
-	cExecuteForm( "$this.ldap_functions.save_institutional_accounts", document.forms[0], handler_save_institutional_accounts );
-}
+function _processReturn( data )
+{	
+	if( data )
+	{	
+		if( data.msg && data.status == false )
+		{
+			write_msg( data.msg, 'error' );
+		}
+		else
+		{
+			if( data.status && data.status  == true )
+			{
+				close_lightbox();
 
-function handler_save_institutional_accounts(data_return)
-{
-	handler_save_institutional_accounts2(data_return);
-	return;
-}
-function handler_save_institutional_accounts2(data_return)
-{
-	if ( data_return.msg && data_return.msg.length > 0 )
-	{
-		write_msg(data_return.msg, 'error');
+				var _msgInformation = get_lang('Institutional account successful created');
+
+				if( _editAccount )
+				{
+					_msgInformation = get_lang('Institutional account successful saved');
+
+					get_institutional_accounts( $("#ea_institutional_account_search").val() );
+				}
+
+				_editAccount = true;
+
+				write_msg( _msgInformation + '.', 'normal' );
+			}
+		}
 	}
-	else
-	{
-		get_institutional_accounts(Element('ea_institutional_account_search').value);
-
-		close_lightbox();
-
-		write_msg(get_lang('Institutional account successful saved') + '.', 'normal');
-	}
-
-	return;
 }
 
 function delete_institutional_accounts(uid)
 {
-	if (!confirm(get_lang('Are you sure that you want to delete this institutional account') + "?"))
+	if( !confirm(get_lang('Are you sure that you want to delete this institutional account') + "?") )
 	{
 		return;
 	}
 
-	var handle_delete_institutional_account = function(data_return)
+	var handle_delete_institutional_account = function( data )
 	{
-		if (!data_return.status)
+		if( data.status === false )
 		{
-			write_msg(data_return.msg, 'error');
+			write_msg( data.msg , 'error' );
 		}
 		else
 		{
-			write_msg(get_lang('Institutional account successful deleted') + '.', 'normal');
+			write_msg( get_lang('Institutional account successful deleted') + '.', 'normal' );
 
 			get_institutional_accounts(Element('ea_institutional_account_search').value);
 		}
