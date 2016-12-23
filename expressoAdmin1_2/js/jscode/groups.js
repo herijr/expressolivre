@@ -1,7 +1,12 @@
 // Variaveis Globais
 countFiles = 0;
+
+var typeForm = "";
+
 function validate_fields(type, restrictionsOnGroup)
 {
+	typeForm = type;
+
 	document.forms[0].cn.value = document.forms[0].cn.value.toLowerCase();
 	
 	if (document.forms[0].cn.value == ''){
@@ -48,9 +53,9 @@ function validate_fields(type, restrictionsOnGroup)
 		else
 		{
 			if (type == 'create_group')
-				cExecuteForm ("$this.group.create", document.forms[0], handler_create);
+				cExecuteForm ("$this.group.create", document.forms[0], callBackReturn );
 			else if (type == 'edit_group')
-				cExecuteForm ("$this.group.save", document.forms[0], handler_save);
+				cExecuteForm ("$this.group.save", document.forms[0], callBackReturn);
 		}
 	}
 
@@ -80,36 +85,29 @@ function validate_fields(type, restrictionsOnGroup)
 
 // HANDLER CREATE
 // É necessário 2 funcões de retorno por causa do cExecuteForm.
-function handler_create(data)
-{
-	return_handler_create(data);
-}
-function return_handler_create(data)
-{
-	if (!data.status)
-		alert(data.msg);
-	else{
-		alert(get_lang('Group successful created') + '.');
-		location.href="./index.php?menuaction=expressoAdmin1_2.uigroups.list_groups";
-	}
-	return;
-}
+function callBackReturn( data ){ _processReturn( data ); }
 
-// HANDLER SAVE
-// É necessário 2 funcões de retorno por causa do cExecuteForm.
-function handler_save(data)
+function _processReturn( data )
 {
-	return_handler_save(data);
-}
-function return_handler_save(data)
-{
-	if (!data.status)
-		alert(data.msg);
-	else{
-		alert(get_lang('Group successful saved') + '.');
-		location.href="./index.php?menuaction=expressoAdmin1_2.uigroups.list_groups";
+	if( data.status && $.trim(data.msg) === "" )
+	{
+		var _msg = get_lang('Group successful created') + '.';
+	
+		if( typeForm == "edit_group" )
+		{	
+			_msg = get_lang('Group successful saved') + '.';	
+		}
+
+		alert( _msg );
+
+		typeForm = "";
+
+		location.href = "./index.php?menuaction=expressoAdmin1_2.uigroups.list_groups";
 	}
-	return;
+	else
+	{
+		if( data.msg ){ alert(data.msg); }
+	}
 }
 
 function sinc_combos_org(context, recursive)
