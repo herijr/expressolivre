@@ -334,9 +334,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$p->set_block('scl_maillist','body','body');
 
 			// Pega combo das organizações e seleciona a org da lista.
-			// $org = $this->functions->get_organizations($manager_context, trim(strtolower($maillist_info['context'])));
-			foreach ($manager_contexts as $index=>$context)
-				$sectors .= $this->functions->get_organizations($context, trim(strtolower($maillist_info['context'])) );
+			$sectors = $this->functions->get_organizations($GLOBALS['phpgw_info']['server']['ldap_context']);
 
 			// Usuarios de senders.
 			if (count($maillist_info['senders_info']) > 0)
