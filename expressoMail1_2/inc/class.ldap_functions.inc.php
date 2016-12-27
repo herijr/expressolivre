@@ -9,7 +9,7 @@ function ldapRebind($ldap_connection, $ldap_url)
 
 class ldap_functions
 {
-	var $ds;
+	var $ds = null;
 	var $ldap_host;
 	var $ldap_context;
 	var $imap;
@@ -60,8 +60,10 @@ class ldap_functions
 	}
 	
 	// Using ContactCenter configuration.
-	function ldapConnect($refer = false,$catalog = 0){
-		if ($catalog > 0 && is_array($this->external_srcs)){
+	function ldapConnect( $refer = false, $catalog = 0 )
+	{
+		if( $catalog > 0 && is_array($this->external_srcs) )
+		{
 			$this->ldap_host 	= $this->external_srcs[$catalog]['host'];
 			$this->ldap_context = $this->external_srcs[$catalog]['dn'];
 			$this->bind_dn 		= $this->external_srcs[$catalog]['acc'];
@@ -69,60 +71,81 @@ class ldap_functions
 			$this->object_class = $this->external_srcs[$catalog]['obj'];
 			$this->base_dn 		= $this->external_srcs[$catalog]['dn'];
 			$this->branch 		= $this->external_srcs[$catalog]['branch'];
-		}else {
+		}
+		else
+		{
 			$this->ldap_host 	= $_SESSION['phpgw_info']['expressomail']['ldap_server']['host'];
 			$this->ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
-			$this->bind_dn = $_SESSION['phpgw_info']['expressomail']['ldap_server']['acc'];
-			$this->bind_dn_pw = $_SESSION['phpgw_info']['expressomail']['ldap_server']['pw'];
-			$this->branch = 'ou';
+			$this->bind_dn      = $_SESSION['phpgw_info']['expressomail']['ldap_server']['acc'];
+			$this->bind_dn_pw   = $_SESSION['phpgw_info']['expressomail']['ldap_server']['pw'];
+			$this->branch       = 'ou';
 		}
 
 		$this->ds = ldap_connect($this->ldap_host);
+		
 		ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+
 		ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $refer);
-		if ($refer)	{
-			ldap_set_rebind_proc($this->ds, ldapRebind);
-		}
-		@ldap_bind($this->ds,$this->bind_dn,$this->bind_dn_pw );
+
+		if( $refer ){ ldap_set_rebind_proc( $this->ds, ldapRebind); }
+		
+		@ldap_bind( $this->ds , $this->bind_dn, $this->bind_dn_pw );
 	}
-
-	//Teste jakjr retornando o DS
-	function ldapConnect2($refer = false){
-		$ds = ldap_connect($_SESSION['phpgw_info']['expressomail']['ldap_server']['host']);
-
-		if (!$ds)
-			return false;
-
-		ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-		ldap_set_option($ds, LDAP_OPT_REFERRALS, $refer);
-		if ($refer)
-			ldap_set_rebind_proc($ds, ldapRebind);
-		@ldap_bind($ds, $_SESSION['phpgw_info']['expressomail']['ldap_server']['acc'],$_SESSION['phpgw_info']['expressomail']['ldap_server']['pw']);
-
-		return $ds;
-	}
-
 
 	// usa o host e context do setup.
-	function ldapRootConnect($refer = false){
+	function ldapRootConnect( $refer = false, $connectLdapMaster = false )
+	{
 		$this->ldap_host 	= $_SESSION['phpgw_info']['expressomail']['server']['ldap_host'];
 		$this->ldap_context = $_SESSION['phpgw_info']['expressomail']['server']['ldap_context'];
-		if (
-			isset( $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_host'] ) && $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_host'] &&
-			isset( $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_dn'] ) && $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_dn'] &&
-			isset( $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_pw'] ) && $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_pw']
-		) {
-				$this->ds = ldap_connect($_SESSION['phpgw_info']['expressomail']['server']['ldap_master_host']);
-				ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-				ldap_set_option($this->ds, LDAP_OPT_REFERRALS,0);				 
-				ldap_bind($this->ds, $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_dn'], $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_pw']);
-		}else{
-			$this->ds = ldap_connect($this->ldap_host);
-			ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-			ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $refer);			
-    		ldap_bind($this->ds, $_SESSION['phpgw_info']['expressomail']['server']['ldap_root_dn'],$_SESSION['phpgw_info']['expressomail']['server']['ldap_root_pw']);
-		}
 
+		if( $this->ds == null )
+		{
+			if( $connectLdapMaster )
+			{
+				$ldapMaster = false;
+				if( isset( $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_host'] ) )
+				{
+					$ldapMaster = $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_host'];
+				}
+
+				$ldapMasterDN = false;
+				if( isset( $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_dn'] ) )
+				{
+					$ldapMasterDN = $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_dn'];
+				}
+
+				$ldapMasterPW = false;
+				if( isset( $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_pw'] ) )
+				{
+					$ldapMasterPW = $_SESSION['phpgw_info']['expressomail']['server']['ldap_master_root_pw'];
+				}
+
+				if( $ldapMaster && ( $ldapMasterDN && $ldapMasterPW ) )
+				{
+					$this->ds = ldap_connect( $ldapMaster );
+					
+					ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+					ldap_set_option($this->ds, LDAP_OPT_REFERRALS,0);				 
+					ldap_bind( $this->ds, $ldapMasterDN, $ldapMasterPW );
+				}
+				else
+				{
+					$this->ldapRootConnect( $refer, false );
+				}
+			}
+			else
+			{
+				$ldapHost = $this->ldap_host;
+				$ldapDN   = $_SESSION['phpgw_info']['expressomail']['server']['ldap_root_dn'];
+				$ldapPW   = $_SESSION['phpgw_info']['expressomail']['server']['ldap_root_pw'];
+
+				$this->ds = ldap_connect( $ldapHost );
+
+				ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+				ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $refer);			
+	    		ldap_bind( $this->ds , $ldapDN , $ldapPW );
+			}
+		}
 	}
 
 	function quicksearch($params)
@@ -971,48 +994,70 @@ class ldap_functions
 	function getUserByEmail($params)
 	{
 		$expires = 60*60*24*30; /* 30 days */
+
 		header("Cache-Control: maxage=".$expires);
 		header("Pragma: public");
 		header("Expires: ".gmdate('D, d M Y H:i:s', time()+$expires));	
-		$filter="(&(phpgwAccountType=u)(mail=" . $params['email'] . "))";
+		
+		$filter = "(&(phpgwAccountType=u)(mail=".$params['email']."))";
+		
 		$ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
-		if($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'])
-		    $extendedinfo=true;
+		
+		if( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'] )
+		{
+		    $extendedinfo = true;
+		}
 		else
-		    $extendedinfo=false;
+		{
+		    $extendedinfo = false;
+		}
 
-		if($extendedinfo)
+		if( $extendedinfo )
+		{
 		    $justthese = array("cn","uid","telephoneNumber","jpegPhoto","mobile","ou","employeeNumber");
+		}
 		else
+		{
 		    $justthese = array("cn","uid","telephoneNumber","jpegPhoto");
+		}
 
 		// Follow the referral
-		$ds = $this->ldapConnect2(true);
-		if ($ds)
+		$this->ldapConnect(true);
+		
+		if( $this->ds )
 		{
-			$sr=@ldap_search($ds, $ldap_context, $filter, $justthese);
+			$sr = @ldap_search( $this->ds, $ldap_context, $filter, $justthese );
 
-			if (!$sr)
+			if ( !$sr )
+			{
 				return null;
+			}
+			else
+			{
+				$entry = ldap_first_entry( $this->ds, $sr );
 
-			$entry = ldap_first_entry($ds, $sr);
-
-			if($entry) {
-				$obj =  array("cn" => utf8_decode(current(ldap_get_values($ds, $entry, "cn"))),
-						  "email" => $params['email'],
-						  "uid" => ldap_get_values($ds, $entry, "uid"),
-						  "type" => "global",
-						  "mobile" =>  @ldap_get_values($ds, $entry, "mobile"),
-						  "telefone" =>  @ldap_get_values($ds, $entry, "telephonenumber"),
-						  "ou" =>  @ldap_get_values($ds, $entry, "ou"),
-						  "employeeNumber" =>  @ldap_get_values($ds, $entry, "employeeNumber")
+				if( $entry )
+				{
+					$obj =  array(
+						    "cn"             => utf8_decode(current(ldap_get_values($this->ds, $entry, "cn"))),
+							"email"          => $params['email'],
+							"uid"            => ldap_get_values($this->ds, $entry, "uid"),
+							"type"           => "global",
+							"mobile"         => @ldap_get_values($this->ds, $entry, "mobile"),
+							"telefone"       => @ldap_get_values($this->ds, $entry, "telephonenumber"),
+							"ou"             => @ldap_get_values($this->ds, $entry, "ou"),
+							"employeeNumber" => @ldap_get_values($this->ds, $entry, "employeeNumber")
 					);
 
-				$_SESSION['phpgw_info']['expressomail']['contact_photo'] = @ldap_get_values_len($ds, $entry, "jpegphoto");
-				ldap_close($ds);
-				return $obj;
+					$_SESSION['phpgw_info']['expressomail']['contact_photo'] = @ldap_get_values_len( $this->ds, $entry, "jpegphoto" );
+					
+					ldap_close( $this->ds );
+					
+					return $obj;
+				}
 			}
 		}
+		
 		return null;
 	}
 	
@@ -1063,7 +1108,7 @@ class ldap_functions
 		}
 		if($params['number'] != $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['telephone_number']) {
 			$old_telephone = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['telephone_number'];
-			$this->ldapRootConnect(false);
+			$this->ldapRootConnect(false, true );
 			if(strlen($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['telephone_number']) == 0) {
 				$info['telephonenumber'] = $params['number'];
 				$result = @ldap_mod_add($this->ds, $_SESSION['phpgw_info']['expressomail']['user']['account_dn'], $info);
@@ -1149,4 +1194,3 @@ class ldap_functions
 		return str_replace( array( '\\', '*', '(', ')', "\x00" ), array( '\\\\', '\*', '\(', '\)', "\\x00" ), $string );
 	}
 }
-?>
