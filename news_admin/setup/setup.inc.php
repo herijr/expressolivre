@@ -13,7 +13,7 @@
 	/* Basic information about this app */
 	$setup_info['news_admin']['name']      = 'news_admin';
 	$setup_info['news_admin']['title']     = 'News Admin';
-	$setup_info['news_admin']['version']   = '2.2.6';
+	$setup_info['news_admin']['version']   = '2.5.1';
 	$setup_info['news_admin']['app_order'] = 16;
 	$setup_info['news_admin']['enable']    = 1;
 
@@ -30,6 +30,6 @@
 	/* Dependencies for this app to work */
 	$setup_info['news_admin']['depends'][] = array(
 		 'appname' => 'phpgwapi',
-		 'versions' => Array('2.2')
+		 'versions' => Array('2.2','2.5.1.1')
 	);
 

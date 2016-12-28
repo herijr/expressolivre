@@ -48,4 +48,55 @@
 		$GLOBALS['setup_info']['news_admin']['currentver'] = '2.2.6';
 		return $GLOBALS['setup_info']['news_admin']['currentver'];
 	}
+	$test[] = '2.2.6';
+	function news_admin_upgrade2_2_6()
+	{
+		$GLOBALS['setup_info']['news_admin']['currentver'] = '2.2.8';
+		return $GLOBALS['setup_info']['news_admin']['currentver'];
+	}
+	$test[] = '2.2.8';
+	function news_admin_upgrade2_2_8()
+	{
+		$GLOBALS['setup_info']['news_admin']['currentver'] = '2.2.10';
+		return $GLOBALS['setup_info']['news_admin']['currentver'];
+	}
+	$test[] = '2.2.10';
+	function news_admin_upgrade2_2_10()
+	{
+		$GLOBALS['setup_info']['news_admin']['currentver'] = '2.3.0';
+		return $GLOBALS['setup_info']['news_admin']['currentver'];
+	}	
+	$test[] = '2.3.0';
+	function news_admin_upgrade2_3_0()
+	{
+		$GLOBALS['setup_info']['news_admin']['currentver'] = '2.4.0';
+		return $GLOBALS['setup_info']['news_admin']['currentver'];
+	}
+	$test[] = '2.4.0';
+	function news_admin_upgrade2_4_0()
+	{
+		$GLOBALS['setup_info']['news_admin']['currentver'] = '2.4.1';
+		return $GLOBALS['setup_info']['news_admin']['currentver'];
+	}
+
+    $test[] = '2.4.1';
+    function news_admin_upgrade2_4_1()
+    {
+        $GLOBALS['setup_info']['news_admin']['currentver'] = '2.4.2';
+        return $GLOBALS['setup_info']['news_admin']['currentver'];
+    }
+
+	$test[] = '2.4.2';
+    function news_admin_upgrade2_4_2()
+    {
+        $GLOBALS['setup_info']['news_admin']['currentver'] = '2.5.0';
+        return $GLOBALS['setup_info']['news_admin']['currentver'];
+    }
+
+    $test[] = '2.5.0';
+    function news_admin_upgrade2_5_0()
+    {
+        $GLOBALS['setup_info']['news_admin']['currentver'] = '2.5.1';
+        return $GLOBALS['setup_info']['news_admin']['currentver'];
+    }
 ?>

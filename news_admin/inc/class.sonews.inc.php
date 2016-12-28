@@ -43,21 +43,15 @@
 			}
 
 			$sql = 'SELECT * FROM phpgw_news WHERE news_cat ' . $filter;
-			$sql_count = 'SELECT count(*) as total FROM phpgw_news WHERE news_cat ' . $filter;
 			if($activeonly)
 			{
 				$now = time();
-				$filter_plus = " AND news_begin<=$now AND news_end>=$now";
-				$sql .= $filter_plus;
-				$sql_count.= $filter_plus;
+				$sql .= " AND news_begin<=$now AND news_end>=$now";
 			}
 			$sql .= $ordermethod;
 
-			$this->db->query($sql_count,__LINE__,__FILE__);
-			if($this->db->next_record())
-				$total = $this->db->f('total');
-			else
-				$total=0;
+			$this->db->query($sql,__LINE__,__FILE__);
+			$total = $this->db->num_rows();
 			$this->db->limit_query($sql,$start,__LINE__,__FILE__,$limit);
 
 			$news = array();

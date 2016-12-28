@@ -407,8 +407,7 @@
 
 		function modify($type = 'edit')
 		{                        
-                        include_once("fckeditor.php");                                                
-                        $this->news_data['is_html'] = ($type == 'add' ? '1' : $this->news_data['is_html'] ); 
+			$this->news_data['is_html'] = ($type == 'add' ? '1' : $this->news_data['is_html'] ); 
 			$options = $this->bo->get_options($this->news_data);
 			$GLOBALS['phpgw']->common->phpgw_header();
 			echo parse_navbar();
@@ -439,10 +438,21 @@
 				)
 			);
                         
-                        $oFCKeditor = new FCKeditor('news[content]') ;                        
-			$oFCKeditor->BasePath = 'news_admin/templates/' . ($GLOBALS['phpgw_info']['server']['template_set'] ? $GLOBALS['phpgw_info']['server']['template_set'] : 'default') . '/fckeditor/';
-			$oFCKeditor->ToolbarSet = 'ExpressoLivre';
-			$oFCKeditor->Value = $this->news_data['content'];                                        
+			$ckeditor = '<script type="text/javascript" src="./prototype/library/ckeditor/ckeditor.js"></script>
+			<textarea cols="80" id="news[content]" name="news[content]" rows="10">' . $this->news_data['content'] . '</textarea>
+			<script type="text/javascript"> CKEDITOR.replace( \'news[content]\',{
+			removePlugins : \'elementspath\',
+			skin : \'office2003\',
+			toolbar : [["Source","Preview","-","Cut","Copy","Paste","-","Print",
+			"Undo","Redo","-","Find","Replace","-","SelectAll" ],
+			["Table","HorizontalRule","SpecialChar","PageBreak","-","Bold",
+			"Italic","Underline","Smiley","Strike","-","Subscript","Superscript",
+			"NumberedList","BulletedList","-","Outdent","Indent","Blockquote",
+			"JustifyLeft","JustifyCenter","JustifyRight","JustifyBlock",
+			"Link", "TextColor","BGColor","Maximize"],
+			["Styles","Format","Font","FontSize"]]
+			});</script>';
+
 			$this->template->set_var(array(
 				'form_button' => '<input type="submit" name="submitit" value="' . lang('save') . '">',
 				'value_id' => $this->news_id,
@@ -452,8 +462,7 @@
 				'label_teaser' => lang('teaser') . ':',
 				'value_teaser' => '<input name="news[teaser]" autocomplete="off" size="60" value="' . @htmlspecialchars($this->news_data['teaser'],ENT_COMPAT,$GLOBALS['phpgw']->translation->charset()) . '" maxLength="100">',
 				'label_content' => lang('Content') . ':',
-				//'value_content' => '<textarea cols="60" rows="6" name="news[content]" wrap="virtual">' . $this->news_data['content'] . '</textarea>',
-				'value_content' => $oFCKeditor->Create(),
+				'value_content' => $ckeditor,
 				'label_category' => lang('Category') . ':',
 				'value_category' => '<select name="news[category]">' . $this->selectlist('write', (int)$this->news_data['category']) . '</select>',
 				'label_visible' => lang('Visible') . ':',
