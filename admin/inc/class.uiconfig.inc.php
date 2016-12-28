@@ -201,9 +201,9 @@
 				/*
 				 * FCK editor to agree term
 				 */
-				include_once("news_admin/inc/fckeditor.php");
+				include_once("prototype/library/fckeditor/fckeditor.php");
 				$oFCKeditor = new FCKeditor('newsettings[agree_term]');//CreateObject('news_admin.fckeditor','newsettings[agree_term]');
-				$oFCKeditor->BasePath = 'news_admin/templates/default/fckeditor/'; 
+				$oFCKeditor->BasePath = 'prototype/library/fckeditor/'; 
 				$oFCKeditor->ToolbarSet = 'Basic';
 				$oFCKeditor->Value = isset($GLOBALS['phpgw_info']['server']['agree_term']) ? $GLOBALS['phpgw_info']['server']['agree_term'] : '';
 				$t->set_var('agree_term_input',$oFCKeditor->Create());

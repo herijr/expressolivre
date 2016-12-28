@@ -11,7 +11,7 @@
 	
 	require_once('../header.session.inc.php');
 	include('inc/class.imap_functions.inc.php');	
-	include_once("inc/fckeditor.php");
+	include_once("../prototype/library/fckeditor/fckeditor.php");
 	
 	if (!$_POST['try_saved'])
 	{
@@ -138,7 +138,7 @@
 
 		// BEGIN FCKEDITOR
 		$oFCKeditor = new FCKeditor('html_signature') ;
-		$oFCKeditor->BasePath 	= 'js/fckeditor/';
+		$oFCKeditor->BasePath 	= '../prototype/library/fckeditor/';
 		$oFCKeditor->ToolbarSet = 'ExpressoLivre';
 		if(is_array($GLOBALS['phpgw_info']['user']['preferences']['expressoMail'])) {
 			$oFCKeditor->Value 	= $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['signature'];
@@ -450,4 +450,3 @@
 	$GLOBALS['phpgw']->template->p('out');
 	// Com o Módulo do IM habilitado, ocorre um erro no IE
 	//$GLOBALS['phpgw']->common->phpgw_footer();
-?>

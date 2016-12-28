@@ -1,4 +1,14 @@
 <?php
+    /**************************************************************************\
+    * eGroupWare - ExpressoMail Preferences                                    *
+    * http://www.expressolivre.org                                             *    
+    * Modified by Alexandre Felipe Muller de Souza <amuller@celepar.pr.gov.br> *
+    * --------------------------------------------                             *
+    *  This program is free software; you can redistribute it and/or modify it *
+    *  under the terms of the GNU General Public License as published by the   *
+    *  Free Software Foundation; either version 2 of the License, or (at your  *
+    *  option) any later version.                                              *
+    \**************************************************************************/
 if(!isset($GLOBALS['phpgw_info'])){
 	$GLOBALS['phpgw_info']['flags'] = array(
 		'currentapp' => 'expressoMail1_2',
@@ -7,18 +17,7 @@ if(!isset($GLOBALS['phpgw_info'])){
 	);
 }
 require_once '../header.inc.php';
-
-	/**************************************************************************\
-	* eGroupWare - ExpressoMail Preferences                                    *
-	* http://www.expressolivre.org                                             *	
-	* Modified by Alexandre Felipe Muller de Souza <amuller@celepar.pr.gov.br> *
-	* --------------------------------------------                             *
-	*  This program is free software; you can redistribute it and/or modify it *
-	*  under the terms of the GNU General Public License as published by the   *
-	*  Free Software Foundation; either version 2 of the License, or (at your  *
-	*  option) any later version.                                              *
-	\**************************************************************************/
-include_once("fckeditor.php");
+include_once("../prototype/library/fckeditor/fckeditor.php");
 include_once("class.functions.inc.php");
 $type = isset($_GET['type']) ? $_GET['type']:$GLOBALS['type']; // FIX ME
 
@@ -277,7 +276,7 @@ create_select_box('Signature Type','type_signature',$default,'','','','onchange=
 
 if ($type == 'user' || $type == ''){
 	$oFCKeditor = new FCKeditor('html_signature');
-	$oFCKeditor->BasePath   = '../expressoMail1_2/js/fckeditor/';
+	$oFCKeditor->BasePath   = '../prototype/library/fckeditor/';
 	$oFCKeditor->ToolbarSet = 'ExpressoLivre';
 
 	$vars = $GLOBALS['phpgw']->preferences->user[$appname];
@@ -486,4 +485,3 @@ function setDefaultTypeSignature() {
 setTimeout('setDefaultTypeSignature();config_form(document.getElementsByName(\'submit\')[0],changeType);',2000);
 </script>");
 }
-?>
