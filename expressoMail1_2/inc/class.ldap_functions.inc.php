@@ -23,10 +23,10 @@ class ldap_functions
 	function ldap_functions(){
 	// todo: Page Configuration for External Catalogs.
 		@include("../contactcenter/setup/external_catalogs.inc.php");
-		$this->external_srcs= ( isset( $external_srcs ) ) ? $external_srcs : NULL;
-		$this->max_result 	= 200;
-		$this->functions = new functions();
-		$this->_server_conf = $_SESSION['phpgw_info']['server'];
+		$this->external_srcs = ( isset( $external_srcs ) ) ? $external_srcs : NULL;
+		$this->max_result    = 200;
+		$this->functions     = new functions();
+		$this->_server_conf  = $_SESSION['phpgw_info']['server'];
 	}
 	
 	function my_org_units()
@@ -81,15 +81,18 @@ class ldap_functions
 			$this->branch       = 'ou';
 		}
 
-		$this->ds = ldap_connect($this->ldap_host);
-		
-		ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+		if( $this->ds == null )
+		{
+			$this->ds = ldap_connect($this->ldap_host);
+			
+			ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
 
-		ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $refer);
+			ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $refer);
 
-		if( $refer ){ ldap_set_rebind_proc( $this->ds, ldapRebind); }
-		
-		@ldap_bind( $this->ds , $this->bind_dn, $this->bind_dn_pw );
+			if( $refer ){ ldap_set_rebind_proc( $this->ds, ldapRebind); }
+			
+			@ldap_bind( $this->ds , $this->bind_dn, $this->bind_dn_pw );
+		}
 	}
 
 	// usa o host e context do setup.
@@ -190,7 +193,7 @@ class ldap_functions
 		// follow the referral
 		$this->ldapConnect(true);
 
-		if ($this->ds)
+		if( $this->ds )
 		{
 			if (($field != 'null') && ($ID != 'null'))
 			{
@@ -208,9 +211,11 @@ class ldap_functions
 				else
 				    $justthese = array("cn", "mail", "telephoneNumber", "phpgwAccountVisible","jpegPhoto", "uid");
 			}
-			$sr=@ldap_search($this->ds, $this->ldap_context, $filter, $justthese, 0, $this->max_result + 1);
-			if(!$sr)
-				return null;
+			
+			$sr = @ldap_search($this->ds, $this->ldap_context, $filter, $justthese, 0, $this->max_result + 1);
+			
+			if( !$sr ){ return null; }
+			
 			$count_entries = ldap_count_entries($this->ds,$sr);
 
 			// Get user org dn.
@@ -221,17 +226,18 @@ class ldap_functions
 			$user_sector_dn = implode(",", $user_sector_dn);
 
 			// New search only on user sector
-			if ($count_entries > $this->max_result)
+			if( $count_entries > $this->max_result )
  			{
 				// Close old ldap conection
 				ldap_close($this->ds);
 
 				// Reopen a local ldap connection, following referral
-				$this->ldapRootConnect(true);
+				$this->ldapConnect(true);
 
-				$sr= ldap_search($this->ds, $user_sector_dn, $filter, $justthese);
-				if(!$sr)
-					return null;
+				$sr = ldap_search($this->ds, $user_sector_dn, $filter, $justthese);
+				
+				if( !$sr ){ return null; }
+
 				$count_entries = ldap_count_entries($this->ds,$sr);
 
 				if ($count_entries > $this->max_result){
