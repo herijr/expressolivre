@@ -47,35 +47,23 @@
 
 		function translation($warnings = False)
 		{
-			for( $i = 1; $i <= 9; $i++ )
+			for ($i = 1; $i <= 9; $i++)
 			{
 				$this->placeholders[] = '%'.$i;
 			}
-			
 			$this->db = is_object($GLOBALS['phpgw']->db) ? $GLOBALS['phpgw']->db : $GLOBALS['phpgw_setup']->db;
-			
 			if (!isset($GLOBALS['phpgw_setup']))
 			{
 				$this->system_charset = @$GLOBALS['phpgw_info']['server']['system_charset'];
-
-				error_log( 'SYSTEM CHARSET 1 : ' . $this->system_charset . PHP_EOL , 3, "/tmp/log" );
 			}
 			else
 			{
-				$query = "SELECT config_value FROM phpgw_config WHERE config_app='phpgwapi' AND config_name='system_charset'";
-
-				$this->db->query( $query ,__LINE__ , __FILE__);
-
-				unset( $query );
-				
-				if( $this->db->next_record() )
+				$this->db->query("SELECT config_value FROM phpgw_config WHERE config_app='phpgwapi' AND config_name='system_charset'",__LINE__,__FILE__);
+				if ($this->db->next_record())
 				{
 					$this->system_charset = $this->db->f(0);
 				}
-
-				error_log( 'SYSTEM CHARSET 2 : ' . $this->system_charset . PHP_EOL , 3, "/tmp/log" );
 			}
-
 			// load multi-byte-string-extension if needed, and set its internal encodeing to your system_charset
 			if ($this->system_charset && substr($this->system_charset,0,9) != 'iso-8859-1')
 			{
