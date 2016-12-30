@@ -34,6 +34,6 @@
 		$theight =  $theight < 1 ? 1 : $theight; 
 		$thumb = imagecreatetruecolor ($twidth, $theight);
 		imagecopyresized($thumb, $pic, 0, 0, 0, 0,$twidth, $theight, $width, $height); # resize image into thumb
-		imagejpeg($thumb,"",75); # Thumbnail as JPEG
+		imagejpeg($thumb,NULL,75); # Thumbnail as JPEG
 	}
 ?>

@@ -61,7 +61,7 @@
 		$theight = $twidth * $height / $width; # calculate height
 		$thumb = imagecreatetruecolor ($twidth, $theight);
 		imagecopyresampled($thumb, $pic, 0, 0, 0, 0,$twidth, $theight, $width, $height); # resize image into thumb
-		imagejpeg($thumb,"",80); # Thumbnail as JPEG
+		imagejpeg($thumb,NULL,80); # Thumbnail as JPEG
 	}
 														    
 	ldap_close($ldap_conn);
