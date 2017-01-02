@@ -2,28 +2,20 @@
 include_once("class.imap_functions.inc.php");
 include_once("class.functions.inc.php");
 
-function ldapRebind($ldap_connection, $ldap_url)
-{
-	@ldap_bind($ldap_connection, $_SESSION['phpgw_info']['expressomail']['ldap_server']['acc'],$_SESSION['phpgw_info']['expressomail']['ldap_server']['pw']);
-}
-
 class ldap_functions
 {
 	var $ds = null;
 	var $ldap_host;
 	var $ldap_context;
 	var $imap;
-	var $external_srcs;
 	var $max_result;
 	var $functions;
 	var $sector_search_ldap;
 	var $_my_org_units;
 	var $_server_conf;
 
-	function ldap_functions(){
-	// todo: Page Configuration for External Catalogs.
-		@include("../contactcenter/setup/external_catalogs.inc.php");
-		$this->external_srcs = ( isset( $external_srcs ) ) ? $external_srcs : NULL;
+	function __construct()
+	{
 		$this->max_result    = 200;
 		$this->functions     = new functions();
 		$this->_server_conf  = $_SESSION['phpgw_info']['server'];
@@ -58,45 +50,9 @@ class ldap_functions
 			return $use_array;
 		return !$use_array;
 	}
-	
-	// Using ContactCenter configuration.
-	function ldapConnect( $refer = false, $catalog = 0 )
-	{
-		if( $catalog > 0 && is_array($this->external_srcs) )
-		{
-			$this->ldap_host 	= $this->external_srcs[$catalog]['host'];
-			$this->ldap_context = $this->external_srcs[$catalog]['dn'];
-			$this->bind_dn 		= $this->external_srcs[$catalog]['acc'];
-			$this->bind_dn_pw 	= $this->external_srcs[$catalog]['pw'];
-			$this->object_class = $this->external_srcs[$catalog]['obj'];
-			$this->base_dn 		= $this->external_srcs[$catalog]['dn'];
-			$this->branch 		= $this->external_srcs[$catalog]['branch'];
-		}
-		else
-		{
-			$this->ldap_host 	= $_SESSION['phpgw_info']['expressomail']['ldap_server']['host'];
-			$this->ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
-			$this->bind_dn      = $_SESSION['phpgw_info']['expressomail']['ldap_server']['acc'];
-			$this->bind_dn_pw   = $_SESSION['phpgw_info']['expressomail']['ldap_server']['pw'];
-			$this->branch       = 'ou';
-		}
-
-		if( $this->ds == null )
-		{
-			$this->ds = ldap_connect($this->ldap_host);
-			
-			ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-
-			ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $refer);
-
-			if( $refer ){ ldap_set_rebind_proc( $this->ds, ldapRebind); }
-			
-			@ldap_bind( $this->ds , $this->bind_dn, $this->bind_dn_pw );
-		}
-	}
 
 	// usa o host e context do setup.
-	function ldapRootConnect( $refer = false, $connectLdapMaster = false )
+	function ldapConnect( $refer = false, $connectLdapMaster = false )
 	{
 		$this->ldap_host 	= $_SESSION['phpgw_info']['expressomail']['server']['ldap_host'];
 		$this->ldap_context = $_SESSION['phpgw_info']['expressomail']['server']['ldap_context'];
@@ -128,12 +84,12 @@ class ldap_functions
 					$this->ds = ldap_connect( $ldapMaster );
 					
 					ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-					ldap_set_option($this->ds, LDAP_OPT_REFERRALS,0);				 
+					ldap_set_option($this->ds, LDAP_OPT_REFERRALS , 0 );				 
 					ldap_bind( $this->ds, $ldapMasterDN, $ldapMasterPW );
 				}
 				else
 				{
-					$this->ldapRootConnect( $refer, false );
+					$this->ldapConnect( $refer, false );
 				}
 			}
 			else
@@ -151,7 +107,7 @@ class ldap_functions
 		}
 	}
 
-	function quicksearch($params)
+	function quicksearch( $params )
 	{
 		include_once("class.functions.inc.php");
 		$functions = new functions;
@@ -191,7 +147,7 @@ class ldap_functions
 		$contacts_result['field'] = $field;
 		$contacts_result['ID'] = $ID;
 		// follow the referral
-		$this->ldapConnect(true);
+		$this->ldapConnect();
 
 		if( $this->ds )
 		{
@@ -212,7 +168,7 @@ class ldap_functions
 				    $justthese = array("cn", "mail", "telephoneNumber", "phpgwAccountVisible","jpegPhoto", "uid");
 			}
 			
-			$sr = @ldap_search($this->ds, $this->ldap_context, $filter, $justthese, 0, $this->max_result + 1);
+			$sr = ldap_search($this->ds, $this->ldap_context, $filter, $justthese, 0, $this->max_result + 1);
 			
 			if( !$sr ){ return null; }
 			
@@ -228,12 +184,6 @@ class ldap_functions
 			// New search only on user sector
 			if( $count_entries > $this->max_result )
  			{
-				// Close old ldap conection
-				ldap_close($this->ds);
-
-				// Reopen a local ldap connection, following referral
-				$this->ldapConnect(true);
-
 				$sr = ldap_search($this->ds, $user_sector_dn, $filter, $justthese);
 				
 				if( !$sr ){ return null; }
@@ -246,59 +196,28 @@ class ldap_functions
 					$return['error'] = "many results";
 					return $return;
 				}
-				else
-				{
-					$quickSearch_only_in_userSector = true;
-				}
 			}
 
 			$info = ldap_get_entries($this->ds, $sr);
 
 			$tmp = array();
-			$tmp_users_from_user_org = array();
 
-			if (!$quickSearch_only_in_userSector) {
-				$catalogsNum=count($this->external_srcs);
-				for ($i=0; $i<=count($this->external_srcs); $i++)	{
-					if ($this->external_srcs[$i]["quicksearch"]) {
-						$this->ldapConnect(true,$i);
-						$filter="(|(cn=*$search_for*)(mail=*$search_for*))";
-						if($extendedinfo)
-						$justthese = array("cn", "mail", "telephoneNumber", "mobile", "phpgwAccountVisible", "uid","employeeNumber", "ou");
-						else
-						    $justthese = array("cn", "mail", "telephoneNumber", "phpgwAccountVisible", "uid");
-						$sr=@ldap_search($this->ds, $this->ldap_context, $filter, $justthese, 0, $this->max_result+1);
-						if(!$sr)
-							return null;
-						$count_entries = ldap_count_entries($this->ds,$sr);
-						$search = ldap_get_entries($this->ds, $sr);
-						for ($j=0; $j<$search["count"]; $j++) {
-							$info[] = $search[$j];
-						}
-						$info["count"] = count($info)-1;
-					}
-				}
-			}
+			$tmp_users_from_user_org = array();
 
 			for ($i=0; $i<$info["count"]; $i++)
 			{
-				if ($quickSearch_only_in_userSector)
+				if (preg_match("/$user_sector_dn/i", $info[$i]['dn']))
 				{
-					$tmp[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
+					$tmp_users_from_user_org[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
 				}
 				else
 				{
-					if (preg_match("/$user_sector_dn/i", $info[$i]['dn']))
-					{
-						$tmp_users_from_user_org[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
-					}
-					else
-					{
-						$tmp[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
-					}
+					$tmp[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
 				}
 			}
+
 			natcasesort($tmp_users_from_user_org);
+
 			natcasesort($tmp);
 
 			if (($field != 'null') && ($ID != 'null'))
@@ -382,7 +301,9 @@ class ldap_functions
 				}
 			}
 		}
-		ldap_close($this->ds);
+		
+		ldap_close( $this->ds );
+		
 		return $contacts_result;
 	}
 
@@ -464,18 +385,12 @@ class ldap_functions
 	function get_catalogs(){
 		$catalogs = array();
 		$catalogs[0] = $this->functions->getLang("Global Catalog");
-		if($this->external_srcs)
-			foreach ($this->external_srcs as $key => $valor ){
-			$catalogs[$key] = $valor['name'];
-		}
 		return $catalogs;
 	}
 	function get_organizations($params){
 		$organizations = array();
-		$params['referral']?$referral = $params['referral']:$referral = false;
-		$cat = $params['catalog'];
 
-		$this->ldapConnect($referral,$cat);
+		$this->ldapConnect();
 
 			if($this->branch != '') {
 				$filter="(&(".$this->branch."=*)(!(phpgwAccountVisible=-1)))";
@@ -500,8 +415,7 @@ class ldap_functions
 	}
 	function get_organizations2($params){
 		$organizations = array();
-		$referral = $params['referral'];
-		$this->ldapRootConnect($referral);
+		$this->ldapConnect();
 		if ($this->ds) {
 			$filter="(&(objectClass=organizationalUnit)(!(phpgwAccountVisible=-1)))";
 			$justthese = array("ou");
@@ -529,7 +443,7 @@ class ldap_functions
 	//Busca usuarios de um contexto e ja retorna as options do select - usado por template serpro;
 	function search_users($params)
     {
-    	$this->ldapConnect(false,0);
+    	$this->ldapConnect();
         //Monta lista de Grupos e Usuarios
         $users = Array();
         $groups = Array();
@@ -631,7 +545,7 @@ class ldap_functions
 		    $extendedinfo=false;
 
 
-		$this->ldapConnect(true,$catalog);
+		$this->ldapConnect();
 
 		$params['organization'] == 'all' ? $user_context = $this->ldap_context :$user_context = $this->branch."=".$params['organization'].",".$this->ldap_context;
 
@@ -652,7 +566,6 @@ class ldap_functions
 				else
 				    $justthese = array("cn", "mail");
 				$filter="(&(objectClass=".$this->object_class.")(cn=".$cn."))";
-				//$user_context = $this->branch."=".$params['organization'].",".$external_srcs[$catalog]['dn'];
 			}
 
 			$sr=@ldap_search($this->ds, $user_context, $filter, $justthese, 0, $max_result+1);
@@ -713,7 +626,7 @@ class ldap_functions
 		$result['mail']= array();
 		$result['mailalter']= array();
 		$user = $_SESSION['phpgw_info']['expressomail']['user']['account_lid'];
-		$this->ldapRootConnect(false);
+		$this->ldapConnect();
 		if ($this->ds) {
 			$filter="uid=".$user;
 			$justthese = array("mail","mailAlternateAddress");
@@ -732,7 +645,7 @@ class ldap_functions
 	//Busca usuarios de um contexto e ja retorna as options do select;
 	function get_available_users($params)
     {
-        $this->ldapRootConnect();
+        $this->ldapConnect();
         //Monta lista de Grupos e Usuarios
         $users = Array();
         $groups = Array();
@@ -788,7 +701,7 @@ class ldap_functions
 	//Busca usuarios de um contexto e ja retorna as options do select;
 	function get_available_users2($params)
 	{
-            $this->ldapRootConnect();
+            $this->ldapConnect();
             $context    = $params['context'];
             $justthese  = array("cn", "uid", "cn");
             $filter     = ( isset($params['cn']) ) ? "(&(cn=*".$params['cn']."*)(phpgwaccounttype=u)(!(phpgwaccountvisible=-1)))" : 
@@ -831,7 +744,7 @@ class ldap_functions
 	function uid2cn($uid)
 	{
 		// do not follow the referral
-		$this->ldapRootConnect(false);
+		$this->ldapConnect();
 		if ($this->ds)
 		{
 			$filter="(&(phpgwAccountType=u)(uid=$uid))";
@@ -853,7 +766,7 @@ class ldap_functions
 			$uidNumber = implode(')(uidnumber=', $uidNumber);
 
 		// do not follow the referral
-		$this->ldapConnect(true);
+		$this->ldapConnect();
 
 		if ($this->ds)
 		{
@@ -891,7 +804,7 @@ class ldap_functions
 	function groupcn2gidNumber($cn)
 	{
 		// do not follow the referral
-		$this->ldapRootConnect(false);
+		$this->ldapConnect();
 		if ($this->ds)
 		{
 			$filter="(&(phpgwAccountType=g)(objectClass=posixGroup)(cn=$cn))";
@@ -907,7 +820,7 @@ class ldap_functions
 	function uidnumber2uid($uidnumber)
 	{
 		// do not follow the referral
-		$this->ldapRootConnect(false);
+		$this->ldapConnect();
 		if ($this->ds)
 		{
 			$filter="(&(phpgwAccountType=u)(uidnumber=$uidnumber))";
@@ -944,7 +857,7 @@ class ldap_functions
 			}			
 		}
 		
-		$this->ldapRootConnect(false);
+		$this->ldapConnect();
 		if ($this->ds) {
 			$justthese = array("cn","mail","uid");
 			if($filter) {
@@ -1028,7 +941,7 @@ class ldap_functions
 		}
 
 		// Follow the referral
-		$this->ldapConnect(true);
+		$this->ldapConnect();
 		
 		if( $this->ds )
 		{
@@ -1070,7 +983,7 @@ class ldap_functions
 	function uid2uidnumber($uid)
 	{
 		// do not follow the referral
-		$this->ldapRootConnect(false);
+		$this->ldapConnect();
 		if ($this->ds)
 		{
 			$filter="(&(phpgwAccountType=u)(uid=$uid))";
@@ -1114,7 +1027,7 @@ class ldap_functions
 		}
 		if($params['number'] != $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['telephone_number']) {
 			$old_telephone = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['telephone_number'];
-			$this->ldapRootConnect(false, true );
+			$this->ldapConnect(false, true );
 			if(strlen($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['telephone_number']) == 0) {
 				$info['telephonenumber'] = $params['number'];
 				$result = @ldap_mod_add($this->ds, $_SESSION['phpgw_info']['expressomail']['user']['account_dn'], $info);
@@ -1140,7 +1053,7 @@ class ldap_functions
 		if ( isset( $params['search'] ) ) {
 			if ( strlen( $params['search'] ) < 3 ) $this->return_json( array( 'status' => 'FEW CHARACTERS TO SEARCH' ) );
 			
-			if ( !$this->ds ) $this->ldapRootConnect();
+			if ( !$this->ds ) $this->ldapConnect();
 			
 			$search = $this->ldap_escape( $params['search'] );
 			$sr = ldap_search(
@@ -1168,7 +1081,7 @@ class ldap_functions
 		if ( isset( $params['get'] ) ) {
 			if ( strlen( $params['get'] ) < 1 ) $this->return_json( array( 'status' => 'FEW CHARACTERS TO SEARCH' ) );
 			
-			if ( !$this->ds ) $this->ldapRootConnect();
+			if ( !$this->ds ) $this->ldapConnect();
 			
 			$sr = ldap_search(
 				$this->ds, $this->ldap_context, '(uid='.$this->ldap_escape( $params['get'] ).')', array( 'cn', 'uid', 'jpegPhoto' )
@@ -1198,5 +1111,10 @@ class ldap_functions
 	
 	function ldap_escape( $string ) {
 		return str_replace( array( '\\', '*', '(', ')', "\x00" ), array( '\\\\', '\*', '\(', '\)', "\\x00" ), $string );
+	}
+
+	function __destruct()
+	{
+		if( $this->ds != null ){ ldap_close( $this->ds ); }
 	}
 }

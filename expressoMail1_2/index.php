@@ -87,9 +87,6 @@
 
 	//Local messages
 	$_SESSION['phpgw_info']['server']['expressomail']['enable_local_messages'] = $current_config['enable_local_messages'];
-
-	// Get Data from ldap_manager and emailadmin.
-	$ldap_manager = CreateObject('contactcenter.bo_ldap_manager');
 	
 	// Loading ExpressoAdmin Config
 	$c = CreateObject('phpgwapi.config','expressoAdmin1_2');
@@ -103,7 +100,6 @@
 
 	$_SESSION['phpgw_info']['expressomail']['email_server'] = CreateObject('emailadmin.bo')->getProfile();
 	$_SESSION['phpgw_info']['expressomail']['server'] = $GLOBALS['phpgw_info']['server'];
-	$_SESSION['phpgw_info']['expressomail']['ldap_server'] = $ldap_manager ? $ldap_manager->srcs[1] : null;
 	$_SESSION['phpgw_info']['expressomail']['user']['email'] = $GLOBALS['phpgw']->preferences->values['email'];
 	$_SESSION['phpgw_info']['server']['temp_dir'] = $GLOBALS['phpgw_info']['server']['temp_dir'];
 	
