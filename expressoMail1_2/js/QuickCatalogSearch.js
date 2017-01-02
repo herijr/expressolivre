@@ -370,17 +370,27 @@
 		while(Element('select_organization').options.length > 0) {
 			Element('select_organization').remove(0);
 		}
-	 	var handler_org = function(data){
-			Element('select_organization').options[0] = new Option(get_lang('all'),'all');
-			if (data != null){
+	 	
+	 	var handler_org = function(data)
+	 	{
+			if( data && data != false )
+			{
+				Element('select_organization').options[0] = new Option(get_lang('all'),'all');
+
 				var user_organization = Element('user_organization').value;
-				for(x = 0; x < data.length; x++) {
+				
+				for(x = 0; x < data.length; x++)
+				{
 					Element('select_organization').options[x+1] = new Option(data[x].toUpperCase(),data[x]);
+					
 					if(user_organization.toUpperCase() == data[x].toUpperCase())
+					{
 						Element('select_organization').options[x+1].selected = true;
+					}
 				}
 			}
-		}		
+		};
+
 		cExecute ("$this.ldap_functions.get_organizations&referral=false&catalog="+Element('select_catalog').value, handler_org);		
 	}
 

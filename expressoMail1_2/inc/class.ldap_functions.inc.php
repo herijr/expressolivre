@@ -387,59 +387,57 @@ class ldap_functions
 		$catalogs[0] = $this->functions->getLang("Global Catalog");
 		return $catalogs;
 	}
-	function get_organizations($params){
+	
+	function get_organizations( $params )
+	{
 		$organizations = array();
 
 		$this->ldapConnect();
 
-			if($this->branch != '') {
-				$filter="(&(".$this->branch."=*)(!(phpgwAccountVisible=-1)))";
-				$justthese = array("$this->branch");
-			$sr = ldap_list($this->ds, $this->ldap_context, $filter, $justthese);
-			$info = ldap_get_entries($this->ds, $sr);
-
-			if($info["count"] == 0)
-			{
-			    $organizations[0]['ou'] = $this->ldap_context;
-			}
-
-			for ($i=0; $i<$info["count"]; $i++)
-				$organizations[$i] = $info[$i]["ou"][0];
-
-			ldap_close($this->ds);
-			sort($organizations);
-		return $organizations;
-			}else{
-			return null;
-	}
-	}
-	function get_organizations2($params){
-		$organizations = array();
-		$this->ldapConnect();
-		if ($this->ds) {
-			$filter="(&(objectClass=organizationalUnit)(!(phpgwAccountVisible=-1)))";
+		if( $this->ds )
+		{
+			$filter    = "(&(objectClass=organizationalUnit)(!(phpgwAccountVisible=-1)))";
 			$justthese = array("ou");
-			$sr = ldap_list($this->ds, $this->ldap_context, $filter, $justthese);
-			$info = ldap_get_entries($this->ds, $sr);
+			$sr        = ldap_list($this->ds, $this->ldap_context, $filter, $justthese);
+			$info      = ldap_get_entries( $this->ds, $sr );
 
-
-			if($info["count"] == 0)
+			if( isset( $params['catalog'] ) )
 			{
-			    $organizations[0]['ou'] = $this->ldap_context;
-			    $organizations[0]['dn'] = $this->ldap_context;
+				if( $info["count"] == 0 )
+				{
+					$organizations[0]['ou'] = $this->ldap_context;
+				}
+
+				for( $i=0; $i < $info["count"]; $i++ )
+				{			
+					$organizations[$i] = $info[$i]["ou"][0];
+				}	
 			}
-			else{
-			    for ($i=0; $i<$info["count"]; $i++)
-			    {
-				    $organizations[$i]['ou'] = $info[$i]["ou"][0];
-				    $organizations[$i]['dn'] = $info[$i]["dn"];
-			    }
+			else
+			{				
+				if( $info["count"] == 0 )
+				{
+				    $organizations[0]['ou'] = $this->ldap_context;
+				    $organizations[0]['dn'] = $this->ldap_context;
+				}
+				else
+				{
+				    for( $i = 0; $i < $info["count"]; $i++ )
+				    {
+					    $organizations[$i]['ou'] = $info[$i]["ou"][0];
+					    $organizations[$i]['dn'] = $info[$i]["dn"];
+				    }
+				}
 			}
-			ldap_close($this->ds);
-			sort($organizations);
+
+			sort( $organizations );
+
+			return $organizations;
 		}
-		return $organizations;
+
+		return false;
 	}
+	
 	//Busca usuarios de um contexto e ja retorna as options do select - usado por template serpro;
 	function search_users($params)
     {
@@ -547,7 +545,7 @@ class ldap_functions
 
 		$this->ldapConnect();
 
-		$params['organization'] == 'all' ? $user_context = $this->ldap_context :$user_context = $this->branch."=".$params['organization'].",".$this->ldap_context;
+		$params['organization'] == 'all' ? $user_context = $this->ldap_context : $user_context = "ou=".$params['organization'].",".$this->ldap_context;
 
 		if ($this->ds) {
 			if ($catalog == 0){

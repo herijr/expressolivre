@@ -222,20 +222,25 @@
 		}
 
 		var handler_organizations = function(data)
-                {
-			var user_organization = Element('user_organization').value;
-			
-			for(i = 0; i < data.length; i++)
-                        {
-				Element('em_combo_org').options[i] = new Option(data[i].ou,data[i].dn);
-				if(data[i].ou.indexOf("dc=") != -1 || user_organization.toUpperCase() == data[i].ou.toUpperCase())
-				{
-					Element('em_combo_org').options[i].selected = true;
-					_this.get_available_users(data[i].dn);
+        {
+			if( data && data != false )
+			{				
+				var user_organization = Element('user_organization').value;
+
+				for(i = 0; i < data.length; i++)
+	            {
+					Element('em_combo_org').options[i] = new Option(data[i].ou,data[i].dn);
+				
+					if(data[i].ou.indexOf("dc=") != -1 || user_organization.toUpperCase() == data[i].ou.toUpperCase())
+					{
+						Element('em_combo_org').options[i].selected = true;
+						_this.get_available_users(data[i].dn);
+					}
 				}
 			}
 		}
-		cExecute ("$this.ldap_functions.get_organizations2&referral=false", handler_organizations);
+		
+		cExecute ("$this.ldap_functions.get_organizations&referral=false", handler_organizations);
 
 		var butt = Element('dJSWin_wfolders_bok')
                 
