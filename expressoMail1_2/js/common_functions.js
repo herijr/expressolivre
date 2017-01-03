@@ -776,7 +776,7 @@ function emQuickSearch(emailList, field, ID){
             return false;
 	}
 
-	cExecute ("$this.ldap_functions.quicksearch&search_for="+search_for+"&field="+field+"&ID="+ID, handler_emQuickSearch);
+	cExecute ("$this.ldap_functions.quickSearch&search_for="+search_for+"&field="+field+"&ID="+ID, handler_emQuickSearch);
 }
 
 function folderbox(){

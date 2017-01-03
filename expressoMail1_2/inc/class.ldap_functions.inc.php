@@ -107,213 +107,231 @@ class ldap_functions
 		}
 	}
 
-	function quicksearch( $params )
+	function quickSearch( $params )
 	{
-		include_once("class.functions.inc.php");
-		$functions = new functions;
+		$searchFor = ( isset( $params['search_for'] ) ? utf8_encode($params['search_for']) : "" );
+		$field     = ( isset( $params['field'] ) ? $params['field'] : "" );
+		$ID        = ( isset( $params['ID'] ) ? $params['ID'] : "" );
 
-		$search_for	= utf8_encode($params['search_for']);
-		$field		= $params['field'];
-		$ID			= $params['ID'];
-		
-		if($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'])
-		    $extendedinfo=true;
-		else
-		    $extendedinfo=false;
+		$extendedInfo = false;
 
-		$search_for	= explode(" ",$search_for);
-		$aux="";
-		foreach ($search_for as $search)
+		if( isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info']) )
 		{
-			if(!$aux)
-			{
-				$aux=$search;
-			}
-			else
-			{
-				if (strlen($search) > 2)
-				{
-					$aux=$aux."*".$search;
-				}
-				else
-				{
-					$aux=$aux." ".$search;
-				}
-			}
+			$extendedInfo =  true;
 		}
-		$search_for=$aux;
-		
-		$contacts_result = array();
-		$contacts_result['field'] = $field;
-		$contacts_result['ID'] = $ID;
-		// follow the referral
-		$this->ldapConnect();
+
+		$searchFor = trim($searchFor);
+
+		$searchFor = preg_replace( '/\*/', "", $searchFor);
+
+		$searchFor = implode("*", explode(" ", $searchFor ) );
+
+		$searchFor = preg_replace('/\*\*/', "*", $searchFor );
+
+		$return = array('field' => $field, 'ID' => $ID );
+
+		$this->ldapConnect(false);
 
 		if( $this->ds )
 		{
-			if (($field != 'null') && ($ID != 'null'))
+			$justThese = array( "cn", "mail", "telephoneNumber", "phpgwAccountVisible", "uid" );
+
+			if( $extendedInfo )
 			{
-				$filter="(& (&(|(phpgwAccountType=u)(phpgwAccountType=g)(phpgwAccountType=l)(phpgwAccountType=i)(phpgwAccountType=s))(mail=*)) (|(cn=*$search_for*)(mail=*$search_for*)) (!(phpgwaccountvisible=-1)) )";
-				if($extendedinfo)
-				$justthese = array("cn", "mail", "telephoneNumber", "mobile", "phpgwAccountVisible", "uid", "employeeNumber", "ou");
-				else
-				    $justthese = array("cn", "mail", "telephoneNumber", "phpgwAccountVisible", "uid");
+				$justThese = array_merge( $justThese , array("mobile", "employeeNumber", "ou" ) );
+			}
+
+			$filter = "(&(phpgwAccountType=u)(cn=*$searchFor*)(!(phpgwaccountvisible=-1)))";
+
+			if( ( $field != 'null') && ($ID != 'null') )
+			{
+				$filter = "(&(&(|(phpgwAccountType=u)(phpgwAccountType=g)(phpgwAccountType=l)(phpgwAccountType=i)(phpgwAccountType=s))(mail=*)) (|(cn=*$searchFor*)(mail=*$searchFor*)) (!(phpgwaccountvisible=-1)))";
 			}
 			else
 			{
-				$filter="(& (phpgwAccountType=u)(cn=*$search_for*) (!(phpgwaccountvisible=-1)) )";
-				if($extendedinfo)
-				$justthese = array("cn", "mail", "telephoneNumber", "mobile", "phpgwAccountVisible","jpegPhoto", "uid", "employeeNumber", "ou");
-				else
-				    $justthese = array("cn", "mail", "telephoneNumber", "phpgwAccountVisible","jpegPhoto", "uid");
+				$justThese = array_merge( $justThese, array( "jpegPhoto") );
 			}
 			
-			$sr = ldap_search($this->ds, $this->ldap_context, $filter, $justthese, 0, $this->max_result + 1);
-			
-			if( !$sr ){ return null; }
-			
-			$count_entries = ldap_count_entries($this->ds,$sr);
+			$ldapSearch = ldap_search( $this->ds, $this->ldap_context, $filter, $justThese, 0, $this->max_result + 1 );
 
-			// Get user org dn.
-			$user_dn = $_SESSION['phpgw_info']['expressomail']['user']['account_dn'];
-			$user_sector_dn = ldap_explode_dn ( $user_dn, false );
-			array_shift($user_sector_dn);
-			array_shift($user_sector_dn);
-			$user_sector_dn = implode(",", $user_sector_dn);
 
-			// New search only on user sector
-			if( $count_entries > $this->max_result )
- 			{
-				$sr = ldap_search($this->ds, $user_sector_dn, $filter, $justthese);
-				
-				if( !$sr ){ return null; }
-
-				$count_entries = ldap_count_entries($this->ds,$sr);
-
-				if ($count_entries > $this->max_result){
-					$return = array();
-					$return['status'] = false;
-					$return['error'] = "many results";
-					return $return;
-				}
-			}
-
-			$info = ldap_get_entries($this->ds, $sr);
-
-			$tmp = array();
-
-			$tmp_users_from_user_org = array();
-
-			for ($i=0; $i<$info["count"]; $i++)
+			if( !$ldapSearch )
 			{
-				if (preg_match("/$user_sector_dn/i", $info[$i]['dn']))
-				{
-					$tmp_users_from_user_org[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
-				}
-				else
-				{
-					$tmp[$info[$i]["mail"][0] . '%' . $info[$i]["telephonenumber"][0] . '%'. $info[$i]["mobile"][0] . '%' . $info[$i]["uid"][0] . '%' . $info[$i]["jpegphoto"]['count'] . '%' . $info[$i]["employeenumber"][0] . '%' . $info[$i]["ou"][0]] = utf8_decode($info[$i]["cn"][0]);
-				}
-			}
-
-			natcasesort($tmp_users_from_user_org);
-
-			natcasesort($tmp);
-
-			if (($field != 'null') && ($ID != 'null'))
-			{
-				$i = 0;
-
-				$tmp = array_merge($tmp, $tmp_users_from_user_org);
-				natcasesort($tmp);
-
-				foreach ($tmp as $info => $cn)
-				{
-					$contacts_result[$i] = array();
-					$contacts_result[$i]["cn"] = $cn;
-					list ($contacts_result[$i]["mail"], $contacts_result[$i]["phone"], $contacts_result[$i]["mobile"], $contacts_result[$i]["uid"], $contacts_result[$i]["jpegphoto"], $contacts_result[$i]["employeenumber"], $contacts_result[$i]["ou"]) = explode('%', $info);
-					$i++;
-				}
-				$contacts_result['quickSearch_only_in_userSector'] = $quickSearch_only_in_userSector;
+				$return = array(
+					'status' => false,
+					'error'  => 'Search fail'
+				);
 			}
 			else
-			{
-				$options_users_from_user_org = '';
-				$options = '';
+			{				
+				$count_entries = ldap_count_entries( $this->ds, $ldapSearch );
 
-				/* List of users from user org */
-				$i = 0;
-				foreach ($tmp_users_from_user_org as $info => $cn)
-				{
-					$contacts_result[$i] = array();
-					$options_users_from_user_org .= $this->make_quicksearch_card($info, $cn);
-					$i++;
+				// Get user org dn.
+				$user_dn = $_SESSION['phpgw_info']['expressomail']['user']['account_dn'];
+				$user_sector_dn = ldap_explode_dn ( $user_dn, false );
+				array_shift($user_sector_dn);
+				array_shift($user_sector_dn);
+				$user_sector_dn = implode(",", $user_sector_dn);
+				$quickSearch_only_in_userSector = false;
+
+				// New search only on user sector
+				if( $count_entries > $this->max_result )
+	 			{
+	 				unset( $ldapSearch );
+
+					$ldapSearch = ldap_search( $this->ds, $user_sector_dn, $filter, $justThese , 0 , $this->max_result + 1 );
+
+					$quickSearch_only_in_userSector = true;
 				}
 
-				/* List of users from others org */
-				foreach ($tmp as $info => $cn)
-				{
-					$contacts_result[$i] = array();
-					$options .= $this->make_quicksearch_card($info, $cn);
-					$i++;
-				}
+				$count_entries = ldap_count_entries( $this->ds, $ldapSearch );
 
-				if ($quickSearch_only_in_userSector)
+				if(  $count_entries > $this->max_result )
 				{
-					if ($options != '')
+					$return = array(
+						'status' => false,
+						'error'  => "many results",
+					);
+				}
+				else
+				{
+					$info = ldap_get_entries( $this->ds, $ldapSearch );
+					
+					$tmp  = array();
+			        
+			        $tmp_users_from_user_org = array();
+
+					for( $i = 0; $i < $info["count"]; $i++ )
 					{
-						$head_option =
-							'<tr class="quicksearchcontacts_unselected">' .
-								'<td colspan="2" width="100%" align="center">' .
-									str_replace("%1", $this->max_result,$this->functions->getLang('More than %1 results were found')) . '.<br>' .
-									$this->functions->getLang('Showing only the results found in your organization') . '.';
-								'</td>' .
-							'</tr>';
-						$contacts_result = $head_option . $options_users_from_user_org . $options;
+						$_user = ( isset( $info[$i]["mail"][0] ) ? $info[$i]["mail"][0].'%' : '%') . 
+							     ( isset( $info[$i]["telephonenumber"][0] ) ? $info[$i]["telephonenumber"][0] . '%' : '%' ) .
+							     ( isset( $info[$i]["mobile"][0] )? $info[$i]["mobile"][0] . '%' : '%' ) .
+							     ( isset( $info[$i]["uid"][0] ) ? $info[$i]["uid"][0] . '%' : '%') .
+							     ( isset( $info[$i]["jpegphoto"]['count'] ) ?  $info[$i]["jpegphoto"]['count'] .'%' : '%' ) .
+							     ( isset( $info[$i]["employeenumber"][0] ) ? $info[$i]["employeenumber"][0] . '%' : '%' ) .
+							     ( isset( $info[$i]["ou"][0] ) ? $info[$i]["ou"][0] : '' );
+
+						if( $quickSearch_only_in_userSector )		     
+						{	
+							$tmp[ $_user ] = utf8_decode( $info[$i]["cn"][0] );
+						}
+						else
+						{
+							if ( preg_match("/$user_sector_dn/i", $info[$i]['dn']) )
+							{
+								$tmp_users_from_user_org[ $_user ] = utf8_decode( $info[$i]["cn"][0] );
+							}
+							else
+							{
+								$tmp[ $_user ] = utf8_decode( $info[$i]["cn"][0] );	
+							}
+						}
+					}
+
+					natcasesort($tmp_users_from_user_org);
+					
+					natcasesort($tmp);
+
+					if (($field != 'null') && ($ID != 'null'))
+					{
+						$i = 0;
+
+						$tmp = array_merge($tmp, $tmp_users_from_user_org);
+
+						natcasesort($tmp);
+
+						foreach ($tmp as $info => $cn)
+						{
+							$contacts_result[$i] = array();
+							$contacts_result[$i]["cn"] = $cn;
+							list ($contacts_result[$i]["mail"], $contacts_result[$i]["phone"], $contacts_result[$i]["mobile"], $contacts_result[$i]["uid"], $contacts_result[$i]["jpegphoto"], $contacts_result[$i]["employeenumber"], $contacts_result[$i]["ou"]) = explode('%', $info);
+							$i++;
+						}
+
+						$contacts_result['quickSearch_only_in_userSector'] = $quickSearch_only_in_userSector;
 					}
 					else
 					{
-						$return = array();
-						$return['status'] = false;
-						$return['error'] = "many results";
-						return $return;
-					}
-				}
-				else
-				{
-					if (($options_users_from_user_org != '') && ($options != ''))
-					{
-						$head_option0 =
-							'<tr class="quicksearchcontacts_unselected">' .
-								'<td colspan="2" width="100%" align="center" style="background:#EEEEEE"><B>' .
-									$this->functions->getLang('Users from your organization') . '</B> ['.count($tmp_users_from_user_org).']';
-								'</td>' .
-							'</tr>';
+						$options_users_from_user_org = '';
+						$options = '';
 
-						$head_option1 =
-							'<tr class="quicksearchcontacts_unselected">' .
-								'<td colspan="2" width="100%" align="center" style="background:#EEEEEE"><B>' .
-									$this->functions->getLang('Users from others organizations') . '</B> ['.count($tmp).']';
-								'</td>' .
-							'</tr>';
+						/* List of users from user org */
+						$i = 0;
+						foreach ($tmp_users_from_user_org as $info => $cn)
+						{
+							$contacts_result[$i] = array();
+							$options_users_from_user_org .= $this->make_quicksearch_card($info, $cn);
+							$i++;
+						}
+
+						/* List of users from others org */
+						foreach ($tmp as $info => $cn)
+						{
+							$contacts_result[$i] = array();
+							$options .= $this->make_quicksearch_card($info, $cn);
+							$i++;
+						}
+
+						if ($quickSearch_only_in_userSector)
+						{
+							if ($options != '')
+							{
+								$head_option =
+									'<tr class="quicksearchcontacts_unselected">' .
+										'<td colspan="2" width="100%" align="center">' .
+											str_replace("%1", $this->max_result,$this->functions->getLang('More than %1 results were found')) . '.<br>' .
+											$this->functions->getLang('Showing only the results found in your organization') . '.';
+										'</td>' .
+									'</tr>';
+								
+								$contacts_result = $head_option . $options_users_from_user_org . $options;
+							}
+						}
+						else
+						{
+							$head_option0 = "";
+
+							$head_option1 = "";
+
+							if (($options_users_from_user_org != '') && ($options != ''))
+							{
+								$head_option0 =
+									'<tr class="quicksearchcontacts_unselected">' .
+										'<td colspan="2" width="100%" align="center" style="background:#EEEEEE"><B>' .
+											$this->functions->getLang('Users from your organization') . '</B> ['.count($tmp_users_from_user_org).']';
+										'</td>' .
+									'</tr>';
+
+								$head_option1 =
+									'<tr class="quicksearchcontacts_unselected">' .
+										'<td colspan="2" width="100%" align="center" style="background:#EEEEEE"><B>' .
+											$this->functions->getLang('Users from others organizations') . '</B> ['.count($tmp).']';
+										'</td>' .
+									'</tr>';
+							}
+							
+							$contacts_result = $head_option0 . $options_users_from_user_org . $head_option1 . $options;
+						}
 					}
-					$contacts_result = $head_option0 . $options_users_from_user_org . $head_option1 . $options;
+
+					$return = $contacts_result;
 				}
 			}
 		}
-		
-		ldap_close( $this->ds );
-		
-		return $contacts_result;
+		else
+		{
+			$return = array( 'status' => false, 'error' => 'No connect Ldap' );
+		}
+
+		return $return;
 	}
 
 	function make_quicksearch_card($info, $cn)
 	{
-		include_once("class.functions.inc.php");
-		$functions = new functions;
-
 		$contacts_result = array();
+
 		$contacts_result["cn"] = $cn;
+
 		if($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'])
 		    $extendedinfo=true;
 		else
@@ -368,7 +386,7 @@ class ldap_functions
 				'</td>' .
 				'<td class="cc">' .
 					'<span name="cn">' . $empNumber . $contacts_result['cn'] . '</span>' . '<br>' .
-					'<a title="'.$functions->getLang("Write message").'" onClick="javascript:QuickSearchUser.create_new_message(\''.$contacts_result["cn"].'\', \''.$contacts_result["mail"].'\')">' .
+					'<a title="'.$this->functions->getLang("Write message").'" onClick="javascript:QuickSearchUser.create_new_message(\''.$contacts_result["cn"].'\', \''.$contacts_result["mail"].'\')">' .
 						'<font color=blue>' .
 						'<span name="mail">' . $contacts_result['mail'] . '</span></a></font>'.
 						'&nbsp;&nbsp;<img src="templates/default/images/user_card.png" style="cursor: pointer;" title="'.$this->functions->getLang("Add Contact").'" onclick="javascript:connector.loadScript(\'ccQuickAdd\');ccQuickAddOne.showList(\''.$fn.','.$fn.','.$sn.','.$contacts_result["mail"].'\')">&nbsp;&nbsp;'.
