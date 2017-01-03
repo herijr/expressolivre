@@ -284,11 +284,11 @@
 				$this->news_data = $_POST['news'];
 				if(!$this->news_data['subject'])
 				{
-					$errors[] = lang('The subject is missing.');
+					$errors[] = lang('the subject is missing.');
 				}
 				if(!$this->news_data['content'])
 				{
-					$errors[] = lang('The news content is missing.');
+					$errors[] = lang('the news content is missing.');
 				}
 				if(!is_array($errors))
 				{
@@ -377,11 +377,11 @@
 			{
 				if(!$this->news_data['subject'])
 				{
-					$errors[] = lang('The subject is missing');
+					$errors[] = lang('the subject is missing');
 				}
 				if(!$this->news_data['content'])
 				{
-					$errors[] = lang('The news content is missing');
+					$errors[] = lang('the news content is missing');
 				}
 
 				if(!is_array($errors))

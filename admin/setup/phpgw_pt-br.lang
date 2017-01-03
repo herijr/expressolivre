@@ -518,7 +518,7 @@ Execute RCLs update	admin	pt-br	Executar atualização das LCRs
 Confirm RCLs update	admin	pt-br	Confirma atualização das LCRs
 Log of RCLs update	admin	pt-br	Log da atualizacao das LCRs
 File	admin	pt-br	Arquivo
-not found	admin	pt-br	nao localizado
+not found	common	pt-br	nao localizado
 CAs (Certificate Authority)	admin	pt-br	ACs (Autoridades Certificadoras)
 RCLs(Revoked Certificate List)	admin	pt-br	LCRs(Listas de Certificados Revogados)
 View Current configuration	admin	pt-br	Visualizar Configuracao em uso

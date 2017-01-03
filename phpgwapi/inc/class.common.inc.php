@@ -535,6 +535,10 @@
 		function grab_owner_name($accountid = '')
 		{
 			$GLOBALS['phpgw']->accounts->get_account_name($accountid,$lid,$fname,$lname);
+			if (! $lid && ! $firstname && ! $lastname)
+			{
+				return "( " . lang("not found") . " )";
+			}
 			return $this->display_fullname($lid,$fname,$lname);
 		}
 
