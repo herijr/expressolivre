@@ -115,20 +115,23 @@ class ldap_functions
 
 		$extendedInfo = false;
 
-		if( isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info']) )
+		if( isset( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'] ) )
 		{
-			$extendedInfo =  true;
+			if( trim( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'] ) === "1" )
+			{
+				$extendedInfo = true;
+			}
 		}
 
 		$searchFor = trim($searchFor);
 
-		$searchFor = preg_replace( '/\*/', "", $searchFor);
+		$searchFor = preg_replace( '/\*/', "", $searchFor );
 
 		$searchFor = implode("*", explode(" ", $searchFor ) );
 
 		$searchFor = preg_replace('/\*\*/', "*", $searchFor );
 
-		$return = array('field' => $field, 'ID' => $ID );
+		$return = array();
 
 		$this->ldapConnect(false);
 
@@ -249,6 +252,8 @@ class ldap_functions
 						}
 
 						$contacts_result['quickSearch_only_in_userSector'] = $quickSearch_only_in_userSector;
+						$contacts_result['field'] = $field;
+						$contacts_result['ID'] = $ID;		
 					}
 					else
 					{
