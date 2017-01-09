@@ -109,7 +109,7 @@ class CatalogAdapter extends ExpressoAdapter {
 		if (empty($uidNumber))
 		{
 			$params = array ("search_for" => $search);
-	 		$result = $this->getLdapCatalog()->quicksearch($params);
+	 		$result = $this->getLdapCatalog()->quickSearch($params);
 		}
 		else
 	 		$result = $this->getLdapCatalog()->uidNumber2cn($uidNumber);

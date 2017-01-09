@@ -39,9 +39,10 @@ class CatalogAdapter extends ExpressoAdapter {
 	}		
 
 	protected function getLdapCatalog(){
-		if(!$this->ldapCatalog) {
-			$catalog_config = CreateObject("contactcenter.bo_ldap_manager");
-			$_SESSION['phpgw_info']['expressomail']['ldap_server'] = $catalog_config ? $catalog_config->srcs[1] : null;
+		if(!$this->ldapCatalog)
+		{
+			$_SESSION['phpgw_info']['expressomail']['server'] = $GLOBALS['phpgw_info']['server'];
+			
 			$this->ldapCatalog = CreateObject("expressoMail1_2.ldap_functions");
 		}
 	
@@ -109,7 +110,7 @@ class CatalogAdapter extends ExpressoAdapter {
 		if (empty($uidNumber))
 		{
 			$params = array ("search_for" => $search);
-	 		$result = $this->getLdapCatalog()->quicksearch($params);
+	 		$result = $this->getLdapCatalog()->quickSearch($params);
 		}
 		else
 	 		$result = $this->getLdapCatalog()->uidNumber2cn($uidNumber);
