@@ -15,7 +15,7 @@ class SoapClientX extends SoapClient
 				)
 			);
 	
-		$params = array_merge( [ 'stream_context' => $context ] , $options );
+		$params = array_merge( array( 'stream_context' => $context ) , $options );
 
 		parent::__construct( $wsdl, $params );
 
