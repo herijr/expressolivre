@@ -65,59 +65,65 @@ emInfoContact.prototype.connectVoip = function (phoneUser, typePhone){
 	cExecute ("$this.functions.callVoipConnect&to="+phoneUser+"&typePhone="+typePhone, handler_connectVoip);
 }
 
-emInfoContact.prototype.show = function (data){
+emInfoContact.prototype.show = function (data)
+{
 	var _this = this;
 	var card = Element("card_cc");
-	card.style.left = (findPosX(this.td) + 20) + "px";
+		card.style.left = (findPosX(this.td) + 20) + "px";
 	var y = findPosY(this.td) + 20 - Element("divScrollMain_"+numBox).scrollTop;
 	var w_height = is_ie ? document.body.clientHeight + document.body.scrollTop : window.innerHeight + window.pageYOffset;
-	if(y + 160 > w_height)
-		card.style.top =  (y - 160) + "px";	
-	else
-		card.style.top = y + "px";
-	card.style.display = '';
-	var cn = data.cn;
-	if(cn && cn.toString().length > 35)
-		cn = cn.toString().substring(0,30) + "...";
+	var cn        = data.cn;
+	var email     = data.email;
+	var phoneUser = "";
+
+	if( y + 160 > w_height ){ card.style.top =  (y - 160) + "px"; }
+	else{ card.style.top = y + "px"; }
 	
-	var email = data.email;
-	if(email && email.toString().length > 35)
-		email = email.toString().substring(0,30) + "...";
+	card.style.display = '';
+		
+	if(cn && cn.toString().length > 35){ cn = cn.toString().substring(0,30) + "..."; }
+	
+	if(email && email.toString().length > 35){ email = email.toString().substring(0,30) + "..."; }
 
-		var phoneUser;
+	data.telefone ? phoneUser = data.telefone : phoneUser = "<br/>";
 
-		data.telefone ? phoneUser = data.telefone : phoneUser ="<br />";
+	data.mobile ? phoneUser += "<br/>&nbsp;"+data.mobile :  phoneUser += "<br/>";
 
-		data.mobile ? phoneUser += "<br />&nbsp;"+data.mobile :  phoneUser += "<br />";
+	data.employeeNumber ? employeeNumber = data.employeeNumber : employeeNumber ="";
 
-		data.employeeNumber ? employeeNumber = data.employeeNumber : employeeNumber ="";
+	data.ou ? ou = data.ou :  ou = "";
 
-		data.ou ? ou = data.ou :  ou = "";
-
-
-
-	if(preferences.voip_enabled) {
+	if( preferences.voip_enabled )
+	{
 		phoneUser = '';
+	
 		if(data.telefone)
+		{
 			phoneUser = "<a title=\""+get_lang("Call to Comercial Number")+"\" href=\"#\" onclick=\"InfoContact.connectVoip('"+ data.telefone+"', 'com')\">"+ data.telefone+"</a>";
-		if(data.mobile){
+		}
+			
+		if(data.mobile)
+		{
 			phoneUser += "<br>&nbsp;<a title=\""+get_lang("Call to Mobile Number")+"\" href=\"#\" onclick=\"InfoContact.connectVoip('"+data.mobile+"', 'mob')\">"+data.mobile+"</a>";
 		}
 	}
 
-		Element("card_cc_td").innerHTML =
-						"<table cellpadding=0 cellspacing=0 border=0 height='100%' width='100%'><tr>"+
-						"<td  style='padding-top:4px' align='center' valign='center' colspan ='2'><img src='templates/"+template+"/images/"+(data.type)+"_catalog.png' /><font size=1 color=BLACK>&nbsp;<b>"+get_lang("Sender's Information")+"</b></font>"+_this.verifyIM(data.uid,data.email)+"</td></tr>"+
+	var _imgPhoto = '<img style="float:left;width:60px;height:80px;" src="templates/default/images/photo.jpg"/>';
+	
+	if( data.photo && data.photo.length > 0 )
+	{
+		_imgPhoto = '<img style="float:left;width:60px;height:80px;" src="data:image/jpeg;base64,'+ data.photo +'"/>';
+	}	
 
-						"<tr><td align='center' style='width:70px;height:93px;padding-left:6px' align='center' valign='center'>"+
-						"<img style='float:left' src='./inc/show_img.php?email="+data.email+"'></td>"+
-						"<td style='padding-left:2px' width='70%' align='left' valign='top'>"+
-						"<br><img style='float:left'align='center' src='templates/"+template+"/images/phone.gif' />&nbsp;<font  size=1  color=BLACK>"+(phoneUser ? phoneUser : get_lang("None") )+"</font><br />"+
-						"<br><font size=1 color=BLACK>"+cn+"</font><br><b>"+employeeNumber+"</b>"+
-						"<br/>"+ou+"</td></tr>"+
-						"<tr><td  style='padding-bottom:4px' align='center' valign='center' colspan ='2' nowrap><span title='"+get_lang("Write message")+"' style='cursor:pointer' onclick='InfoContact.sendMail(\""+cn+"\",\""+data.email+"\")'><font size=1 color=DARKBLUE><u>"+email+"</u></font></span>"+
-										"</td></tr></table>";
-
+	Element("card_cc_td").innerHTML = "<table cellpadding=0 cellspacing=0 border=0 height='100%' width='100%'><tr>" +
+	"<td  style='padding-top:4px' align='center' valign='center' colspan ='2'><font size=1 color=BLACK>&nbsp;<b>"+get_lang("Sender's Information")+"</b></font>"+_this.verifyIM(data.uid,data.email)+"</td></tr>" +
+	"<tr><td align='center' style='width:70px;height:93px;padding-left:6px' align='center' valign='center'>" + _imgPhoto +
+	"<td style='padding-left:2px' width='70%' align='left' valign='top'>" +
+	"<br><img style='float:left'align='center' src='templates/"+template+"/images/phone.gif' />&nbsp;<font  size=1  color=BLACK>"+(phoneUser ? phoneUser : get_lang("None") )+"</font><br />" +
+	"<br><font size=1 color=BLACK>"+cn+"</font><br><b>"+employeeNumber+"</b>" +
+	"<br/>"+ou+"</td></tr>" +
+	"<tr><td  style='position:relative; top:-8px;' align='center' valign='center' colspan ='2' nowrap><span title='"+get_lang("Write message")+"' style='cursor:pointer' onclick='InfoContact.sendMail(\""+cn+"\",\""+data.email+"\")'><font size=1 color=DARKBLUE><u>"+email+"</u></font></span>" +
+	"</td></tr></table>";
 
 	this.timeout_hide = setTimeout("InfoContact.hide()",1000);	
 }

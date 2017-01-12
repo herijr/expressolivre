@@ -931,74 +931,90 @@ class ldap_functions
 		}
 	}
 
-	function getUserByEmail($params)
+	function getUserByEmail( $params )
 	{
-		$expires = 60*60*24*30; /* 30 days */
+		$_return = array();
 
-		header("Cache-Control: maxage=".$expires);
-		header("Pragma: public");
-		header("Expires: ".gmdate('D, d M Y H:i:s', time()+$expires));	
-		
-		$filter = "(&(phpgwAccountType=u)(mail=".$params['email']."))";
-		
-		$ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
-		
-		if( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'] )
+		if( isset($params['email']) && trim($params['email']) !== "" )
 		{
-		    $extendedinfo = true;
-		}
-		else
-		{
-		    $extendedinfo = false;
-		}
+			$justThese = array("cn","uid","mail","telephoneNumber","jpegPhoto");
 
-		if( $extendedinfo )
-		{
-		    $justthese = array("cn","uid","telephoneNumber","jpegPhoto","mobile","ou","employeeNumber");
-		}
-		else
-		{
-		    $justthese = array("cn","uid","telephoneNumber","jpegPhoto");
-		}
-
-		// Follow the referral
-		$this->ldapConnect();
-		
-		if( $this->ds )
-		{
-			$sr = @ldap_search( $this->ds, $ldap_context, $filter, $justthese );
-
-			if ( !$sr )
+			if( isset( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'] ) )
 			{
-				return null;
-			}
-			else
-			{
-				$entry = ldap_first_entry( $this->ds, $sr );
-
-				if( $entry )
+				if( trim( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['extended_info'] ) === "1" )
 				{
-					$obj =  array(
-						    "cn"             => utf8_decode(current(ldap_get_values($this->ds, $entry, "cn"))),
-							"email"          => $params['email'],
-							"uid"            => ldap_get_values($this->ds, $entry, "uid"),
-							"type"           => "global",
-							"mobile"         => @ldap_get_values($this->ds, $entry, "mobile"),
-							"telefone"       => @ldap_get_values($this->ds, $entry, "telephonenumber"),
-							"ou"             => @ldap_get_values($this->ds, $entry, "ou"),
-							"employeeNumber" => @ldap_get_values($this->ds, $entry, "employeeNumber")
-					);
+					$justThese = array_merge( $justThese , array("mobile", "employeeNumber", "ou" ) );
+				}
+			}
 
-					$_SESSION['phpgw_info']['expressomail']['contact_photo'] = @ldap_get_values_len( $this->ds, $entry, "jpegphoto" );
-					
-					ldap_close( $this->ds );
-					
-					return $obj;
+			$this->ldapConnect();
+
+			if( $this->ds )
+			{
+				$filter       = "(&(phpgwAccountType=u)(mail=".$params['email']."))";
+				$ldap_context = $_SESSION['phpgw_info']['expressomail']['server']['ldap_context'];
+				$search       = ldap_search( $this->ds, $ldap_context, $filter, $justThese );
+
+				if( $search )
+				{
+					if( ldap_count_entries( $this->ds, $search ) > 0 )
+					{
+						$_user = ldap_get_entries( $this->ds, $search );
+
+						$_userLDAP = array();
+
+						$_userLDAP['type'] = "global";
+
+						foreach( $_user as $key => $value )
+						{
+							if( isset( $value["cn"][0] ) )
+							{
+								$_userLDAP['cn'] = utf8_decode( $value["cn"][0] );
+							}
+
+							if( isset( $value["mail"][0] ) )
+							{
+								$_userLDAP['email'] = $value["mail"][0];
+							}
+
+							if( isset( $value["uid"][0] ) )
+							{
+								$_userLDAP['uid'] = $value["uid"][0];
+							}
+
+							if( isset( $value["mobile"][0] ) )
+							{
+								$_userLDAP['mobile'] = $value["mobile"][0];
+							}
+
+							if( isset( $value["telephonenumber"][0] ) )
+							{
+								$_userLDAP['telefone'] = $value["telephonenumber"][0];
+							}
+
+							if( isset( $value["ou"][0] ) )
+							{
+								$_userLDAP['ou'] = $value["ou"][0];
+							}
+
+							if( isset( $value["employeenumber"][0] ) )
+							{
+								$_userLDAP['employeeNumber'] = $value["employeenumber"][0];
+							}
+
+							if( isset( $value["jpegphoto"][0] ) )
+							{
+								$_userLDAP['photo'] = base64_encode( $value['jpegphoto'][0] );
+							}
+						}
+						
+						$_return = $_userLDAP;
+					}
 				}
 			}
 		}
-		
-		return null;
+	
+		return ( count($_return) > 0 ? $_return : null );
 	}
 	
 	function uid2uidnumber($uid)
