@@ -237,6 +237,19 @@
 		       					<input id="em_input_sendAcl" onclick="sharedAccounts.setAcl(this);" type="checkbox">
 		       					<img title="{lang_The_owner_can_send_message}" src="./expressoAdmin1_2/templates/default/images/ajuda.png">
 		       				</div>
+
+	        				<div>
+		        				<label>{lang_save}:</label>
+		       					<input id="em_input_saveAcl" onclick="sharedAccounts.setAcl(this);" type="checkbox">
+		       					<img title="{lang_other_users_will_save_the_sent_messages_as_you_in_this_mailbox}" src="./expressoAdmin1_2/templates/default/images/ajuda.png">
+		       				</div>
+
+	        				<div>
+		        				<label>{lang_folder}:</label>
+		       					<input id="em_input_folderAcl" onclick="sharedAccounts.setAcl(this);" type="checkbox">
+		       					<img title="{lang_allow_create_or_delete_folders_on_this_mailbox}" src="./expressoAdmin1_2/templates/default/images/ajuda.png">
+		       				</div>
+
 		       			</div>
 					</div>
 				</div>

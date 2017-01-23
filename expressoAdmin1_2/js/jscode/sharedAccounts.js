@@ -197,7 +197,27 @@ var sharedAccounts = new function()
 			{
 				$('#em_input_sendAcl').prop("disabled",false);
 				$('#em_input_sendAcl').prop("checked",true);
-			}		
+			}
+
+            if( result[0].acl.indexOf('p',0) >= 0 )
+			{
+			        $('#em_input_saveAcl').prop("disabled",false);
+			        $('#em_input_saveAcl').prop("checked",true);
+			}
+			
+			if( result[0].acl.indexOf('c',0) >= 0 )
+			{
+			        $('#em_input_folderAcl').prop("checked",true);
+			}
+			
+			if( $('#em_input_writeAcl').is(":checked") && $('#em_input_sendAcl').is(":checked") )
+			{
+			        $('#em_input_saveAcl').prop("disabled",false);
+			}
+			else
+			{
+				$('#em_input_saveAcl').prop("disabled",true );
+			}
 		}
 	};
 
@@ -295,6 +315,19 @@ var sharedAccounts = new function()
 			if( $("#em_input_deleteAcl").is(":checked") ){ _acl += "d"; }
 			if( $("#em_input_writeAcl").is(":checked") ){ _acl += "wip"; }
 			if( $("#em_input_sendAcl").is(":checked") ){ _acl += "a"; }
+			if( $("#em_input_folderAcl").is(":checked") ){ _acl += "c"; }
+
+			if( $("#em_input_sendAcl").is(":checked") && $("#em_input_writeAcl").is(":checked") )
+			{
+				$("#em_input_saveAcl").prop("disabled", false);
+			}
+			else
+			{
+				$("#em_input_saveAcl").prop("disabled", true );	
+				$("#em_input_saveAcl").prop("checked", false );
+			}	
+
+			if( $("#em_input_saveAcl").is(":checked") ){ _acl += "p"; }
 
 			this.setAclUser( _user , _acl );
 		}

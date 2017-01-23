@@ -252,6 +252,7 @@ Only numbers are allowed	expressoAdmin1_2	pt-br	Apenas números são permitidos
 only on ldap	expressoAdmin1_2	pt-br	somente no ldap
 organization	expressoAdmin1_2	pt-br	Organização
 Organizations	expressoAdmin1_2	pt-br	Organizações
+other users will save the sent messages as you in this mailbox	expressoAdmin1_2	pt-br	Outros usuários irão SALVAR as mensagens enviadas como sendo você nesta caixa
 owners	expressoAdmin1_2	pt-br	Donos
 participants from the list can send email to this list	expressoAdmin1_2	pt-br	Participantes da lista podem enviar e-mail para a mesma
 password and re-password are different	expressoAdmin1_2	pt-br	Senha e re-senha são diferentes
@@ -562,3 +563,5 @@ Organization dn	expressoAdmin1_2	pt-br	DN da organização
 Birthdate	expressoAdmin1_2	pt-br	Data de nascimento
 Field description is empty	expressoAdmin1_2	pt-br	O campo descrição está vazio
 ad loading	expressoAdmin1_2	pt-br	Carregando o Active Directory
+allow create or delete folders on this mailbox	expressoAdmin1_2	pt-br	Permitir criar ou excluir pastas nessa caixa de correio
+folder	expressoAdmin1_2	pt-br	Pasta
