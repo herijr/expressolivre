@@ -897,140 +897,136 @@
 			@return integer $id The Contact ID
 		*/
 		//alterada para receber a informacao em 'notes' - Rommel Cysne - rommel.cysne@serpro.gov.br
-		function add_single_entry ( $data )
+		
+		function add_single_entry( $data )
 		{
-			$permissions = $this->security->get_permissions();
-			
-			if (!$permissions['create'])
+			$_addresses   = array();
+			$_contact     = array();
+			$_companies   = array();
+			$_connections = array();
+			$_relations   = array();
+
+			foreach( $data as $field => $value )
 			{
-				//return false;
+				if( $value !== false )
+				{	
+					if( is_array( $value) )
+					{
+						switch( $field )
+						{
+							case "connections"  : $_connections = $value; break;
+							
+							case "companies"	: $_companies = $value; break;
+							
+							case "addresses"	: $_addresses = $value; break;
+
+							case "relations"	: $_relations = $value; break;
+						};
+					}
+					else
+					{
+						$_contact[ $field ] = $value;
+					}
+				}
 			}
-			
+
+			// Contact
 			$contact = CreateObject('contactcenter.so_contact');
+
 			$contact->reset_values();
-			
-			$altered = false;
-			foreach($data as $field => $value)
+
+			foreach( $_contact as $field => $value )
 			{
-				if ($value === false)
+				$contact->set_field( $field , $value );	
+			}
+
+			$contact->set_field('id_owner',$GLOBALS['phpgw_info']['user']['account_id']);
+			
+			$contact->commit();
+
+			// Relations
+			foreach( $_relations as $relation_fields )
+			{
+				$contact->set_relation($relation_fields['id_relation'], $relation_fields['id_typeof_relation']);
+			}
+
+			// Companies					
+			foreach( $_companies as $company_fields )
+			{
+				if( $company_fields['company_name'] )
 				{
-					continue;
+					$fields = array('company.id_company');
+					$restric = array(
+						0 => array(
+							'field' => 'company.company_name',
+							'type'  => 'iLIKE',
+							'value' => $company_fields['company_name']
+						)
+					);
+					
+					if( $result = $this->find( $fields , $restric ) )
+					{
+						$id = $result[0]['id_company'];
+						$company_fields['id_company'] = $id;
+					}
+					else
+					{
+						$company = CreateObject('contactcenter.so_company');
+						$company->reset_values();
+						$company->set_company_name( $company_fields['company_name'] );
+						$company->set_field('id_company_owner',$GLOBALS['phpgw_info']['user']['account_id']);
+						$company_fields['id_company'] = $company->commit();
+					}
 				}
 				
-				$altered = true;
-				switch($field)
-				{
-					case 'photo':
-					case 'alias':
-					case 'id_prefix':
-					case 'id_status':
-					case 'id_suffix':
-					case 'corporate_name':
-					case 'job_title':
-					case 'department':
-					case 'web_page':
-					case 'given_names':
-					case 'family_names':
-					case 'names_ordered':
-					case 'birthdate':
-					case 'sex':
-					case 'pgp_key':
-					case 'notes':
-						$contact->set_field($field,$value);
-						break;
-
-					case 'companies':					
-						foreach($value as $company_fields)
-						{
-							if ($company_fields['company_name'])
-							{
-								$fields = array('company.id_company');
-								$restric = array(
-									0 => array(
-										'field' => 'company.company_name',
-										'type'  => 'iLIKE',
-										'value' => $company_fields['company_name']
-									)
-								);
-								
-								if($result = $this->find($fields,$restric))
-								{
-									$id = $result[0]['id_company'];
-									$company_fields['id_company'] = $id;
-								}
-								else
-								{
-									$company = CreateObject('contactcenter.so_company');
-									$company->reset_values();
-									$company->set_company_name($company_fields['company_name']);
-									$company->set_field('id_company_owner',$GLOBALS['phpgw_info']['user']['account_id']);
-									$company_fields['id_company'] = $company->commit();
-								}
-							}
-							
-							$contact->set_company($company_fields);
-						}
-						break;
-					
-					case 'relations':
-						foreach($value as $relation_fields)
-						{
-							$contact->set_relation($relation_fields['id_relation'], $relation_fields['id_typeof_relation']);
-						}
-						break;
-					
-					case 'addresses':
-						foreach($value as $address_fields)
-						{
-							$address = CreateObject('contactcenter.so_address');
-							$address->reset_values();
-							foreach($address_fields as $a_field => $a_value)
-							{
-								if ($a_field !== 'id_typeof_address')
-								{
-									$address->set_field($a_field,$a_value);
-								}
-							}
-							$address->commit();
-							$id_address = $address->get_id();
-							$contact->set_address($id_address, $address_fields['id_typeof_address']);
-						}
-						break;
-					
-					case 'connections':
-						foreach($value as $connection_name => $connection_fields)
-						{
-							$connection = CreateObject('contactcenter.so_connection');
-							$connection->reset_values();
-							
-							foreach($connection_fields as $a_field => $a_value)
-							{
-								if ($a_field !== 'id_typeof_connection')
-								{
-									$connection->set_field($a_field,$a_value);
-								}
-							}
-							
-							$connection->commit();
-							$id_connection = $connection->get_id();
-							$contact->set_connection($id_connection, $connection_fields['id_typeof_connection']);
-						}
-			 			break;
-			 			
-			 		default:
-			 			return false;
-				}
+				$contact->set_company($company_fields);
 			}
 
-			if ($altered)
+			// Addresses
+			foreach( $_addresses as $address_fields )
 			{
-				$contact->set_field('id_owner',$GLOBALS['phpgw_info']['user']['account_id']);
-				return $contact->commit();
-			}
+				$address = CreateObject('contactcenter.so_address');
+
+				$address->reset_values();
+
+				foreach($address_fields as $key => $value)
+				{
+					if ( $key !== 'id_typeof_address' )
+					{
+						$address->set_field( $key , $value );
+					}
+				}
+
+				$address->commit();
 			
-			return false;
+				$contact->set_address( $address->get_id(), $address_fields['id_typeof_address']);
+			}
+
+			// Connections
+			foreach( $_connections as $_conns )
+			{
+				$connection = CreateObject('contactcenter.so_connection');
+
+				$connection->reset_values();
+
+				foreach( $_conns as $key => $value )
+				{	
+					if( $key !== 'id_typeof_connection')
+					{
+						$connection->set_field( $key , $value );
+					}
+				}
+				
+				$connection->commit();
+
+				$contact->set_connection( $connection->get_id() , $_conns['id_typeof_connection'] );
+			}
+
+			$_return = $contact->commit();
+
+			return ( $_return ? $_return : false );
 		}
-		
+
 		/*!
 		
 			@function quick_add
