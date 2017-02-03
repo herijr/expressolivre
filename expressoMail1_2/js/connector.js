@@ -552,7 +552,7 @@ var handlerExecuteForm = null;
 				break;
 			// function that needs expire
 			case 'get_range_msgs2':
-			case 'quicksearch':
+			case 'quickSearch':
 			case 'get_folders_list':
 			case 'search_msg':
 			case 'search_for':

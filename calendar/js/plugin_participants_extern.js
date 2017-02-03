@@ -133,7 +133,7 @@
 					type 			: "POST",
 					dataType		: "json",
 				    accepts			: { json: 'application/json' },
-					url 			: "expressoMail1_2/controller.php?action=expressoMail1_2.ldap_functions.quicksearch",
+					url 			: "expressoMail1_2/controller.php?action=expressoMail1_2.ldap_functions.quickSearch",
 					data			: 
 					{
 	  		   			search_for	: searchFor,
