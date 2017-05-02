@@ -200,7 +200,7 @@ class ExpressoAdapter extends Resource {
 	protected function isLoggedIn(){
 		if($this->getParam('auth') != null) {
 			list($sessionid, $kp3) = explode(":", $this->getParam('auth'));
-			if($GLOBALS['phpgw']->session->verify($sessionid, $kp3)){									
+			if($GLOBALS['phpgw']->session->verify($sessionid, $kp3)){							
 				return $sessionid;
 			}
 			else{
@@ -235,7 +235,7 @@ class ExpressoAdapter extends Resource {
 		return $_return;
 	}
 
-	protected function getUserApps(){
+	protected function getUserApps($user_id = ""){
 		// Load Granted Apps for Web Service
 		$config = parse_ini_file( API_DIRECTORY . '/../config/user.ini',true);
 		$apps 	= $config['Applications.mapping'];
@@ -243,7 +243,9 @@ class ExpressoAdapter extends Resource {
 		// Load Granted Apps for User
 		$contactApps = array();
 		$acl 	= CreateObject('phpgwapi.acl');
-		$user_id = $GLOBALS['phpgw_info']['user']['account_id']['acl'];
+		if ($user_id == "") {
+			$user_id = $GLOBALS['phpgw_info']['user']['account_id']['acl'];
+		}
 		foreach($acl->get_user_applications($user_id) as $app => $value){
 			$enabledApp = array_search($app, $apps);
 			if($enabledApp !== FALSE)

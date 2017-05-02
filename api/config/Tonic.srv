@@ -13,6 +13,12 @@ LoginResource = /core/LoginResource.php
 [/Logout]
 LogoutResource = /core/LogoutResource.php
 
+[/UserApps]
+UserAppsResource = /core/UserAppsResource.php
+
+[/UserApi]
+UserApiResource = /core/UserApiResource.php
+
 [/AvailableServers]
 AvailableServersResource = /availableServers/AvailableServersResource.php
 
