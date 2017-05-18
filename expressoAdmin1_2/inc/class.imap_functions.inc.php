@@ -468,8 +468,12 @@ class imap_functions
 			$result = $this->sieve_functions->move_scripts($uid, $old_profile, $new_profile);
 			if ( !$result['status'] ) throw new Exception($result['msg']);
 			
-			$async->log($tag.'delete: '.$uid);
-			$old_imap->delete_inbox();
+			try {
+				$async->log($tag.'delete: '.$uid);
+				$old_imap->delete_inbox();
+			} catch(Exception $e) {
+				$async->log($tag.'delete: error: '.$e->getMessage());
+			}
 			
 			$status = true;
 			
