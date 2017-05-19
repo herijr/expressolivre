@@ -3,6 +3,7 @@
 /.buildpath
 /.classpath
 /.htaccess
+/widgets
 /bootstrap.php
 /api/config/profileCreateUser.ini
 /api/config/profileHomeServer.ini
