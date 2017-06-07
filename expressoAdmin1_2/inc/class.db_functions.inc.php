@@ -619,8 +619,17 @@ class db_functions
 	
 	function write_log($action, $about)
 	{
+		if (
+			isset( $_SESSION['phpgw_session']['session_lid'] ) && ( !empty( $_SESSION['phpgw_session']['session_lid'] ) )
+		)	$manager = $_SESSION['phpgw_session']['session_lid'];
+		else if (
+			isset( $_SESSION['phpgw_info']['expresso']['user']['account_lid'] ) && ( !empty( $_SESSION['phpgw_info']['expresso']['user']['account_lid'] ) )
+		)	$manager = $_SESSION['phpgw_info']['expresso']['user']['account_lid'];
+		else
+			$manager = 'unknown';
+		
 		$sql = "INSERT INTO phpgw_expressoadmin_log (date, manager, action, userinfo) "
-		. "VALUES('now','" . $_SESSION['phpgw_info']['expresso']['user']['account_lid'] . "','" . strtolower($action) . "','" . strtolower($about) . "')";
+		. "VALUES('now','" . $manager . "','" . strtolower($action) . "','" . strtolower($about) . "')";
 		
 		if (!$this->db->query($sql))
 		{
