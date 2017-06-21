@@ -82,6 +82,9 @@ ContactDeleteResource = /catalog/ContactDeleteResource.php
 [/Catalog/ContactPicture]
 ContactPictureResource = /catalog/ContactPictureResource.php
 
+[/Catalog/Photo(/.*)?]
+ContactEmailPhotoResource = /catalog/ContactEmailPhotoResource.php
+
 [/Calendar/Events]
 EventsResource = /calendar/EventsResource.php
 
