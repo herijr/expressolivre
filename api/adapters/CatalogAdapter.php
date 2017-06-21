@@ -56,7 +56,7 @@ class CatalogAdapter extends ExpressoAdapter {
 	protected function getUserLdapAttrs($mail)
 	{
 		$filter="(&(phpgwAccountType=u)(mail=".$mail."))";
-		$ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
+		$ldap_context = $GLOBALS['phpgw_info']['server']['ldap_context'];
 		$justthese = array("dn", 'jpegPhoto','givenName', 'sn', 'uidNumber'); 
 		$ds = $this->getLdapCatalog()->ds;
 		if ($ds){
@@ -81,6 +81,7 @@ class CatalogAdapter extends ExpressoAdapter {
 		}
 		return false;
 	}
+
 	
 	protected function getUserLdapPhoto($contactID) {		
 		$ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
