@@ -50,21 +50,7 @@ class DelMessageResource extends MailAdapter {
 			}
 			else
 			{
-				$msgArray	= array();
-
-				if( strrpos( $msgID, ",") !== FALSE )
-				{
-					$msgArray = explode(",", $msgID );
-				}
-				else
-				{
-					$msgArray[0] = $msgID;
-				}
-
-				foreach( $msgArray as $msg )
-				{ 
-					$this->getImap()->delete_msgs( $msg ); 
-				}
+				$this->getImap()->delete_msgs( $params ); 
 			}
 			
 			$this->setResult( true );
