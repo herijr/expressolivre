@@ -57,7 +57,7 @@ class CatalogAdapter extends ExpressoAdapter {
 	{
 		$filter="(&(phpgwAccountType=u)(mail=".$mail."))";
 		$ldap_context = $GLOBALS['phpgw_info']['server']['ldap_context'];
-		$justthese = array("dn", 'jpegPhoto','givenName', 'sn', 'uidNumber'); 
+		$justthese = array("dn", 'jpegPhoto','givenName', 'sn', 'uidNumber','telephonenumber'); 
 		$ds = $this->getLdapCatalog()->ds;
 		if ($ds){
 			$sr = @ldap_search($ds, $ldap_context, $filter, $justthese);	
@@ -68,13 +68,15 @@ class CatalogAdapter extends ExpressoAdapter {
 					$sn = @ldap_get_values_len($ds, $entry, "sn");
 					$uidNumber = @ldap_get_values_len($ds, $entry, "uidnumber");
 					$contactHasImagePicture = (@ldap_get_values_len($ds, $entry, "jpegphoto") ? 1 : 0);
+					$phone = @ldap_get_values_len($ds, $entry, "telephonenumber");
 					$dn = ldap_get_dn($ds, $entry);
 					return array(
 						"contactID" => urlencode($dn),
 						"contactUIDNumber" => $uidNumber[0],
 						"contactFirstName" => $givenName[0],
 						"contactLastName" 	=> $sn[0],
-						"contactHasImagePicture" => $contactHasImagePicture 
+						"contactHasImagePicture" => $contactHasImagePicture,
+						"contactPhones" => array($phone[0])
 					);
 				}
 			}
@@ -129,7 +131,6 @@ class CatalogAdapter extends ExpressoAdapter {
 				if(is_int($i)) {
 					$contacts[$i] = array(
 						'contactMails'	=> array($result[$i]['mail']),
-						'contactPhones'	=> array($result[$i]['phone']),
 						'contactAlias' => "",					
 						'contactFullName' 	=> ($result[$i]['cn'] != null ? mb_convert_encoding($row['cn'],"UTF8", "ISO_8859-1") : ""),
 						'contactBirthDate'	=> "",
