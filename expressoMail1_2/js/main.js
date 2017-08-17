@@ -2522,11 +2522,13 @@ function print_msg(msg_folder, msg_number, border_ID){
 			}
 			break;
 		}
-		catch(e){
+		catch(e)
+		{
 			//alert(e.message);
 		}
 	}
-	popup_print( window_print );
+
+	setTimeout( function(){ popup_print( window_print ); }, 500 );
 }
 
 function popup_create()
