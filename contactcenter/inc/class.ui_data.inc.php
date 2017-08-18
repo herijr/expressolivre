@@ -226,6 +226,7 @@
 			$GLOBALS['phpgw']->template->set_var('cc_msg_show_more_info', lang('show more info'));
 			$GLOBALS['phpgw']->template->set_var('cc_msg_clean', lang('Clean'));
 			$GLOBALS['phpgw']->template->set_var('cc_msg_invalid_csv', lang('Select a valid CSV file to import your contacts'));
+			$GLOBALS['phpgw']->template->set_var('cc_msg_browser_support', lang('Update your browser'));
 			$GLOBALS['phpgw']->template->set_var('cc_msg_export_csv', lang('Select the format type that you want to export your contacts'));
 			$GLOBALS['phpgw']->template->set_var('cc_msg_automatic', lang('Automatic'));
 			$GLOBALS['phpgw']->template->set_var('cc_msg_export_error', lang('An error has occurred while the exportation.'));
@@ -432,7 +433,11 @@
 					return;
 
 				case 'import_contacts':
-					return $this->import_contacts($_GET['typeImport'],$_GET['id_group']);
+					return $this->import_contacts(
+						$_GET['typeImport']?: $_POST['typeImport']?: 'expresso',
+						$_GET['id_group']?: $_POST['id_group']?: 0,
+						( isset( $_FILES[0] )? $_FILES[0]['tmp_name'] : false )
+					);
 
 				case 'export_contacts':
 					return $this->export_contacts($_POST['typeExport']);
@@ -3971,347 +3976,272 @@
 		//durante a importacao dos contatos; o processo estava travando por causa de caracteres em campos como nome,
 		//sobrenome, notas e e-mail;
 		//em 19/06/2009 - Rommel Cysne (rommel.cysne@serpro.gov.br);
-		function import_contacts($typeImport){
-			$this->so_group = CreateObject('contactcenter.so_group');
-			if($file = $_SESSION['contactcenter']['importCSV']) {
-				unset($_SESSION['contactcenter']['importCSV']);
-				$len = filesize($file);
-				$count = 0;
-				$return = array('error' => false, '_new' => 0, '_existing' => 0, '_failure' => 0);
-   				$handle = @fopen($file, "r") or die(serialize($return['error'] = true));
-
-				$input_header = fgets($handle);
-				if ($typeImport == 'outlook')
-					$delim = ';';
-				else if ($typeImport == 'auto')
-				$delim = strstr($input_header,',') ? ',' : ';';
-				else
-					$delim = ',';
-				$csv_header = $this->parse_line($input_header,$delim);
-				$firstContact = fgets($handle);
-				preg_match("/\"(.+)\"[,;]/sU",$firstContact,$matches); // yahoo csv
-   				rewind($handle);
-
-   				$header = @fgetcsv($handle, $len, $delim) or die(serialize($return['error'] = true));
-   				if(count($header)  < 2 || count($header) > 100) {
-   					$return['error'] = true;
-   					$return['sizeheader'] = count($header);
-   					echo serialize($return);
-   					return;
-   				}
-
-   				if ($matches[0][strlen($matches[0])-1] == ';')
-					$delim = ';';
-
-				$boGroup = CreateObject('contactcenter.bo_group');
-				$boPeople = CreateObject('contactcenter.bo_people_catalog');
-					switch($typeImport){
-						case 'outlook2000':
-							$name_pos=1;
-							$name2_pos=2;
-							$name3_pos=3;
-							$corporate_street_pos=8;
-							$cep_pos=13;
-							$corporate_street_2_pos=22;
-							$fax_pos=30;
-							$phone_pos=31;
-							$home_phone_pos=37;
-							$personal_cell_pos=40;
-							$pager_pos=43;
-							$birth_pos=48;
-							$notes_pos=49;
-							$email_pos=56;
-							$aditionalEmail_pos=59;
-
-							break;
-						case 'outlook':
-							$name_pos=3;
-							$email_pos=4;
-							$phone_pos=7;
-							$home_phone_pos=10;
-							$personal_cell_pos=12;
-							$corporate_street_pos=13;
-							$cep_pos=15;
-							$phone_pos=18;
-							$fax_pos=19;
-							$pager_pos=20;
-							$notes_pos=25;
-							break;
-						case 'thunderbird':
-							$name_pos=2;
-							$email_pos=4;
-							$phone_pos=7;
-							break;
-						case 'expresso':
-							$name_pos=0;
-							$alias_pos=1;
-							$email_pos=2;
-							$aditionalEmail_pos=3;
-							$personal_cell_pos=4;
-							$corporate_phone_pos=5;
-							$corporate_street_pos=6;
-							$corporate_comp_pos=7;
-							$corporate_cep_pos=8;
-							$corporate_city_pos=9;
-							$corporate_state_pos=10;
-							$corporate_country_pos=11;
-							$home_phone_pos=12;
-							$street_pos=13;
-							$comp_pos=14;
-							$cep_pos=15;
-							$city_pos=16;
-							$state_pos=17;
-							$country_pos=18;
-							$birth_pos=19;
-							$sex_pos = 20;
-							$pgp_key_pos = 21;
-							$notes_pos=22;
-							$web_page_pos=23;
-							$corporate_name_pos=24;
-							$job_title_pos=25;
-							$department_pos=26;
-							$corporate_fax_pos=27;
-							$corporate_pager_pos=28;
-							$corporate_cell_pos=29;
-							$fax_pos=30;
-							$pager_pos=31;
-							$corporate_street_2_pos = 32;
-							$street_2_pos = 33;						
-							break;
-					default:
-							foreach($csv_header as $index => $fieldName)
-							{
-								switch(strtolower($fieldName)){
-								case 'name':
-								case 'nome':
-								case 'first name':
-									$name_pos = $index;
-									break;
-								case 'second name':
-								case 'segundo nome':
-									$name2_pos = $index;
-									break;
-								case 'sobrenome':
-								case 'surname':
-									$name3_pos = $index;
-									break;
-								case 'business street':
-								case 'rua do endereço comercial':
-									$corporate_street_pos = $index;
-									break;
-								case 'rua do endereço comercial 2':
-								case 'outro endereço':
-									$corporate_street_2_pos = $index;
-									break;
-								case 'business postal code':
-								case 'cep do endereço comercial':
-									$cep_pos = $index;
-									break;
-								case 'business fax':
-								case 'fax comercial':
-								case 'fax':
-									$fax_pos = $index;
-									break;
-								case 'home phone':
-								case 'telefone residencial':
-									$home_phone_pos = $index;
-									break;
-								case 'mobile phone':
-								case 'telefone celular':
-									$personal_cell_pos = $index;
-									break;
-								case 'pager':
-									$pager_pos = $index;
-									break;
-								case 'phone':
-								case 'business phone':
-								case 'telefone':
-								case 'telefone principal':
-								case 'telefone comercial':
-                                                                case 'telefone comercial':                                                                    
-									$phone_pos = $index;
-									break;
-								case 'aniversário':
-								case 'birthdate':
-									$birth_pos = $index;
-								case 'anotações':
-								case 'notes':
-									$notes_pos = $index;
-								case 'e-mail':
-								case 'email':
-								case 'e-mail address':
-								case 'endereço de correio eletrônico':
-								case 'end. de email':
-									$email_pos = $index;
-									break;
-								case 'endereço de correio eletrônico 2':
-									$aditionalEmail_pos = $index;
-									break;
-								}
-							}
-							break;
-				}
-
-				while (($data = fgetcsv($handle, $len, $delim))) {
-					foreach ($header as $key=>$heading)
-               			$row[$heading]=(isset($data[$key])) ? $data[$key] : '';
-
-						$sdata = array();
-						$full_name  = trim($row[$header[$name_pos]]);
-						$email		= trim($row[$header[$email_pos]]);
-						$phone		= trim($row[$header[$phone_pos]]);
-						$name2		= trim($row[$header[$name2_pos]]);
-						$name3		= trim($row[$header[$name3_pos]]);
-
-						$birth		= trim($row[$header[$birth_pos]]);
-						$notes 		= trim($row[$header[$notes_pos]]);
-						$altEmail	= trim($row[$header[$altEmail_pos]]);
-						$sdata['alias']         		= trim($row[$header[$alias_pos]]);
-						$sdata['corporate_name']      = trim($row[$header[$corporate_name_pos]]);
-						$sdata['job_title']         	= trim($row[$header[$job_title_pos]]);
-						$sdata['department']       	= trim($row[$header[$department_pos]]);
-						$sdata['web_page']			= trim($row[$header[$web_page_pos]]);
-						
-						$sdata['sex']         		= trim($row[$header[$sex_pos]]);
-						$sdata['pgp_key']      = trim($row[$header[$pgp_key_pos]]);
-
-
-					$full_name = $full_name;
-					$array_name = explode(' ', str_replace('"','',(str_replace('\'','',$full_name))));
-					$sdata['given_names'] = addslashes($array_name[0]);
-					$array_name[0] = null;
-					$sdata['family_names'] = trim(implode(' ',$array_name));
-					if($sdata['family_names'] == '')
-					{
-						$sdata['family_names'] = addslashes($name2) . " " . addslashes($name3);
+		function import_contacts( $filetype, $group, $file )
+		{
+			if ( !is_file( $file ) ) return array( 'error' => lang( 'file not found' ) );
+			if ( !( $handle = fopen( $file, 'r' ) ) ) return array( 'error' => lang( 'file could not be opened' ) );
+			
+			$header = fgets( $handle );
+			$delim  = ( $filetype === 'outlook' )? ';' : ( ( $filetype === 'auto' && strstr( $header, ';' ) )? ';' : ',' ) ;
+			$header = $this->parse_line( $header, $delim );
+			
+			switch ( $filetype ) {
+				
+				case 'outlook2000':
+					$name_pos               = 1;
+					$name2_pos              = 2;
+					$name3_pos              = 3;
+					$corporate_street_pos   = 8;
+					$cep_pos                = 13;
+					$corporate_street_2_pos = 22;
+					$fax_pos                = 30;
+					$phone_pos              = 31;
+					$home_phone_pos         = 37;
+					$personal_cell_pos      = 40;
+					$pager_pos              = 43;
+					$birth_pos              = 48;
+					$notes_pos              = 49;
+					$email_pos              = 56;
+					$aditionalEmail_pos     = 59;
+					break;
+					
+				case 'outlook':
+					$name_pos               = 3;
+					$email_pos              = 4;
+					$phone_pos              = 7;
+					$home_phone_pos         = 10;
+					$personal_cell_pos      = 12;
+					$corporate_street_pos   = 13;
+					$cep_pos                = 15;
+					$phone_pos              = 18;
+					$fax_pos                = 19;
+					$pager_pos              = 20;
+					$notes_pos              = 25;
+					break;
+					
+				case 'thunderbird':
+					$name_pos               = 2;
+					$email_pos              = 4;
+					$phone_pos              = 7;
+					break;
+					
+				case 'expresso':
+					$name_pos               = 0;
+					$alias_pos              = 1;
+					$email_pos              = 2;
+					$aditionalEmail_pos     = 3;
+					$personal_cell_pos      = 4;
+					$corporate_phone_pos    = 5;
+					$corporate_street_pos   = 6;
+					$corporate_comp_pos     = 7;
+					$corporate_cep_pos      = 8;
+					$corporate_city_pos     = 9;
+					$corporate_state_pos    = 10;
+					$corporate_country_pos  = 11;
+					$home_phone_pos         = 12;
+					$street_pos             = 13;
+					$comp_pos               = 14;
+					$cep_pos                = 15;
+					$city_pos               = 16;
+					$state_pos              = 17;
+					$country_pos            = 18;
+					$birth_pos              = 19;
+					$sex_pos                = 20;
+					$pgp_key_pos            = 21;
+					$notes_pos              = 22;
+					$web_page_pos           = 23;
+					$corporate_name_pos     = 24;
+					$job_title_pos          = 25;
+					$department_pos         = 26;
+					$corporate_fax_pos      = 27;
+					$corporate_pager_pos    = 28;
+					$corporate_cell_pos     = 29;
+					$fax_pos                = 30;
+					$pager_pos              = 31;
+					$corporate_street_2_pos = 32;
+					$street_2_pos           = 33;
+					break;
+					
+				default:
+					foreach ( $header as $key => $value ) {
+						switch ( strtolower( $value ) ){
+							case 'name':
+							case 'nome':
+							case 'first name':
+								$name_pos = $key;
+								break;
+							case 'second name':
+							case 'segundo nome':
+								$name2_pos = $key;
+								break;
+							case 'sobrenome':
+							case 'surname':
+								$name3_pos = $key;
+								break;
+							case 'business street':
+							case 'rua do endereço comercial':
+								$corporate_street_pos = $key;
+								break;
+							case 'rua do endereço comercial 2':
+							case 'outro endereço':
+								$corporate_street_2_pos = $key;
+								break;
+							case 'business postal code':
+							case 'cep do endereço comercial':
+								$cep_pos = $key;
+								break;
+							case 'business fax':
+							case 'fax comercial':
+							case 'fax':
+								$fax_pos = $key;
+								break;
+							case 'home phone':
+							case 'telefone residencial':
+								$home_phone_pos = $key;
+								break;
+							case 'mobile phone':
+							case 'telefone celular':
+								$personal_cell_pos = $key;
+								break;
+							case 'pager':
+								$pager_pos = $key;
+								break;
+							case 'phone':
+							case 'business phone':
+							case 'telefone':
+							case 'telefone principal':
+							case 'telefone comercial':
+								$phone_pos = $key;
+								break;
+							case 'aniversário':
+							case 'birthdate':
+								$birth_pos = $key;
+								break;
+							case 'anotações':
+							case 'notes':
+								$notes_pos = $key;
+								break;
+							case 'e-mail':
+							case 'email':
+							case 'e-mail address':
+							case 'endereço de correio eletrônico':
+							case 'end. de email':
+								$email_pos = $key;
+								break;
+							case 'endereço de correio eletrônico 2':
+								$aditionalEmail_pos = $key;
+								break;
+						}
 					}
-
-						$sdata['connections']['default_email']['connection_name'] = lang('Main');
-						$sdata['connections']['default_email']['connection_value'] = addslashes($email);
-						$sdata['connections']['aditional_email']['connection_name'] = "Alternativo";
-						$sdata['connections']['aditional_email']['connection_value'] = trim($row[$header[$aditionalEmail_pos]]);
-
-						$sdata['connections']['default_phone']['connection_name'] = lang('Main');
-                                                $sdata['connections']['default_phone']['connection_value'] = $phone;
-
-                                               if( trim($row[$header[$home_phone_pos]]) != "" )
-                                                {    
-                                                    $sdata['connections']['aditional_phone']['home_phone']['connection_name'] = 'Casa';
-                                                    $sdata['connections']['aditional_phone']['home_phone']['connection_value'] = trim($row[$header[$home_phone_pos]]);
-                                                }   
-
-                                                if( trim($row[$header[$personal_cell_pos]]) != "" )
-                                                {        
-                                                    $sdata['connections']['aditional_phone']['cellphone']['connection_name'] = 'Celular';
-                                                    $sdata['connections']['aditional_phone']['cellphone']['connection_value'] = trim($row[$header[$personal_cell_pos]]);
-                                                }
-
-                                                if( trim($row[$header[$corporate_phone_pos]]) != "")
-                                                {    
-                                                    $sdata['connections']['aditional_phone']['corporate_phone']['connection_name'] = 'Trabalho';
-                                                    $sdata['connections']['aditional_phone']['corporate_phone']['connection_value'] = trim($row[$header[$corporate_phone_pos]]);
-                                                }
-
-                                                if( trim($row[$header[$fax_pos]]) != "" )
-                                                {        
-                                                    $sdata['connections']['aditional_phone']['fax']['connection_name'] = 'Fax';
-                                                    $sdata['connections']['aditional_phone']['fax']['connection_value'] = trim($row[$header[$fax_pos]]);
-                                                }
-
-                                                if ($GLOBALS['phpgw_info']['server']['personal_contact_type'] == 'True')
-                                                {
-                                                    if( trim($row[$header[$pager_pos]]) != "" )
-                                                    {    
-                                                        $sdata['connections']['aditional_phone']['pager']['connection_name'] = 'Pager';
-                                                        $sdata['connections']['aditional_phone']['pager']['connection_value'] = trim($row[$header[$pager_pos]]);
-                                                    }
-
-                                                    if( trim($row[$header[$corporate_fax_pos]]) != "" )
-                                                    {    
-                                                        $sdata['connections']['aditional_phone']['corporate_fax']['connection_name'] = 'Fax Corporativo';
-                                                        $sdata['connections']['aditional_phone']['corporate_fax']['connection_value'] = trim($row[$header[$corporate_fax_pos]]);
-                                                    }
-
-                                                    if( trim($row[$header[$corporate_cell_pos]]) != "" )
-                                                    {    
-                                                        $sdata['connections']['aditional_phone']['corporate_cell']['connection_name'] = 'Celular Corporativo';
-                                                        $sdata['connections']['aditional_phone']['corporate_cell']['connection_value'] = trim($row[$header[$corporate_cell_pos]]);
-                                                    }       
-
-                                                    if( trim($row[$header[$corporate_pager_pos]]) != "" )
-                                                    {    
-                                                        $sdata['connections']['aditional_phone']['corporate_pager']['connection_name'] = 'Pager Corporativo';
-                                                        $sdata['connections']['aditional_phone']['corporate_pager']['connection_value'] = trim($row[$header[$corporate_pager_pos]]);
-                                                    }
-                                                }
-                                                
-						$sdata['addresses']['address_corporative']['address1'] = trim($row[$header[$corporate_street_pos]]);
-						$sdata['addresses']['address_corporative']['address2'] = trim($row[$header[$corporate_street_2_pos]]);
-						$sdata['addresses']['address_corporative']['complement'] = trim($row[$header[$corporate_comp_pos]]);
-						$sdata['addresses']['address_corporative']['postal_code'] = trim($row[$header[$corporate_cep_pos]]);						
-						$sdata['addresses']['address_corporative']['id_country'] = "BR";
-						$sdata['addresses']['address_corporative']['id_state'] = trim($row[$header[$corporate_state_pos]]);	
-						$sdata['addresses']['address_corporative']['id_city'] = trim($row[$header[$corporate_city_pos]]);
-						
-													
-						$sdata['addresses']['address_personal']['address1'] = trim($row[$header[$street_pos]]);
-						$sdata['addresses']['address_personal']['address2'] = trim($row[$header[$street_2_pos]]);
-						$sdata['addresses']['address_personal']['complement'] = trim($row[$header[$comp_pos]]);
-						$sdata['addresses']['address_personal']['postal_code'] = trim($row[$header[$cep_pos]]);
-						$sdata['addresses']['address_personal']['id_country'] = "BR";							
-						$sdata['addresses']['address_personal']['id_state'] = trim($row[$header[$state_pos]]);	
-						$sdata['addresses']['address_personal']['id_city'] =  trim($row[$header[$city_pos]]);
-
-					if(trim($birth)) {
-						$array_birth = explode("/",trim($birth));
-						$sdata['birthdate'] = date('Y-m-d', mktime(0,0,0,$array_birth[1],$array_birth[0],$array_birth[2]));
-					}
-
-					$sdata['notes'] = addslashes($notes);
-					//$sdata['is_quick_add'] = true;
-					$sdata['connections']['default_phone']['connection_value'] = $phone;
-
-					// 	verifica se email já existe!
-					$email = addslashes($email);
-					$contact = $boGroup->verify_contact($email);
-
-					if(!$sdata['given_names'] && $email){
-							$a_email = explode("@",$email);
-							$sdata['given_names'] = addslashes($a_email[0]);
-					}
-
-					$line_iteration = $return['_failure'] + $return['_existing'] + $return['_new'];
-
-					if($contact){
-						$return['_existing']++;
-					}
-					else if((!preg_match("/^[/_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i", $email)) && $email) {
-						$return['_failure']++;
-						$return['_failure_status'] .= "Line: " . ($line_iteration + 2) . ", Invalid E-Mail address: " . $email ."<br>";
-					}
-					else if (!$sdata['given_names'] || !$boPeople ->quick_add($sdata)){
-						$return['_failure']++;
-						$return['_failure_status'] .= "Line: " . ($line_iteration + 2) . ", Invalid Name: " . $sdata['given_names'] ."<br>";
-					}
-					else{	
-							$id_group = 0;
-							if ( array_key_exists( 'id_group', $_GET ) )
-								$id_group = $_GET[ 'id_group' ];
-
-							if($id_group != 0){								
-								$this->so_group->add_user_by_name($id_group,$full_name);
-							}						
-							$return['_new']++;
-		   				}
-       			}
-   				fclose($handle);
-				unlink($file);
+					break;
 			}
-			else
-				$return['error'] = true;
-
-			echo serialize($return);
+			
+			$so_group  = CreateObject( 'contactcenter.so_group' );
+			$bo_people = CreateObject( 'contactcenter.bo_people_catalog' );
+			$add_conn  = function( &$data, $tag, $name, $value ) {
+				if ( is_string( $value ) && ( !empty( $value ) ) )
+					$data[$tag] = array( 'connection_name' => lang( $name ), 'connection_value' => $value );
+			};
+			$status = array(
+				'new'   => 0,
+				'exist' => 0,
+				'fail'  => array(),
+			);
+			$line_number = 1;
+			while ( $data = fgetcsv( $handle, 0, $delim ) ) {
+				$line_number++;
+				foreach ( $header as $key => $value )
+					$row[$value] = isset( $data[$key] )? $data[$key] : '';
+				
+				$email = trim( $row[$header[$email_pos]] );
+				
+				// Check if email is valid
+				if ( !preg_match( '#^[/_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$#i', $email ) ) {
+					$status['fail'][] = lang( 'line' ).' '.$line_number.': '.lang( 'invalid email' ).': "'.$email.'"';
+					continue;
+				}
+				// Check if email already exists
+				if ( $so_group->verifyContact( $email ) ) {
+					$status['exist']++;
+					continue;
+				}
+				
+				$sdata = array();
+				
+				$names_arr = explode( ' ', str_replace( array( '"', '\'' ), '', trim( $row[$header[$name_pos]] ) ) );
+				$sdata['given_names'] = addslashes( array_shift( $names_arr ) );
+				if ( empty( $sdata['given_names'] ) && $email ) {
+					$sdata['given_names'] = addslashes( array_shift( explode( '@', $email ) ) );
+				}
+				// Check if name is valid
+				if ( empty( $sdata['given_names'] ) ) {
+					$status['fail'][] = 'line '.$line_number.': '.lang( 'empty name' );
+					continue;
+				}
+				
+				$sdata['family_names'] = trim( implode( ' ', $names_arr ) );
+				if ( empty( $sdata['family_names'] ) ) {
+					$sdata['family_names'] = addslashes( trim( $row[$header[$name2_pos]] )).' '.addslashes( trim( $row[$header[$name3_pos]] ) );
+				}
+				
+				if ( trim( $row[$header[$birth_pos]] ) ) {
+					$array_birth = explode( '/', trim( $row[$header[$birth_pos]] ) );
+					$sdata['birthdate'] = date( 'Y-m-d', mktime( 0, 0, 0, $array_birth[1], $array_birth[0], $array_birth[2] ) );
+				}
+				
+				$sdata['sex']            = trim( $row[$header[$sex_pos]] );
+				$sdata['alias']          = trim( $row[$header[$alias_pos]] );
+				$sdata['notes']          = addslashes( trim( $row[$header[$notes_pos]] ) );
+				$sdata['pgp_key']        = trim( $row[$header[$pgp_key_pos]] );
+				$sdata['web_page']       = trim( $row[$header[$web_page_pos]] );
+				$sdata['job_title']      = trim( $row[$header[$job_title_pos]] );
+				$sdata['department']     = trim( $row[$header[$department_pos]] );
+				$sdata['corporate_name'] = trim( $row[$header[$corporate_name_pos]] );
+				
+				$sdata['addresses']['address_corporative']['id_city']        = trim( $row[$header[$corporate_city_pos]] );
+				$sdata['addresses']['address_corporative']['address1']       = trim( $row[$header[$corporate_street_pos]] );
+				$sdata['addresses']['address_corporative']['address2']       = trim( $row[$header[$corporate_street_2_pos]] );
+				$sdata['addresses']['address_corporative']['id_state']       = trim( $row[$header[$corporate_state_pos]] );
+				$sdata['addresses']['address_corporative']['id_country']     = 'BR';
+				$sdata['addresses']['address_corporative']['complement']     = trim( $row[$header[$corporate_comp_pos]] );
+				$sdata['addresses']['address_corporative']['postal_code']    = trim( $row[$header[$corporate_cep_pos]] );
+				
+				$sdata['addresses']['address_personal']['id_city']           = trim( $row[$header[$city_pos]] );
+				$sdata['addresses']['address_personal']['address1']          = trim( $row[$header[$street_pos]] );
+				$sdata['addresses']['address_personal']['address2']          = trim( $row[$header[$street_2_pos]] );
+				$sdata['addresses']['address_personal']['id_state']          = trim( $row[$header[$state_pos]] );
+				$sdata['addresses']['address_personal']['id_country']        = 'BR';
+				$sdata['addresses']['address_personal']['complement']        = trim( $row[$header[$comp_pos]] );
+				$sdata['addresses']['address_personal']['postal_code']       = trim( $row[$header[$cep_pos]] );
+				
+				$add_conn( $sdata['connections'],                    'default_email',   'Main',        $email );
+				$add_conn( $sdata['connections'],                    'aditional_email', 'Alternative', trim( $row[$header[$aditionalEmail_pos]] ) );
+				$add_conn( $sdata['connections'],                    'default_phone',   'Main',        trim( $row[$header[$phone_pos]] ) );
+				$add_conn( $sdata['connections']['aditional_phone'], 'home_phone',      'Home Phone',  trim( $row[$header[$home_phone_pos]] ) );
+				$add_conn( $sdata['connections']['aditional_phone'], 'cellphone',       'Cell Phone' , trim( $row[$header[$personal_cell_pos]] ) );
+				$add_conn( $sdata['connections']['aditional_phone'], 'corporate_phone', 'Work',        trim( $row[$header[$corporate_phone_pos]] ) );
+				$add_conn( $sdata['connections']['aditional_phone'], 'fax',             'Fax',         trim( $row[$header[$fax_pos]] ) );
+				if ( $GLOBALS['phpgw_info']['server']['personal_contact_type'] == 'True' ) {
+					$add_conn( $sdata['connections']['aditional_phone'], 'pager',           'Pager',                trim( $row[$header[$pager_pos]] ) );
+					$add_conn( $sdata['connections']['aditional_phone'], 'corporate_fax',   'Corporative Fax',        trim( $row[$header[$corporate_fax_pos]] ) );
+					$add_conn( $sdata['connections']['aditional_phone'], 'corporate_cell',  'Corporative Cell Phone', trim( $row[$header[$corporate_cell_pos]] ) );
+					$add_conn( $sdata['connections']['aditional_phone'], 'corporate_pager', 'Corporative Pager',      trim( $row[$header[$corporate_pager_pos]] ) );
+				}
+				
+				// Insert contact
+				if ( !( $id = $bo_people->quick_add( $sdata ) ) ) {
+					$status['fail'][] = lang( 'line' ).' '.$line_number.': '.lang( 'contact invalid' ).': "'.$sdata['given_names'].'"';
+					continue;
+				}
+				
+				// Insert contact on group
+				if ( $group != 0 ) $so_group->add_user_by_name( $group, $id );
+				
+				$status['new']++;
+			}
+			
+			fclose( $handle );
+			unlink( $file );
+			return $status;
 		}
 	}
-
-?>

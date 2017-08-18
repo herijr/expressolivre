@@ -934,6 +934,28 @@
 			return 'error in parts';
 		}
 	}
+	
+	function getBestSupportedMimeType( $mimeTypes = null )
+	{
+		$acceptTypes = Array ();
+		foreach ( explode( ',', strtolower( str_replace( ' ', '', $_SERVER['HTTP_ACCEPT'] ) ) ) as $a ) {
+			$q = 1;
+			if ( strpos( $a, ';q=' ) ) list( $a, $q ) = explode( ';q=', $a );
+			$acceptTypes[$a] = $q;
+		}
+		arsort( $acceptTypes );
+		if ( !$mimeTypes ) return $acceptTypes;
+		$mimeTypes = array_map( 'strtolower', (array)$mimeTypes );
+		foreach ( $acceptTypes as $mime => $q ) if ( $q && in_array( $mime, $mimeTypes ) ) return $mime;
+		return false;
+	}
+
+	function utf8_encode_recursive( $value )
+	{
+		if ( is_string( $value ) ) return utf8_encode( $value );
+		if ( is_array( $value ) ) return array_combine( array_map( 'utf8_encode_recursive', array_keys( $value ) ), array_map( 'utf8_encode_recursive', $value ) );
+		return $value;
+	}
 
 	/*!
 	 @function copyobj

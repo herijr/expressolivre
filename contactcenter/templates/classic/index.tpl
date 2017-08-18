@@ -50,6 +50,7 @@
 <input id="cc_msg_importing_contacts" type="hidden" value="{cc_msg_importing_contacts}">
 <input id="cc_msg_import_finished" type="hidden" value="{cc_msg_import_finished}">
 <input id="cc_msg_invalid_csv" type="hidden" value="{cc_msg_invalid_csv}">
+<input id="cc_msg_browser_support" type="hidden" value="{cc_msg_browser_support}">
 <input id="cc_msg_new" type="hidden" value="{cc_msg_new}">
 <input id="cc_msg_failure" type="hidden" value="{cc_msg_failure}">
 <input id="cc_msg_exists" type="hidden" value="{cc_msg_exists}">

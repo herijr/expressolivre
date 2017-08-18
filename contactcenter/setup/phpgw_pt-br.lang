@@ -19,6 +19,7 @@ Catalog %1 not showed due to error: Time limit exceeded	contactcenter	pt-br	Catá
 Catalog %1 temporarily unavailable. Please try again later!	contactcenter	pt-br	Catálogo %1 temporariamente indisponível. Favor tentar novamente mais tarde!
 Catalogues	contactcenter	pt-br	Catálogos
 Cellphone	contactcenter	pt-br	Celular
+Cell Phone	contactcenter	pt-br	Celular
 Choose City	contactcenter	pt-br	Escolher Cidade...
 Choose Country	contactcenter	pt-br	Escolher País...
 Choose 'E-mail' or 'Telephone'	contactcenter	pt-br	Escolha E-Mail ou Telefone
@@ -62,6 +63,7 @@ Country	contactcenter	pt-br	País
 Corporate	contactcenter	pt-br	Empresa
 Corporative	contactcenter	pt-br	Corporativo
 Corporative Cellphone	contactcenter	pt-br	Celular Corporativo
+Corporative Cell Phone	contactcenter	pt-br	Celular Corporativo
 Corporative Fax	contactcenter	pt-br	Fax Corporativo
 Corporative Pager	contactcenter	pt-br	Pager Corporativo
 Data to be serialized is of unknown type!	contactcenter	pt-br	Dado a ser serializado é de tipo desconhecido
@@ -75,6 +77,7 @@ Edit Contact	contactcenter	pt-br	Editar Contato
 Edit Group	contactcenter	pt-br	Editar Grupo
 E-mails and Telephones	contactcenter	pt-br	E-mails e Telefones
 Empty	contactcenter	pt-br	Vazio
+empty name	contactcenter	pt-br	nome vazio
 Entry added with success!	contactcenter	pt-br	Contato adicionado com sucesso!
 Export as Expresso (default) CSV.	contactcenter	pt-br	Exportar como Expresso (padrão) CSV.
 Export as Mozilla Thunderbird CSV.	contactcenter	pt-br	Exportar como Mozilla Thunderbird CSV.
@@ -88,6 +91,8 @@ Family Names	common	pt-br	Sobrenome
 Fax	contactcenter	pt-br	Fax
 Female	contactcenter	pt-br	Feminino
 field is empty	contactcenter	pt-br	Campo está vazio
+file not found	contactcenter	pt-br	arquivo não encontrado
+file could not be opened	contactcenter	pt-br	o arquivo não pôde ser aberto
 Fill the field Full Name	contactcenter	pt-br	Preencha o Nome Completo
 Found %1 Entries	common	pt-br	Encontrado %1 Resultado(s)
 Full Add	contactcenter	pt-br	Adicionar Completo
@@ -105,10 +110,13 @@ Import / Export Personal Contacts	contactcenter	pt-br	Importar/Exportar Contatos
 Importing contacts...	contactcenter	pt-br	Importando Contatos...
 Insert a New Group	common	pt-br	Inserir um Novo Grupo
 insert	common	pt-br	Inserir
+invalid contact	contactcenter	pt-br	contato inválido
 Invalid Date	common	pt-br	Data inválida
+invalid email	common	pt-br	e-mail inválido
 Is Default?	contactcenter	pt-br	É Padrão?
 Is My	contactcenter	pt-br	É meu
 Job Title	contactcenter	pt-br	Cargo
+line	common	pt-br	linha
 Main	contactcenter	pt-br	Principal
 Male	contactcenter	pt-br	Masculino
 Month	contactcenter	pt-br	Mês
@@ -186,6 +194,7 @@ Type of Address	contactcenter	pt-br	Tipo de Endereço
 Type of Connection	contactcenter	pt-br	Tipo de Conexão
 Unavailable or empty Catalog	contactcenter	pt-br	Catálogo vazio ou indisponível
 Updated Successfully!	contactcenter	pt-br	Atualizado com Sucesso!
+Update your browser	contactcenter	pt-br	Atualize seu navegador
 Users List	contactcenter	pt-br	Lista de Usuários
 Value	contactcenter	pt-br	Valor
 Views	contactcenter	pt-br	Visões

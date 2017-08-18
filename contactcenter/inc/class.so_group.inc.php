@@ -351,7 +351,7 @@
 			'phpgw_cc_contact_conns B, phpgw_cc_connections C where '.
 			'A.id_contact = B.id_contact and B.id_connection = C.id_connection '.
 			'and B.id_typeof_contact_connection = 1 and '.
-			'A.id_owner ='.$this->owner.' and C.connection_value = \''.$email.'\'';
+			'A.id_owner ='.$this->owner.' and C.connection_value = \''.addslashes( $email ).'\'';
 						
 			if (!$this->db->query($query))
 			{
@@ -422,19 +422,15 @@
 			return $return;
 		}
 		
-		function insertContactsByGroup($idGroup, $contacts)
-		{									
-			
-			foreach($contacts as $index => $idConnection) 
-			{			
-				$query = "INSERT INTO phpgw_cc_contact_grps(id_group,id_connection) ".
-			 			"VALUES(".$idGroup.",".$idConnection.")";			
-
-				if (!$this->db->query($query))
-					exit ('Query failed! File: '.__FILE__.' on line'.__LINE__);			
+		function insertContactsByGroup( $idGroup, $contacts )
+		{
+			foreach( $contacts as $idConnection ) {
+				$query = '
+				 INSERT INTO phpgw_cc_contact_grps( id_group, id_connection )
+				 VALUES( '.$idGroup.', '.$idConnection.' )';
+				if ( !$this->db->query( $query ) ) exit( 'Query failed! File: '.__FILE__.' on line '.__LINE__);
 			}
-									 			
-			return True;		
+			return true;
 		}
 		
 		function updateContactsByGroup($id_group, $contacts)
@@ -521,28 +517,20 @@
 			return True;		
 		}
 		
-		function add_user_by_name($id_group){
-			$query = 'select C.id_connection, A.id_contact, A.names_ordered, C.connection_value, B.id_typeof_contact_connection'.
-			         ' from phpgw_cc_contact A, phpgw_cc_contact_conns B, phpgw_cc_connections C'. 
-					 ' where A.id_contact = B.id_contact and B.id_connection = C.id_connection'.
-					 	' and A.last_update = (select max(up.last_update) from phpgw_cc_contact up where up.id_owner ='.$this->owner.")".
-					 	' and A.id_owner ='.$this->owner.' and C.connection_is_default = true'.
-					 ' order by A.names_ordered,C.connection_value';
+		function add_user_by_name( $id_group, $id_contact )
+		{
+			$query = '
+			 SELECT c.id_connection AS id
+			 FROM phpgw_cc_contact AS a
+			 JOIN phpgw_cc_contact_conns AS b ON a.id_contact = b.id_contact
+			 JOIN phpgw_cc_connections AS c ON b.id_connection = c.id_connection
+			 WHERE a.id_owner = '.$this->owner.'
+			  AND a.id_contact = '.$id_contact.'
+			  AND c.connection_is_default = true
+			  AND b.id_typeof_contact_connection = 1';
 			
-						
-			if (!$this->db->query($query)){
-				exit ('Query failed! File: '.__FILE__.' on line'.__LINE__);
-			}
-			 
-			$return = array(); 
-			
-			$array_connections = array();
-			while($this->db->next_record()){
-				$return = $this->db->row();
-				array_push($array_connections, $return['id_connection']);				
-			}			
-			$this -> insertContactsByGroup($id_group, $array_connections);
-									
+			if ( !$this->db->query( $query ) || !$this->db->next_record() ) exit ( 'Query failed! File: '.__FILE__.' on line '.__LINE__ );
+			$this->insertContactsByGroup( $id_group, (array)$this->db->f( 'id' ) );
 		}
 		
 	}

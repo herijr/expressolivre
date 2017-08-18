@@ -85,7 +85,14 @@
 	$GLOBALS[$class] = CreateObject(sprintf('%s.%s',$app,$class));
 	if((is_array($GLOBALS[$class]->public_functions) && $GLOBALS[$class]->public_functions[$method]) && ! $invalid_data)
 	{
-		execmethod($_GET['menuaction']);
+		$result = execmethod( $_GET['menuaction'] );
+		
+		if ( getBestSupportedMimeType( 'application/json' ) ) {
+			header( 'Content-Type: application/json' );
+			echo json_encode( utf8_encode_recursive( $result ) );
+			exit;
+		}
+		
 		unset($app);
 		unset($class);
 		unset($method);
