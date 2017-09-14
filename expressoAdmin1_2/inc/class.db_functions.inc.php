@@ -917,5 +917,24 @@ class db_functions
 		
 		$this->db->query($query);
 	}
+
+	function getProtectedFields( $uidNumber, $field )
+	{
+		$query = 'SELECT * FROM phpgw_expressoadmin_protected_fields ' .
+					'WHERE uidnumber = \''.$uidNumber.'\' AND field = \''.$field.'\' ' .
+					'ORDER BY date DESC LIMIT 1;';
+		
+		$this->db->query( $query );
+
+		return ( $this->db->next_record() ? true : false );
+	}
+
+	function setProtectedField( $uidNumber, $field, $value )
+	{
+		$query = 'INSERT INTO phpgw_expressoadmin_protected_fields( uidnumber, field, value, date )' .
+					'VALUES(\''.$uidNumber.'\', \''.$field.'\', \''.$value.'\', \''.date("Y-m-d H:i:s").'\');';
+
+		return ( !$this->db->query( $query ) ? false :  true );
+	}
 }
 ?>

@@ -583,18 +583,51 @@
 			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) || 
 			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE )) )
 			{
-				foreach ($new_values as $atribute=>$value)
+
+				// CENTRAL DE SEGURANCA
+				// Verifica se o campo é protegido 
+				$fields_protected = array();
+
+				$fields_protected = explode( ",", $new_values['protected_fields'] );
+
+				foreach ( $new_values as $atribute => $value )
 				{
+					if( in_array( $atribute , $fields_protected ) )
+					{
+						$this->db_functions->setProtectedField( $new_values['uidnumber'], $atribute, utf8_encode($new_values[$atribute]) );						
+					}
+
 					$pos = strstr($atribute, 'corporative_information_');
 					if ($pos !== false || $atribute == 'birthdate' )
 					{
-						$ldap_atribute = str_replace("corporative_information_", "", $atribute);
+						$ldap_atribute = trim(str_replace("corporative_information_", "", $atribute));
+
 						// REPLACE CORPORATIVE ATTRIBUTES
-						if (isset($diff[$atribute]) && $diff[$atribute] && ($old_values[$atribute] != ''))
+						if( isset($diff[$atribute]) && $diff[$atribute] && ($old_values[$atribute] != '') )
 						{
-							$ldap_atribute = str_replace("corporative_information_", "", $atribute);
-							$ldap_mod_replace[$ldap_atribute] = utf8_encode($new_values[$atribute]);
-							$this->db_functions->write_log('modified user attribute', $dn . ': ' . $ldap_atribute . ': ' . $old_values[$atribute] . '->' . $new_values[$atribute]);
+							$is_replace = false;
+
+							if( $this->db_functions->getProtectedFields( $new_values['uidnumber'], $atribute ) )
+							{
+								if( in_array( $atribute , $fields_protected ) )
+								{
+									$is_replace = true;
+								}
+								else
+								{
+									$is_replace = false;
+								}
+							}
+							else
+							{
+								$is_replace = true;
+							}
+
+							if( $is_replace )
+							{
+								$ldap_mod_replace[$ldap_atribute] = utf8_encode($new_values[$atribute]);
+								$this->db_functions->write_log('modified user attribute', $dn . ': ' . $ldap_atribute . ': ' . $old_values[$atribute] . '->' . $new_values[$atribute]);
+							}
 						}
 						//ADD CORPORATIVE ATTRIBUTES
 						elseif (($old_values[$atribute] == '') && ($new_values[$atribute] != ''))
@@ -605,8 +638,11 @@
 						//REMOVE CORPORATIVE ATTRIBUTES
 						elseif (($old_values[$atribute] != '') && ($new_values[$atribute] == ''))
 						{
-							$ldap_remove[$ldap_atribute] = array();
-							$this->db_functions->write_log('removed user attribute', $dn . ': ' . $ldap_atribute . ': ' . $old_values[$atribute] . '->' . $new_values[$atribute]);	
+							if( !$this->db_functions->getProtectedFields( $new_values['uidnumber'], $atribute ) )
+							{
+								$ldap_remove[$ldap_atribute] = array();
+								$this->db_functions->write_log('removed user attribute', $dn . ': ' . $ldap_atribute . ': ' . $old_values[$atribute] . '->' . $new_values[$atribute]);
+							}
 						}
 					}
 				}

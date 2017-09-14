@@ -171,15 +171,24 @@
 		</tr>
 		<tr bgcolor={row_off}>
 			<td>{lang_cpf}:</td>
-			<td><input type="text" name="corporative_information_cpf" autocomplete="off" value="{corporative_information_cpf}" size="30" maxlength=14 onKeyUp="FormataCPF(event, this)"></td>
+			<td>
+				<input type="text" name="corporative_information_cpf" autocomplete="off" value="{corporative_information_cpf}" size="30" maxlength=14 onKeyUp="FormataCPF(event, this)" {corporative_information_cpf_disabled} >
+				<span style="color:red;font-size:10px;">{corporative_information_cpf_disabled_lang}</span>
+			</td>
 		</tr>
 		<tr bgcolor={row_on}>
-			<td>{lang_rg}:</td>
-			<td><input type="text" name="corporative_information_rg" autocomplete="off" value="{corporative_information_rg}" size="30"></td>
+			<td>{lang_rg}:</td> 
+			<td>
+				<input type="text" name="corporative_information_rg" autocomplete="off" value="{corporative_information_rg}" size="30" {corporative_information_rg_disabled} >
+				<span style="color:red;font-size:10px;">{corporative_information_rg_disabled_lang}</span>
+			</td>
 		</tr>
 		<tr bgcolor={row_off}>
 			<td>{lang_rguf}:</td>
-			<td><input type="text" name="corporative_information_rguf" autocomplete="off" value="{corporative_information_rguf}" size="30"></td>
+			<td>
+				<input type="text" name="corporative_information_rguf" autocomplete="off" value="{corporative_information_rguf}" size="30" {corporative_information_rguf_disabled} >
+				<span style="color:red;font-size:10px;">{corporative_information_rguf_disabled_lang}</span>
+			</td>
 		</tr>
 		<tr bgcolor={row_on}>
 			<td>{lang_description}:</td>

@@ -764,6 +764,14 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				'corporative_information_rg'			=> $user_info['corporative_information_rg'],
 				'corporative_information_rguf'			=> $user_info['corporative_information_rguf'],
 				'corporative_information_description'	=> $user_info['corporative_information_description'],
+				// Fields Protected
+				'corporative_information_cpf_disabled'	=> ( $this->db_functions->getProtectedFields( $user_info['uidnumber'], 'corporative_information_cpf' ) ? "disabled" : "" ),
+				'corporative_information_rg_disabled'	=> ( $this->db_functions->getProtectedFields( $user_info['uidnumber'], 'corporative_information_rg' ) ? "disabled" : "" ),
+				'corporative_information_rguf_disabled'	=> ( $this->db_functions->getProtectedFields( $user_info['uidnumber'], 'corporative_information_rguf' ) ? "disabled" : "" ),
+				
+				'corporative_information_cpf_disabled_lang' => ( $this->db_functions->getProtectedFields( $user_info['uidnumber'], 'corporative_information_cpf' ) ? lang("Fields blocked") : "" ),
+				'corporative_information_rg_disabled_lang'	=> ( $this->db_functions->getProtectedFields( $user_info['uidnumber'], 'corporative_information_rg' ) ? lang("Fields blocked") : "" ),
+				'corporative_information_rguf_disabled_lang'=> ( $this->db_functions->getProtectedFields( $user_info['uidnumber'], 'corporative_information_rguf' ) ? lang("Fields blocked") : "" ),
 				
 				// MIGRATE MAILBOX
 				'isMigrateMB'					=> $isMigrateMB,

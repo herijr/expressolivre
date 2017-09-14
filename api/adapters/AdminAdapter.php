@@ -193,9 +193,41 @@ class AdminAdapter extends ExpressoAdapter
 			}
 		}
 
+		// Central de Seguranca
+		$protectedFields = $this->getProfileProtectedFields();
+
+		if( $protectedFields && is_array($protectedFields) )
+		{
+			if( isset($protectedFields['user']) && !empty(trim($protectedFields['user'])) )
+			{
+				if( trim($protectedFields['user']) === trim( $_SESSION['phpgw_info']['expresso']['user']['account_lid']) )
+				{
+					$fields = rtrim( $protectedFields['fields'], "," );
+					
+					$fields = preg_replace( "/\s/", "", $fields );
+					
+					$fields = explode( "," , $fields );
+
+					foreach( $fields as $field )
+					{
+						if( isset( $params[ $field ] ) )
+						{
+							$params['protected_fields'] .= $field . ",";
+						}
+					}
+				}
+			}
+		}
+
+		if( isset($params['protected_fields']) )
+		{
+			$params['protected_fields'] = rtrim( $params['protected_fields'], "," );
+		}
+
 		//Array Merge
 		$updateUser = array();
 		$updateUser = array_merge( $userInfo, $params );
+
 		$result = $adminUpdateUser->save($updateUser);
 
 		return $result;
@@ -225,6 +257,18 @@ class AdminAdapter extends ExpressoAdapter
 		}
 
 		return $result;
+	}
+
+	private function getProfileProtectedFields()
+	{
+		$default = false;
+
+		if( file_exists(API_DIRECTORY.'/../config/profileProtectedFields.ini') )
+		{
+			$default = $this->readProfile('profileProtectedFields.ini', 'protected-fields');
+		}
+
+		return $default;
 	}
 
 	private function getProfile($profileUser)
