@@ -193,12 +193,14 @@ class AdminAdapter extends ExpressoAdapter
 			}
 		}
 
-		// Central de Seguranca
+		// Protected Fields
 		$protectedFields = $this->getProfileProtectedFields();
 
 		if( $protectedFields && is_array($protectedFields) )
 		{
-			if( isset($protectedFields['user']) && !empty(trim($protectedFields['user'])) )
+			$protectedFields['user'] = ( isset($protectedFields['user']) ? trim($protectedFields['user']) : "" );
+
+			if( !empty($protectedFields['user']) )
 			{
 				if( trim($protectedFields['user']) === trim( $_SESSION['phpgw_info']['expresso']['user']['account_lid']) )
 				{
