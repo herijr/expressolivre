@@ -1152,6 +1152,6 @@ class ldap_functions
 
 	function __destruct()
 	{
-		if( $this->ds != null ){ ldap_close( $this->ds ); }
+		if( $this->ds != null && is_resource( $this->ds ) ){ ldap_close( $this->ds ); }
 	}
 }
