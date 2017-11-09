@@ -1260,16 +1260,6 @@
 		{
 			$type = strtolower(str_replace('-','_',$type));
 			$event[$type] = $value;
-			/*
-			if(is_string($value))
-			{
-				$this->debug("Setting ".$type." = ".$value);
-			}
-			else
-			{
-				$this->debug("Setting ".$type." = "._debug_array($value,False));
-			}
-			*/
 		}
 
 		function read_line_unfold($ical_text)
@@ -1413,7 +1403,6 @@
 
 		function parse_parameters(&$event,$majortype,$value)
 		{
-			//$this->debug ('value: '.$value);
 			if(!preg_match('/[=;]/',$value))
 			{
 				$return_value[] = Array(
@@ -1424,8 +1413,7 @@
 			}
 			elseif(preg_match('/(.*(\:\\\\)?.*):(.*)/',$value,$temp))
 			{
-				//$this->debug('Value : '._debug_array($temp,False));
-				//$this->debug('Param '.$majortype.' Value : '.$temp[3]);
+
 				if($temp[3])
 				{
 					$return_value[] = Array(
@@ -1436,14 +1424,11 @@
 				}
 				while(preg_match('/(([A-Z\-]*)[=]([[:alnum:] \_\)\(\/\$\.\,\:\\\|\*\&\^\%\#\!\~\"\?\&\@\<\>\-]*))([\;]?)(.*)/',$value,$temp))
 				{
-					//$this->debug('Value : '._debug_array($temp,False));
-					//$this->debug('Param '.$temp[2].' Value : '.$temp[3]);
 					$return_value[] = Array(
 						'param'	=> $temp[2],
 						'value'	=> $temp[3]
 					);
 					$value = chop($temp[5]);
-					//$this->debug('Value would be = '.$value);
 				}
 			}
 			else
@@ -1460,13 +1445,12 @@
 					$this->debug('Value would be = '.$value);
 				}
 			}
-
-			//$this->debug('parse_parameters array return_value: '._debug_array($return_value,False));
-
+			
 			for($i=0;$i<count($return_value);$i++)
 			{
 				$name = strtolower($return_value[$i]['param']);
 				$value = $this->strip_quotes($return_value[$i]['value']);
+
 				if(substr($name,0,2) == 'x-')
 				{
 					$param = 'x_type';
@@ -1475,6 +1459,7 @@
 				else
 				{
 					$param = str_replace('-','_',strtolower($name));
+					
 					if(!isset($this->parameter[$param]) || $majortype == 'tzid')
 					{
 						if($majortype == 'attendee' || $majortype == 'organizer')
@@ -1488,7 +1473,7 @@
 						}
 					}
 				}
-				//$this->debug('name : '.$name.' : Param = '.$param);
+
 				if(@$this->parameter[$param]['properties'][$majortype])
 				{
 					switch(@$this->parameter[$param]['type'])
@@ -1535,20 +1520,16 @@
 		function parse_value(&$event,$majortype,$value,$mode)
 		{
 			$var = Array();
-			//$this->debug('Mode : '.$mode.' Majortype : '.$majortype);
 			$this->parse_parameters($var,$majortype,$value);
+			
 			if($this->property[$majortype][$mode]['multiples'])
 			{
-				//$this->debug('parse_value var array: '._debug_array($var,False));
 				$event[$majortype][] = $var;
 			}
 			else
 			{
-				//$this->debug('Majortype : '.$majortype);
-				//$this->debug('Property : '.$this->property[$majortype]['type']);
 				if($this->property[$majortype]['type'] == 'date-time')
 				{
-					//$this->debug('Got a DATE-TIME type!');
 					$t_var = $var[$majortype];
 					unset($var[$majortype]);
 					if ( $t_var )
@@ -1558,7 +1539,6 @@
 						{
 							$var[$key] = $val;
 						}
-						//$this->debug($majortype.' : '._debug_array($var,False));
 					}
 				}
 				$this->set_var($event,$majortype,$var);
@@ -2002,15 +1982,34 @@
 
 		function switch_date($var)
 		{
-		$this->debug('SWITCH_DATE: gettype = '.gettype($var));
+			$this->debug('SWITCH_DATE: gettype = '.gettype($var));
 			if(is_string($var))
 			{
 				$dtime = Array();
+
 				if(strpos($var,':'))
 				{
 					$pos = explode(':',$var);
 					$var = $pos[1];
 				}
+
+				// Is utc ?
+				if( strripos( $var, "Z") !== false )
+				{
+					$string_utc = substr( $var , 0 , strripos( $var, "Z") );
+
+					$dateUTC = date("Y-m-d H:i:s", strtotime( $string_utc ) );
+
+					// create a $dt object with the UTC timezone
+					$dtBR = new DateTime( $dateUTC, new DateTimeZone('UTC'));
+
+					// change the timezone of the object without changing it's time
+					$dtBR->setTimezone( new DateTimeZone( $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['timezone'] ) );
+
+					// format the datetime
+					$var = $dtBR->format("Ymd\THis");
+				}
+
 				$this->set_var($dtime,'year',(int)(substr($var,0,4)));
 				$this->set_var($dtime,'month',(int)(substr($var,4,2)));
 				$this->set_var($dtime,'mday',(int)(substr($var,6,2)));
@@ -2038,28 +2037,6 @@
 								}
 							}
 						}
-					}
-					else
-					{
-						/*
-						* The time provided by the iCal is considered local time.
-						*
-						* The implementor will need to consider how to convert that time to UTC.
-						*/
-						//					if($this->api)
-						//					{
-						//						$dtime['hour'] -= $GLOBALS['phpgw_info']['users']['common']['tz_offset'];
-						//						if($dtime['hour'] < 0)
-						//						{
-						//							$dtime['mday'] -= 1;
-						//							$dtime['hour'] = 24 - $dtime['hour'];
-						//						}
-						//						elseif($dtime['hour'] >= 24)
-						//						{
-						//							$dtime['mday'] += 1;
-						//							$dtime['hour'] = $dtime['hour'] - 24;
-						//						}
-						//					}
 					}
 				}
 				else
@@ -2579,19 +2556,12 @@
 			$text = $this->read_line_unfold($ical_text);
 			while($text)
 			{
-//				if(strlen($ical_text[$i]) > 75)
-//				{
-//					continue;
-//				}
-
 				preg_match('/'.$property_regexp.'/',$text,$temp);
-				//$this->debug ('Majortype dump: '._debug_array($temp, false) );
 				$majortype = str_replace('-','_',strtolower($temp[1]));
 				$value = chop($temp[2]);
-
+				
 				if($mode != 'none' && ($majortype != 'begin' && $majortype != 'end'))
 				{
-					//$this->debug('PARSE:MAJORTYPE : '.$majortype);
 					if(isset($this->property[$majortype]))
 					{
 						$state = @$this->property[$majortype]["$mode"]['state'];
@@ -2628,14 +2598,12 @@
 					if(isset($_f_['day_raw']) OR $_f_['day_raw'])
 					{
 						// Days
-//						if(preg_match('/D/', $_f_['day_raw']))
 						if(strstr($_f_['day_raw'],'D'))
 						{
 							$dur['days'] = preg_replace("/([0-9]+)D(.*)/i", "\\1", $_f_['day_raw']);
 						}
 
 						// Weeks
-//						if(preg_match("/W/", $_f_["day_raw"]))
 						if(strstr($_f_['day_raw'],'W'))
 						{
 							$dur['weeks'] = preg_replace("/([^|.*]+D)?([0-9]+)W/i", "\\2", $_f_['day_raw']);
@@ -2646,15 +2614,12 @@
 					if(isset($_f_['time_raw']) OR $_f_['time_raw'])
 					{
 						// Hours
-//						if(preg_match("/H/", $_f_["time_raw"]))
 						if(strstr($_f_['time_raw'],'H'))
 						{
 							$dur['hours'] = preg_replace("/([0-9]+)H(.*)/i", "\\1", $_f_['time_raw']);
 						}
 
 						// Minutes
-						/* If you find better, contact me very quickly :) */
-//						if(preg_match("/M/", $_f_["time_raw"]))
 						if(strstr($_f_['time_raw'],'M'))
 						{
 							$dur['minutes'] = preg_replace("/([^|.*]+H)?([0-9]+)M(.*)/i", "\\2", $_f_['time_raw']);
@@ -2662,7 +2627,6 @@
 
 						// Seconds
 						/* Same comment :) */
-//						if(preg_match("/S/", $_f_["time_raw"]) )
 						if(strstr($_f_['time_raw'],'S'))
 						{
 							$dur['seconds'] = preg_replace("/([^|.*]+M)?([0-9]+)S(.*)/i", "\\2", $_f_['time_raw']);
@@ -2786,7 +2750,6 @@
 				}
 				elseif($state == 'optional' || $state == 'required')
 				{
-					//$this->debug('Mode : '.$mode.' Majortype : '.$majortype . ' Type : '.$type);
 					if($do_to_text)
 					{
 						$value = $this->from_text($value);
@@ -2848,7 +2811,6 @@
 			}
 			return $this->ical;
 		}
-
 
 		function switch_to_phpgw_status($partstat)
 		{
@@ -3024,6 +2986,7 @@
 			$GLOBALS['phpgw_info']['user']['preferences'] = $GLOBALS['phpgw']->preferences->create_email_preferences();
 			$users_email = $GLOBALS['phpgw_info']['user']['preferences']['email']['address'];
 			$cats = CreateObject('phpgwapi.categories');
+			
 			$ical = $this->parse($mime_msg);
 			switch($ical['version']['value'])
 			{
@@ -3049,10 +3012,6 @@
 				}
 				if($uid_exists)
 				{
-					// $event = $so_event->read_entry($uid_exists);
-					// $this->check_owner($event,$ical['event'][$i],$so_event);
-					// $event = $so_event->get_cached_event();
-					// $so_event->add_entry($event);
 					Header('Location: ' . $GLOBALS['phpgw']->link('/index.php',
 							Array(
 								'menuaction'	=> 'calendar.uiicalendar.import',
@@ -3135,7 +3094,7 @@
 							$temp_time = $so_event->maketime($ical['event'][$i][$i_datevar]) + $GLOBALS['phpgw']->datetime->tz_offset;
 							
 							//verifica se o vcard importado tem a referência do timezone
-							if($ical['event'][$i][$i_datevar]['tzid']) {
+							if( $ical['event'][$i][$i_datevar]['tzid'] ){
 								$dateTimeZone = new DateTimeZone( $ical['event'][$i][$i_datevar]['tzid'] );
 								$dateTime = new DateTime("now", $dateTimeZone);
 								$timeOffset = $dateTimeZone->getOffset($dateTime);	
@@ -3145,7 +3104,7 @@
 							}
 							
 							@reset($date_array);
-							while(list($key,$var) = each($date_array))
+							while( list($key,$var) = each($date_array) )
 							{
 								$event[$e_datevar][$var] = (int)(date($key,$temp_time));
 							}

@@ -2973,8 +2973,8 @@
 				$start_time = mktime($event['start']['hour'],$event['start']['min'],$event['start']['sec'],$event['start']['month'],$event['start']['mday'],$event['start']['year']) - $GLOBALS['phpgw']->datetime->tz_offset;
 				$end_time = mktime($event['end']['hour'],$event['end']['min'],$event['end']['sec'],$event['end']['month'],$event['end']['mday'],$event['end']['year']) - $GLOBALS['phpgw']->datetime->tz_offset;
 				
-				$start_time = date("Ymd\THis\Z", $start_time);
-				$end_time = date("Ymd\THis\Z", $end_time);
+				$start_time = date("Ymd\THis", $start_time);
+				$end_time = date("Ymd\THis", $end_time);
 	
 				// Necessario espacos apos quebra-de-linha, na descricao, caso contrario 
 				// ocorrera erro ao importar o agendamento no Outlook (erro lunar).
@@ -2983,7 +2983,7 @@
 				$tmpattach.="BEGIN:VEVENT\r\n"
 				."DTSTART:".$start_time."\r\n"
 				."DTEND:".$end_time."\r\n"
-				."LAST-MODIFIED:".gmdate("Ymd\THis\Z")."\r\n" //Hora no formato UTC
+				."LAST-MODIFIED:".date("Ymd\THis")."\r\n"
 				."UID:Expresso-".$event['id'].$event['uid']."\r\n";
 
 				// Participants Externs
