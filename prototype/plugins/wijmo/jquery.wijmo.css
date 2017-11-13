@@ -468,7 +468,7 @@ div.wijmo-wijprogressbar-north
 .ui-dialog-titlebar
 {
     /* extend jquery.ui.dialog.css*/
-    text-align: right;
+    /*text-align: right; <- afeta dialogs que não deveria, expecificar melhor a regra*/
 }
 
 /* for ie 6 minimize*/

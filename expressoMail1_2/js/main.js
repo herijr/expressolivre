@@ -530,6 +530,9 @@ function refresh(alert_new_msg){
 		if(!verify_session(data))
 			return;
 			
+		if ( parseInt( alert_new_msg ) && data && data.new_msgs && data.new_msgs.sum && data.new_msgs.sum > 0 )
+			open_alert_new_msg( data.new_msgs );
+		
 		var box = Element("tbody_box");
 		if (box.childNodes.length == 0)
 		{
@@ -609,8 +612,6 @@ function refresh(alert_new_msg){
 				});
 			});
 
-			if( parseInt(alert_new_msg) && data.new_msgs > 0 )
-				alert(data['new_msgs'] > 1 ? get_lang("You have %1 new messages", data['new_msgs']) + "!" : get_lang("You have 1 new message") +"!");
 			build_quota(data['quota']);
 		}
 		// Update Box BgColor
@@ -2975,4 +2976,46 @@ function searchEmail(emailString){
 		}
 
 		return arrayInvalidEmails;
+}
+
+function open_alert_new_msg( params ) {
+	if ( !$('#recent').length ) {
+		$('body').append( $('<div id="recent">').data(
+			{ sum: 0, info: {}, fav: new Favico( { animation: 'none', fontStyle: 'normal' } ) }
+		) );
+	}
+	var info = $('#recent').data( 'info' );
+	for ( var key in params.info ) if ( params.info.hasOwnProperty( key ) ) {
+		if ( info[key] == undefined ) info[key] = 0;
+		info[key] += parseInt( params.info[key] );
+	}
+	$('#recent').data( 'info', info );
+	var text = '';
+	for ( var key in info ) if ( info.hasOwnProperty( key ) ) {
+		text += lang_folder( key.replace(/^inbox\//i, '') )+': '+info[key]+'</br>'
+	}
+	var tot = $('#recent').data( 'sum' ) + params.sum;
+	var title = ( ( tot > 1 )? get_lang( 'You have %1 new messages', tot ) : get_lang( 'You have 1 new message' ) ) + '!';
+	$('#recent')
+		.html( text )
+		.data( 'sum', tot )
+		.data( 'fav' ).badge( tot );
+	$('#recent').dialog( {
+		title: title,
+		modal: true,
+		draggable: false,
+		resizable: false,
+		maxWidth: 600,
+		maxHeight: 400,
+		buttons: { Ok: function() { $(this).dialog( 'close' ); } },
+		close: function( event, ui ) {
+			$('#recent').data( 'sum', 0 ).data( 'info', {} ).data( 'fav' ).reset();
+			$(window).off( 'resize.fav' ).off( 'scroll.fav' );
+		}
+	} );
+	$(window).on( 'resize.fav', open_alert_new_msg_resize ).on( 'scroll.fav', open_alert_new_msg_resize );
+}
+
+function open_alert_new_msg_resize() {
+	$('#recent').parent().position({ my : 'center', at : 'center', of : window });
 }

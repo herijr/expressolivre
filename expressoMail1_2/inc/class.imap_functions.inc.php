@@ -1616,36 +1616,64 @@ class imap_functions
 		return $return;
 	}
 
+	function get_num_recent( $cur_folder, $rw = true )
+	{
+		$result = array( 'sum' => 0, 'info' => array() );
+		$alert_pref = (int)$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['alert_new_msg'];
+		if ( $alert_pref && ( $socket = fsockopen( $this->imap_server, $this->imap_port ) ) === false ) return $result;
+		fgets( $socket );
+		fputs( $socket, 'c0 AUTHENTICATE PLAIN '.base64_encode( $this->username.chr(0).$this->username.chr(0).$this->password ).PHP_EOL );
+		fgets( $socket );
+		$folders = array();
+		switch ( $alert_pref ) {
+			case 1: $folders[] = imap_utf7_encode( $cur_folder ); break;
+			case 2: $folders[] = 'INBOX'; break;
+			case 3:
+				fputs( $socket, 'c1 LIST INBOX *'.PHP_EOL );
+				while ( ( $line = fgets( $socket ) ) && ord( $line[0] ) === 42 )
+					$folders[] = rtrim( array_pop( explode( ' ', $line, 5 ) ) );
+				break;
+		}
+		foreach ( $folders as $folder ) {
+			fputs( $socket, 'c2 '.( $rw? 'SELECT' : 'EXAMINE' ).' '.$folder.PHP_EOL );
+			while ( ( $line = fgets( $socket ) ) && ord( $line[0] ) === 42 ) {
+				if ( ( $rec = explode( ' ', rtrim( $line ), 3 ) ) && $rec[2] === 'RECENT' && ((int)$rec[1]) > 0 ) {
+					$result['sum'] += $rec[1];
+					$result['info'][$folder] = $rec[1];
+				}
+			}
+		}
+		fputs( $socket, 'c3 LOGOUT'.PHP_EOL);
+		fgets( $socket );
+		return $result;
+	}
 
 	function refresh($params)
 	{
-
-		$folder = $params['folder'];
-		$msg_range_begin = $params['msg_range_begin'];
-		$msg_range_end = $params['msg_range_end'];
-		$msgs_existent = $params['msgs_existent'];
-		$sort_box_type = $params['sort_box_type'];
-		$sort_box_reverse = $params['sort_box_reverse'];
+		$result             = array();
+		$folder             = $params['folder'];
+		$msg_range_begin    = $params['msg_range_begin'];
+		$msg_range_end      = $params['msg_range_end'];
+		$msgs_existent      = $params['msgs_existent'];
+		$sort_box_type      = $params['sort_box_type'];
+		$sort_box_reverse   = $params['sort_box_reverse'];
 		$msgs_in_the_server = array();
-		$search_box_type = $params['search_box_type'] != "ALL" && $params['search_box_type'] != "" ? $params['search_box_type'] : false;
+		
+		$result['new_msgs'] = $this->get_num_recent( $folder );
+		$search_box_type    = $params['search_box_type'] != "ALL" && $params['search_box_type'] != "" ? $params['search_box_type'] : false;
 		$msgs_in_the_server = $this->get_msgs($folder, $sort_box_type, $search_box_type, $sort_box_reverse,$msg_range_begin,$msg_range_end);
 		$msgs_in_the_server = array_keys($msgs_in_the_server);
-		if(!count($msgs_in_the_server))
-			return array();
+		if ( !count($msgs_in_the_server)) return $result;
 
-		$num_msgs = (count($msgs_in_the_server) - imap_num_recent($this->mbox));
-		$msgs_in_the_client = explode(",", $msgs_existent);
-
-		$msg_to_insert  = array_diff($msgs_in_the_server, $msgs_in_the_client);
-		$msg_to_delete = array_diff($msgs_in_the_client, $msgs_in_the_server);
+		$msgs_in_the_client = explode( ",", $msgs_existent );
+		$msg_to_insert      = array_diff($msgs_in_the_server, $msgs_in_the_client);
+		$msg_to_delete      = array_diff($msgs_in_the_client, $msgs_in_the_server);
 
 		$msgs_to_exec = array();
 		foreach($msg_to_insert as $msg_number)
 			$msgs_to_exec[] = $msg_number;
 		sort($msgs_to_exec);
 
-		$return = array();
-                $return['new_msgs'] = imap_num_recent($this->mbox);
 		$i = 0;
 		foreach($msgs_to_exec as $msg_number)
 		{
@@ -1660,86 +1688,87 @@ class imap_functions
     
 			$tempHeader = @imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
 			$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
-			$return[$i]['Importance'] = $flag==0?"Normal":$importance[1];
+			$result[$i]['Importance'] = $flag==0?"Normal":$importance[1];
 
 			$msg_sample = $this->get_msg_sample($msg_number);
-			$return[$i]['msg_sample'] = $msg_sample;
+			$result[$i]['msg_sample'] = $msg_sample;
 
 			$header = $this->get_header($msg_number);
 			if (!is_object($header))
 				continue;
 
-			$return[$i]['msg_number']	= $msg_number;
+			$result[$i]['msg_number'] = $msg_number;
 			
 			//get the next msg number to append this msg in the view in a correct place
 			$msg_key_position = array_search($msg_number, $msgs_in_the_server);
 			
 			if($msg_key_position !== false && array_key_exists($msg_key_position + 1, $msgs_in_the_server) !== false)
-				$return[$i]['next_msg_number'] = $msgs_in_the_server[$msg_key_position + 1];
+				$result[$i]['next_msg_number'] = $msgs_in_the_server[$msg_key_position + 1];
 
-			$return[$i]['msg_folder']	= $folder;
+			$result[$i]['msg_folder']	= $folder;
 			// Atribui o tipo (normal, signature ou cipher) ao campo Content-Type
-			$return[$i]['ContentType']  = $this->getMessageType($msg_number, $tempHeader);
-			$return[$i]['Recent']		= $header->Recent;
-			$return[$i]['Unseen']		= $header->Unseen;
-			$return[$i]['Answered']		= $header->Answered;
-			$return[$i]['Deleted']		= $header->Deleted;
-			$return[$i]['Draft']		= $header->Draft;
-			$return[$i]['Flagged']		= $header->Flagged;
+			$result[$i]['ContentType']  = $this->getMessageType($msg_number, $tempHeader);
+			$result[$i]['Recent']		= $header->Recent;
+			$result[$i]['Unseen']		= $header->Unseen;
+			$result[$i]['Answered']		= $header->Answered;
+			$result[$i]['Deleted']		= $header->Deleted;
+			$result[$i]['Draft']		= $header->Draft;
+			$result[$i]['Flagged']		= $header->Flagged;
 
-			$return[$i]['udate'] = $header->udate;
+			$result[$i]['udate'] = $header->udate;
 		
 			$from = $header->from;
-			$return[$i]['from'] = array();
+			$result[$i]['from'] = array();
 			$tmp = imap_mime_header_decode($from[0]->personal);
-			$return[$i]['from']['name'] = $tmp[0]->text;
-			$return[$i]['from']['email'] = $from[0]->mailbox . "@" . $from[0]->host;
-			//$return[$i]['from']['full'] ='"' . $return[$i]['from']['name'] . '" ' . '<' . $return[$i]['from']['email'] . '>';
-			if(!$return[$i]['from']['name'])
-				$return[$i]['from']['name'] = $return[$i]['from']['email'];
+			$result[$i]['from']['name'] = $tmp[0]->text;
+			$result[$i]['from']['email'] = $from[0]->mailbox . "@" . $from[0]->host;
+			//$result[$i]['from']['full'] ='"' . $result[$i]['from']['name'] . '" ' . '<' . $result[$i]['from']['email'] . '>';
+			if(!$result[$i]['from']['name'])
+				$result[$i]['from']['name'] = $result[$i]['from']['email'];
 
 			/*$toaddress = imap_mime_header_decode($header->toaddress);
-			$return[$i]['toaddress'] = '';
+			$result[$i]['toaddress'] = '';
 			foreach ($toaddress as $tmp)
-				$return[$i]['toaddress'] .= $tmp->text;*/
+				$result[$i]['toaddress'] .= $tmp->text;*/
 			$to = $header->to;
-			$return[$i]['to'] = array();
+			$result[$i]['to'] = array();
 			$tmp = imap_mime_header_decode($to[0]->personal);
-			$return[$i]['to']['name'] = $tmp[0]->text;
-			$return[$i]['to']['email'] = $to[0]->mailbox . "@" . $to[0]->host;
-			$return[$i]['to']['full'] ='"' . $return[$i]['to']['name'] . '" ' . '<' . $return[$i]['to']['email'] . '>';
+			$result[$i]['to']['name'] = $tmp[0]->text;
+			$result[$i]['to']['email'] = $to[0]->mailbox . "@" . $to[0]->host;
+			$result[$i]['to']['full'] ='"' . $result[$i]['to']['name'] . '" ' . '<' . $result[$i]['to']['email'] . '>';
 			$cc = $header->cc;
-			if ( ($cc) && (!$return[$i]['to']['name']) ){
-				$return[$i]['to']['name'] =  $cc[0]->personal;
-				$return[$i]['to']['email'] = $cc[0]->mailbox . "@" . $cc[0]->host;
+			if ( ($cc) && (!$result[$i]['to']['name']) ){
+				$result[$i]['to']['name'] =  $cc[0]->personal;
+				$result[$i]['to']['email'] = $cc[0]->mailbox . "@" . $cc[0]->host;
 			}
-			$return[$i]['subject'] = $this->decode_string($header->fetchsubject);
+			$result[$i]['subject'] = $this->decode_string($header->fetchsubject);
 
-			$return[$i]['Size'] = $header->Size;
-			$return[$i]['reply_toaddress'] = $header->reply_toaddress;
+			$result[$i]['Size'] = $header->Size;
+			$result[$i]['reply_toaddress'] = $header->reply_toaddress;
 
-			$return[$i]['attachment'] = array();
+			$result[$i]['attachment'] = array();
 			if (!isset($imap_attachment))
 			{
 				include_once("class.imap_attachment.inc.php");
 				$imap_attachment = new imap_attachment();
 			}
-			$return[$i]['attachment'] = $imap_attachment->get_attachment_headerinfo($this->mbox, $msg_number);
+			$result[$i]['attachment'] = $imap_attachment->get_attachment_headerinfo($this->mbox, $msg_number);
 			$i++;
 		}
-		$return['quota'] = $this->get_quota(array('folder_id' => $folder));
-		$return['sort_box_type'] = $params['sort_box_type'];
+		$result['quota'] = $this->get_quota(array('folder_id' => $folder));
+		$result['sort_box_type'] = $params['sort_box_type'];
                 if(!$this->mbox || !is_resource($this->mbox))
                 {
                     $this->open_mbox($folder);
                 }
 
-		$return['msgs_to_delete'] = $msg_to_delete;
-                $return['offsetToGMT'] = $this->functions->CalculateDateOffset();
+		$result['msgs_to_delete'] = $msg_to_delete;
+		$result['offsetToGMT'] = $this->functions->CalculateDateOffset();
+		
 		if($this->mbox && is_resource($this->mbox))
 			imap_close($this->mbox);
 
-		return $return;
+		return $result;
 	}
 
 	/**

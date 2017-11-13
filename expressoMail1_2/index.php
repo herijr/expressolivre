@@ -62,6 +62,7 @@
 	echo '<script type="text/javascript" src="../prototype/plugins/jquery-xmpp/jquery.xmpp.js"></script>';
 	echo '<script type="text/javascript" src="../prototype/plugins/messenger/lang/messages.js"></script>';	
 	echo '<script type="text/javascript" src="../prototype/plugins/messenger/im.js"></script>';
+	echo '<script type="text/javascript" src="../prototype/plugins/ejci/favico-0.3.10.min.js"></script>';
 
 	//Enable/Disable VoIP Service -> Voip Server Config
 	$voip_enabled = false;

@@ -110,7 +110,13 @@ create_check_box('Would you like to use local messages?','use_local_messages','E
 create_select_box('Desired action to archive messages to local folders','keep_archived_messages',$arquived_messages,'After store email in your local computer delete it from server');
 create_check_box('Automaticaly create Default local folders?','auto_create_local','Enable this option if you want to automaticaly create the Inbox, Draft, Trash and Sent folders');
 create_check_box('Show previous message, after delete actual message?','delete_and_show_previous_message','Enable this option if you want to read the next message everytime you delete a message');
-create_check_box('Do you wanna receive an alert for new messages?','alert_new_msg','Everytime you receive new messages you will be informed');
+$default = array(
+	'0' => lang( 'no' ),
+	'1' => lang( 'Current box only' ),
+	'2' => lang( 'Inbox only' ),
+	'3' => lang( 'All boxes'),
+);
+create_select_box('Do you wanna receive an alert for new messages?','alert_new_msg',$default,'Everytime you receive new messages you will be informed');
 create_check_box('Show default view on main screen?','mainscreen_showmail','Show unread messages in your home page');
 create_check_box('Do you want to use remove attachments function?','remove_attachments_function','It allow you to remove attachments from messages');
 create_check_box('Do you want to use important flag in email editor?','use_important_flag','It allow you to send emails with important flag, but you can receive unwanted messages with important flag');

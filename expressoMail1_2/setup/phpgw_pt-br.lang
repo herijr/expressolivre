@@ -736,3 +736,6 @@ Block Send Email Group	admin	pt-br	Grupos LDAP bloqueados para envio de emails
 Fill with group names separated by commas	admin	pt-br	Preencha com nomes de grupos separados por virgula.
 Block Email Message	admin	pt-br	Mensagem de Bloqueio de envio de emails
 Start the Expresso Messenger automatically	expressoMail1_2	pt-br	Iniciar o Expresso Messenger automaticamente
+Current box only	expressoMail1_2	pt-br	Somente caixa atual
+Inbox only	expressoMail1_2	pt-br	Somente caixa de entrada
+All boxes	expressoMail1_2	pt-br	Todas caixas
