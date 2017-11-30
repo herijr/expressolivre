@@ -58,3 +58,9 @@
 #tables_domains ul li span{ color: red; padding:0 10px;}
 #tables_domains ul li a { text-decoration: none; text-align: center }
 #navigation { padding :0 10px; margin-bottom: 10px; }
+
+.extras_section table, .extras_section input { width: 100%; }
+#selectable_extras { table-layout: fixed; }
+#selectable_extras tr:hover { background-color: #c5dbec; cursor: pointer; }
+#selectable_extras tr.selected { background-color: #79b7e7; }
+#selectable_extras td { overflow: hidden; border: 1px solid #ddd; }

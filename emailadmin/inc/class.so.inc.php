@@ -94,7 +94,35 @@ class so
 			(($mode == 'mail')? ' INNER JOIN phpgw_emailadmin_domains ON (phpgw_emailadmin.profileid = phpgw_emailadmin_domains.profileid)' : '').
 			' WHERE ('.(($mode == 'mail')? 'phpgw_emailadmin_domains.domain' : 'phpgw_emailadmin.profileid').' = \''.$value.'\' )';
 		$this->db->query($query, __LINE__, __FILE__);
-		return $this->db->next_record()? $this->colMap($this->db->row()) : false;
+		return $this->db->next_record()? array_merge(
+			$this->colMap( $this->db->row() ),
+			array( 'defaultUserQuota' => $this->getDefaultUserQuota( ( $mode === 'mail' )? $value : '' ) )
+		) : false;
+	}
+
+	function getDefaultUserQuota( $domain = '' )
+	{
+		$domain = preg_replace( '/.*@/', '', trim( $domain ) );
+		if ( !isset( $_SESSION['phpgw_info']['expresso']['expressoAdmin'] ) ) {
+			$c = CreateObject('phpgwapi.config','expressoAdmin1_2');
+			$c->read_repository();
+			$_SESSION['phpgw_info']['expresso']['expressoAdmin'] = $c->config_data;
+		}
+		while ( !empty( $domain ) ) {
+			$this->db->query(
+				'SELECT extras '.
+				'FROM phpgw_emailadmin_domains '.
+				'WHERE domain = \''.$this->db->db_addslashes( $domain ).'\' AND extras like \'%"defaultUserQuota"%\''
+			);
+			while ( $this->db->next_record() )
+			{
+				$extras = unserialize( $this->db->f( 'extras' ) );
+				if ( isset( $extras['defaultUserQuota'] ) ) return $extras['defaultUserQuota'];
+			}
+			$domain = ( strpos( $domain, '.' ) === false )? '' : trim( preg_replace( '/^[^.]*\./', '', $domain ) );
+		}
+		return isset( $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] )?
+		(int)$_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] : 20;
 	}
 
     function getDomains( $domain )
@@ -149,8 +177,9 @@ class so
 	{
 		if( $params['action'] == 'edit' )
 		{
-			$query = 'UPDATE phpgw_emailadmin_domains SET organization_units='.
-				( count( (array)$params['ous'] )? "'".$this->db->db_addslashes( serialize( (array)$params['ous'] ) )."'" : 'null' ).
+			$query = 'UPDATE phpgw_emailadmin_domains SET'.
+				' organization_units = '.( count( (array)$params['ous'] )? "'".$this->db->db_addslashes( serialize( (array)$params['ous'] ) )."'" : 'null' ).
+				', extras = '.( count( (array)$params['extras'] )? "'".$this->db->db_addslashes( serialize( (array)$params['extras'] ) )."'" : 'null' ).
 			' WHERE domainid='.((int)$params['domainid']);
 		}
 
@@ -159,7 +188,8 @@ class so
 			$query = 'INSERT INTO phpgw_emailadmin_domains( profileid, domain, organization_units ) VALUES('.
 				(int)$params['profileid'].",".
 				"'".$this->db->db_addslashes( $params['domain'] )."',".
-				( count( (array)$params['ous'] )? "'".$this->db->db_addslashes( serialize( (array)$params['ous'] ) )."'" : 'null' ).
+				( count( (array)$params['ous'] )? "'".$this->db->db_addslashes( serialize( (array)$params['ous'] ) )."'" : 'null' )."',".
+				( count( (array)$params['extras'] )? "'".$this->db->db_addslashes( serialize( (array)$params['extras'] ) )."'" : 'null' ).
 				')';
 		}
 

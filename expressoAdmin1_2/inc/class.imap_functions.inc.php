@@ -51,7 +51,7 @@ class imap_functions
 		return $this->set_profile( $this->boemailadmin->getProfile('uid', $uid), $uid );
 	}
 	
-	function create($uid, $mailquota = 20)
+	function create( $uid, $mailquota = false )
 	{
 		$this->reset_profile($uid);
 		
@@ -61,6 +61,8 @@ class imap_functions
 			'status'	=> false,
 			'msg'		=> lang('Profile not found'),
 		);
+		
+		$mailquota = ( $mailquota === false )? $this->_profile['defaultUserQuota'] : $mailquota;
 		
 		if (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid))
 		{
@@ -124,9 +126,9 @@ class imap_functions
 		$this->reset_profile($uid);
 		
 		$result = array();
-		$result['mailbox_profile_descr']	= lang('Profile not found');
-		$result['mailquota']				= $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'];
-		$result['mailquota_used']			= '0.0';
+		$result['mailbox_profile_descr'] = lang('Profile not found');
+		$result['mailquota']             = isset( $this->_profile['defaultUserQuota'] )? $this->_profile['defaultUserQuota']: $this->boemailadmin->getDefaultUserQuota();
+		$result['mailquota_used']        = '0.0';
 		
 		if ($this->_profile === false) return $result;
 		
@@ -236,18 +238,15 @@ class imap_functions
 		{
 			if (is_null($get_quota['limit']))
 			{
-				$expressoAdmin_defaultUserQuota = $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'];
-				if (empty($expressoAdmin_defaultUserQuota))
-					$expressoAdmin_defaultUserQuota = '20';
-				
-				if (! @imap_set_quota($this->_imap, 'user' . $this->_profile['imapDelimiter'] . $old_mailbox, ($expressoAdmin_defaultUserQuota * 1024) ) )
+				$def_quota = $this->_profile['defaultUserQuota'] * 1024;
+				if (! @imap_set_quota($this->_imap, 'user' . $this->_profile['imapDelimiter'] . $old_mailbox, $def_quota ) )
 				{
 					$result['status'] = false;
 					$result['msg'] = $this->functions->lang("User without quota. Error setting user quota. Process aborted.\n") . $this->functions->lang('Server returns') . ': ' . imap_last_error();
 					return $result;
 				}
 				
-				$get_quota['STORAGE']['limit'] = $expressoAdmin_defaultUserQuota * 1024;
+				$get_quota['STORAGE']['limit'] = $def_quota;
 				$get_quota['STORAGE']['usage'] = 0;
 			}
 		}
@@ -386,11 +385,8 @@ class imap_functions
 			return $result;
 		}
 		
-		$quota = isset($_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'])?
-			(int) $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] : 20;
-		
-		if (isset($params['mailquota']) && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_QUOTA ))
-			$quota = $params['mailquota'];
+		$quota = ( isset($params['mailquota']) && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_QUOTA ) )?
+			$params['mailquota'] : $this->_profile['defaultUserQuota'];
 		
 		$result = $this->create($params['uid'], $quota);
 		$result['quota'] = $quota;
@@ -406,12 +402,14 @@ class imap_functions
 	
 	function get_profile_info($params)
 	{
-		$profile = CreateObject('emailadmin.bo')->getProfile('mail', $params['mail']);
+		$email_bo = CreateObject('emailadmin.bo');
+		$profile  = $email_bo->getProfile('mail', $params['mail']);
 		if (!$profile) return false;
 		return array(
-			'profile_id'	=> $profile['profileID'],
-			'profile_descr'	=> $profile['description'],
-			'profile_delim'	=> $profile['imapDelimiter'],
+			'profile_id'       => $profile['profileID'],
+			'profile_descr'    => $profile['description'],
+			'profile_delim'    => $profile['imapDelimiter'],
+			'defaultUserQuota' => $profile['defaultUserQuota'],
 		);
 	}
 	

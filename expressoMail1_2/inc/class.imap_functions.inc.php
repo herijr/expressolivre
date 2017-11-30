@@ -3279,12 +3279,15 @@ class imap_functions
 		$quota = imap_get_quotaroot( $this->mbox, $folder_id );
 		if ( $this->mbox && is_resource( $this->mbox ) ) imap_close( $this->mbox );
 		
-		$def_quota = ( isset($_SESSION['phpgw_info']['expresso']['expressoAdmin1_2']['expressoAdmin_defaultUserQuota'])? (int)$_SESSION['phpgw_info']['expresso']['expressoAdmin1_2']['expressoAdmin_defaultUserQuota'] : 20 ) * 1024;
-		$auto_raise = isset($_SESSION['phpgw_info']['expresso']['expressoAdmin1_2']['expressoAdmin_autoRaiseQuota'])? $_SESSION['phpgw_info']['expresso']['expressoAdmin1_2']['expressoAdmin_autoRaiseQuota'] === 'true' : false;
-		
 		// Auto raise to default user quota, configured in expressoAdmin
-		if ( $auto_raise && isset($quota['limit']) && $quota['limit'] < $def_quota )
-		{
+		if (
+			( $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_autoRaiseQuota'] === 'true' ) &&
+			( isset( $quota['limit'] ) ) &&
+			( $quota['limit'] < (
+				$def_quota = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserQuota'] * 1024
+			) ) &&
+			( $def_quota > 0 )
+		) {
 			$userID = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
 			$mailbox = imap_open(
 				'{'.$this->imap_server.':'.$this->imap_port.'/novalidate-cert}',

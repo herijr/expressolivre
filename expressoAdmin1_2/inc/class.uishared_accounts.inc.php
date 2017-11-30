@@ -94,7 +94,7 @@ class uishared_accounts
 		$p->set_var('modal_id', $modal_id);
                     
         $var = array(
-            'mailquota' =>  $this->current_config['expressoAdmin_defaultUserQuota'],
+            'mailquota' => CreateObject('emailadmin.bo')->getDefaultUserQuota(),
             'changequote_disabled' => $this->functions->check_acl($account_lid, ACL_Managers::ACL_MOD_SHARED_ACCOUNTS_QUOTA) ? '' : 'readonly',
             'disabled_empty_inbox' => $this->functions->check_acl($account_lid, ACL_Managers::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY ) ? '' : 'disabled',
             'display_quota_used' => 'hidden'

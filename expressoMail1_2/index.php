@@ -89,11 +89,6 @@
 	//Local messages
 	$_SESSION['phpgw_info']['server']['expressomail']['enable_local_messages'] = $current_config['enable_local_messages'];
 	
-	// Loading ExpressoAdmin Config
-	$c = CreateObject('phpgwapi.config','expressoAdmin1_2');
-	$c->read_repository();
-	$_SESSION['phpgw_info']['expresso']['expressoAdmin1_2'] = $c->config_data;
-	
     // Loading Admin Config Module
     $c = CreateObject('phpgwapi.config','expressoMail1_2');
     $c->read_repository();

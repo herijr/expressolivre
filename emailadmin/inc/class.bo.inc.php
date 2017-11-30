@@ -71,6 +71,11 @@ class bo
 		return $this->soemailadmin->getProfile( $mode, $value );
 	}
     
+	function getDefaultUserQuota( $domain = false )
+	{
+		return $this->soemailadmin->getDefaultUserQuota( $domain );;
+	}
+
 	function getUsersLdapByMail( $domain )
 	{
 		$result = @ldap_get_entries(

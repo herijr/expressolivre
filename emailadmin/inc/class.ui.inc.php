@@ -43,6 +43,7 @@ class ui
 			$params = array(
 				'domainid'  => trim( $_POST['domainid'] ),
 				'ous'       => isset( $_POST['ous'] )? (array)$_POST['ous'] : array(),
+				'extras'    => isset( $_POST['extras'] )? (array)$_POST['extras'] : array(),
 				'action'    => 'edit',
 			);
 			
@@ -56,6 +57,7 @@ class ui
 				'domain'    => strtolower(trim($_POST['domain'])),
 				'profileid' => trim($_POST['profileid']),
 				'ous'       => isset( $_POST['ous'] )? (array)$_POST['ous'] : array(),
+				'extras'    => isset( $_POST['extras'] )? (array)$_POST['extras'] : array(),
 				'action'    => 'add'
 			);
 			
@@ -378,13 +380,17 @@ class ui
 					$profileData = $this->boemailadmin->getProfile( 'id', $domain['profileid'] );
 					$ous = '';
 					foreach ( (array)unserialize( $domain['organization_units'] ) as $ou ) if ( $ou ) $ous .= '<p>'.$ou.'</p>';
+					$extras = '';
+					foreach ( (array)unserialize( $domain['extras'] ) as $key => $val ) if ( $key )
+						$extras.= '<p>'.$key.' = <q name="'.$key.'">'.$val.'</q></p>';
 
 					$rowsTable .= '<tr data-id="'.$domain['domainid'].'">';
 					$rowsTable .= '<td class="nowrap" name="description">'.$profileData['description'].'</td>';
 					$rowsTable .= '<td class="nowrap" name="domain">'.$domain['domain'].'</td>';
 					$rowsTable .= '<td menu_action="delete" domainid="'.$domain['domainid'].'" title="'.lang('delete').'">'.lang('delete').'</td>';
 					$rowsTable .= '<td menu_action="move" domainid="'.$domain['domainid'].'" title="'.lang('move').'">'.lang('move').'</td>';
-					$rowsTable .= '<td menu_action="edit" name="ous" title="'.lang('edit').'"><ul>'.( empty( $ous )?'-':$ous ).'</ul></td>';
+					$rowsTable .= '<td menu_action="edit" name="ous" title="'.lang('edit').'">'.( empty( $ous )?'-':$ous ).'</td>';
+					$rowsTable .= '<td menu_action="edit" name="extras" title="'.lang('edit').'">'.( empty( $extras)?'-':$extras).'</td>';
 					$rowsTable .= '</tr>';
 				}
 
@@ -418,6 +424,9 @@ class ui
 			"lang_move"				=> lang("move"),
 			"lang_move_domain"		=> lang("move domain"),
 			"lang_ou_list"			=> lang("organizations"),
+			"lang_extras"			=> lang("Other settings"),
+			"lang_key"				=> lang("key"),
+			"lang_value"			=> lang("value"),
 			"lang_save"				=> lang("save"),
 			"lang_search"			=> lang("search"),
 			"lang_search_domain"	=> lang("search domain"),

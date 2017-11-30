@@ -335,7 +335,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 				//MAIL
 				'accountstatus_checked'			=> 'CHECKED',
-				'mailquota'				=> $this->current_config['expressoAdmin_defaultUserQuota'],
+				'mailquota'                             => CreateObject('emailadmin.bo')->getDefaultUserQuota(),
 				'changequote_disabled'			=> $this->functions->check_acl( $manager_lid, ACL_Managers::ACL_MOD_USERS_QUOTA ) ? '' : 'readonly',
 				'imapDelimiter'				=> $_SESSION['phpgw_info']['expresso']['email_server']['imapDelimiter'],
 				'input_mailalternateaddress_fields' 	=> '<input type="text" name="mailalternateaddress[]" id="mailalternateaddress" autocomplete="off" value="{mailalternateaddress}" {disabled} size=50>',

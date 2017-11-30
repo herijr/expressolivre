@@ -72,6 +72,7 @@ var Profile = new function() {
 		$('#profile-descr-label').html(Profile.getLabel());
 		Profile.setVisibility($('.w-mx'),Profile.isProfileValid());
 		$('#profile-msg-lost-share').toggle(Profile.hasLostShare());
+		$('input[name=mailquota]').val(Profile.getDefaultUserQuota());
 	};
 	
 	this.setVisibility = function(obj,value) {
@@ -89,6 +90,10 @@ var Profile = new function() {
 	
 	this.getDelimiter = function() {
 		return _lastResult ? _lastResult.profile_delim : '';
+	};
+	
+	this.getDefaultUserQuota = function() {
+		return _lastResult ? _lastResult.defaultUserQuota : '';
 	};
 	
 	this.isProfileValid = function() {

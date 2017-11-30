@@ -26,6 +26,24 @@
 			</button>
 			<select id="selected_organization_units" multiple style="width:100%;min-height: 58px;"></select>
 		</div>
+		<div class="extras_section">
+			<label class="add_domain"><%=lang['label_extras']%></label>
+			<table><tr>
+				<td style="padding-right: 5px;" >
+					<input id="extras_add_key" type="text" placeholder="<%=lang['key']%>"/>
+				</td>
+				<td>
+					<input id="extras_add_value" type="text" placeholder="<%=lang['value']%>"/>
+				</td>
+			</tr></table>
+			<button id="extras_add" type="button" style="margin: 5px 0;">
+				<img style="vertical-align: middle;" src="expressoAdmin1_2/templates/default/images/add.png">&nbsp;<%=lang['add']%>
+			</button>
+			<button id="extras_remove" type="button" style="float: right; margin: 5px 0;">
+				<img style="vertical-align: middle;" src="expressoAdmin1_2/templates/default/images/rem.png">&nbsp;<%=lang['remove']%>
+			</button>
+			<table id="selectable_extras"></table>
+		</div>
 		
 	</fieldset>
 </div>

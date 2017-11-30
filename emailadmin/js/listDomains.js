@@ -12,8 +12,12 @@ function openDomainDialog( event ) {
 		params.description = $(parent).find( '[name=description]' ).html();
 		params.domain      = $(parent).find( '[name=domain]' ).html();
 		params.ous         = [];
-		$(parent).find( '[name=ous] p' ).each( function() {
+		$(parent).find( 'td[name=ous] p' ).each( function() {
 			params.ous.push( $(this).html() );
+		} );
+		params.extras      = {};
+		$(parent).find( 'td[name=extras] q' ).each( function() {
+			params.extras[$(this).attr('name')] = $(this).html();
 		} );
 	}
 	
@@ -54,7 +58,10 @@ function openDomainDialog( event ) {
 				'remove'        : $('input[type=hidden][name=lang_remove]').val(),
 				'label_profile' : $('input[type=hidden][name=lang_label_profile]').val(),
 				'label_domain'  : $('input[type=hidden][name=lang_label_domain]').val(),
-				'label_ous'     : $('input[type=hidden][name=lang_label_ous]').val()
+				'label_ous'     : $('input[type=hidden][name=lang_label_ous]').val(),
+				'label_extras'  : $('input[type=hidden][name=lang_extras]').val(),
+				'key'           : $('input[type=hidden][name=lang_key]').val(),
+				'value'         : $('input[type=hidden][name=lang_value]').val()
 			};
 			
 			$("#div_add_domain")
@@ -86,6 +93,9 @@ function openDomainDialog( event ) {
 					$('#selected_organization_units option[value$="'+val+'"]').hide();
 					$('#selected_organization_units option[value="'+val+'"]').show();
 				} );
+				$.each( this.params.extras, function( idx, val ){
+					addExtraValue( idx, val );
+				} );
 			}
 			
 			$('#selected_ous_domain_add').on( 'click', function() {
@@ -101,10 +111,31 @@ function openDomainDialog( event ) {
 				redrawSelectOU();
 			} );
 			
+			$('#extras_add').on( 'click', function() {
+				addExtraValue( $('#extras_add_key').val(), $('#extras_add_value').val() );
+				$('#extras_add_key').val('');
+				$('#extras_add_value').val('');
+			} );
+			
+			$('#extras_remove').on( 'click', function() { $('#selectable_extras tr.selected').remove(); } );
+			
 			$('#div_add_domain').parent().show();
 			redrawSelectOU();
 		}
 	});
+}
+function addExtraValue( key, value ) {
+	if ( key.length <= 0 || value.length <= 0 ) return;
+	var sel = $('#selectable_extras td[name='+key+']')
+	if ( sel.length > 0 ) $(sel).html( value );
+	else {
+		$('#selectable_extras').append(
+			$('<tr>')
+				.append( $('<td>').html( key ) )
+				.append( $('<td>').attr('name',key).html( value ) )
+				.on( 'click', function(e){ $(e.currentTarget).toggleClass( "selected" ); })
+		);
+	}
 }
 
 function redrawSelectOU() {
@@ -201,12 +232,18 @@ function addDomains( dialog )
 		$('#selected_organization_units option:available').each( function() {
 			ous.push( $(this).val() );
 		} );
+
+		var extras = {};
+		$('#selectable_extras td[name]').each( function() {
+			extras[$(this).attr('name')] = $(this).html();
+		} );
 		
 		var params = {
 			'domain'    : $('#input_search_domain').val(),
 			'profileid' : $('#selected_profile').val(),
 			'domainid'  : $('#input_domainid').val(),
 			'ous'       : ous,
+			'extras'    : extras,
 			'return'    : false
 		};
 		
@@ -223,9 +260,14 @@ function addDomains( dialog )
 					
 					if ( _data.return == 'add_domain_ok' ) alert( $('input[type=hidden][name=lang_added_domain]').val() );
 					if ( _data.return == 'edit_domain_ok' ){
+						// Update ous list
 						var td = $('#tables_domains tr[data-id='+this.params.domainid+'] td[name=ous]');
 						$(td).html( ( this.params.ous.length > 0 )? '' : '-' );
 						$.each( this.params.ous, function( idx, val ) { $(td).append( $('<p>').html( val ) ) } );
+						// Update extras
+						var td = $('#tables_domains tr[data-id='+this.params.domainid+'] td[name=extras]');
+						$(td).html( ( Object.keys(this.params.extras).length > 0 )? '' : '-' );
+						$.each( this.params.extras, function( idx, val ) { $(td).append( $('<p>').html(idx+' = ').append( $('<q>').attr('name',idx).html( val ) ) ) } );
 						
 						alert( $('input[type=hidden][name=lang_edited_domain]').val() );
 					}

@@ -24,6 +24,9 @@
 <input type="hidden" name="lang_save" value="{lang_save}">
 <input type="hidden" name="lang_add" value="{lang_add}">
 <input type="hidden" name="lang_remove" value="{lang_remove}">
+<input type="hidden" name="lang_extras" value="{lang_extras}">
+<input type="hidden" name="lang_key" value="{lang_key}">
+<input type="hidden" name="lang_value" value="{lang_value}">
 
 <div class="list_domains">
 	<fieldset>
@@ -43,11 +46,12 @@
                         <th scope="col">{lang_delete}</th>
                         <th scope="col">{lang_move_domain}</th>
                         <th scope="col">{lang_ou_list}</th>
+                        <th scope="col">{lang_extras}</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <ul>
                                 <li> {lang_domains_found} : <span>{countDomains}</span> </li>
                             <ul>
