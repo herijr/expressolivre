@@ -577,7 +577,15 @@ class sms
 		if (!(isset($sendAuth['user']) && isset($sendAuth['passwd']))) $this->runException('SMS_SEND_DENIED');
 		
 		// Get instance of SoapClient
-		if ( is_null($this->_soap) ) $this->_soap = new SoapClient($this->_options['wsdl'],array('encoding' => 'UTF-8', 'trace' => true));
+		if ( is_null($this->_soap) ) $this->_soap = new SoapClient($this->_options['wsdl'],array(
+			'encoding' => 'UTF-8',
+			'trace'    => true,
+			'stream_context' => stream_context_create( array( 'ssl' => array(
+				'verify_peer'       => false,
+				'verify_peer_name'  => false,
+				'allow_self_signed' => true,
+			) ) ),
+		));
 		
 		try {
 			// Encode to UTF-8
