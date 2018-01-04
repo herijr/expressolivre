@@ -2004,7 +2004,14 @@
 					$dtBR = new DateTime( $dateUTC, new DateTimeZone('UTC'));
 
 					// change the timezone of the object without changing it's time
-					$dtBR->setTimezone( new DateTimeZone( $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['timezone'] ) );
+					$timeZoneUser = 'America/Sao_Paulo';
+
+					if( isset($GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['timezone']) )
+					{
+						$timeZoneUser = $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['timezone'];
+					}
+					
+					$dtBR->setTimezone( new DateTimeZone( $timeZoneUser ) );
 
 					// format the datetime
 					$var = $dtBR->format("Ymd\THis");
