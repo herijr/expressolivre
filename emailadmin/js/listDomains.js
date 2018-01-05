@@ -53,6 +53,7 @@ function openDomainDialog( event ) {
 			
 			$('#div_add_domain').next().css( { 'background-color': '#E0EEEE' } );
 			
+			_data.extras = extras_vars_keys;
 			_data.lang = {
 				'add'           : $('input[type=hidden][name=lang_add]').val(),
 				'remove'        : $('input[type=hidden][name=lang_remove]').val(),
@@ -60,7 +61,6 @@ function openDomainDialog( event ) {
 				'label_domain'  : $('input[type=hidden][name=lang_label_domain]').val(),
 				'label_ous'     : $('input[type=hidden][name=lang_label_ous]').val(),
 				'label_extras'  : $('input[type=hidden][name=lang_extras]').val(),
-				'key'           : $('input[type=hidden][name=lang_key]').val(),
 				'value'         : $('input[type=hidden][name=lang_value]').val()
 			};
 			
@@ -112,8 +112,7 @@ function openDomainDialog( event ) {
 			} );
 			
 			$('#extras_add').on( 'click', function() {
-				addExtraValue( $('#extras_add_key').val(), $('#extras_add_value').val() );
-				$('#extras_add_key').val('');
+				addExtraValue( $('#selected_extras_add_key').val(), $('#extras_add_value').val() );
 				$('#extras_add_value').val('');
 			} );
 			
@@ -131,7 +130,7 @@ function addExtraValue( key, value ) {
 	else {
 		$('#selectable_extras').append(
 			$('<tr>')
-				.append( $('<td>').html( key ) )
+				.append( $('<td>').html( extras_vars_keys[key] ) )
 				.append( $('<td>').attr('name',key).html( value ) )
 				.on( 'click', function(e){ $(e.currentTarget).toggleClass( "selected" ); })
 		);
@@ -267,7 +266,7 @@ function addDomains( dialog )
 						// Update extras
 						var td = $('#tables_domains tr[data-id='+this.params.domainid+'] td[name=extras]');
 						$(td).html( ( Object.keys(this.params.extras).length > 0 )? '' : '-' );
-						$.each( this.params.extras, function( idx, val ) { $(td).append( $('<p>').html(idx+' = ').append( $('<q>').attr('name',idx).html( val ) ) ) } );
+						$.each( this.params.extras, function( idx, val ) { $(td).append( $('<p>').html(extras_vars_keys[idx]+' = ').append( $('<q>').attr('name',idx).html( val ) ) ) } );
 						
 						alert( $('input[type=hidden][name=lang_edited_domain]').val() );
 					}

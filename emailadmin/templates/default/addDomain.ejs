@@ -29,8 +29,12 @@
 		<div class="extras_section">
 			<label class="add_domain"><%=lang['label_extras']%></label>
 			<table><tr>
-				<td style="padding-right: 5px;" >
-					<input id="extras_add_key" type="text" placeholder="<%=lang['key']%>"/>
+				<td style="width: 50%;">
+					<select id="selected_extras_add_key" style="width: 100%;">
+						<% for(var i in extras){ %>
+							<option value="<%=i%>"><%=extras[i]%></option>
+						<% } %>
+					</select>
 				</td>
 				<td>
 					<input id="extras_add_value" type="text" placeholder="<%=lang['value']%>"/>

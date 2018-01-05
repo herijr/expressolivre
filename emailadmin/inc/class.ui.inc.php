@@ -382,7 +382,7 @@ class ui
 					foreach ( (array)unserialize( $domain['organization_units'] ) as $ou ) if ( $ou ) $ous .= '<p>'.$ou.'</p>';
 					$extras = '';
 					foreach ( (array)unserialize( $domain['extras'] ) as $key => $val ) if ( $key )
-						$extras.= '<p>'.$key.' = <q name="'.$key.'">'.$val.'</q></p>';
+						$extras.= '<p>'.lang( $key ).' = <q name="'.$key.'">'.$val.'</q></p>';
 
 					$rowsTable .= '<tr data-id="'.$domain['domainid'].'">';
 					$rowsTable .= '<td class="nowrap" name="description">'.$profileData['description'].'</td>';
@@ -432,7 +432,8 @@ class ui
 			"lang_search_domain"	=> lang("search domain"),
 			"lang_profile"			=> lang("profile"),
 			"link_back_page" 		=> $GLOBALS['phpgw']->link('/index.php','menuaction=emailadmin.ui.listConfigurations'),
-			"rowsTable"				=> $rowsTable
+			"rowsTable"				=> $rowsTable,
+			'extras_vars_keys_json' => preg_replace( '/^{/', '{ ', json_encode( array( 'defaultUserQuota' => utf8_encode( lang( 'defaultUserQuota' ) ) ) ) ),
 		));	
 
 		$this->template->set_block("body","main");

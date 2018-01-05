@@ -82,6 +82,7 @@
 <script type="text/javascript" src="./prototype/plugins/jquery/jquery-ui-latest.min.js"></script>
 <script type="text/javascript" src="./prototype/plugins/ejs/ejs_production.js"></script>
 <script type="text/javascript" src="./prototype/plugins/ejs/view.js"></script>
+<script type="text/javascript"> var extras_vars_keys = {extras_vars_keys_json}; </script>
 <script type="text/javascript" src="./emailadmin/js/listDomains.js"></script>
 <script type="text/javascript">
 	// Button Back Page
