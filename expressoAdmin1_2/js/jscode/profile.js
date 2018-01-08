@@ -72,7 +72,8 @@ var Profile = new function() {
 		$('#profile-descr-label').html(Profile.getLabel());
 		Profile.setVisibility($('.w-mx'),Profile.isProfileValid());
 		$('#profile-msg-lost-share').toggle(Profile.hasLostShare());
-		$('input[name=mailquota]').val(Profile.getDefaultUserQuota());
+		if ( Profile.getDefaultUserQuota() != undefined )
+			$('input[name=mailquota]').val(Profile.getDefaultUserQuota());
 	};
 	
 	this.setVisibility = function(obj,value) {
@@ -93,7 +94,7 @@ var Profile = new function() {
 	};
 	
 	this.getDefaultUserQuota = function() {
-		return _lastResult ? _lastResult.defaultUserQuota : '';
+		return ( _lastResult && _lastResult.defaultUserQuota )? _lastResult.defaultUserQuota : undefined;
 	};
 	
 	this.isProfileValid = function() {
