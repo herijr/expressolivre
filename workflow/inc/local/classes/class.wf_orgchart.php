@@ -297,6 +297,48 @@ class wf_orgchart
 	}
 
 	/**
+	 * Retorna um array contendo as áreas hierarquicamente
+	 * @return array
+	 * @access public
+	 */
+	function getHierarchicalOrganizationAreas($organizationID, $parent = null, $depth = 0)
+	{
+		if (is_null($parent)){
+			$query = "SELECT a.area_id, a.sigla, a.descricao, a.titular_funcionario_id ".
+					 " FROM public.area a ".
+					 " INNER JOIN public.area_status a_s ON (a_s.area_status_id = a.area_status_id) ".
+					 " WHERE (a.superior_area_id IS NULL) AND (a.organizacao_id = ?) AND (a.ativa = 'S') ".
+					 " ORDER BY a_s.nivel, a.sigla";
+			$result = $this->db->query($query, array($organizationID));
+		} else {
+			$query = "SELECT a.area_id, a.sigla, a.descricao, a.titular_funcionario_id ".
+					 " FROM public.area a ".
+					 " INNER JOIN public.area_status a_s ON (a_s.area_status_id = a.area_status_id) ".
+					 " WHERE (a.superior_area_id = ?) AND (a.ativa = 'S') ".
+					 " ORDER BY a_s.nivel, a.sigla";
+			$result = $this->db->query($query, array($parent));
+		}
+
+		$output = $result->GetArray(-1);
+
+		for ($i = 0; $i < count($output); ++$i)
+		{
+			for ($j = 0; $j < $result->_numOfFields; ++$j)
+				unset($output[$i][$j]);
+
+			if(!empty($output[$i]['titular_funcionario_id'])){
+				$user_data = $this->ldap->getEntryByID($output[$i]['titular_funcionario_id']);
+				$output[$i]['titular_funcionario_nome'] = $user_data['cn'];
+			}
+			$output[$i]['depth'] = $depth;
+			$output[$i]['children'] = $this->getHierarchicalOrganizationAreas($organizationID, $output[$i]['area_id'], $depth + 1);
+//			$output[$i]['descricao'] = utf8_encode($output[$i]['descricao']);
+		}
+
+		return $output;
+	}
+
+	/**
 	 * Searches for all the supervisors of an organization.
 	 *
 	 * This method will search in table areas for all the supervisors and replacement in the organization.
