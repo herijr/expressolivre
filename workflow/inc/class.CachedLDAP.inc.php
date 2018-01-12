@@ -375,5 +375,64 @@ class CachedLDAP
 		return $this->getEntry('uid', $uid);
 	}
 
+	/**
+	 * Recupera os dados dos grupos de acordo com os parâmetros de busca fornecidos
+	 * @param string $field O nome do campo pelo qual a busca será feita
+	 * @param string $value O valor que será utilizao na busca
+	 * @return mixed Uma array associativa caso o grupo seja encontrado ou false caso contrário
+	 * @access private
+	 */
+	protected function getGroupEntries($field, $value)
+	{
+		/* load the information and establish the connection */
+		$this->loadLDAP();
+
+		$ldapQuery = "(&({$field}={$value})(phpgwaccounttype=g))";
+
+		/* perform the search */
+		$resourceIdentifier = ldap_search($this->dataSource, $this->groupContext, $ldapQuery, array('cn','gidnumber'));
+		$entries = ldap_get_entries($this->dataSource, $resourceIdentifier);
+
+		/* check the returned data */
+		if (!$entries['count'])
+			return false;
+
+		unset($entries['count']);
+
+		/* format the output */
+		$output = array();
+		foreach ($entries as $k => $v){
+			$output[$k]['gidnumber'] = !empty($v['gidnumber'][0]) ? $v['gidnumber'][0] : '';
+			$output[$k]['cn'] = !empty($v['cn'][0]) ? $v['cn'][0] : '';
+			$output[$k]['dn'] = !empty($v['dn']) ? $v['dn'] : '';
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Retorna os grupos de um usuário
+	 * @param int $userID O ID do usuário
+	 * @return array Array dos grupos contendo gidnumber, cn e dn
+	 * @access public
+	 */
+	public function getUserGroups($userID)
+	{
+		/* do not perform any search if the user is not number */
+		if (!is_integer($userID))
+			return array();
+
+		/* get user data by uidnumber */
+		$usr = $this->getEntryByID($userID);
+
+		/* initialize output variable */
+		$output = array();
+
+		/* retrieve all occurrencies of groups that have the user as member */
+		$output = $this->getGroupEntries('memberuid', $usr['uid']);
+
+		/* return the output */
+		return $output;
+	}
 }
 ?>
