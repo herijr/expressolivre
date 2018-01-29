@@ -1620,7 +1620,7 @@ class imap_functions
 	{
 		$result = array( 'sum' => 0, 'info' => array() );
 		$alert_pref = (int)$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['alert_new_msg'];
-		if ( $alert_pref && ( $socket = fsockopen( $this->imap_server, $this->imap_port ) ) === false ) return $result;
+		if ( $alert_pref === 0 || ( $socket = fsockopen( $this->imap_server, $this->imap_port ) ) === false ) return $result;
 		fgets( $socket );
 		fputs( $socket, 'c0 AUTHENTICATE PLAIN '.base64_encode( $this->username.chr(0).$this->username.chr(0).$this->password ).PHP_EOL );
 		fgets( $socket );
@@ -1632,6 +1632,10 @@ class imap_functions
 				fputs( $socket, 'c1 LIST INBOX *'.PHP_EOL );
 				while ( ( $line = fgets( $socket ) ) && ord( $line[0] ) === 42 )
 					$folders[] = rtrim( array_pop( explode( ' ', $line, 5 ) ) );
+				$folders = array_diff( $folders, array(
+					'INBOX/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
+					'INBOX/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpam'],
+				) );
 				break;
 		}
 		foreach ( $folders as $folder ) {
