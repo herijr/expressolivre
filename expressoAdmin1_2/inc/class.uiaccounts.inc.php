@@ -1041,14 +1041,13 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 					if ( !preg_match( '/User not found/', $ad->getError() ) ) $msg .= '<br>'.$ad->getError();
 				}
 				$result['ad_status']             = $ad_status;
-				$result['html']                  = utf8_encode( $msg );
-				$result['active_directory_info'] = utf8_encode( lang( $info? 'Active Directory information' : 'create the account in the oraganization unit' ) );
+				$result['html']                  = $msg;
+				$result['active_directory_info'] = lang( $info? 'Active Directory information' : 'create the account in the oraganization unit' );
 				$result['status']                = true;
 				
 			} else $result['html'] = utf8_encode( lang( 'You do not have access to this module' ) );
 			
-			echo json_encode( $result );
-			return true;
+			return $result;
 		}
 	}
 ?>
