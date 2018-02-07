@@ -113,3 +113,6 @@ use tls encryption	emailadmin	pt-br	Usar encriptação TLS
 virtual mail manager	emailadmin	pt-br	Gerenciador Virtual Mail
 organizations	emailadmin	pt-br	Organizações
 defaultUserQuota	emailadmin	pt-br	Quota padrão de usuário
+Other settings	emailadmin	pt-br	Outras configurações
+key	emailadmin	pt-br	chave
+value	emailadmin	pt-br	valor
