@@ -5,6 +5,7 @@ docker pull expressolivre/database
 docker pull expressolivre/mailboxes
 docker pull expressolivre/ldap
 docker pull expressolivre/frontend-des
+docker pull expressolivre/frontend-des-php7
 
 # Server Ldap
 docker run -itd --name ldap.expresso -p 389:389 -p 636:636 expressolivre/ldap
@@ -26,9 +27,16 @@ docker exec -it database.expresso service postgresql restart
 docker exec -it database.expresso service postgresql stop
 docker exec -it database.expresso service postgresql start
 
-# Server Frontend
+# Server Frontend - PHP 5.6
 docker run -itd --name frontend-80.expresso -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso -p 80:80 expressolivre/frontend-des
 docker exec -it frontend-80.expresso service rsyslog restart
 docker exec -it frontend-80.expresso service apache2 restart
 docker exec -it frontend-80.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
 docker exec -it frontend-80.expresso ./tmp/check_service.sh
+
+# Server Frontend - PHP 7.0
+#docker run -itd --name frontend-8080.expresso -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso -p 8080:80 expressolivre/frontend-des-php7
+#docker exec -it frontend-8080.expresso service rsyslog restart
+#docker exec -it frontend-8080.expresso service apache2 restart
+#docker exec -it frontend-8080.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
+#docker exec -it frontend-8080.expresso ./tmp/check_service.sh
