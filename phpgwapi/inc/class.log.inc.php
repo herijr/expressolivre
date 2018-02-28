@@ -30,13 +30,13 @@
 		function message($etext,$p0='',$p1='',$p2='',$p3='',$p4='',$p5='',$p6='',$p7='',$p8='',$p9='')
 		{
 			$parms = array($p0,$p1,$p2,$p3,$p4,$p5,$p6,$p7,$p8,$p9);
-			CreateObject('phpgwapi.error',$etext,$parms,1);
+			CreateObject('phpgwapi.error_sys',$etext,$parms,1);
 		}
 
 		function error($etext,$p0='',$p1='',$p2='',$p3='',$p4='',$p5='',$p6='',$p7='',$p8='',$p9='')
 		{
 			$parms = array($p0,$p1,$p2,$p3,$p4,$p5,$p6,$p7,$p8,$p9);
-			CreateObject('phpgwapi.error',$etext,$parms,false);
+			CreateObject('phpgwapi.error_sys',$etext,$parms,false);
 		}
 
 		function iserror($ecode)

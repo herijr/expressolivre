@@ -21,16 +21,16 @@
 	 * along with this library; if not, write to the Free Software Foundation,  *
 	 * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA            *
 	 \**************************************************************************/
-	
-	
+
+
 	/***************************************************************************\
 	* If running in PHP3, then force admin to upgrade                           *
 	\***************************************************************************/
 
 	error_reporting(error_reporting() & ~E_NOTICE);
-	
+
 	require_once(PHPGW_API_INC.'/common_functions.inc.php');
-	
+
 	/*!
 	 @function lang
 	 @abstract function to handle multilanguage support
@@ -56,8 +56,8 @@
 				}
 				fclose($fp);
 			}
-			$return = str_replace('%1',$vars[0],$GLOBALS['phpgw_info']['phpgwapi']['lang'][$key]);			
-			return $return;  
+			$return = str_replace('%1',$vars[0],$GLOBALS['phpgw_info']['phpgwapi']['lang'][$key]);
+			return $return;
 		}
 		$value = $GLOBALS['phpgw']->translation->translate("$key",$vars);
 		return $value;
@@ -66,19 +66,19 @@
 		function get_theme()
 		{
 			$test_cookie = get_var('THEME', 'COOKIE');
-			
+
 			// se o cookie foi definido coloca tema na sessão
 			if (!empty($test_cookie))
 			{
 				$_SESSION['THEME'] = $test_cookie;
 			}
-			
+
 			// se tema não estiver definido na sessão retorna $GLOBALS['phpgw_info']['user']['preferences']['common']['theme']
 			if ( !( isset( $_SESSION['THEME'] ) && $_SESSION['THEME'] ) )
 			{
 				return $GLOBALS['phpgw_info']['user']['preferences']['common']['theme'];
 			}
-			
+
 			// senão retorna o tema definido na sessão
 			return $_SESSION['THEME'];
 		}
@@ -98,14 +98,14 @@
 		echo '<b>!!! YOU DO NOT HAVE YOUR $GLOBALS[\'phpgw_info\'][\'flags\'][\'currentapp\'] SET !!!';
 		echo '<br>!!! PLEASE CORRECT THIS SITUATION !!!</b>';
 	}
-	
+
 	if ( get_magic_quotes_runtime() ) @set_magic_quotes_runtime( false );
 	print_debug('sane environment','messageonly','api');
 
 	/****************************************************************************\
 	* Multi-Domain support                                                       *
 	\****************************************************************************/
-	
+
 	/* make them fix their header */
 	if (!isset($GLOBALS['phpgw_domain']))
 	{
@@ -186,7 +186,7 @@
 	//@$GLOBALS['phpgw']->db->query("SELECT COUNT(config_name) FROM phpgw_config");
 	//if(!@$GLOBALS['phpgw']->db->next_record())
 	{
-		
+
 		/* BEGIN - CELEPAR - jakjr - 05/06/2006 */
 		/* $setup_dir = str_replace($_SERVER['PHP_SELF'],'index.php','setup/'); */
 		/*echo '<center><b>Fatal Error:</b> It appears that you have not created the database tables for '
@@ -209,7 +209,7 @@
 	}*/
 
 	/* jakjr: ExpressoLivre does not use cache. */
-	/*	
+	/*
 	$cache_query = "select content from phpgw_app_sessions where"
 		." sessionid = '0' and loginid = '0' and app = 'phpgwapi' and location = 'config'";
 
@@ -275,7 +275,7 @@
 	if (! isset($GLOBALS['phpgw_info']['flags']['included_classes']['error']) ||
 		! $GLOBALS['phpgw_info']['flags']['included_classes']['error'])
 	{
-		include_once(PHPGW_INCLUDE_ROOT.'/phpgwapi/inc/class.error.inc.php');
+		include_once(PHPGW_INCLUDE_ROOT.'/phpgwapi/inc/class.error_sys.inc.php');
 		$GLOBALS['phpgw_info']['flags']['included_classes']['error'] = True;
 	}
 
@@ -344,7 +344,7 @@
 				}
 			}
 
-			
+
 			// this removes the sessiondata if its saved in the URL
 			$query = preg_replace('/[&]?sessionid(=|%3D)[^&]+&kp3(=|%3D)[^&]+&domain=.*$/','',$_SERVER['QUERY_STRING']);
 			Header('Location: '.$GLOBALS['phpgw_info']['server']['webserver_url'].'/login.php?cd=10&phpgw_forward='.urlencode($relpath.(!empty($query) ? '?'.$query : '')));
@@ -450,7 +450,7 @@
 			$GLOBALS['phpgw']->datetime = CreateObject('phpgwapi.date_time');
 		}
 		$GLOBALS['phpgw']->applications->read_installed_apps();	// to get translated app-titles
-		
+
 		/*************************************************************************\
 		* Load the header unless the developer turns it off                       *
 		\*************************************************************************/

@@ -11,7 +11,7 @@
 	\**************************************************************************/
 
 
-	class error
+	class error_sys
 	{
 		/***************************\
 		*	Instance Variables...   *
@@ -34,7 +34,7 @@
 			return lang($this->msg,$this->parms);
 		}
 
-		function error($parms)
+		function error_sys($parms)
 		{
 			if ($parms == '')
 			{

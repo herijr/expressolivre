@@ -30,14 +30,14 @@
 		function message($parms)
 		{
 			$parms['ismsg']=1;
-			CreateObject('phpgwapi.error',$parms);
+			CreateObject('phpgwapi.error_sys',$parms);
 			return true;
 		}
 
 		function error($parms)
 		{
 			$parms['ismsg']=0;
-			CreateObject('phpgwapi.error',$parms);
+			CreateObject('phpgwapi.error_sys',$parms);
 			return true;
 		}
 
@@ -46,7 +46,7 @@
 			$parms['ismsg']=0;
 			$save = $this->errorstack;
 			$this->errorstack = array();
-			CreateObject('phpgwapi.error',$parms);
+			CreateObject('phpgwapi.error_sys',$parms);
 			$this->commit();
 			$this->errorstack = $save;
 			return true;
