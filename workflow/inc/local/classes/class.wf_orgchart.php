@@ -120,6 +120,7 @@ class wf_orgchart
 	 * @param int $organizationID O ID da organização.
 	 * @param boolean $searchLdap True, caso seja necessário buscar no LDAP os dados dos usuários. Ou false, caso contrário.
 	 * @param boolean $onlyActiveUsers true para retornar somente usuários ativos e false caso contrário
+	 * @param int $ldapOperationMode Modo de operação da classe que buscará os dados no LDAP. Por padrão usa o modo normal.
 	 * @return array Uma array seqüencial contendo os funcionários de uma organização. Cada linha do array conterá:
 	 * - organizacao_id
 	 * - funcionario_id: uidNumber do funcionário
@@ -139,7 +140,7 @@ class wf_orgchart
 	 * - uid: uid do funcionário (quando busca no Ldap)
 	 * @access public
 	 */
-	function getOrganizationEmployees($organizationID, $searchLdap = false, $onlyActiveUsers = false)
+	function getOrganizationEmployees($organizationID, $searchLdap = false, $onlyActiveUsers = false, $ldapOperationMode = 0)
 	{
 		$query = "SELECT f.organizacao_id, " .
 				 "       f.funcionario_id, " .
@@ -181,7 +182,10 @@ class wf_orgchart
 		$output = $result->GetArray(-1);
 
 		if($searchLdap){
+			$opModeOld = $this->ldap->getOperationMode();
+			$this->ldap->setOperationMode($ldapOperationMode);
 			$output = $this->searchEmployeeDataInLdap($output);
+			$this->ldap->setOperationMode($opModeOld);
 		}
 
 		return $output;

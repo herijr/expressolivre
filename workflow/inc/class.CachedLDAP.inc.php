@@ -283,6 +283,15 @@ class CachedLDAP
 	}
 
 	/**
+	 * Recupera o modo como a classe está operando no momento
+	 * @return int Valor do modo de operação atual
+	 */
+	function getOperationMode()
+	{
+		return $this->operationMode;
+	}
+
+	/**
 	* Define o modo como a classe vai operar (se busca somente no LDAP, no Banco de Dados, etc.)
 	* @param int $operationMode O modo de operação da classe
 	* @return void
