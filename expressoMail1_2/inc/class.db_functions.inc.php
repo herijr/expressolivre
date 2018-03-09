@@ -10,7 +10,7 @@ if ( !isset( $_SESSION['phpgw_info']['expressomail']['server']['db_name'] ) ) {
 } else {
 	define( 'PHPGW_INCLUDE_ROOT', __DIR__.'/../..');
 	define( 'PHPGW_API_INC', PHPGW_INCLUDE_ROOT.'/phpgwapi/inc' );
-	include_once( PHPGW_API_INC.'/class.db.inc.php' );
+	include_once( PHPGW_API_INC.'/class.db_egw.inc.php' );
 }
 
 include_once( 'class.dynamic_contacts.inc.php' );
@@ -23,7 +23,7 @@ class db_functions
 	var $related_ids; 
 	
 	function db_functions(){
-		$this->db = new db();		
+		$this->db = new db_egw();		
 		$this->db->Halt_On_Error = 'no';
 		$this->db->connect(
 				$_SESSION['phpgw_info']['expressomail']['server']['db_name'], 

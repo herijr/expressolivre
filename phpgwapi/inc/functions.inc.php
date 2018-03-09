@@ -167,7 +167,7 @@
 	 /************************************************************************\
 	 * Load up the main instance of the db class.                             *
 	 \************************************************************************/
-	$GLOBALS['phpgw']->db           = CreateObject('phpgwapi.db');
+	$GLOBALS['phpgw']->db           = CreateObject('phpgwapi.db_egw');
 	if ($GLOBALS['phpgw']->debug)
 	{
 		$GLOBALS['phpgw']->db->Debug = 1;
@@ -264,7 +264,7 @@
 	$GLOBALS['phpgw']->translation  = CreateObject('phpgwapi.translation');
 	$GLOBALS['phpgw']->common       = CreateObject('phpgwapi.common');
 	$GLOBALS['phpgw']->hooks        = CreateObject('phpgwapi.hooks');
-	$GLOBALS['phpgw']->auth         = CreateObject('phpgwapi.auth');
+	$GLOBALS['phpgw']->auth         = CreateObject('phpgwapi.auth_egw');
 	$GLOBALS['phpgw']->accounts     = CreateObject('phpgwapi.accounts');
 	$GLOBALS['phpgw']->acl          = CreateObject('phpgwapi.acl');
 	$GLOBALS['phpgw']->session      = CreateObject('phpgwapi.sessions');

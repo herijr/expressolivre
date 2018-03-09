@@ -86,7 +86,7 @@ class WorkflowObjects
 			if ($dedicatedDB)
 			{
 				/* connect to the database */
-				$this->cache['DBGalaxia'] = Factory::newInstance('WorkflowWatcher', Factory::newInstance('db'));
+				$this->cache['DBGalaxia'] = Factory::newInstance('WorkflowWatcher', Factory::newInstance('db_egw'));
 				$this->cache['DBGalaxia']->disconnect(); /* for some reason it won't connect to the desired database unless we disconnect it first */
 				$this->cache['DBGalaxia']->Halt_On_Error = 'no';
 				$this->cache['DBGalaxia']->connect(
@@ -135,7 +135,7 @@ class WorkflowObjects
 			}
 
 			/* connect to the database */
-			$this->cache['DBExpresso'] = Factory::newInstance('WorkflowWatcher', Factory::newInstance('db'));
+			$this->cache['DBExpresso'] = Factory::newInstance('WorkflowWatcher', Factory::newInstance('db_egw'));
 			$this->cache['DBExpresso']->disconnect(); /* for some reason it won't connect to the desired database unless we disconnect it first */
 			$this->cache['DBExpresso']->Halt_On_Error = 'no';
 			$this->cache['DBExpresso']->connect(
@@ -176,7 +176,7 @@ class WorkflowObjects
 			));
 
 			/* connect to the database */
-			$this->cache['DBWorkflow'] = Factory::newInstance('WorkflowWatcher', Factory::newInstance('db'));
+			$this->cache['DBWorkflow'] = Factory::newInstance('WorkflowWatcher', Factory::newInstance('db_egw'));
 			$this->cache['DBWorkflow']->disconnect(); /* for some reason it won't connect to the desired database unless we disconnect it first */
 			$this->cache['DBWorkflow']->Halt_On_Error = 'no';
 			$this->cache['DBWorkflow']->connect(

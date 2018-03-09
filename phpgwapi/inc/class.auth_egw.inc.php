@@ -27,7 +27,7 @@
 	}
 	include(PHPGW_API_INC.'/class.auth_'.$GLOBALS['phpgw_info']['server']['auth_type'].'.inc.php');
 
-	class auth extends auth_
+	class auth_egw extends auth_
 	{
 		var $seeded = False;
 		var $error  = '';

@@ -2,7 +2,7 @@
 
 define('PHPGW_INCLUDE_ROOT','../');	
 define('PHPGW_API_INC','../phpgwapi/inc');
-require_once(PHPGW_API_INC . '/class.db.inc.php');
+require_once(PHPGW_API_INC . '/class.db_egw.inc.php');
 
 class notifications
 {
@@ -37,7 +37,7 @@ class notifications
 
 	private final function connectDB()
 	{
-		$this->db = new db();
+		$this->db = new db_egw();
 		$this->db->connect($this->db_name,$this->db_host,$this->db_port,$this->db_user,$this->db_pass,$this->db_type);		
 	}	
 	

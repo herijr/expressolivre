@@ -1,7 +1,7 @@
 <?php
 define('PHPGW_INCLUDE_ROOT','../');	
 define('PHPGW_API_INC','../phpgwapi/inc');
-include_once(PHPGW_API_INC.'/class.db.inc.php');
+include_once(PHPGW_API_INC.'/class.db_egw.inc.php');
 
 class db_functions
 {	
@@ -15,7 +15,7 @@ class db_functions
 		else
 			$_SESSION['phpgw_info']['expresso']['server'] = $GLOBALS['phpgw_info']['server'];
 		
-		$this->db = new db();
+		$this->db = new db_egw();
 		$this->db->Halt_On_Error = 'no';
 		
 		$this->db->connect(

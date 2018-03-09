@@ -34,8 +34,8 @@
 			$this->current_config = $_SESSION['phpgw_info']['expresso']['expressoAdmin'];
 
 			defined('PHPGW_API_INC') || define('PHPGW_API_INC','../phpgwapi/inc');
-			include_once(PHPGW_API_INC.'/class.auth.inc.php');
-			$this->auth = new auth;
+			include_once(PHPGW_API_INC.'/class.auth_egw.inc.php');
+			$this->auth = new auth_egw();
 		}
 		
 		function create($params)

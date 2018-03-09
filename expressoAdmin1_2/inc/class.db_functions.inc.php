@@ -1,7 +1,7 @@
 <?php
 defined('PHPGW_INCLUDE_ROOT') || define('PHPGW_INCLUDE_ROOT','../');	
 defined('PHPGW_API_INC') || define('PHPGW_API_INC','../phpgwapi/inc');
-include_once(PHPGW_API_INC.'/class.db.inc.php');
+include_once(PHPGW_API_INC.'/class.db_egw.inc.php');
 
 class db_functions
 {	
@@ -22,7 +22,7 @@ class db_functions
 		else
 			$_SESSION['phpgw_info']['expresso']['server'] = $GLOBALS['phpgw_info']['server'];
 		
-		$this->db = new db();
+		$this->db = new db_egw();
 		$this->db->Halt_On_Error = 'no';
 		$this->db->connect(
 				$_SESSION['phpgw_info']['expresso']['server']['db_name'], 
@@ -147,7 +147,7 @@ class db_functions
 			$user = $current_config['expressoAdmin_nextid_db_user'];
 			$pass = $current_config['expressoAdmin_nextid_db_password'];
 			
-			$db = new db();
+			$db = new db_egw();
 			$db->Halt_On_Error = 'no';
 			$db->connect($name, $host, $port, $user, $pass, 'pgsql');
 		}

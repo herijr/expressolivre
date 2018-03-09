@@ -26,7 +26,7 @@
 	}
 	include_once(PHPGW_API_INC.'/adodb/adodb.inc.php');
 
-	class db
+	class db_egw
 	{
 		/**
 		* @var string $type database type
@@ -114,12 +114,12 @@
 		* @param string $query query to be executed (optional)
 		*/
 
-		function db($query = '')
+		function db_egw($query = '')
 		{
 			$this->query($query);
 		}
 
-		function db_($query='') {}	// only for NOT useing ADOdb
+		function db_egw_($query='') {}	// only for NOT useing ADOdb
 
 		/**
 		* @return int current connection id

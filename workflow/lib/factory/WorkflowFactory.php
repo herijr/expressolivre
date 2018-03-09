@@ -140,7 +140,7 @@ final class WorkflowFactory extends BaseFactory {
 		$this->registerFileInfo('NaturalResultSet', 'class.natural_resultset.php', 'inc/natural');
 
 		/* registering egw external classes */
-		$this->registerFileInfo('db', 'class.db.inc.php', '', EGW_INC_ROOT);
+		$this->registerFileInfo('db_egw', 'class.db_egw.inc.php', '', EGW_INC_ROOT);
 		$this->registerFileInfo('acl', 'class.acl.inc.php', '', EGW_INC_ROOT);
 		$this->registerFileInfo('accounts', 'class.accounts.inc.php', '', EGW_INC_ROOT);
 		$this->registerFileInfo('config', 'class.config.inc.php', '', EGW_INC_ROOT);

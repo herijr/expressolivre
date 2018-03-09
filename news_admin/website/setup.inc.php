@@ -40,9 +40,9 @@
 	include($path_to_header . 'header.inc.php');
 	include(PHPGW_SERVER_ROOT . '/phpgwapi/inc/class.Template.inc.php');
 	$tpl = new Template($template_path);
-	include(PHPGW_SERVER_ROOT . '/phpgwapi/inc/class.db.inc.php');
+	include(PHPGW_SERVER_ROOT . '/phpgwapi/inc/class.db_egw.inc.php');
 
-	$GLOBALS['phpgw']->db = new db();
+	$GLOBALS['phpgw']->db = new db_egw();
 	$GLOBALS['phpgw']->db->Host     = $GLOBALS['phpgw_domain'][$domain]['server']['db_host'];
 	$GLOBALS['phpgw']->db->Type     = $GLOBALS['phpgw_domain'][$domain]['db_type'];
 	$GLOBALS['phpgw']->db->Database = $GLOBALS['phpgw_domain'][$domain]['db_name'];

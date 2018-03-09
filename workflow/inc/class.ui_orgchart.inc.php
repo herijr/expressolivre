@@ -106,7 +106,7 @@ class ui_orgchart extends ui_ajaxinterface
 		$config_values = Factory::getInstance('config', 'workflow');
 		$config_values->read_repository();
 		$conf_db = $config_values->config_data;
-		$db = Factory::getInstance('db');
+		$db = Factory::getInstance('db_egw');
 		$db->connect(
 			$conf_db['database_name'],
 			$conf_db['database_host'],

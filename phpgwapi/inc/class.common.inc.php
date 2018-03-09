@@ -1411,7 +1411,7 @@ function get_css( )
 		{
 			if(!@is_object($GLOBALS['phpgw']->auth))
 			{
-				$GLOBALS['phpgw']->auth = CreateObject('phpgwapi.auth');
+				$GLOBALS['phpgw']->auth = CreateObject('phpgwapi.auth_egw');
 			}
 			return $GLOBALS['phpgw']->auth->encrypt_password($password,$sql);
 		}

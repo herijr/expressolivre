@@ -11,7 +11,7 @@ include('../../header.inc.php');
 $_SESSION['calendar']['user'] = $GLOBALS['phpgw_info']['user'];
 $_SESSION['calendar']['server'] = $GLOBALS['phpgw_info']['server'];
 define('PHPGW_API_INC','../../phpgwapi/inc');
-include_once(PHPGW_API_INC.'/class.db.inc.php');
+include_once(PHPGW_API_INC.'/class.db_egw.inc.php');
 $page_content = <<<PAGE
 <HTML><HEAD></HEAD><BODY>
 <SCRIPT type="text/javascript">
@@ -84,7 +84,7 @@ var Total = 0;
 </SCRIPT>
 PAGE;
 echo $page_content;
-$db = new db();
+$db = new db_egw();
 $db->Halt_On_Error = 'no';
 $db->connect(
 	$_SESSION['calendar']['server']['db_name'],

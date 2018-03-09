@@ -50,7 +50,7 @@ class PreferencesAdapter extends ExpressoAdapter
 
 	private function updatePasswordLdap( $newPassword, $currentPassword )
 	{
-		$auth 		= CreateObject('phpgwapi.auth');
+		$auth 		= CreateObject('phpgwapi.auth_egw');
 		$_return	= "false";
 
 		if( $GLOBALS['phpgw_info']['server']['certificado'] )

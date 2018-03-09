@@ -802,7 +802,7 @@
 			$account->save_repository();
 			if ($_userData['account_passwd'])
 			{
-				$auth = CreateObject('phpgwapi.auth');
+				$auth = CreateObject('phpgwapi.auth_egw');
 				$auth->change_password($old_passwd, $_userData['account_passwd'], $_userData['account_id']);
 				$GLOBALS['hook_values']['account_id'] = $_userData['account_id'];
 				$GLOBALS['hook_values']['old_passwd'] = $old_passwd;
