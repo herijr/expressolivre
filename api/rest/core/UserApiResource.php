@@ -17,7 +17,7 @@ class UserApiResource extends ExpressoAdapter {
 
  		$apis = array( 
  			"https://api.expresso.pr.gov.br/", 
- 			"https://api.expresso.pr.gov.br/muni/", 
+ 			"https://api.expresso.pr.gov.br/municipios/", 
  			"https://api.expresso.pr.gov.br/seed/", 
  			"https://api.expresso.pr.gov.br/sefa/", 
  			"https://api.expresso.pr.gov.br/sesp/"
@@ -42,63 +42,58 @@ class UserApiResource extends ExpressoAdapter {
 			
 		}
 
- 		$account_id = $GLOBALS['phpgw']->accounts->name2id($user_id);
 
-		if ($account_id == "") { 
-			Errors::runException(2200);
-		} else {
+		$response = array();
+		$params = array();
+		$params['user'] = $user_id;		
 
-			$response = array();
-			$params = array();
-			$params['user'] = $user_id;		
+		$i = 0;
 
-			$i = 0;
+		$predictedAPI = "";
 
-			$predictedAPI = "";
+		foreach ($apis as $api) {
 
-			foreach ($apis as $api) {
+			$result = $this->callBase($api . $resource, $params);
 
-				$result = $this->callBase($api . $resource, $params);
+			$arr_res = json_decode($result);
+			
+			$apps = $arr_res->result->apps; 
 
-				$arr_res = json_decode($result);
-				
-				$apps = $arr_res->result->apps; 
-
-				if (!is_array($apps)) {
-					$apps = array();
-				}
-				$qtdFound = 0;
-				foreach( $modulesArray as $moduleName )
-				{
-					foreach ($apps as $appName) {
-						if ($moduleName == $appName) {
-							$qtdFound = $qtdFound + 1;
-						}
-					}	
-				}
-
-				if (count($modulesArray) != 0) {
-					if ($qtdFound == count($modulesArray)) {
-						$predictedAPI = $api;
+			if (!is_array($apps)) {
+				$apps = array();
+			}
+			$qtdFound = 0;
+			foreach( $modulesArray as $moduleName )
+			{
+				foreach ($apps as $appName) {
+					if ($moduleName == $appName) {
+						$qtdFound = $qtdFound + 1;
 					}
-				} else {
-					if (count($apps) != 0) {
-						$predictedAPI = $api;
-					}
-				}
-
-				$response['apis'][$i]["api"] = $api;
-				$response['apis'][$i]['apps'] = $apps;
-				$i++;
+				}	
 			}
 
-			if ($predictedAPI != "") {
-				$response['userAPI'] = $predictedAPI;
+			if (count($modulesArray) != 0) {
+				if ($qtdFound == count($modulesArray)) {
+					$predictedAPI = $api;
+				}
+			} else {
+				if (count($apps) != 0) {
+					$predictedAPI = $api;
+				}
 			}
 
-			$this->setResult($response);
-
+			$response['apis'][$i]["api"] = $api;
+			$response['apis'][$i]['apps'] = $apps;
+			$i++;
 		}
+
+		if ($predictedAPI != "") {
+			$response['userAPI'] = $predictedAPI;
+			$this->setResult($response);
+		} else {
+			Errors::runException(2200);
+		}
+
  		
 		return $this->getResponse();
 	}
