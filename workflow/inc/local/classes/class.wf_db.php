@@ -6,7 +6,7 @@
 	* @package Workflow
 	* @subpackage local
 	**/
-	class wf_db extends db
+	class wf_db extends db_egw
 	{
 	/**
 	 * Construtor da classe wf_db Inicializa os dados da classe
@@ -15,7 +15,7 @@
  	 */
 		function wf_db()
 		{
-			parent::db();
+			parent::db_egw();
 
 			$dbconf = array(
 						'database_name'	=> '',
