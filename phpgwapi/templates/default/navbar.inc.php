@@ -50,6 +50,12 @@ function parse_navbar($force = False)
 	$i = 0;
 	foreach ($GLOBALS['phpgw_info']['navbar'] as $app => $app_data) {
 		
+		if( array_search( intval($_SERVER['SERVER_PORT']), [ 80, 443 ] ) !== false ){
+			$app_data['url'] = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['SERVER_NAME'].$app_data['url'];
+		} else {
+			$app_data['url'] = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'] . $app_data['url'];
+		}
+
 		$current_app = False;
 		if ($app != 'preferences' && $app != 'about' && $app != 'logout') {
 			
