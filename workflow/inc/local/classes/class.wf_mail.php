@@ -131,6 +131,7 @@ class wf_mail extends PHPMailer
 		/* preenche as informações para envio */
 		$this->FromName = $fromName;
 		$this->From = $from;
+		$this->ClearReplyTos();
 		$this->AddReplyTo($from);
 		$this->Subject = $subject;
 		$this->Body = str_replace("\n",'<br />',html_entity_decode($body));
