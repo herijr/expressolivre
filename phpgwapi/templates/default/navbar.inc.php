@@ -52,9 +52,9 @@ function parse_navbar($force = False)
 	foreach ($GLOBALS['phpgw_info']['navbar'] as $app => $app_data) {
 		
 		if( array_search( intval($_SERVER['SERVER_PORT']), array( 80, 443 ) ) !== false ){
-			$app_data['url'] = ( ( $GLOBALS['phpgw_info']['server']['use_https'] == 1 ) ? "https" : "http" )."://".$_SERVER['SERVER_NAME'].$app_data['url'];
+			$app_data['url'] = ( ( $GLOBALS['phpgw_info']['server']['use_https'] == 2 ) ? "https" : "http" )."://".$_SERVER['SERVER_NAME'].$app_data['url'];
 		} else {
-			$app_data['url'] = ( ( $GLOBALS['phpgw_info']['server']['use_https'] == 1 ) ? "https" : "http" )."://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'] . $app_data['url'];
+			$app_data['url'] = ( ( $GLOBALS['phpgw_info']['server']['use_https'] == 2 ) ? "https" : "http" )."://".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'] . $app_data['url'];
 		}
 
 		$current_app = False;
