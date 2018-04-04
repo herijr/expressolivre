@@ -62,10 +62,9 @@
 
 		function parseRequest($data="")
 		{
-			global $HTTP_SERVER_VARS;
 
 			$this->debug("entering parseRequest() on ".date("H:i Y-m-d"));
-			$request_uri = $HTTP_SERVER_VARS["REQUEST_URI"];
+			$request_uri = $_SERVER["REQUEST_URI"];
 			$this->debug("request uri: $request_uri");
 			// get headers
 			$headers_array = getallheaders();

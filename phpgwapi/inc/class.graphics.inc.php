@@ -80,13 +80,11 @@
 				return;
 			}
 
-			global $HTTP_POST_VARS;
-
-			if (is_array($HTTP_POST_VARS))
+			if( isset($_POST) && is_array($_POST) )
 			{
-				while( list($key, $val) = each($HTTP_POST_VARS)) 
+				while( list($key, $val) = each($_POST)) 
 				{
-					if (preg_match("/(.*)_x/",$key,$varName) && $HTTP_POST_VARS[$varName[1]."_y"])
+					if (preg_match("/(.*)_x/",$key,$varName) && $_POST[$varName[1]."_y"])
 					{
 						$name = $varName[1];
 						global $$name;

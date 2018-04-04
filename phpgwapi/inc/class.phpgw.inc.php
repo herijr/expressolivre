@@ -138,8 +138,6 @@
 		 */
 		function redirect($url = '')
 		{
-			/* global $HTTP_ENV_VARS; */
-
 			$iis = @strpos($GLOBALS['HTTP_ENV_VARS']['SERVER_SOFTWARE'], 'IIS', 0);
 
 			if(!$url)

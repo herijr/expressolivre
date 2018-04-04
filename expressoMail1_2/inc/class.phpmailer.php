@@ -1680,20 +1680,17 @@ class PHPMailer
      * @return mixed
      */
     function ServerVar($varName) {
-        global $HTTP_SERVER_VARS;
-        global $HTTP_ENV_VARS;
 
-        if(!isset($_SERVER))
-        {
-            $_SERVER = $HTTP_SERVER_VARS;
-            if(!isset($_SERVER["REMOTE_ADDR"]))
-                $_SERVER = $HTTP_ENV_VARS; // must be Apache
-        }
-        
-        if(isset($_SERVER[$varName]))
-            return $_SERVER[$varName];
-        else
-            return "";
+			if(!isset($_SERVER))
+			{
+				if(!isset($_SERVER["REMOTE_ADDR"]))
+					$_SERVER = $_ENV; // must be Apache
+			}
+
+			if(isset($_SERVER[$varName]))
+				return $_SERVER[$varName];
+			else
+				return "";
     }
 
     /**
