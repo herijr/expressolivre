@@ -1840,7 +1840,7 @@ class imap_functions
 		$serverString = "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}"; 
 		
 		if ( $params && isset($params['noSharedFolders']) && $params['noSharedFolders'] )
-			$folders_list = array_merge(imap_getmailboxes($mbox_stream, $serverString, 'INBOX' ), imap_getmailboxes($mbox_stream, $serverString, 'INBOX/*' ) );
+			$folders_list = imap_getmailboxes($mbox_stream, $serverString, 'INBOX*' );
 		else
 			$folders_list = imap_getmailboxes($mbox_stream, $serverString, '*' );
 
@@ -4370,4 +4370,3 @@ class imap_functions
 	    return $data; 
     }  
 }
-
