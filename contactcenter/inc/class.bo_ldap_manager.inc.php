@@ -457,11 +457,11 @@
 		function translate_accentuation($text)
 		{
 			/*
-			 * Esta operaï¿½ï¿½o resolve o problema causado pela conversï¿½o de caracteres acentuados realizada
-			 * pela funï¿½ï¿½o ldap_explode_dn().
+			 * Esta operação resolve o problema causado pela conversão de caracteres acentuados realizada
+			 * pela função ldap_explode_dn().
 			 */
 
-			return utf8_decode(preg_replace("/\\\([0-9A-Fa-f]{2})/e", "''.chr(hexdec('\\1')).''", $text));
+			return utf8_decode(preg_replace_callback('/\\\([0-9A-Fa-f]{2})/', function ($matches) { return chr(hexdec($matches[1])); }, $text));
 		}
 
 		function get_ldap_tree_level($id_source, $resource, $context, $objectClass, $branch_dn, $external = 0)
