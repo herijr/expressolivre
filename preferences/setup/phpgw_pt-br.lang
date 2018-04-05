@@ -35,7 +35,7 @@ forced preferences	preferences	pt-br	Preferências obrigatórias
 Format of %1 telephone number is invalid.	preferences	pt-br	Formato do número de telefone %1 inválido.
 help off	preferences	pt-br	Desligar ajuda
 hours	preferences	pt-br	horas
-Home	preferences	pt-br	Residencial
+Home	preferences	pt-br	Página Inicial
 how do you like to display accounts	preferences	pt-br	Como você gostaria que as contas fossem mostradas
 how do you like to select accounts	preferences	pt-br	Como você gostaria de selecionar as contas
 how many hours are you in front or after the timezone of the server.<br>if you are in the same time zone as the server select 0 hours, else select your locale date and time.	preferences	pt-br	Quantas horas você está além ou aquém do fuso-horário do servidor.<br> Se você estiver no mesmo selecione 0, caso contrário, escolha o fuso-horário apropriado.
