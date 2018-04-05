@@ -3503,10 +3503,9 @@
 
 			foreach($tree as $id => $value)
 			{
-//				echo 'ID: '.$id.'<br>';
 				$rtree[$parent.'.'.$id] = array(
 					'type'    => $value['type'],
-					'id'      => $parent.'.'.$id,
+					'id'      => $parent.".".$id,
 					'pid'     => $parent,
 					'caption' => $value['name']
 				);
@@ -3515,15 +3514,12 @@
 				{
 					case 'catalog_group':
 					case 'mixed_catalog_group':
-						$rtree = $rtree + $this->convert_tree($value['sub_branch'],$iconDir,$parent.'.'.$id);
+						$rtree = $rtree + $this->convert_tree($value['sub_branch'],$iconDir,$parent.".".$id);
 						break;
 				}
 			}
 
-			if (count($rtree))
-			{
-				return $rtree;
-			}
+			return $rtree;
 		}
 
 		function get_catalog_add_contact($id){
