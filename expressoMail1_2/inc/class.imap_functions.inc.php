@@ -3285,7 +3285,8 @@ class imap_functions
 		
 		// Auto raise to default user quota, configured in expressoAdmin
 		if (
-			( $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_autoRaiseQuota'] === 'true' ) &&
+			( isset($_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_autoRaiseQuota']) && 
+				$_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_autoRaiseQuota'] === 'true' ) &&
 			( isset( $quota['limit'] ) ) &&
 			( $quota['limit'] < (
 				$def_quota = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserQuota'] * 1024
