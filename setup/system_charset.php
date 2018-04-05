@@ -32,7 +32,7 @@
 
 	$GLOBALS['phpgw_setup']->translation->setup_translation_sql();
 	$translation = &$GLOBALS['phpgw_setup']->translation->sql;
-	$translation->translation(True);	// to get the mbstring warnings
+	$translation->translation(true);	// to get the mbstring warnings
 
 	$tpl_root = $GLOBALS['phpgw_setup']->html->setup_tpl_dir('setup');
 	$setup_tpl = CreateObject('phpgwapi.Template',$tpl_root);
