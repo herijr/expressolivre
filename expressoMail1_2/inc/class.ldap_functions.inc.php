@@ -692,9 +692,11 @@ class ldap_functions
             $info = ldap_get_entries($this->ds, $sr);
             for ($i=0; $i<$info["count"]; $i++)
             {
-                if ($info[$i]["phpgwaccountvisible"][0] == '-1')
-                    continue;
-                $users[$uids=$info[$i]["uidnumber"][0]] = Array('name'    =>    $uids=$info[$i]["cn"][0], 'type'    =>    "u");
+								if( isset($info[$i]["phpgwaccountvisible"][0]) && $info[$i]["phpgwaccountvisible"][0] == '-1' ){
+									continue;
+								}
+
+								$users[$uids=$info[$i]["uidnumber"][0]] = Array('name'    =>    $uids=$info[$i]["cn"][0], 'type'    =>    "u");
             }
         }
         ldap_close($this->ds);
