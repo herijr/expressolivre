@@ -11,6 +11,8 @@ class ContactEmailPhotoResource extends CatalogAdapter {
         public function setDocumentation() {
 
                 $this->setResource("Catalog","Catalog/Photo","Retorna a Foto do Usuário.",array("GET"));
+                $this->setIsMobile(true);
+                $this->addResourceParam("auth","string",true,"Chave de autenticação do Usuário.",false);
                 $this->addResourceParam("email","string",false,"Email do usuário que será buscado a foto.");
 
         }
