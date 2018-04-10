@@ -11,6 +11,7 @@ class ContactEmailPhotoResource extends CatalogAdapter {
         public function setDocumentation() {
 
                 $this->setResource("Catalog","Catalog/Photo","Retorna a Foto do Usuário.",array("GET"));
+                $this->addResourceParam("email","string",false,"Email do usuário que será buscado a foto.");
 
         }
 
@@ -53,6 +54,27 @@ class ContactEmailPhotoResource extends CatalogAdapter {
                         }
                 }
                 return false;
+        }
+
+        public function post($request){
+
+            parent::post($request);
+
+            if( $this->isLoggedIn() )
+            {
+                $email = $this->getParam('email');
+
+                $this->getLdapCatalog()->ldapConnect(true);
+
+                $photo = $this->getUserJpegPhotoByEmail($email);
+
+                $contact[] = array('contactMail'     => $email, 'contactPicture'   => ($photo != null ? base64_encode($photo) : ""));
+
+                $result = array ('contacts' => $contact);
+                $this->setResult($result);      
+            }
+
+            return $this->getResponse();
         }
 
         public function get($request) {
