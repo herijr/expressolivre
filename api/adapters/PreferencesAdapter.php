@@ -37,7 +37,7 @@ class PreferencesAdapter extends ExpressoAdapter
 		{
 			if( ldap_bind($connLdap, $ldapContext, $currentPassword) ){ $_return = true; }
 
-			ldap_close($connLap);
+			ldap_close($connLdap);
 		}
 
 		return $_return;
