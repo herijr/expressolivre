@@ -10,7 +10,8 @@ class SearchLdapResource extends AdminAdapter
 
 		$this->addResourceParam("accountSearchUID","string",true,"Faz a busca pelo uid do usuário no catálogo ldap");
 		$this->addResourceParam("accountSearchCPF","string",true,"Faz a busca pelo CPF do usuário no catálogo ldap");
-
+		$this->addResourceParam("accountSearchRG","string",true,"Faz a busca pelo RG do usuário no catálogo ldap");
+		$this->addResourceParam("accountSearchMail","string",true,"Faz a busca pelo email do usuário no catálogo ldap");
 	}
 
 	public function post($request)
@@ -101,5 +102,3 @@ class SearchLdapResource extends AdminAdapter
  		return $this->getResponse();
 	}
 }
-
-?>
