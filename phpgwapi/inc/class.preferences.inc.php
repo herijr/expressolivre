@@ -383,7 +383,7 @@
 		@note the effektive prefs ($this->data) are updated to reflect the change
 		@returns the new effective prefs (even when forced or default prefs are deleted!)
 		*/
-		function delete($app_name, $var = False,$type = 'user')
+		function delete($app_name, $var = false,$type = 'user')
 		{
 			//echo "<p>delete('$app_name','$var','$type')</p>\n";
 			$set_via = array(
@@ -422,15 +422,19 @@
 				else
 				{
 					$arr = $this->$set_from;
-					if($var && @isset($arr[$app_name][$var]) && $arr[$app_name][$var] !== '')
+					if( $var )
 					{
-						$this->data[$app_name][$var] = $this->$set_from[$app_name][$var];
-						break;
+						if( isset($arr[$app_name][$var]) && trim($arr[$app_name][$var]) !== "" )
+						{
+							$this->data[$app_name][$var] = $this->$set_from[$app_name][$var];	
+							break;
+						}
 					}
 					unset($arr);
 				}
 			}
-			reset ($this->data);
+			reset( $this->data );
+			
 			return $this->data;
 		}
 
