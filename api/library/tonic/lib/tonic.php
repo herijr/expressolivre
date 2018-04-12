@@ -354,7 +354,8 @@ class Request {
                     }
                     if (
                         !isset($this->resources[$resourceDetails['mountPoint'].$uri]) ||
-                        $this->resources[$resourceDetails['mountPoint'].$uri]['priority'] < $priority
+												( isset($this->resources[$resourceDetails['mountPoint'].$uri]['priority']) &&
+                        $this->resources[$resourceDetails['mountPoint'].$uri]['priority'] < $priority )
                     ) {
                         $this->resources[$resourceDetails['mountPoint'].$uri] = array(
                             'namespace' => $resourceDetails['namespaceName'],
@@ -840,4 +841,3 @@ class ResponseException extends Exception {
     }
     
 }
-
