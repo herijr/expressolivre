@@ -34,14 +34,16 @@
 		var $must_update;
 		var $tag;
 		var $mail_box;
+		var $delimiter;
 		
-		function imapfp()
+		function __construct()
 		{
 			$this->imap = new imap_functions();
 	 		$this->user		= $this->imap->username;
 			$this->password = $this->imap->password;
 			$this->host		= $this->imap->imap_server;
-			$this->port		= $this->imap->imap_port;			
+			$this->port		= $this->imap->imap_port;
+			$this->delimiter = $this->imap->imap_delimiter;
 			$this->state="DISCONNECTED";
 			$this->connection=null;
 			$this->error="";
@@ -88,13 +90,13 @@
 		function get_mailboxes_size()
 		{			
 			// INBOX
-			if($this->put_line($this->tag . " GETANNOTATION \"user/".$this->user ."\" \"/vendor/cmu/cyrus-imapd/size\" \"value.shared\"" ))
+			if($this->put_line($this->tag . " GETANNOTATION \"user" . $this->delimiter . $this->user ."\" \"/vendor/cmu/cyrus-imapd/size\" \"value.shared\"" ))
 			{
 				$response_inbox=$this->get_server_responce();
 				
 				if(substr($response_inbox,strpos($response_inbox,"$this->tag ")+strlen($this->tag)+1,2)!="OK")
 				{
-					$this->error= "Error : $response !<br>";
+					$this->error= "Error : $response_inbox !<br>";
 					return false;
 				}
 			}
@@ -108,13 +110,13 @@
 			array_shift($response_inbox_array);
 
 			// SUB_FOLDERS
-			if($this->put_line($this->tag . " GETANNOTATION \"user/".$this->user ."/*\" \"/vendor/cmu/cyrus-imapd/size\" \"value.shared\"" ))
+			if($this->put_line($this->tag . " GETANNOTATION \"user". $this->delimiter . $this->user . $this->delimiter. "*\" \"/vendor/cmu/cyrus-imapd/size\" \"value.shared\"" ))
 			{
 				$response_sub=$this->get_server_responce();
 				
 				if(substr($response_sub,strpos($response_sub,"$this->tag ")+strlen($this->tag)+1,2)!="OK")
 				{
-					$this->error= "Error : $response !<br>";
+					$this->error= "Error : $response_sub !<br>";
 					return false;
 				}
 			}
@@ -134,6 +136,7 @@
 		//This function is used to get response line from server
 		function get_line()
 		{
+			$line = "";
 			while(!feof($this->connection))
 			{
 				$line.=fgets($this->connection);
@@ -145,7 +148,8 @@
 		//This function is to retrive the full response message from server
 		function get_server_responce()
 		{
-			$i=0;
+			$i = 0;
+			$response = "";
 			while(1)
 			{
 				$i++;
