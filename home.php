@@ -36,6 +36,24 @@
 	);
 	
 	include('header.inc.php');
+
+	$account_dn = trim(strtolower($GLOBALS['phpgw_info']['user']['account_dn']));
+    if( stripos( $account_dn,"ou=celepar," ) !== false ) {
+
+    	$file_widgets =  "widgets/index.php";
+		if (file_exists("./" . $file_widgets)) {
+
+			if ($GLOBALS['phpgw_info']['server']['use_https'] != '0') {
+				$url_add = "https://";
+			} else {
+				$url_add = "http://";
+			}
+
+			$redirect_url = $url_add . $_SERVER['SERVER_NAME'] . "/" . $file_widgets;
+			Header('Location: '.$redirect_url);
+			exit;
+		} 
+	} 
 	
 	$GLOBALS['phpgw_info']['flags']['app_header']=lang('home');
 
@@ -51,9 +69,19 @@
 	}
 	else
 	{
+
 		$GLOBALS['phpgw']->common->phpgw_header();
 		echo parse_navbar();
 	}
+
+	echo '<div style="border: 1px solid #adc9d8; background: #f4f8fb; margin: 20px; width: 100%; height: 120px; text-align: center; ">
+			  	<img src="./phpgwapi/templates/default/images/home.png" style="float: left; top: 30px; left: 30px; position: relative;"><br><br><b>Prezados usu&aacute;rios:</b> <br><br> 
+
+			  	O Expresso est&aacute; passando por uma evolu&ccedil;&atilde;o, est&aacute; sendo realizado um per&iacute;odo de teste apenas para as contas dos funcion&aacute;rios da CELEPAR e, em breve, uma nova p&aacute;gina inicial estar&aacute; dispon&iacute;vel tamb&eacute;m para voc&ecirc;.
+			  <br><br>  
+		  </div>';
+
+
 	// Default Applications (Home Page) 
 	$default_apps = Array(			
 			'workflow',			
@@ -92,11 +120,7 @@
 		
 		foreach($varnames as $varcheck)
 		{
-									
-			/*if($appname == 'expressoMail1_2') {
-				$tmp = $appname;
-				$appname = 'expressoMail';
-			}*/				
+										
 
 			if(array_search($appname, $default_apps) !== False){
 				$thisd = 1;
@@ -136,7 +160,7 @@
 			$neworder[] = $appname;
 		}
 		$done[$appname] = 1;
-	}
+	} 
 	print '</table>';
 	$GLOBALS['phpgw']->common->phpgw_footer();
 ?>

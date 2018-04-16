@@ -85,4 +85,6 @@
 
 	include(personalize_include_path('phpgwapi','login'));
 
+	echo "<script>window.localStorage.clear();</script>"; 
+
 ?>
