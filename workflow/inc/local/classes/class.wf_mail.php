@@ -114,9 +114,11 @@ class wf_mail extends PHPMailer
 	* @param mixed $to Uma string contendo o e-mail do destino (destinatário) ou uma array contendo uma lista de destinatários.
 	* @param string $subject O assunto do e-mail.
 	* @param string $body O corpo da mensagem.
+	* @param string $fromName Nome do remetente. Caso não seja informado, utiliza o nome do processo.
+	* @param string $replyTo Uma string contendo o endereço de resposta do e-mail, ou uma array contendo uma lista de endereços de resposta. Caso não seja informado, utiliza o endereço do remetente.
 	* @access public
 	*/
-	function quickSend($from, $to, $subject, $body, $fromName = '')
+	function quickSend($from, $to, $subject, $body, $fromName = '', $replyTo = '')
 	{
 		/* limpa possíveis erros (para que outras chamadas ao método não influenciem a chamada atual) */
 		$this->clearErrors();
@@ -131,8 +133,6 @@ class wf_mail extends PHPMailer
 		/* preenche as informações para envio */
 		$this->FromName = $fromName;
 		$this->From = $from;
-		$this->ClearReplyTos();
-		$this->AddReplyTo($from);
 		$this->Subject = $subject;
 		$this->Body = str_replace("\n",'<br />',html_entity_decode($body));
 		// se for necessária compatibilidade com clientes de email antigos (e.g. mutt) descomente a linha abaixo
@@ -142,6 +142,14 @@ class wf_mail extends PHPMailer
 			$to = array($to);
 		foreach ($to as $recipient)
 			$this->AddAddress($recipient);
+
+		$this->ClearReplyTos();
+		if (empty($replyTo))
+			$replyTo = $from;
+		if (!is_array($replyTo))
+			$replyTo = array($replyTo);
+		foreach ($replyTo as $recipient)
+			$this->AddReplyTo($recipient);
 
 		/* envia o e-mail */
 		return parent::Send();
