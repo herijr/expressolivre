@@ -60,31 +60,33 @@ if ( isset( $GLOBALS['phpgw'] ) && !isset( $_SESSION['connection_db_info'] ) )
 	
 	$GLOBALS['phpgw']->db->next_record();
 	
-    if ( $GLOBALS['phpgw']->db->row() )
-    {
-        $userAuth     = "";
-        $rows         = $GLOBALS['phpgw']->db->row();
+	if ( $GLOBALS['phpgw']->db->row() )
+	{
+		$userAuth     = "";
+		$rows         = $GLOBALS['phpgw']->db->row();
 
-        if( isset( $rows['btrim'] ) )
-        {
-            $userAuth = $rows['btrim'];
-        }
+		if( isset( $rows['btrim'] ) )
+		{
+		    $userAuth = $rows['btrim'];
+		}
 
-        if( isset( $rows['ip'] ) )
-        {
-            $userAuth .= "{".$rows['ip']."}";
-        }
+		if( isset( $rows['ip'] ) )
+		{
+		    $userAuth .= "{".$rows['ip']."}";
+		}
 
-        if( isset( $rows['browser'] ) )
-        {
-            $userAuth .= $rows['browser'];
-        }
+		if( isset( $rows['browser'] ) )
+		{
+		    $userAuth .= $rows['browser'];
+		}
 
-        $_SESSION['connection_db_info']['user_auth'] = $userAuth;
+		$_SESSION['connection_db_info']['user_auth'] = $userAuth;
 
-        unset( $userAuth );
-        unset( $rows );
-    }
+		unset( $userAuth );
+		unset( $rows );
+	}
+	
+	unset( $query );
 }
 
 // Check User Agent
