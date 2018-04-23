@@ -24,9 +24,7 @@ class DocumentationResource extends ExpressoAdapter {
 		{
 			foreach( $classFile as $className => $filePath )
 			{
-				//echo $className . "\n";=
-
-				$class = new $className();
+				$class = new $className( 0 );
 				$class->setDocumentation();
 				$class_doc = $class->getDocumentation();
 				if ($class_doc["id"] != "") {
