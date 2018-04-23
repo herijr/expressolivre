@@ -590,7 +590,7 @@ class imap_functions
 	{
 		$return = array();
 		$msg_number = $params['msg_number'];
-		if(@preg_match('(.+)(_[a-zA-Z0-9]+)',$msg_number,$matches)) { //Verifies if it comes from a tab diferent of the main one.
+		if(preg_match('/(.+)(_[a-zA-Z0-9]+)/',$msg_number,$matches)) { //Verifies if it comes from a tab diferent of the main one.
 			$msg_number = $matches[1];
 			$plus_id = $matches[2];
 		}
