@@ -830,7 +830,9 @@ WHERE (c2.relname=\'%s\' or c2.relname=lower(\'%s\'))';
 			@pg_freeresult($this->_resultid);
 			$this->_resultid = false;
 		}
-		@pg_close($this->_connectionID);
+		if( is_resource( $this->_connectionID ) ){
+			@pg_close($this->_connectionID);
+		}
 		$this->_connectionID = false;
 		return true;
 	}
