@@ -1348,10 +1348,14 @@ class ldap_functions
 				if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE ))
 				{
 					$result['corporative_information_employeenumber']	= isset($entry[0]['employeenumber'][0])? $entry[0]['employeenumber'][0] : '';
-					$result['corporative_information_cpf']				= isset($entry[0]['cpf'][0])? $entry[0]['cpf'][0] : '';
-					$result['corporative_information_rg']				= isset($entry[0]['rg'][0])? $entry[0]['rg'][0] : '';
-					$result['corporative_information_rguf']				= isset($entry[0]['rguf'][0])? $entry[0]['rguf'][0] : '';
-					$result['corporative_information_description']		= isset($entry[0]['description'][0])? utf8_decode($entry[0]['description'][0]) : '';
+					$result['corporative_information_cpf'] = isset($entry[0]['cpf'][0])? $entry[0]['cpf'][0] : '';
+					$result['corporative_information_rg'] = isset($entry[0]['rg'][0])? $entry[0]['rg'][0] : '';
+					$result['corporative_information_rguf'] = isset($entry[0]['rguf'][0])? $entry[0]['rguf'][0] : '';
+					$result['corporative_information_description'] = isset($entry[0]['description'][0])? utf8_decode($entry[0]['description'][0]) : '';
+					$result['corporative_information_datanascimento'] = isset($entry[0]['datanascimento'][0])? $entry[0]['datanascimento'][0] : '';
+					$result['corporative_information_st'] = isset($entry[0]['st'][0])? $entry[0]['st'][0] : '';
+					$result['corporative_information_city'] = isset($entry[0]['city'][0])? $entry[0]['city'][0] : '';
+					$result['corporative_information_sexo'] = isset($entry[0]['sexo'][0])? $entry[0]['sexo'][0] : '';
 				}
 				
 				// MailLists
