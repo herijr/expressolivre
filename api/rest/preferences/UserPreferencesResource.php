@@ -18,9 +18,8 @@ class UserPreferencesResource extends PreferencesAdapter
 	{
 		// to Receive POST Params (use $this->params)
  		parent::post($request);
-
  		if( $this->isLoggedIn() )
-		{
+ 		{
 
 			$module = $this->getParam('module');
 			$preference = $this->getParam('preference');
@@ -32,10 +31,10 @@ class UserPreferencesResource extends PreferencesAdapter
 			$prefs_default = &$GLOBALS['phpgw']->preferences->default[$appName];
 			$prefs_user = &$GLOBALS['phpgw']->preferences->user[$appName];
 
-			$prefs = array_merge($prefs_default,$prefs_user);
+			$prefs = (array)array_merge((array)$prefs_default,(array)$prefs_user);
 
 			foreach( $prefs as $k => $pref) {
-				$prefs[$k] = mb_convert_encoding($pref, "UTF8","ISO_8859-1");
+				$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF8","ISO_8859-1") : $pref;
 			}
 
 			if ($preference == "") {
