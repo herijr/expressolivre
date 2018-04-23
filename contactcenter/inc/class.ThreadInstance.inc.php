@@ -34,7 +34,7 @@
 				return $this->getLine(true);
 		}
 		function response ($status, $data) {
-			response ($status, $data);
+			responseTo( $status, $data );
 		}
 		function getLine ($wait = false) {
 			if ($wait) {

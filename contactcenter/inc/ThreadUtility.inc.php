@@ -18,7 +18,7 @@
 	 * Utility class used in the "Thread" solution
 	 */
 
-	function response ($status, $response) {
+	function responseTo ($status, $response) {
 		echo $status . "\n";
 		echo base64_encode(serialize($response)), "\n";
 	}
