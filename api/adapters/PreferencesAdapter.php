@@ -67,7 +67,13 @@ class PreferencesAdapter extends ExpressoAdapter
 
 		return $_return;
 	}
-
+	
+	public function readUserApp()
+	{
+		$config = parse_ini_file( API_DIRECTORY . '/../config/user.ini',true);
+		
+		return $config['Preferences.mapping'];
+	}
 }
 
 ?>

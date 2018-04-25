@@ -20,33 +20,38 @@ class UserPreferencesResource extends PreferencesAdapter
  		parent::post($request);
  		if( $this->isLoggedIn() )
  		{
-
-			$module = $this->getParam('module');
+			$appName = $this->getParam('module');
 			$preference = $this->getParam('preference');
 
-			if ($preference == "") { $preference = ""; }
-			if (($module == "mail") || ( $module == "")) { $appName = "expressoMail"; }
-			else { $appName = $module; }
+			if( trim($appName) === "" ) { $appName = "mail"; }
 
-			$prefs_forced = (isset(&$GLOBALS['phpgw']->preferences->forced[$appName]) ? &$GLOBALS['phpgw']->preferences->forced[$appName] : array());
-			$prefs_default = (isset(&$GLOBALS['phpgw']->preferences->default[$appName]) ? &$GLOBALS['phpgw']->preferences->default[$appName] : array());
-			$prefs_user = (isset(&$GLOBALS['phpgw']->preferences->user[$appName]) ? &$GLOBALS['phpgw']->preferences->user[$appName] : array());
+			$apps = $this->readUserApp();
+			$module = $appName;
+			if( array_key_exists( $appName, $apps ) )
+			{
+				$appName = $apps[$appName];
+				$prefs_forced = (isset($GLOBALS['phpgw']->preferences->forced[$appName]) ? $GLOBALS['phpgw']->preferences->forced[$appName] : array());
+				$prefs_default = (isset($GLOBALS['phpgw']->preferences->default[$appName]) ? $GLOBALS['phpgw']->preferences->default[$appName] : array());
+				$prefs_user = (isset($GLOBALS['phpgw']->preferences->user[$appName]) ? $GLOBALS['phpgw']->preferences->user[$appName] : array());
 
-			$prefs = array_merge( $prefs_default, $prefs_user);
+				$prefs = array_merge( $prefs_default, $prefs_user);
 
-			foreach( $prefs as $k => $pref) {
-				$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF8","ISO_8859-1") : $pref;
-			}
-
-			if ($preference == "") {
-				$result = array( $module => $prefs );
-			} else {
-				if (isset($prefs[$preference])) {
-					$result = array( $module => array( "" . $preference => $prefs[$preference]) );
-				} else {
-					$result = array( $module => array( "" . $preference => "") );
+				foreach( $prefs as $k => $pref) {
+					$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF8","ISO_8859-1") : $pref;
 				}
-				
+
+				if ($preference == "") {
+					$result = array( $module => $prefs );
+				} else {
+					if (isset($prefs[$preference])) {
+						$result = array( $module => array( "" . $preference => $prefs[$preference]) );
+					} else {
+						$result = array( $module => array( "" . $preference => "") );
+					}
+					
+				}
+			} else {
+				$result = array( $module => array( "" . $preference => "") );
 			}
 			
 			$this->setResult($result);
