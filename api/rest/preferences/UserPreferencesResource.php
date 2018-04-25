@@ -25,13 +25,14 @@ class UserPreferencesResource extends PreferencesAdapter
 			$preference = $this->getParam('preference');
 
 			if ($preference == "") { $preference = ""; }
-			if (($module == "mail") || ($module == "")) { $appName = "expressoMail"; }
+			if (($module == "mail") || ( $module == "")) { $appName = "expressoMail"; }
+			else { $appName = $module; }
 
-			$prefs_forced = &$GLOBALS['phpgw']->preferences->forced[$appName];
-			$prefs_default = &$GLOBALS['phpgw']->preferences->default[$appName];
-			$prefs_user = &$GLOBALS['phpgw']->preferences->user[$appName];
+			$prefs_forced = (isset(&$GLOBALS['phpgw']->preferences->forced[$appName]) ? &$GLOBALS['phpgw']->preferences->forced[$appName] : array());
+			$prefs_default = (isset(&$GLOBALS['phpgw']->preferences->default[$appName]) ? &$GLOBALS['phpgw']->preferences->default[$appName] : array());
+			$prefs_user = (isset(&$GLOBALS['phpgw']->preferences->user[$appName]) ? &$GLOBALS['phpgw']->preferences->user[$appName] : array());
 
-			$prefs = (array)array_merge((array)$prefs_default,(array)$prefs_user);
+			$prefs = array_merge( $prefs_default, $prefs_user);
 
 			foreach( $prefs as $k => $pref) {
 				$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF8","ISO_8859-1") : $pref;
