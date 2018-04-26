@@ -1844,14 +1844,14 @@ class imap_functions
 		else
 			$folders_list = imap_getmailboxes($mbox_stream, $serverString, '*' );
 
-		$folders_list = array_slice($folders_list,0,$this->foldersLimit); 
-
 		$tmp = array(); 
 		$resultMine = array(); 
 		$resultDefault = array(); 
 
 		if ( is_array($folders_list) )
         {
+			$folders_list = array_slice( $folders_list, 0, $this->foldersLimit );
+
 			reset($folders_list);
 		
 			$this->ldap = new ldap_functions();
