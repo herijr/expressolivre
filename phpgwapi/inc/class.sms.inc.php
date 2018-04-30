@@ -81,11 +81,14 @@ class sms
 		try {
 			if (!extension_loaded('soap')) $this->runException('E_LOAD_EXTENSION');
 			
+			$options = array();
+			
 			foreach ($this->_options as $key => $value)
 				if (isset($GLOBALS['phpgw_info']['server']['sms_'.$key]))
 					$options[$key] = $GLOBALS['phpgw_info']['server']['sms_'.$key];
 			
-			$this->_setOptions($options);
+			if( count($options) > 0 )
+				$this->_setOptions($options);
 			
 			if ($this->isEnabled()) $this->_setUser();
 			
