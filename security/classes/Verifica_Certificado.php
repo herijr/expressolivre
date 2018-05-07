@@ -113,7 +113,7 @@ class Verifica_Certificado
 		$crl = file_get_contents($pcrl,true);
 		$cert_data = Crl_parseASN($crl);
                 # testa se crl expirada....	
-		if(gmdate('YmdHis') >= data_hora($cert_data[1][0][1][4][1]))
+		if(gmdate('YmdHis', time() + 3600*(-3 + date("I"))) >= data_hora($cert_data[1][0][1][4][1]))
 		{
 			# Se crl expirada, assume certificado revogado..
 			$this->erros_ssl[]= 'Couldn\'t verify if certificate was revoked.(CD-02)';  //'Arquivo CRL expirado.';

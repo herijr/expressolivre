@@ -12,6 +12,10 @@
 /api/old_versions/*/config/profileHomeServer.ini
 /header.inc.php
 /security/temp/*.tmp
+/security/crls/*.crl
+/security/classes/*.crt
+/security/classes/*.pem
+/logs/*
 /phpgwapi/templates/news/config_images.ini
 /phpgwapi/templates/news/src_images/*
 *.log
