@@ -1299,26 +1299,28 @@
 			reset($var);
 		}
 	}
-		
-	foreach(array('_GET','_POST','_REQUEST','HTTP_GET_VARS','HTTP_POST_VARS','HTTP_REQUEST_VARS') as $where)
+	
+	if( !isset($GLOBALS['phpgw_info']['flags']['disable_modify_request']) || !$GLOBALS['phpgw_info']['flags']['disable_modify_request'] == True )
 	{
-		$pregs = array(
-			'order' => '/^[a-zA-Z0-9_]*$/',
-			'sort'  => '/^(ASC|DESC|asc|desc|0|1|2|3|4|5|6|7){0,1}$/',
-		);
-		foreach(array('order','sort') as $name)
+		foreach(array('_GET','_POST','_REQUEST','HTTP_GET_VARS','HTTP_POST_VARS','HTTP_REQUEST_VARS') as $where)
 		{
-			if (isset($GLOBALS[$where][$name]) && !is_array($GLOBALS[$where][$name]) && !preg_match($pregs[$name],$GLOBALS[$where][$name]))
+			$pregs = array(
+				'order' => '/^[a-zA-Z0-9_]*$/',
+				'sort'  => '/^(ASC|DESC|asc|desc|0|1|2|3|4|5|6|7){0,1}$/',
+			);
+			foreach(array('order','sort') as $name)
 			{
-				$GLOBALS[$where][$name] = '';
+				if (isset($GLOBALS[$where][$name]) && !is_array($GLOBALS[$where][$name]) && !preg_match($pregs[$name],$GLOBALS[$where][$name]))
+				{
+					$GLOBALS[$where][$name] = '';
+				}
+			}
+			if (is_array($GLOBALS[$where]))
+			{
+				_check_script_tag($GLOBALS[$where],$where);
 			}
 		}
-		if (is_array($GLOBALS[$where]))
-		{
-			_check_script_tag($GLOBALS[$where],$where);
-		}
 	}
-	
 	if(floor(phpversion()) <= 4)
 	{
 		/**

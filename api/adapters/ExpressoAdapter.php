@@ -22,11 +22,14 @@ class ExpressoAdapter extends Resource {
 		
 		if (!isset($GLOBALS['phpgw_info'])) {
 			
+			preg_match( "/.*(Mail\/Send)/" , $_SERVER['REQUEST_URI'], $foundResources );
+
 			$GLOBALS['phpgw_info'] = array(
 				'flags' => array(
 					'currentapp'				=> "login",
 					'noheader'					=> True,
-					'disable_Template_class'	=> True
+					'disable_Template_class'	=> True,
+					'disable_modify_request'  	=> ( ( count($foundResources) > 0 ) ? True : False ),
 				)
 			);
 
