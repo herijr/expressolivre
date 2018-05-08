@@ -1204,7 +1204,8 @@
 						'gn'  => isset( $new_values['givenname'] )? $new_values['givenname'] : $old_values['givenname'],
 						'sn'  => isset( $new_values['sn']        )? $new_values['sn']        : $old_values['sn'],
 						'dep' => isset( $new_values['context']   )? $new_values['context']   : $old_values['context'],
-						'pwd' => (isset( $diff['password1'] ) && $diff['password1'])? $new_values['password1'] : false,
+						'ou'  => ( isset( $new_values['ad_ou'] ) && !empty( $new_values['ad_ou'] ) )? $new_values['ad_ou']     : false,
+						'pwd' => ( isset( $diff['password1']   ) && $diff['password1']             )? $new_values['password1'] : false,
 					)
 				);
 			} else {
