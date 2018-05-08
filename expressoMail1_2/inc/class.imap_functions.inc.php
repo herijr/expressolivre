@@ -1969,6 +1969,7 @@ class imap_functions
 		}
 		
 		// Sorting resultDefault
+		$resultDefault2 = array();
 		foreach ($resultDefault as $key => $folder_id)
 		{
 			switch( $resultDefault[$key]['folder_id'] )
