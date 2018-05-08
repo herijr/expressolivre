@@ -149,7 +149,7 @@ if ( empty( $_SESSION['phpgw_session']['session_id'] ) || $invalidSession )
 	{
 		error_log( '[ INVALID SESSION ] >>>>'.$_SESSION['connection_db_info']['user_auth'].'<<<< - >>>>' . implode( '', $userAgent ), 0 );
 	
-		$GLOBALS['phpgw']->session->phpgw_setcookie( 'sessionid' );
+		isset( $GLOBALS['phpgw']->session ) ? $GLOBALS['phpgw']->session->phpgw_setcookie( 'sessionid' ) : setcookie( 'sessionid', '', 0 );
 	
 		$GLOBALS['phpgw']->redirect( $GLOBALS['phpgw_info']['server']['webserver_url'].'/login.php?cd=10' );
 	}
