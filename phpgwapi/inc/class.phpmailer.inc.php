@@ -1190,52 +1190,66 @@ class PHPMailer
      * @access private
      * @return string
      */
-    function EncodeQP ($str) {
-        $encoded = $this->FixEOL($str);
-        if (substr($encoded, -(strlen($this->LE))) != $this->LE)
-            $encoded .= $this->LE;
+			function EncodeQP ($str) {
+				$encoded = $this->FixEOL($str);
+				if (substr($encoded, -(strlen($this->LE))) != $this->LE){
+					$encoded .= $this->LE;
+				}
 
-        // Replace every high ascii, control and = characters
-        $encoded = preg_replace('/([\000-\010\013\014\016-\037\075\177-\377])/e',
-                  "'='.sprintf('%02X', ord('\\1'))", $encoded);
-        // Replace every spaces and tabs when it's the last character on a line
-        $encoded = preg_replace("/([\011\040])".$this->LE."/e",
-                  "'='.sprintf('%02X', ord('\\1')).'".$this->LE."'", $encoded);
+				// Replace every high ascii, control and = characters
+				$encoded = preg_replace_callback('/([\000-\010\013\014\016-\037\075\177-\377])/',
+					function($m){
+						return '='.sprintf('%02X', ord( $m[0] ) );
+				}, $encoded);
+				
+				// Replace every spaces and tabs when it's the last character on a line
+				$encoded = preg_replace_callback("/([\011\040])".$this->LE."/",
+						function($m){
+							return '='.sprintf('%02X', ord( $m[0] ).$this->LE );
+				}, $encoded);
 
-        // Maximum line length of 76 characters before CRLF (74 + space + '=')
-        $encoded = $this->WrapText($encoded, 74, true);
+				// Maximum line length of 76 characters before CRLF (74 + space + '=')
+				$encoded = $this->WrapText($encoded, 74, true);
 
-        return $encoded;
-    }
+				return $encoded;
+			}
 
     /**
      * Encode string to q encoding.  
      * @access private
      * @return string
      */
-    function EncodeQ ($str, $position = "text") {
-        // There should not be any EOL in the string
-        $encoded = preg_replace("[\r\n]", "", $str);
+		function EncodeQ ($str, $position = "text") {
+			// There should not be any EOL in the string
+			$encoded = preg_replace("[\r\n]", "", $str);
+			switch (strtolower($position)) {
+				case "phrase":
+					$encoded = preg_replace_callback("/([^A-Za-z0-9!*+\/ -])/", 
+						function($m){
+							return '='.sprintf('%02X', ord( $m[0] ) );
+						}, $encoded);
+						
+					break;
+				case "comment":
+					$encoded = preg_replace_callback("/([\(\)\"])/", 
+						function($m){
+							return '='.sprintf('%02X', ord( $m[0] ) );
+						}, $encoded);
+				case "text":
+				default:
+					// Replace every high ascii, control =, ? and _ characters
+					$encoded = preg_replace_callback('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/',
+							function($m){
+								return '='.sprintf('%02X', ord( $m[0] ) );
+							}, $encoded);
+					break;
+			}
 
-        switch (strtolower($position)) {
-          case "phrase":
-            $encoded = preg_replace("/([^A-Za-z0-9!*+\/ -])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
-            break;
-          case "comment":
-            $encoded = preg_replace("/([\(\)\"])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
-          case "text":
-          default:
-            // Replace every high ascii, control =, ? and _ characters
-            $encoded = preg_replace('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/e',
-                  "'='.sprintf('%02X', ord('\\1'))", $encoded);
-            break;
-        }
-        
-        // Replace every spaces to _ (more readable than =20)
-        $encoded = str_replace(" ", "_", $encoded);
+			// Replace every spaces to _ (more readable than =20)
+			$encoded = str_replace(" ", "_", $encoded);
 
-        return $encoded;
-    }
+			return $encoded;
+		}
 
     /**
      * Adds a string or binary attachment (non-filesystem) to the list.
