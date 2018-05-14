@@ -49,7 +49,7 @@
 			}else if(code == '27'){
 				QuickAddTelephone.load_telephonenumber(this);					
 			}else {
-				$(this).maskPhone();
+				$(this).maskPhone('default');
 			} 
 		}; 
 		input.onblur = function() { 

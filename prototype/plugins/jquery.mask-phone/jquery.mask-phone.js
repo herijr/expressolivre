@@ -6,7 +6,7 @@
 
     var maskList = null;
 
-    $.initPhoneMask = function( callBack )
+    $.initPhoneMask = function( fileJson, callBack )
     {
         if( loadScriptPhoneMask == 1 ){  return callBack(); } 
         else { arrayScriptPhoneMask.push(callBack); if( loadScriptPhoneMask == 0 ) return; }
@@ -21,7 +21,9 @@
                 {
                     loadScriptPhoneMask = 1;
 
-                    maskList = $.masksSort($.masksLoad("../prototype/plugins/jquery.mask-phone/phone-codes.json"), ['#'], /[0-9]|#/, "mask");
+                    var fileDefault = ( $.trim(fileJson.toLowerCase()) === "default" ? "phone-codes-default.json" : "phone-codes.json" );
+
+                  	maskList = $.masksSort($.masksLoad("../prototype/plugins/jquery.mask-phone/"+fileDefault ), ['#'], /[0-9]|#/, "mask");
 
                     for( var i in arrayScriptPhoneMask )
                     {
@@ -35,8 +37,10 @@
     $.fn.maskPhone = function()
     {
         var that = this;
+				
+				var fileJson = ( arguments.length > 0 ? arguments[0] : "" );
 
-        $.initPhoneMask( function()
+        $.initPhoneMask( fileJson, function()
         {
             var maskOpts =
             {

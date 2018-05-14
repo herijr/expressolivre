@@ -515,7 +515,7 @@
 </table>
 
 <script type="text/javascript">
-	$(document).ready( function(){ $("#telephonenumber").maskPhone(); });
+	$(document).ready( function(){ $("#telephonenumber").maskPhone('default'); });
 
 	var tab = new Tabs(9,'activetab','inactivetab','tab','tabcontent','','','tabpage');
 	

@@ -118,11 +118,11 @@
 <script type="text/javascript">
 	$(document).ready(function()
 	{
-		$("#telephonenumber").maskPhone();
+		$("#telephonenumber").maskPhone('default');
 
-		$("#homephone").maskPhone();
+		$("#homephone").maskPhone('default');
 
-		$("#mobile").maskPhone();
+		$("#mobile").maskPhone('default');
 	});
 </script>
 <br>
