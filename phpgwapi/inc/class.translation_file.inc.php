@@ -33,7 +33,7 @@
 
 		/*!
 		@function translate
-		@abstract Translate phrase to user selected lang
+		@abstract Translate phrase to ufser selected lang
 		@param $key  phrase to translate
 		@param $vars vars sent to lang function, passed to us
 		*/
@@ -56,22 +56,6 @@
 				if($GLOBALS['phpgw']->db->next_record())
 				{
 					$this->system_charset = $GLOBALS['phpgw']->db->f(0);
-				}
-			}
-			// load multi-byte-string-extension if needed, and set its internal encodeing to your system_charset
-			if($this->system_charset && substr($this->system_charset,0,9) != 'iso-8859-1')
-			{
-				if($this->mbstring = extension_loaded('mbstring') || ( version_compare( PHP_VERSION, '5.3.0', '<' ) && @dl(PHP_SHLIB_PREFIX.'mbstring.'.PHP_SHLIB_SUFFIX) ) )
-				{
-					ini_set('mbstring.internal_encoding',$this->system_charset);
-					if(ini_get('mbstring.func_overload') < 7)
-					{
-						if($warnings) echo "<p>Warning: Please set <b>mbstring.func_overload = 7</b> in your php.ini for useing <b>$this->system_charset</b> as your charset !!!</p>\n";
-					}
-				}
-				else
-				{
-					if($warnings) echo "<p>Warning: Please get and/or enable the <b>mbstring extension</b> in your php.ini for useing <b>$this->system_charset</b> as your charset, we are defaulting to <b>iconv</b> for now !!!</p>\n";
 				}
 			}
 		}
