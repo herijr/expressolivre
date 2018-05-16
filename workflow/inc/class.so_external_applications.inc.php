@@ -215,7 +215,8 @@ class so_external_applications
 		}
 
 		if (strlen($image) > 0)
-			$query = "INSERT INTO egw_wf_external_application(name, description, address, image, authentication, post, intranet_only) VALUES(?, ?, ?, currVAL('seq_egw_wf_external_application') || '.$image', ?, ?, ?)";
+			$query = "INSERT INTO egw_wf_external_application(name, description, address, image, image_path, authentication, post, intranet_only)
+						VALUES(?, ?, ?, currVAL('seq_egw_wf_external_application') || '.$image', '$this->EXTERNAL_APPLICATION_PATH', ?, ?, ?)";
 		else
 			$query = "INSERT INTO egw_wf_external_application(name, description, address, authentication, post, intranet_only) VALUES(?, ?, ?, ?, ?, ?)";
 
@@ -294,8 +295,8 @@ class so_external_applications
 				$image = $currentImage;
 
 		/* update the external application */
-		$query = "UPDATE egw_wf_external_application SET name = ?, description = ?, address = ?, image = ?, authentication = ?, post = ?, intranet_only = ? WHERE (external_application_id = ?)";
-		$result = $this->db->query($query, array($name, $description, $address, $image, $authentication, $post, $intranetOnly, $externalApplicationID));
+		$query = "UPDATE egw_wf_external_application SET name = ?, description = ?, address = ?, image = ?, image_path = ?, authentication = ?, post = ?, intranet_only = ? WHERE (external_application_id = ?)";
+		$result = $this->db->query($query, array($name, $description, $address, $image, $this->EXTERNAL_APPLICATION_PATH, $authentication, $post, $intranetOnly, $externalApplicationID));
 		$this->_checkError($result);
 
 		return (($result === false) ? false : true);

@@ -215,6 +215,7 @@
 					'name' => array('type' => 'varchar', 'precision' => '50', 'nullable' => False),
 					'description' => array('type' => 'text', 'nullable' => True),
 					'image' => array('type' => 'varchar', 'precision' => '100', 'nullable' => True),
+					'image_path' => array('type' => 'varchar', 'precision' => '250', 'nullable' => True),
 					'address' => array('type' => 'varchar', 'precision' => '120', 'nullable' => False),
 					'authentication' => array('type' => 'bit', 'precision' => '1', 'nullable' => True),
 					'post' => array('type' => 'text', 'nullable' => True),

@@ -169,12 +169,12 @@
 
 		$workflowHostInfo = extractDatabaseParameters();
 
-			/* connect to workflow database */
-			$workflowDB = $GLOBALS['phpgw']->ADOdb;
-			if ($workflowDB->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], 'workflow'))
-			{
-				/* creating table substitution */
-				$workflowDB->query('CREATE SCHEMA listagem AUTHORIZATION postgres; GRANT ALL ON SCHEMA listagem TO postgres; GRANT ALL ON SCHEMA listagem TO admin_workflow;');
+		/* connect to workflow database */
+		$workflowDB = $GLOBALS['phpgw']->ADOdb;
+		if ($workflowDB->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], 'workflow'))
+		{
+			/* creating table substitution */
+			$workflowDB->query('CREATE SCHEMA listagem AUTHORIZATION postgres; GRANT ALL ON SCHEMA listagem TO postgres; GRANT ALL ON SCHEMA listagem TO admin_workflow;');
 
 			$workflowDB->query("CREATE TABLE listagem.listagem
 							(
@@ -353,18 +353,32 @@
 		return $GLOBALS['setup_info']['workflow']['currentver'];
 	}
 
-    $test[] = '2.4.1';
-    function workflow_upgrade2_4_1()
-    {
-        $GLOBALS['setup_info']['workflow']['currentver'] = '2.4.2';
-        return $GLOBALS['setup_info']['workflow']['currentver'];
-    }
-	$test[] = '2.4.2';
-    	function workflow_upgrade2_4_2()
-    	{
-        	$GLOBALS['setup_info']['workflow']['currentver'] = '2.5.0';
-        	return $GLOBALS['setup_info']['workflow']['currentver'];
-    	}
+	$test[] = '2.4.1';
+	function workflow_upgrade2_4_1()
+	{
+		$GLOBALS['setup_info']['workflow']['currentver'] = '2.4.2';
+		return $GLOBALS['setup_info']['workflow']['currentver'];
+	}
 
+	$test[] = '2.4.2';
+	function workflow_upgrade2_4_2()
+	{
+		$GLOBALS['setup_info']['workflow']['currentver'] = '2.5.0';
+		return $GLOBALS['setup_info']['workflow']['currentver'];
+	}
+
+	$test[] = '2.5.0';
+	function workflow_upgrade2_5_0()
+	{
+		$workflowHostInfo = extractDatabaseParameters();
+
+		if ($GLOBALS['phpgw']->ADOdb->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], $workflowHostInfo['dbname']))
+		{
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE public.egw_wf_external_application ADD COLUMN image_path CHARACTER VARYING');
+		}
+
+		$GLOBALS['setup_info']['workflow']['currentver'] = '2.5.1';
+		return $GLOBALS['setup_info']['workflow']['currentver'];
+	}
 
 ?>
