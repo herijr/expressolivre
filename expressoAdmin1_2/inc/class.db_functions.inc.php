@@ -132,75 +132,24 @@ class db_functions
 		return $result;
 	}
 
-	function get_next_id($type)
+	function get_next_id()
 	{
-		$return['status'] = true;
-		
-		$current_config = $_SESSION['phpgw_info']['expresso']['expressoAdmin'];
-		
-		if ( isset( $current_config['expressoAdmin_nextid_db_host'] ) && $current_config['expressoAdmin_nextid_db_host'] != '' )
-		{
-			$this->db->disconnect();
-			$host = $current_config['expressoAdmin_nextid_db_host'];
-			$port = $current_config['expressoAdmin_nextid_db_port'];
-			$name = $current_config['expressoAdmin_nextid_db_name'];
-			$user = $current_config['expressoAdmin_nextid_db_user'];
-			$pass = $current_config['expressoAdmin_nextid_db_password'];
-			
+		$config = $_SESSION['phpgw_info']['expresso']['expressoAdmin'];
+		if ( isset( $config['expressoAdmin_nextid_db_host'] ) && $config['expressoAdmin_nextid_db_host'] != '' ) {
 			$db = new db_egw();
 			$db->Halt_On_Error = 'no';
-			$db->connect($name, $host, $port, $user, $pass, 'pgsql');
-		}
-		else
-		{
-			$db = $this->db;
-		}
-		
-		// Busco o ID dos accounts
-		$query_accounts_nextid = "SELECT id FROM phpgw_nextid WHERE appname = 'accounts'";
-        if (!$db->query($query_accounts_nextid))
-        {
-        	$return['status'] = false;
-			$result['msg'] = lang('Problems running query on DB') . '.';
-			$db->disconnect();
-        	return $return;
-        }
-        else
-        {
-        	$accounts_nextid = $db->Query_ID->fields[0];
-        }
-		
-		// Busco o ID dos groups
-		$query_groups = "SELECT id FROM phpgw_nextid WHERE appname = 'groups'";
-        if (!$db->query($query_groups))
-        {
-        	$return['status'] = false;
-			$result['msg'] = lang('Problems running query on DB') . '.';
-			$db->disconnect();
-        	return $return;
-        }
-        else
-        {
-        	$groups_nextid = $db->Query_ID->fields[0];
-        }
-
-		//Retorna o maior dos ID's incrementado de 1
-		if ($accounts_nextid >= $groups_nextid)
-			$id = $accounts_nextid;
-		else
-			$id = $groups_nextid;
-		$return['id'] = (int)($id + 1);
-		
-		
-		// Atualizo o BD
-		$query_update_id = "UPDATE phpgw_nextid set id = '" . $return['id'] . "' WHERE appname = '" . $type . "'";
-		if (!$db->query($query_update_id))
-		{
-        	$return['status'] = false;
-			$result['msg'] = lang('Problems running query on DB') . '.';
-		}
-		$db->disconnect();
-		return $return;
+			$db->connect(
+				$config['expressoAdmin_nextid_db_name'],
+				$config['expressoAdmin_nextid_db_host'],
+				$config['expressoAdmin_nextid_db_port'],
+				$config['expressoAdmin_nextid_db_user'],
+				$config['expressoAdmin_nextid_db_password'],
+				'pgsql'
+			);
+		} else $db = $this->db;
+		if ( !$db->query( 'SELECT nextval( \'"phpgw_uidNumber_seq"\' );' ) )
+			return array( 'status' => false, 'msg' => lang('Problems running query on DB').'.' );
+		return array( 'id' => $db->Query_ID->fields[0] );
 	}
 	
 	function add_user2group($gidnumber, $uidnumber)

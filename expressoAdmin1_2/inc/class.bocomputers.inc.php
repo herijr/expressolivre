@@ -42,8 +42,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$current_config = $c->config_data;
 			// Leio o ID a ser usado na criação do objecto.
 			// Esta funcao ja incrementa o ID
-			$next_id = ($this->db_functions->get_next_id('accounts'));
-			
+			$next_id = $this->db_functions->get_next_id();
 			if ((!is_numeric($next_id['id'])) || (!$next_id['status']))
 			{
 				$return['status'] = false;

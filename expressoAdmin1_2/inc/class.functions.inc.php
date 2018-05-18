@@ -436,33 +436,6 @@
 			return $result;
 		}
 
-		function get_next_id()
-		{
-			// Busco o ID dos accounts
-			$query_accounts = "SELECT id FROM phpgw_nextid WHERE appname = 'accounts'";
-			$GLOBALS['phpgw']->db->query($query_accounts);
-			while($GLOBALS['phpgw']->db->next_record())
-			{
-				$result_accounts[] = $GLOBALS['phpgw']->db->row();
-			}
-			$accounts_id = $result_accounts[0]['id'];
-
-			// Busco o ID dos groups
-			$query_groups = "SELECT id FROM phpgw_nextid WHERE appname = 'groups'";
-			$GLOBALS['phpgw']->db->query($query_groups);
-			while($GLOBALS['phpgw']->db->next_record())
-			{
-				$result_groups[] = $GLOBALS['phpgw']->db->row();
-			}
-			$groups_id = $result_groups[0]['id'];
-
-			//Retorna o maior dos ID's
-			if ($accounts_id >= $groups_id)
-				return $accounts_id;
-			else
-				return $groups_id;
-		}
-
 		function make_list_app($account_lid, $user_applications='', $disabled='')
 		{
 			// create list of ALL available apps

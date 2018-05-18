@@ -63,7 +63,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$params['mailForwardingAddress'] = $array_tmp;
 			
 			// Leio o ID a ser usado na criação do objecto.
-			$next_id = ($this->db_functions->get_next_id('accounts'));
+			$next_id = $this->db_functions->get_next_id();
 			if ((!is_numeric($next_id['id'])) || (!$next_id['status']))
 			{
 				$return['status'] = false;

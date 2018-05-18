@@ -62,7 +62,7 @@
 				}
 			
 				// Leio o ID a ser usado na criação do objecto. Esta função já incrementa o ID no BD.
-				$next_id = ($this->db_functions->get_next_id('accounts'));
+				$next_id = $this->db_functions->get_next_id();
 				if ((!is_numeric($next_id['id'])) || (!$next_id['status']))
 				{
 					$return['status'] = false;
