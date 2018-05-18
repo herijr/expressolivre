@@ -242,19 +242,21 @@ class ExpressoAdapter extends Resource {
 		// Load Granted Apps for Web Service
 		$config = parse_ini_file( API_DIRECTORY . '/../config/user.ini',true);
 		$apps 	= $config['Applications.mapping'];
-	
 		// Load Granted Apps for User
 		$contactApps = array();
 		$acl 	= CreateObject('phpgwapi.acl');
-		if ($user_id == "") {
-			$user_id = $GLOBALS['phpgw_info']['user']['account_id']['acl'];
-		}
-		foreach($acl->get_user_applications($user_id) as $app => $value){
-			$enabledApp = array_search($app, $apps);
-			if($enabledApp !== FALSE)
-				$contactApps[] = $enabledApp;
-		}
-	
+    $user_id = ( trim($user_id) !== "" ? $user_id : $GLOBALS['phpgw_info']['user']['account_id']);
+    $applicationsACL = $acl->get_user_applications($user_id);
+
+    if( is_array($applicationsACL) && count($applicationsACL) > 0 ){
+      foreach($applicationsACL as $app => $value){
+        $enabledApp = array_search($app, $apps);
+        if( $enabledApp !== FALSE ){
+          $contactApps[] = $enabledApp;
+        }
+  		}
+    }
+
 		return $contactApps;
 	}
 
