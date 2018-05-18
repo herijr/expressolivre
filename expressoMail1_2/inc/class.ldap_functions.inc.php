@@ -155,7 +155,7 @@ class ldap_functions
 				$justThese = array_merge( $justThese, array( "jpegPhoto") );
 			}
 			
-			$ldapSearch = ldap_search( $this->ds, $this->ldap_context, $filter, $justThese, 0, $this->max_result + 1 );
+			$ldapSearch = @ldap_search( $this->ds, $this->ldap_context, $filter, $justThese, 0, $this->max_result + 1 );
 
 
 			if( !$ldapSearch )
@@ -182,7 +182,7 @@ class ldap_functions
 	 			{
 	 				unset( $ldapSearch );
 
-					$ldapSearch = ldap_search( $this->ds, $user_sector_dn, $filter, $justThese , 0 , $this->max_result + 1 );
+					$ldapSearch = @ldap_search( $this->ds, $user_sector_dn, $filter, $justThese , 0 , $this->max_result + 1 );
 
 					$quickSearch_only_in_userSector = true;
 				}
@@ -1095,7 +1095,7 @@ class ldap_functions
 			if ( !$this->ds ) $this->ldapConnect();
 			
 			$search = $this->ldap_escape( $params['search'] );
-			$sr = ldap_search(
+			$sr = @ldap_search(
 				$this->ds, $this->ldap_context,
 				'(|(uid='.$search.')(cn=*'.str_replace( ' ', '*', $search ).'*))', array( 'cn', 'uid' ), 0,
 				100, isset( $params['timelimit'] )? $params['timelimit'] : 10
