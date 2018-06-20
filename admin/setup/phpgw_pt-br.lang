@@ -109,6 +109,7 @@ day	admin	pt-br	Dia
 day of week<br>(0-6, 0=sun)	admin	pt-br	Dia da Semana <br> (0-6, 0=Dom)
 db host	admin	pt-br	Host do BD
 db name	admin	pt-br	Nome do BD
+db sequence	admin	pt-br	Nome da sequência
 db password	admin	pt-br	Senha
 db port	admin	pt-br	Porta do BD
 db user	admin	pt-br	Usuário

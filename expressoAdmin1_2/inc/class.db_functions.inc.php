@@ -146,8 +146,12 @@ class db_functions
 				$config['expressoAdmin_nextid_db_password'],
 				'pgsql'
 			);
-		} else $db = $this->db;
-		if ( !$db->query( 'SELECT nextval( \'"phpgw_uidNumber_seq"\' );' ) )
+			$seq = $config['expressoAdmin_nextid_db_sequence'];
+		} else {
+			$db = $this->db;
+			$seq = 'nextid_seq';
+		}
+		if ( !$db->query( 'SELECT nextval( \'"'.$seq.'"\' );' ) )
 			return array( 'status' => false, 'msg' => lang('Problems running query on DB').'.' );
 		return array( 'id' => $db->Query_ID->fields[0] );
 	}

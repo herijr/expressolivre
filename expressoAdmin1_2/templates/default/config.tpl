@@ -215,14 +215,18 @@ function test_db_connection()
 		<td><input id="nextid_db_name" name="newsettings[expressoAdmin_nextid_db_name]" value="{value_expressoAdmin_nextid_db_name}" size="30" /></td>
 	</tr>
 	<tr class="row_on">
+		<td>{lang_db_sequence}:</td>
+		<td><input id="nextid_db_sequence" name="newsettings[expressoAdmin_nextid_db_sequence]" value="{value_expressoAdmin_nextid_db_sequence}" size="30" /></td>
+	</tr>
+	<tr class="row_off">
 		<td>{lang_db_user}:</td>
 		<td><input id="nextid_db_user" name="newsettings[expressoAdmin_nextid_db_user]" value="{value_expressoAdmin_nextid_db_user}" size="30" /></td>
 	</tr>
-	<tr class="row_off">
+	<tr class="row_on">
 		<td>{lang_db_password}:</td>
 		<td><input id="nextid_db_password" name="newsettings[expressoAdmin_nextid_db_password]" value="{value_expressoAdmin_nextid_db_password}" size="30" /></td>
 	</tr>
-	<tr class="row_on">
+	<tr class="row_off">
 		<td><input type="button" value="{lang_test_connection_with_DB}" onClick="javascript:test_db_connection()"></td>
 		<td><span>{lang_Result}: </span><span id="nextid_db_result"></span></td>
 	</tr>
