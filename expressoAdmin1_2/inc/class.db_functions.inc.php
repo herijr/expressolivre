@@ -153,7 +153,7 @@ class db_functions
 		}
 		if ( !$db->query( 'SELECT nextval( \'"'.$seq.'"\' );' ) )
 			return array( 'status' => false, 'msg' => lang('Problems running query on DB').'.' );
-		return array( 'id' => $db->Query_ID->fields[0] );
+		return array( 'status' => true, 'id' => (int)$db->Query_ID->fields[0] );
 	}
 	
 	function add_user2group($gidnumber, $uidnumber)
