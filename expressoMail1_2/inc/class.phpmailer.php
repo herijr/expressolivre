@@ -1433,6 +1433,8 @@ class PHPMailer
      * @return string
      */
 		function EncodeQP ($str) {
+      $LE = $this->LE;
+      
 			$encoded = $this->FixEOL($str);
 			if (substr($encoded, -(strlen($this->LE))) != $this->LE){
 				$encoded .= $this->LE;
@@ -1443,11 +1445,12 @@ class PHPMailer
 				function($m){
 					return '='.sprintf('%02X', ord( $m[0] ) );
 				}, $encoded);
+        
 			// Replace every spaces and tabs when it's the last character on a line
-			$encoded = preg_replace_callback("/([\011\040])".$this->LE."/",
-					function($m){
-						return '='.sprintf('%02X', ord( $m[0] ).$this->LE );
-					}, $encoded);
+      $encoded = preg_replace_callback("/([\011\040])".$LE."/",
+          function($m) use( $LE ){
+            return '='.sprintf('%02X', ord( $m[0] ).$LE );
+          }, $encoded);
 
 			// Maximum line length of 76 characters before CRLF (74 + space + '=')
 			$encoded = $this->WrapText($encoded, 74, true);
