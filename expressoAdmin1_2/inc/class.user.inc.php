@@ -254,7 +254,28 @@
 						}
 					}
 				}
-				
+
+				// API - Chama funcao para salvar foto no OpenLDAP.
+				if( isset( $params['accountPhoto']) )
+				{
+					if ( $params['accountPhoto']['name'] != '' && $this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PICTURE ) )
+	  				{
+	  					$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10240 : $this->current_config['expressoAdmin_photo_length'];
+		  
+	  					if( $params['accountPhoto']['size'] > $size_conf )
+	  					{
+	  						$return['status'] = false;
+	  						$return['msg'] .= $this->functions->lang('User photo could not be saved because is bigger than').' '.( $size_conf / 1024 ).' kb.';
+	  					} else {
+	  						$result = $this->ldap_functions->ldap_save_photo( $dn, array( $params['accountPhoto']['source'] ) );
+	  						if ( !$result['status'] ) {
+	  							$return['status'] = false;
+	  							$return['msg'] .= $result['msg'];
+	  						}
+	  					}
+	  				}
+				}
+
 				//GROUPS
 				if ($params['groups'])
 				{
@@ -707,15 +728,15 @@
 			// PHOTO
 			if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_PICTURE ))
 			{
+				$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10240 : $this->current_config['expressoAdmin_photo_length'];
+        
 				if (isset($new_values['delete_photo']) && $new_values['delete_photo'])
 				{
 					$this->ldap_functions->ldap_remove_photo($dn);
 					$this->db_functions->write_log("removed user photo",$dn);
 				}
-				elseif ($_FILES['photo']['name'] != '')
+				elseif($_FILES['photo']['name'] != '')
 				{
-					$size_conf = $this->current_config['expressoAdmin_photo_length'] == '' ? 10240 : $this->current_config['expressoAdmin_photo_length'];
-
 					if( $_FILES['photo']['size'] > $size_conf )
 					{
 						$return['status'] = false;
@@ -732,10 +753,32 @@
 						{
 							$photo_exist = false;
 							$this->db_functions->write_log("added user photo",$dn);
-						}				
-						$this->ldap_functions->ldap_save_photo($dn, $_FILES['photo']['tmp_name'], $new_values['photo_exist'], $photo_exist);
+						}
+						$this->ldap_functions->ldap_save_photo($dn, $_FILES['photo']['tmp_name'], $new_values['photo_exist']);
 					}
-				}	
+				}
+				else if( isset($new_values['accountPhoto']) )	
+				{
+					if( $new_values['accountPhoto']['size'] > $size_conf )
+					{
+						$return['status'] = false;
+						$return['msg']   .= $this->functions->lang('User photo could not be saved because is bigger than').' '.( $size_conf / 1024 ).' kb.';
+					}
+					else
+					{
+						if( $new_values['accountPhoto']['photo_exist'] )
+						{
+							$photo_exist = true;
+							$this->db_functions->write_log("mofified user photo",$dn);
+						}
+						else
+						{
+							$photo_exist = false;
+							$this->db_functions->write_log("added user photo",$dn);
+						}
+						$this->ldap_functions->ldap_save_photo( $dn, array( $new_values['accountPhoto']['source'] ), $photo_exist );
+					}
+				}
 			}
 			
 			// Verifica o acesso para adicionar ou remover tais atributos

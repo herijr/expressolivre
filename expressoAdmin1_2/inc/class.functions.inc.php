@@ -154,7 +154,7 @@
 			elseif( $type == 'api')
 			{
 				$queryLDAP = ( ( unserialize($query) ) ? unserialize($query) : $query );
-				$justthese	= array("uidnumber", "uid", "cn", "mail", "dn", "cpf", "rg", "rgUF");
+				$justthese	= array("uidnumber", "uid", "cn", "mail", "dn", "cpf", "rg", "rgUF", "jpegPhoto");
 				$search		= ldap_search( $ldap_conn, $contexts[0], "(&(phpgwAccountType=u)(".$queryLDAP[0]."=".$queryLDAP[1]."))", $justthese );
 				$info 		= ldap_get_entries( $ldap_conn, $search );
 				$return 	= false;
@@ -169,6 +169,7 @@
 					$return[0]['accountCpf']	= $info[0]['cpf'][0];
 					$return[0]['accountRG']		= $info[0]['rg'][0];
 					$return[0]['accountRgUF']	= $info[0]['rguf'][0];
+					$return[0]['accountPhoto'] = ((isset($info[0]['jpegphoto']['count']) && $info[0]['jpegphoto']['count'] == 1 ) ? true : false );
 				}		
 
 				ldap_close($ldap_conn);

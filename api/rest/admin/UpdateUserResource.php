@@ -26,6 +26,8 @@ class UpdateUserResource extends AdminAdapter
 		$this->addResourceParam("accountSt","string",false,"Estado");
 		$this->addResourceParam("accountDescription","string",false,"Descrição do usuário");
 		$this->addResourceParam("accountMailQuota","string",false,"Cota de e-mail em MB");
+		$this->addResourceParam("accountJpegPhoto","file", false, "Foto do usuario");
+		$this->addResourceParam("accountDeletePhoto","string", false, "Deletar foto ( 0 - Nao , 1 - Sim )");
 
 	}
 
@@ -67,6 +69,7 @@ class UpdateUserResource extends AdminAdapter
 				$st				= $this->getParam('accountSt');
 				$city			= $this->getParam('accountCity');
 				$sex			= $this->getParam('accountSex');
+				$deletePhoto = ( $this->getParam('accountDeletePhoto') ) ? trim($this->getParam('accountDeletePhoto')) : null;
 				
 				if ( $uidNumber === 0 && $loginUser !== '' ) {
 					
@@ -167,6 +170,28 @@ class UpdateUserResource extends AdminAdapter
 				
 				if ( trim($sex) != "" )
 					$fields['corporative_information_sexo'] = $sex;
+
+				if( isset($_FILES) && count($_FILES) > 0 )
+				{
+					$attrUser = $this->getUserSearchLdap(serialize(array("uid",$fields['uid'])));
+
+					$fields['accountPhoto'] = array(
+						'name' => $_FILES['accountPhoto']['name'],
+						'type' => $_FILES['accountPhoto']['type'],
+						'tmp_name' => $_FILES['accountPhoto']['tmp_name'],
+						'size' => $_FILES['accountPhoto']['size'],
+						'error' => $_FILES['accountPhoto']['error'],
+						'source' => base64_encode(file_get_contents( $_FILES['accountPhoto']['tmp_name'], $_FILES['accountPhoto']['size'])),
+								'photo_exist' => ( $attrUser[0]['accountPhoto'] == true ? true :  false )
+					);
+
+					unset( $_FILES['accountPhoto'] );
+				}
+				
+				if( !is_null($deletePhoto) )
+				{
+					$fields['delete_photo'] = ( intval($deletePhoto) === 1 ? true : false );
+				}
 				
 				// Update Fields
 				$msg = $this->updateUser( $fields );

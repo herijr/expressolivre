@@ -1043,13 +1043,19 @@ class ldap_functions
 	
 	function ldap_save_photo($dn, $pathphoto, $photo_exist=false)
 	{
-		$fd = fopen($pathphoto, "r");
-		$fsize = filesize($pathphoto);
-		$jpegStr = fread($fd, $fsize);
-		fclose ($fd);
-		$attrs['jpegPhoto'] = $jpegStr;
-			
-		if ($photo_exist)
+		if( is_array($pathphoto) )
+		{
+			$attrs['jpegPhoto'] = base64_decode($pathphoto[0]);
+
+		} else {
+			$fd = fopen($pathphoto, "r");
+			$fsize = filesize($pathphoto);
+			$jpegStr = fread($fd, $fsize);
+			fclose ($fd);
+			$attrs['jpegPhoto'] = $jpegStr;
+		}
+	
+		if($photo_exist)
 			$res = @ldap_mod_replace($this->ldap, $dn, $attrs);
 		else
 			$res = @ldap_mod_add($this->ldap, $dn, $attrs);

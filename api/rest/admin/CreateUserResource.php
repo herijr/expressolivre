@@ -25,6 +25,7 @@ class CreateUserResource extends AdminAdapter
 		$this->addResourceParam("accountCity","string",true,"Cidade");
 		$this->addResourceParam("accountSt","string",true,"Estado");
 		$this->addResourceParam("accountDescription","string",true,"Descrição do usuário");
+		$this->addResourceParam("accountJpegPhoto","file", false, "Foto do usuario");
 
 	}
 
@@ -63,6 +64,20 @@ class CreateUserResource extends AdminAdapter
 				$city			= $this->getParam('accountCity');
 				$sex			= $this->getParam('accountSex');
 				$description 	= $common->convertChar(trim($this->getParam('accountDescription')));
+
+				if( isset($_FILES) && count($_FILES) > 0 )
+				{
+				  $accountPhoto = array(
+				    'name' => $_FILES['accountPhoto']['name'],
+				    'type' => $_FILES['accountPhoto']['type'],
+				    'tmp_name' => $_FILES['accountPhoto']['tmp_name'],
+				    'size' => $_FILES['accountPhoto']['size'],
+				    'error' => $_FILES['accountPhoto']['error'],
+				    'source' => base64_encode(file_get_contents( $_FILES['accountPhoto']['tmp_name'], $_FILES['accountPhoto']['size']))
+				  );
+		
+				  unset( $_FILES['accountPhoto'] );
+				}
 
 				// Field Validation
 				if( trim($loginUser) == "" && isset($loginUser) )	
@@ -152,6 +167,7 @@ class CreateUserResource extends AdminAdapter
 				$fields['corporative_information_st'] 	= $st;
 				$fields['corporative_information_city'] = $city;
 				$fields['corporative_information_sexo'] = $sex;
+				$fields['accountPhoto'] = $accountPhoto;
 
 				// Validate Fields
 				$msg = $this->validateFields( array("attributes" => serialize($fields)) );
