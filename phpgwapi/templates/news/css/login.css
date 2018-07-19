@@ -36,10 +36,3 @@ body { font:12px Arial, Helvetica, sans-serif; color:#333; }
 #nav-information-login-control.play-pause { background: url("../images/icon_play_pause.png") left top #DFDFDF; float: right; }
 #nav-information-login-control.play {background-position:bottom;}
 #footer { display:block; text-align:center; padding:20px 0; color:#006699; font-size:0.917em; }
-#footer ul { display:block; margin:0 auto; width:290px; }
-#footer li { float:left; width:130px; text-align:center; }
-#footer .logo-governo,
-#footer .logo-celepar { display:block; float:left; overflow:hidden; text-indent:-1000px; }
-#footer .logo-governo { width:83px; height:71px; background:url(../images/logo_govparana_93x70.gif) no-repeat; }
-#footer .logo-celepar {	width:104px; height:49px; background:url(../images/logo_celepar_104x49.png) no-repeat; margin:0 10px; }
-#footer span {display:block;clear:both;}

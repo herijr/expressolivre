@@ -36,16 +36,9 @@
 			</div>
 			<center>
 				<div id="footer">
-					<ul id="footer-logos">
-						<li><a href="http://www.pr.gov.br/" class="logo-governo">Governo do Paraná</a></li>
-						<li>
-							<a href="http://www.pr.gov.br/" class="logo-celepar">Celepar - Tecnologia da Informação e Comunicação do Paraná</a>
-							<span id="info-deploy"><a title="Projeto Expresso Livre" target="_blank" href="http://www.expressolivre.org/">Expresso Livre</a>&nbsp;{version} {ultima_rev}<br />Powered by <a title="eGroupWare" target="_blank" href="http://www.egroupware.org/">eGroupWare</a>
-							</span>
-						</li>
-					</ul>
+					{login_logo_file}
 				</div>
-			</center>
+			</center> 
 		</div>
 		<div>{applet}</div>
 		<!-- JavaScript -->

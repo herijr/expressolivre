@@ -271,6 +271,7 @@
 	$tmpl->set_var('lang_login',lang('login'));
 
 	$tmpl->set_var('website_title', $GLOBALS['phpgw_info']['server']['site_title']);
+	$tmpl->set_var('login_logo_file', $GLOBALS['phpgw_info']['server']['login_logo_file']);
 	$tmpl->set_var('template_set', $template);
 
 	if( !isset($_SESSION['token_expresso']) || trim($_SESSION['token_expresso']) === "" )
@@ -379,6 +380,6 @@
 	if(is_file(dirname( __FILE__ ) . '/../../../infodist/ultima-revisao-svn.php'))
 	include_once(dirname( __FILE__ ) . '/../../../infodist/ultima-revisao-svn.php');
 	if(isset($ultima_revisao)) $tmpl->set_var('ultima_rev','<br>' . $ultima_revisao);
-
+  
 	$tmpl->pfp('loginout','login_form');
 ?>

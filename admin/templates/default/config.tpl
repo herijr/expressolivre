@@ -55,6 +55,15 @@
      </select>
     </td>
    </tr>
+   <tr class="row_on">
+       <td>{lang_personal_contact_type}:</td>
+       <td>
+        <select name="newsettings[personal_contact_type]">
+         <option value="">{lang_default}</option>
+         <option value="True"{selected_personal_contact_type_True}>{lang_advanced}</option>
+        </select>
+       </td>
+      </tr>
 	<tr class="th">
 		<td colspan="2">&nbsp;<b>{lang_organizations}:</b> {lang_organizations_help}</td>
 	</tr>
@@ -87,18 +96,9 @@
     <td colspan="2">&nbsp;<b>{lang_appearance}</b></td>
    </tr>
  <tr class="row_off">
-    <td>{lang_HTML_code_of_the_organization_login}</td>
-    <td><textarea cols="50" rows="2" name="newsettings[login_logo_file]">{value_login_logo_file}</textarea></td>
-   </tr>
-
-<tr class="th">
-    <td>{lang_personal_contact_type}:</td>
-    <td>
-     <select name="newsettings[personal_contact_type]">
-      <option value="">{lang_default}</option>
-      <option value="True"{selected_personal_contact_type_True}>{lang_advanced}</option>
-     </select>
-    </td>
+    <td colspan="2">{lang_HTML_code_of_the_organization_login}: <br />
+      <textarea style="width: 99%; height: 250px" align="right" name="newsettings[login_logo_file]">{value_login_logo_file}</textarea>
+  </td>
    </tr>
 
    <tr class="th">
