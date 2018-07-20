@@ -484,7 +484,7 @@
 				// 1 coluna
 				if (($i +1) % 3 == 1)
 				{
-					$checked = $user_applications[$app] ? 'CHECKED' : '';
+					$checked = (isset($user_applications[$app]) ? ( $user_applications[$app] ? 'CHECKED' : '') : '');
 					$app_col1 = sprintf("<td>%s</td><td width='10'><input type='checkbox' name='apps[%s]' value='1' %s %s></td>\n",
 					$data['title'],$app,$checked, $disabled);
 					if ($i == ($total_apps-1))
@@ -494,7 +494,7 @@
 				// 2 coluna
 				if (($i +1) % 3 == 2)
 				{
-					$checked = $user_applications[$app] ? 'CHECKED' : '';
+					$checked = (isset($user_applications[$app]) ? ( $user_applications[$app] ? 'CHECKED' : '') : '');
 					$app_col2 = sprintf("<td>%s</td><td width='10'><input type='checkbox' name='apps[%s]' value='1' %s %s></td>\n",
 					$data['title'],$app,$checked, $disabled);
 
@@ -504,7 +504,7 @@
 				// 3 coluna
 				if (($i +1) % 3 == 0)
 				{
-					$checked = $user_applications[$app] ? 'CHECKED' : '';
+					$checked = (isset($user_applications[$app]) ? ( $user_applications[$app] ? 'CHECKED' : '') : '');
 					$app_col3 = sprintf("<td>%s</td><td width='10'><input type='checkbox' name='apps[%s]' value='1' %s %s></td>\n",
 					$data['title'],$app,$checked, $disabled);
 
