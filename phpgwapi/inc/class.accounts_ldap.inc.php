@@ -600,24 +600,26 @@
 			if (!isset($to_ldap[$which])) return False;
 			
 			$sri = ldap_search($this->ds, $this->user_context, '(&('.$to_ldap[$which].'=' . (string)$name . ')(phpgwaccounttype=u))', array("uidnumber"));
-			$allValues = ldap_get_entries($this->ds, $sri);
-
-			if (@$allValues[0]['uidnumber'][0])
-			{
-				return (int)$allValues[0]['uidnumber'][0];
-			}
-
-			if ($which == 'account_lid')	// groups only support account_lid
-			{
-				$sri = ldap_search($this->ds, $this->group_context, '(&(cn=' . (string)$name . ')(phpgwaccounttype=g))', array("gidnumber"));
+			
+			if( is_resource($sri) ){
 				$allValues = ldap_get_entries($this->ds, $sri);
-	
-				if (@$allValues[0]['gidnumber'][0])
-				{
-					return (int)$allValues[0]['gidnumber'][0];
+				if( isset($allValues[0]['uidnumber'][0])){
+					return (int)$allValues[0]['uidnumber'][0];
 				}
 			}
-			
+
+			// groups only support account_lid
+			if ($which == 'account_lid'){
+				$sri = ldap_search($this->ds, $this->group_context, '(&(cn=' . (string)$name . ')(phpgwaccounttype=g))', array("gidnumber"));
+
+				if( is_resource($sri)){
+					$allValues = ldap_get_entries($this->ds, $sri);
+					if (isset($allValues[0]['gidnumber'][0])){
+						return (int)$allValues[0]['gidnumber'][0];
+					}
+				}
+			}
+
 			return False;
 		}
 

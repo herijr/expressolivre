@@ -193,33 +193,32 @@ class soradius
 	
 	private function _getProfiles()
 	{
-		$entries = ldap_get_entries(
-			$this->ldap_connection,
-			@ldap_search(
-				$this->ldap_connection,
-				$this->_radius_dn,
-				'(cn=*)'
-			)
-		);
-		
-		if ( is_null($entries) ) {
-			if ( $this->_createDC() ) return $this->_getProfiles();
-			else return false;
-		}
-		
 		$result = array();
-		$schema = $this->getRadiusSchema();
-		for ( $i = 0; $i < $entries['count']; $i++ ) {
-			$result[$entries[$i]['cn'][0]] = array();
-			for ( $j = 0; $j < $entries[$i]['count']; $j++ ) {
-				if ( !in_array( $entries[$i][$j], array('cn','objectclass') ) ) {
-					$key = array_search(strtolower($entries[$i][$j]),array_map('strtolower',$schema['may']));
-					unset( $entries[$i][$entries[$i][$j]]['count'] );
-					$result[$entries[$i]['cn'][0]][($key===false)?$entries[$i][$j]:$schema['may'][$key]] = $entries[$i][$entries[$i][$j]];
+
+		$search = @ldap_search( $this->ldap_connection, $this->_radius_dn, '(cn=*)' );
+
+		if( is_resource( $search ) ){
+			$entries = ldap_get_entries( $this->ldap_connection, $search );
+			
+			if ( is_null($entries) ) {
+				if ( $this->_createDC() ) return $this->_getProfiles();
+				else return false;
+			}
+			
+			$result = array();
+			$schema = $this->getRadiusSchema();
+			for ( $i = 0; $i < $entries['count']; $i++ ) {
+				$result[$entries[$i]['cn'][0]] = array();
+				for ( $j = 0; $j < $entries[$i]['count']; $j++ ) {
+					if ( !in_array( $entries[$i][$j], array('cn','objectclass') ) ) {
+						$key = array_search(strtolower($entries[$i][$j]),array_map('strtolower',$schema['may']));
+						unset( $entries[$i][$entries[$i][$j]]['count'] );
+						$result[$entries[$i]['cn'][0]][($key===false)?$entries[$i][$j]:$schema['may'][$key]] = $entries[$i][$entries[$i][$j]];
+					}
 				}
 			}
+			ksort($result);
 		}
-		ksort($result);
 		return $result;
 	}
 	

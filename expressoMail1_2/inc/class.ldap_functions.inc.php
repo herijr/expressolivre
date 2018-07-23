@@ -158,7 +158,7 @@ class ldap_functions
 			$ldapSearch = @ldap_search( $this->ds, $this->ldap_context, $filter, $justThese, 0, $this->max_result + 1 );
 
 
-			if( !$ldapSearch )
+			if( !is_resource($ldapSearch) )
 			{
 				$return = array(
 					'status' => false,

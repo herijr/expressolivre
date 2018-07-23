@@ -180,23 +180,25 @@
 			{
 				$justthese = array("uidnumber", "uid", "cn", "mail");
 				$filter="(&(phpgwAccountType=u)(|(uid=*".$query."*)(sn=*".$query."*)(cn=*".$query."*)(givenName=*".$query."*)(mail=$query*)(mailAlternateAddress=$query*)))";
+				$return = false;
 
 				$tmp = array();
 				foreach ($contexts as $index=>$context)
 				{
-					$search=ldap_search($ldap_conn, $context, $filter, $justthese);
-					$info = ldap_get_entries($ldap_conn, $search);
+					$search = ldap_search($ldap_conn, $context, $filter, $justthese);
+					if( is_resource($search) ){
+						$info = ldap_get_entries($ldap_conn, $search);
+						for ($i=0; $i < $info['count']; $i++)
+						{
+							if ( $this->denied( $info[$i]['dn'] ) )
+								continue;
 
-					for ($i=0; $i < $info['count']; $i++)
-					{
-						if ( $this->denied( $info[$i]['dn'] ) )
-							continue;
-
-						$tmp[$info[$i]['uid'][0]]['account_id']	 = $info[$i]['uidnumber'][0];
-						$tmp[$info[$i]['uid'][0]]['account_lid'] = $info[$i]['uid'][0];
-						$tmp[$info[$i]['uid'][0]]['account_cn']	 = $info[$i]['cn'][0];
-						$tmp[$info[$i]['uid'][0]]['account_mail']= $info[$i]['mail'][0];
-						$sort[] = $info[$i]['uid'][0];
+							$tmp[$info[$i]['uid'][0]]['account_id']	 = $info[$i]['uidnumber'][0];
+							$tmp[$info[$i]['uid'][0]]['account_lid'] = $info[$i]['uid'][0];
+							$tmp[$info[$i]['uid'][0]]['account_cn']	 = $info[$i]['cn'][0];
+							$tmp[$info[$i]['uid'][0]]['account_mail']= $info[$i]['mail'][0];
+							$sort[] = $info[$i]['uid'][0];
+						}
 					}
 				}
 				ldap_close($ldap_conn);
@@ -215,24 +217,28 @@
 				$filter="(&(phpgwAccountType=g)(|(cn=*$query*)(mail=$query*)))";
 				$filter="(&(|(phpgwAccountType=g)(objectclass=groupOfNames)(objectclass=groupOfUniqueNames))(|(cn=*$query*)(mail=$query*)))";
 				$justthese = array("gidnumber", "cn", "description", "mail", "objectclass");
+				$return = false;
 
 				$tmp = array();
 				foreach ($contexts as $index=>$context)
 				{
 					$search=ldap_search($ldap_conn, $context, $filter, $justthese);
-					$info = ldap_get_entries($ldap_conn, $search);
-					for ($i=0; $i < $info['count']; $i++)
-					{
-						if ( $this->denied( $info[$i]['dn'] ) )
-							continue;
+					if( is_resource($search) ){
+						$info = ldap_get_entries($ldap_conn, $search);
+						for ($i=0; $i < $info['count']; $i++)
+						{
+							if ( $this->denied( $info[$i]['dn'] ) ){
+								continue;
+							}
 
-						$cn = $sort[] = $info[$i]['cn'][0];
-						$tmp[$cn]['cn']          = $cn;
-						$tmp[$cn]['dn']          = $info[$i]['dn'];
-						$tmp[$cn]['mail']        = $info[$i]['mail'][0];
-						$tmp[$cn]['gidnumber']   = $info[$i]['gidnumber'][0];
-						$tmp[$cn]['description'] = utf8_decode( $info[$i]['description'][0] );
-						$tmp[$cn]['type']        = in_array( 'posixGroup', $info[$i]['objectclass'] )? 0 : ( in_array( 'groupOfNames', $info[$i]['objectclass'] )? 1 : 2 );
+							$cn = $sort[] = $info[$i]['cn'][0];
+							$tmp[$cn]['cn']          = $cn;
+							$tmp[$cn]['dn']          = $info[$i]['dn'];
+							$tmp[$cn]['mail']        = $info[$i]['mail'][0];
+							$tmp[$cn]['gidnumber']   = $info[$i]['gidnumber'][0];
+							$tmp[$cn]['description'] = utf8_decode( $info[$i]['description'][0] );
+							$tmp[$cn]['type']        = in_array( 'posixGroup', $info[$i]['objectclass'] )? 0 : ( in_array( 'groupOfNames', $info[$i]['objectclass'] )? 1 : 2 );
+						}
 					}
 				}
 				ldap_close($ldap_conn);
@@ -248,23 +254,27 @@
 			{
 				$filter="(&(phpgwAccountType=l)(|(cn=*".$query."*)(uid=*".$query."*)(mail=$query*)))";
 				$justthese = array("uidnumber", "cn", "uid", "mail");
+				$return = false;
 
 				$tmp = array();
 				foreach ($contexts as $index=>$context)
 				{
 					$search=ldap_search($ldap_conn, $context, $filter, $justthese);
-					$info = ldap_get_entries($ldap_conn, $search);
+					if( is_resource($search)){
+						$info = ldap_get_entries($ldap_conn, $search);
 
-					for ($i=0; $i < $info['count']; $i++)
-					{
-						if ( $this->denied( $info[$i]['dn'] ) )
-							continue;
+						for ($i=0; $i < $info['count']; $i++)
+						{
+							if ( $this->denied( $info[$i]['dn'] ) ){
+								continue;
+							}
 
-						$tmp[$info[$i]['uid'][0]]['uid']		= $info[$i]['uid'][0];
-						$tmp[$info[$i]['uid'][0]]['name']		= $info[$i]['cn'][0];
-						$tmp[$info[$i]['uid'][0]]['uidnumber']	= $info[$i]['uidnumber'][0];
-						$tmp[$info[$i]['uid'][0]]['email']		= $info[$i]['mail'][0];
-						$sort[] = $info[$i]['uid'][0];
+							$tmp[$info[$i]['uid'][0]]['uid']		= $info[$i]['uid'][0];
+							$tmp[$info[$i]['uid'][0]]['name']		= $info[$i]['cn'][0];
+							$tmp[$info[$i]['uid'][0]]['uidnumber']	= $info[$i]['uidnumber'][0];
+							$tmp[$info[$i]['uid'][0]]['email']		= $info[$i]['mail'][0];
+							$sort[] = $info[$i]['uid'][0];
+						}
 					}
 				}
 				ldap_close($ldap_conn);
@@ -279,40 +289,29 @@
 			{
 				$filter="(&(objectClass=sambaSAMAccount)(|(sambaAcctFlags=[W          ])(sambaAcctFlags=[DW         ])(sambaAcctFlags=[I          ])(sambaAcctFlags=[S          ]))(cn=*".$query."*))";
 				$justthese = array("cn","uidNumber","description");
+				$return = false;
 
 				$tmp = array();
 				foreach ($contexts as $index=>$context)
 				{
 					$search=ldap_search($ldap_conn, $context, $filter, $justthese);
-					ldap_sort($ldap_conn, $search, 'cn');
-					$info = ldap_get_entries($ldap_conn, $search);
-					for ($i=0; $i < $info['count']; $i++)
-					{
-						if ( $this->denied( $info[$i]['dn'] ) )
-							continue;
+					if( is_resource($search) ){
+						ldap_sort($ldap_conn, $search, 'cn');
+						$info = ldap_get_entries($ldap_conn, $search);
+						for ($i=0; $i < $info['count']; $i++)
+						{
+							if ( $this->denied( $info[$i]['dn'] ) ){
+								continue;
+							}
 
-						$return[$info[$i]['uidnumber'][0]]['cn']          = $info[$i]['cn'][0];
-                        $return[$info[$i]['uidnumber'][0]]['uidNumber']   = $info[$i]['uidnumber'][0];
-                        $return[$info[$i]['uidnumber'][0]]['description'] = utf8_decode($info[$i]['description'][0]);
-
-						/*
-						$tmp[$info[$i]['cn'][0]]['cn']			= $info[$i]['cn'][0];
-						$tmp[$info[$i]['cn'][0]]['uidNumber']	= $info[$i]['uidnumber'][0];
-						$tmp[$info[$i]['cn'][0]]['description']	= utf8_decode($info[$i]['description'][0]);
-						$sort[] = $info[$i]['cn'][0];
-						*/
+							$return[$info[$i]['uidnumber'][0]]['cn']          = $info[$i]['cn'][0];
+							$return[$info[$i]['uidnumber'][0]]['uidNumber']   = $info[$i]['uidnumber'][0];
+							$return[$info[$i]['uidnumber'][0]]['description'] = utf8_decode($info[$i]['description'][0]);
+						}
 					}
-
 				}
-				ldap_close($ldap_conn);
 
-				/*
-				if (!empty($sort))
-				{
-					natcasesort($sort);
-					foreach ($sort as $computer_cn)
-						$return[$computer_cn] = $tmp[$computer_cn];
-				}*/
+				ldap_close($ldap_conn);
 
 				return $return;
 			}

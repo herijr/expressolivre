@@ -815,35 +815,38 @@ class ldap_functions
 		$recursive = $params['recursive'];
 		$justthese = array("cn", "uidNumber");
 		$filter="(phpgwAccountType=u)";
+		$options = "";
 		
-		if ($recursive == 'true') {
-			if ( $context === $GLOBALS['phpgw_info']['server']['ldap_context'] ) return '';
-			$groups_list=ldap_search($this->ldap, $context, $filter, $justthese);
-		} else
-    		$groups_list=ldap_list($this->ldap, $context, $filter, $justthese);
-    	
-    	$entries = ldap_get_entries($this->ldap, $groups_list);
-    	
-		for ($i=0; $i<$entries["count"]; $i++){
-			$u_tmp[$entries[$i]["uidnumber"][0]] = $entries[$i]["cn"][0];
-		}
-			
-		if (count($u_tmp))
-			natcasesort($u_tmp);
-
-		$i = 0;
-		$users = array();
-			
-		if (count($u_tmp))
-		{
-			foreach ($u_tmp as $uidnumber => $cn)
-			{
-				$options .= "<option value=$uidnumber>$cn</option>";
+		if( $recursive == 'true'){
+			if( $context === $GLOBALS['phpgw_info']['server']['ldap_context'] ){
+				return '';
 			}
-			unset($u_tmp);
+			$groups_list=ldap_search($this->ldap, $context, $filter, $justthese);
+		} else {
+    	$groups_list=ldap_list($this->ldap, $context, $filter, $justthese);
+		}
+    
+		if( is_resource($groups_list) )
+		{	
+	  	$entries = ldap_get_entries( $this->ldap, $groups_list );
+	    	
+			for ($i=0; $i<$entries["count"]; $i++){
+				$u_tmp[$entries[$i]["uidnumber"][0]] = $entries[$i]["cn"][0];
+			}
+		
+			if (count($u_tmp))
+			{
+				natcasesort($u_tmp);
+				
+				foreach ($u_tmp as $uidnumber => $cn)
+				{
+					$options .= "<option value=$uidnumber>$cn</option>";
+				}
+				unset($u_tmp);
+			}
 		}
 
-    	return $options;
+    return $options;
 	}
 
 	//Busca usuarios de um contexto e ja retorna as options do select;

@@ -129,67 +129,70 @@ class sector_search_ldap {
 		$justthese = array("dn");
 		$filter = $show_invisible_ou ? "(objectClass=organizationalUnit)" : "(& (objectClass=organizationalUnit) (!(phpgwAccountVisible=-1)) )";
 		$search = ldap_search($ldap_conn, $context, $filter, $justthese);
+		$options = "";
 		
-		ldap_sort($ldap_conn, $search, "ou");
-		$info = ldap_get_entries($ldap_conn, $search);
-		ldap_close($ldap_conn);
+		if( is_resource($search)){
+			ldap_sort($ldap_conn, $search, "ou");
+			$info = ldap_get_entries($ldap_conn, $search);
 		
-		// Retiro o count do array info e inverto o array para ordenação.
-		
-		if ($info["count"] == 0) {
-			return $options = "<option value='$context' selected=\"selected\"> $context </option>";
-		}
-		
-		for ($i = 0; $i < $info["count"]; $i++) {
-			$dn = $info[$i]["dn"];
+			ldap_close($ldap_conn);
 			
-			// Necessário, pq em uma busca com ldapsearch objectClass=organizationalUnit, traz tb o próprio ou.
-			if (strtolower($dn) == $context)
-				continue;
+			// Retiro o count do array info e inverto o array para ordenação.
+			if( $info["count"] == 0) {
+				return $options = "<option value='$context' selected=\"selected\"> $context </option>";
+			}
 			
-			if ( $filter_config && $this->denied( $dn ) )
-				continue;
-			
-			$array_dn = ldap_explode_dn($dn, 1);
-			
-			$array_dn_reverse = array_reverse($array_dn, true);
-			
-			// Retirar o indice count do array.
-			array_pop($array_dn_reverse);
-			
-			$inverted_dn[$dn] = implode("#", $array_dn_reverse);
-		}
-		
-		if (is_array($inverted_dn)) {
-			// Ordenação
-			natcasesort($inverted_dn);
-			
-			// Construção do select
-			$level = 0;
-			foreach ($inverted_dn as $dn => $invert_ufn) {
-				$display = '';
+			for ($i = 0; $i < $info["count"]; $i++) {
+				$dn = $info[$i]["dn"];
 				
-				$array_dn_reverse = explode("#", $invert_ufn);
-				$array_dn = array_reverse($array_dn_reverse, true);
+				// Necessário, pq em uma busca com ldapsearch objectClass=organizationalUnit, traz tb o próprio ou.
+				if (strtolower($dn) == $context)
+					continue;
 				
-				$level = count($array_dn) - (int) (count(explode(",", $this->_server_conf['ldap_context'])) + 1);
+				if ( $filter_config && $this->denied( $dn ) )
+					continue;
 				
-				if ($level == 0)
-					$display .= '+';
-				else {
-					for ($i = 0; $i < $level; $i++)
-					$display .= '---';
+				$array_dn = ldap_explode_dn($dn, 1);
+				
+				$array_dn_reverse = array_reverse($array_dn, true);
+				
+				// Retirar o indice count do array.
+				array_pop($array_dn_reverse);
+				
+				$inverted_dn[$dn] = implode("#", $array_dn_reverse);
+			}
+
+			if (is_array($inverted_dn)) {
+				// Ordenação
+				natcasesort($inverted_dn);
+				
+				// Construção do select
+				$level = 0;
+				foreach ($inverted_dn as $dn => $invert_ufn) {
+					$display = '';
+					
+					$array_dn_reverse = explode("#", $invert_ufn);
+					$array_dn = array_reverse($array_dn_reverse, true);
+					
+					$level = count($array_dn) - (int) (count(explode(",", $this->_server_conf['ldap_context'])) + 1);
+					
+					if ($level == 0)
+						$display .= '+';
+					else {
+						for ($i = 0; $i < $level; $i++)
+						$display .= '---';
+					}
+					
+					reset($array_dn);
+					$display .= ' ' . (current($array_dn) );
+					
+					$dn = trim(strtolower($dn));
+					if ($dn == $selected)
+						$select = ' selected';
+					else
+						$select = '';
+					$options .= "<option value='$dn'$select>$display</option>";
 				}
-				
-				reset($array_dn);
-				$display .= ' ' . (current($array_dn) );
-				
-				$dn = trim(strtolower($dn));
-				if ($dn == $selected)
-					$select = ' selected';
-				else
-					$select = '';
-				$options .= "<option value='$dn'$select>$display</option>";
 			}
 		}
 		
@@ -197,8 +200,9 @@ class sector_search_ldap {
 		$first_sector_ufn = ldap_dn2ufn($context);
 		$first_sector_string = explode(",", $first_sector_ufn);
 		
-		if ($context == $selected)
+		if ($context == $selected){
 			$select_first_entrie = ' selected';
+		}
 		$options = "<option value='$context'$select_first_entrie>+ " . strtoupper($first_sector_string[0]) . "</option>" . $options;
 		
 		return $options;
