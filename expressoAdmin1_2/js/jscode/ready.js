@@ -1,6 +1,13 @@
-
+function check_overquota() {
+	if ( parseInt( $('input[name=mailquota]').val() ) <= parseInt( $('#mailquotaused').html() ) ) $('#overquotamsg').show();
+	else $('#overquotamsg').hide();
+}
 $(document).ready(function()
 {
+
+	check_overquota();
+	$('input[name=mailquota]').on('keyup.overquota',check_overquota);
+	
 	var _loadData = function()
 	{
 		$('#ea_combo_org_info').trigger('change');

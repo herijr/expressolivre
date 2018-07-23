@@ -72,8 +72,7 @@ var Profile = new function() {
 		$('#profile-descr-label').html(Profile.getLabel());
 		Profile.setVisibility($('.w-mx'),Profile.isProfileValid());
 		$('#profile-msg-lost-share').toggle(Profile.hasLostShare());
-		if ( Profile.getDefaultUserQuota() != undefined )
-			$('input[name=mailquota]').val(Profile.getDefaultUserQuota());
+		this.checkQuota();
 	};
 	
 	this.setVisibility = function(obj,value) {
@@ -132,5 +131,21 @@ var Profile = new function() {
 	this.hasLostShare = function(){
 		if ( _lastResult == undefined ) return false;
 		return _prevId > 0 && Profile.isProfileValid() && _lastResult && _lastResult.profile_id != _prevId;
+	};
+
+	this.checkQuota = function() {
+		$('#quotchangedamsg').hide();
+		if ( Profile.getDefaultUserQuota() != undefined ) {
+			if ( parseInt( Profile.getDefaultUserQuota() ) != parseInt( $('input[name=mailquota]').val() ) ) {
+				$('input[name=mailquota]').off('blur.defaultquota').on('blur.defaultquota',function() {
+					$('#quotchangedamsg').hide();
+					$('input[name=mailquota]').off('blur.defaultquota');
+				});
+				$('#quotchangedamsg').show();
+			}
+			$('#quotchangedamsg b').html( parseInt($( 'input[name=mailquota]').val() ) );
+			$('input[name=mailquota]').val( Profile.getDefaultUserQuota() );
+		}
+		check_overquota();
 	};
 }

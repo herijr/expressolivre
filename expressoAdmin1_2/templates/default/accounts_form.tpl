@@ -253,12 +253,18 @@
 
 		<tr bgcolor={row_on} id="display_quota" style="display:{display_quota}" class="w-mx">
 			<td>{lang_email_quota_in_MB}:</td>
-			<td><input type="text" name="mailquota" id="mailquota" autocomplete="off" value="{mailquota}" {changequote_disabled} {disabled} {disabled_is_migrate} size=10></td>
+			<td>
+				<input type="text" name="mailquota" id="mailquota" autocomplete="off" value="{mailquota}" {changequote_disabled} {disabled} {disabled_is_migrate} size=10>
+				<div style="color: rgb(255, 0, 0); display: inline;">
+					<div id="quotchangedamsg">{lang_quota_changed_from} <b>{mailquota}</b>{lang_MB_to_organization_default_quota}</div>
+					<div id="overquotamsg">{lang_exceeded_quota}</div>
+				</div>
+			</td>
 		</tr>
 		
 		<tr bgcolor={row_off} id="display_quota_used" style="display:{display_quota_used}" class="w-mx">
 			<td>{lang_quota_used_in_mb}:</td>
-			<td>{mailquota_used}</td>
+			<td id="mailquotaused">{mailquota_used}</td>
 		</tr>
 
 		<tr bgcolor={row_on} id="display_empty_user_inbox" style="display:{display_empty_user_inbox}" class="w-mx">

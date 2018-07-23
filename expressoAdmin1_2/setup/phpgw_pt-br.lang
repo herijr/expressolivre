@@ -565,3 +565,6 @@ Field description is empty	expressoAdmin1_2	pt-br	O campo descrição está vazio
 ad loading	expressoAdmin1_2	pt-br	Carregando o Active Directory
 allow create or delete folders on this mailbox	expressoAdmin1_2	pt-br	Permitir criar ou excluir pastas nessa caixa de correio
 folder	expressoAdmin1_2	pt-br	Pasta
+quota changed from	expressoAdmin1_2	pt-br	Cota alterada de
+MB to organization default quota	expressoAdmin1_2	pt-br	MB para a cota padrão da organização
+exceeded quota	expressoAdmin1_2	pt-br	Cota ultrapassada
