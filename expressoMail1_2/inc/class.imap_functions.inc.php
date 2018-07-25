@@ -77,9 +77,27 @@ class imap_functions
 				$this->mbox = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder, $this->username, $this->password);
 			}
 		}
-		
+
+		$errors = imap_errors();
+		if(is_array($errors)){
+			if( preg_match('/SECURITY PROBLEM: insecure server advertised AUTH=PLAIN/i', $errors[0]) === false){
+			  throw new Exception('IMAP error detected');
+			}
+		}
+
 		return $this->mbox;
 	 }
+	 
+	private function close_mbox( $conn, $expunge = false )
+	{
+		if( is_resource($conn) ){
+			if( !$expunge ){ 
+				imap_close( $conn ); 
+			} else {
+				imap_close( $conn, $expunge ); 
+			}
+		}
+	}
 
 	function parse_error($error){
 		// This error is returned from Imap.
@@ -249,7 +267,7 @@ class imap_functions
 		$head_array['from']['email'] = $this->decode_string($from[0]->mailbox) . "@" . $from[0]->host;
 		if(!$head_array['from']['name'])
 			$head_array['from']['name'] = $head_array['from']['email'];
-		$to = $header->to;
+		$to = (isset($header->to) ? $header->to : false);
 		$head_array['to'] = array();
 		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que não possuem o campo "para", vêm com o recipiente preenchido, porém com um recipiente a mais alegando erro de sintaxe.
 			$head_array['to']['name'] = $head_array['to']['email'] = NULL;
@@ -569,7 +587,7 @@ class imap_functions
 			$msg_info['header'] = $this->get_info_head_msg($msg_number);
 
 			$attach_params["num_msg"] = $msg_number;
-			imap_close($this->mbox);
+			$this->close_mbox($this->mbox);
 			$this->mbox=false;
 			array_push($return,serialize($msg_info));
 
@@ -732,7 +750,7 @@ class imap_functions
 
 		if($return['from']['full'] == $return['sender']['full'])
 			$return['sender'] = null;
-		$to = $header->to;
+		$to = (isset($header->to) ? $header->to : false );
 		$return['toaddress2'] = "";
 		if (!empty($to))
 		{
@@ -864,7 +882,7 @@ class imap_functions
 		$return['reply_toaddress'] = $header->reply_toaddress;
                 
                 if($return_get_body['body']=='isSigned'){
-                    imap_close($this->mbox);
+                    $this->close_mbox($this->mbox);
                     $new_mail = $this->show_decript($return_get_body,$dec = 1);
                     //$new_mail['signature'] =  $return_get_body['signature'];
                     $return['body'] 		= $new_mail['body'];
@@ -941,8 +959,8 @@ class imap_functions
 			$return['thumbs']  = $this->get_thumbs($msg,$msg_number,$msg_folder);
 			$return['signature'] = $this->get_signature($msg,$msg_number,$msg_folder);
 		}
-		
-		if(!$msg->structure[$msg_number]->parts) //Simple message, only 1 piece
+
+		if(!isset($msg->structure[$msg_number]->parts)) //Simple message, only 1 piece
 		{
 			$is_pkcs7 = preg_match( '/^(?:x-|)pkcs7-mime$/', strtolower( $msg->structure[$msg_number]->subtype ) );
 			
@@ -963,7 +981,7 @@ class imap_functions
 				array_shift($return['signature']);
 				$return['signature'];
 				//$return['signature'] = $this->get_signature($msg,$msg_number,$msg_folder);
-				imap_close($this->mbox);
+				$this->close_mbox($this->mbox);
 				return $return;
 			}
 
@@ -1612,7 +1630,7 @@ class imap_functions
 		$return['border_ID'] = $border_ID;
 
 		if($mbox_stream)
-			imap_close($mbox_stream, CL_EXPUNGE);
+			$this->close_mbox($mbox_stream, CL_EXPUNGE);
 		return $return;
 	}
 
@@ -1740,7 +1758,7 @@ class imap_functions
 			$result[$i]['to']['name'] = $tmp[0]->text;
 			$result[$i]['to']['email'] = $to[0]->mailbox . "@" . $to[0]->host;
 			$result[$i]['to']['full'] ='"' . $result[$i]['to']['name'] . '" ' . '<' . $result[$i]['to']['email'] . '>';
-			$cc = $header->cc;
+			$cc = ( isset($header->cc) ? $header->cc : false );
 			if ( ($cc) && (!$result[$i]['to']['name']) ){
 				$result[$i]['to']['name'] =  $cc[0]->personal;
 				$result[$i]['to']['email'] = $cc[0]->mailbox . "@" . $cc[0]->host;
@@ -1770,7 +1788,7 @@ class imap_functions
 		$result['offsetToGMT'] = $this->functions->CalculateDateOffset();
 		
 		if($this->mbox && is_resource($this->mbox))
-			imap_close($this->mbox);
+			$this->close_mbox($this->mbox);
 
 		return $result;
 	}
@@ -1821,10 +1839,9 @@ class imap_functions
 
 		$mbox_stream = $this->open_mbox();
 		
-		if (
-			$params && isset($params['onload']) && $params['onload'] &&
-			$_SESSION['phpgw_info']['expressomail']['server']['certificado']
-		) $this->delete_mailbox(array("del_past" => "INBOX/decifradas"));
+		if($params && isset($params['onload']) && $params['onload'] && isset($_SESSION['phpgw_info']['expressomail']['server']['certificado'])){ 
+			$this->delete_mailbox(array("del_past" => "INBOX/decifradas"));
+		}
 		
 		$inbox  = 'INBOX';
 		$trash  = $inbox . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'];
@@ -1884,7 +1901,7 @@ class imap_functions
                         continue;
                     }
                     
-                    $result[$i]['folder_unseen'] = $status->unseen;
+                    $result[$i]['folder_unseen'] = ( isset($status->unseen) ? $status->unseen : false );
                     
                     $folder_id = $tmp_folder_id[1];
                     
@@ -2017,7 +2034,7 @@ class imap_functions
 		}
 
 		if($mbox_stream)
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 
 		return $result;
 
@@ -2041,7 +2058,7 @@ class imap_functions
 						if(!imap_createmailbox($mbox_stream,imap_utf7_encode("{".$imap_server."}$tmp"))){
 							$result = implode("<br />\n", imap_errors());
 							if("Mailbox already exists" != $result) {
-								imap_close($mbox_stream);
+								$this->close_mbox($mbox_stream);
 								return $result;
 							}
 						}
@@ -2050,7 +2067,7 @@ class imap_functions
 			}
 		}
 		if($mbox_stream)
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 		return true;
 	}
 
@@ -2069,7 +2086,7 @@ class imap_functions
 		}
 		/*
 		if($mbox_stream)
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 		*/
 		return $result;
 	}
@@ -2091,7 +2108,7 @@ class imap_functions
 			$result = imap_errors();
 		}
 		if($mbox_stream)
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 		return $result;
 
 	}
@@ -2106,7 +2123,7 @@ class imap_functions
 		}
 		$num_msgs = imap_num_msg($this->mbox);
 		if($this->mbox && is_resource($this->mbox))
-			imap_close($this->mbox);
+			$this->close_mbox($this->mbox);
 
 		return $num_msgs;
 	}
@@ -2116,7 +2133,7 @@ class imap_functions
 		$serverString = "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}";		
 		$list = imap_getmailboxes($mbox,$serverString, $folder);
 		$return = is_array($list);		
-		imap_close($mbox);
+		$this->close_mbox($mbox);
 		return $return;
 	}
 	
@@ -2812,7 +2829,7 @@ class imap_functions
 		if(imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
 			imap_expunge($mbox_stream);
 			if($mbox_stream)
-				imap_close($mbox_stream);
+				$this->close_mbox($mbox_stream);
 			return $return;
 		}else {
 			if(strstr(imap_last_error(),'Over quota')) {
@@ -2826,29 +2843,29 @@ class imap_functions
 				$quota 	= imap_get_quotaroot($mbox_stream, "INBOX");
 				if(! imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, 2.1 * $quota['usage'])) {
 					if($mbox_stream)
-						imap_close($mbox_stream);
+						$this->close_mbox($mbox_stream);
 					if($mbox)
-						imap_close($mbox);
+						$this->close_mbox($mbox);
 					return "move_messages(): Error setting quota for MOVE or DELETE!! ". "user".$this->imap_delimiter.$userID." line ".__LINE__."\n";
 				}
 				if(imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
 					imap_expunge($mbox_stream);
 					if($mbox_stream)
-						imap_close($mbox_stream);
+						$this->close_mbox($mbox_stream);
 					// return to original quota limit.
 					if(!imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, $quota['limit'])) {
 						if($mbox)
-							imap_close($mbox);
+							$this->close_mbox($mbox);
 						return "move_messages(): Error setting quota for MOVE or DELETE!! line ".__LINE__."\n";
 					}
 					return $return;
 				}
 				else {
 					if($mbox_stream)
-						imap_close($mbox_stream);
+						$this->close_mbox($mbox_stream);
 					if(!imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, $quota['limit'])) {
 						if($mbox)
-							imap_close($mbox);
+							$this->close_mbox($mbox);
 						return "move_messages(): Error setting quota for MOVE or DELETE!! line ".__LINE__."\n";
 					}
 					return imap_last_error();
@@ -2857,7 +2874,7 @@ class imap_functions
 			}
 			else {
 				if($mbox_stream)
-					imap_close($mbox_stream);
+					$this->close_mbox($mbox_stream);
 				return array( 'error' => imap_last_error(), 'folder' => $newmailbox );
 			}
 		}
@@ -3019,7 +3036,7 @@ class imap_functions
 		$return['folder_id'] = $folder;
 
 		if($mbox_stream)
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 		if (is_array($return_files))
 			foreach ($return_files as $index => $_attachment) {
 				if (array_key_exists("name",$_attachment)){
@@ -3102,7 +3119,7 @@ class imap_functions
 		}
 
 		if($this->mbox && is_resource($this->mbox))
-			imap_close($this->mbox);
+			$this->close_mbox($this->mbox);
 		return $return;
 	}
 	
@@ -3263,7 +3280,7 @@ class imap_functions
 		$mbox_stream = $this->open_mbox($params['folder']);
 		$return_array['num_msgs'] = imap_num_msg($mbox_stream);
 		if($mbox_stream)
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 
 		return $return_array;
 	}
@@ -3282,7 +3299,7 @@ class imap_functions
 			$this->mbox = $this->open_mbox();
 
 		$quota = imap_get_quotaroot( $this->mbox, $folder_id );
-		if ( $this->mbox && is_resource( $this->mbox ) ) imap_close( $this->mbox );
+		if ( $this->mbox && is_resource( $this->mbox ) ) $this->close_mbox( $this->mbox );
 		
 		// Auto raise to default user quota, configured in expressoAdmin
 		if (
@@ -3313,7 +3330,7 @@ class imap_functions
 				$this->db->write_log( 'Aumento de Quota automatico ', $userID.' - '.$def_quota, 'expresso-admin' );
 				
 			}
-			imap_close( $mailbox );
+			$this->close_mbox( $mailbox );
 		}
 
 		if (!$quota){
@@ -3452,7 +3469,7 @@ class imap_functions
 			}
 			$j++;
 			if($mbox_stream)
-				imap_close($mbox_stream);
+				$this->close_mbox($mbox_stream);
 		}
 
 		return $return;
@@ -3491,7 +3508,7 @@ class imap_functions
 					
 					if ($messages == ''){
 						if($mbox_stream)
-							imap_close($mbox_stream);
+							$this->close_mbox($mbox_stream);
 						continue;	
 					}
 					
@@ -3506,7 +3523,7 @@ class imap_functions
 					}
 
 					if($mbox_stream)
-						imap_close($mbox_stream);
+						$this->close_mbox($mbox_stream);
 				}
 			}
 		}
@@ -3613,7 +3630,7 @@ class imap_functions
 		$after = imap_status( $mbox, $mailbox, SA_MESSAGES | SA_UNSEEN );
 		
 		// close mailbox
-		if ( $mbox ) imap_close( $mbox );
+		if ( $mbox ) $this->close_mbox( $mbox );
 		$deleted = ( $before->messages - $after->messages );
 		$result['status'] = ( $deleted > 0 );
 		if ( $deleted > 0 ) {
@@ -3791,7 +3808,7 @@ class imap_functions
 		
 		if($mbox_stream)
 		{
-			imap_close($mbox_stream);
+			$this->close_mbox($mbox_stream);
 	    }
 	    
 	    $num_msgs = count($retorno);
@@ -4000,7 +4017,7 @@ class imap_functions
 		$mbox_acl = imap_getacl($mbox_stream, 'user'.$this->imap_delimiter.$user);
 		else
 		  $mbox_acl = imap_getacl($mbox_stream, $user);
-		return $mbox_acl[$this->username];
+		return ( isset($mbox_acl[$this->username]) ? $mbox_acl[$this->username] : false );
 	}
 
 
@@ -4157,11 +4174,11 @@ class imap_functions
 						$result['spam_result'][$dest]['orig'][$mbox] = $msg_number;
 					else $result['spam_result'][$dest]['orig'][$mbox] .= ','.$msg_number;
 				}
-				imap_close( $mbox_stream );
+				$this->close_mbox( $mbox_stream );
 			}
 		} catch ( Exception $e ) {
 			if ( isset( $ch ) && $ch ) curl_close( $ch );
-			if ( isset( $mbox_stream ) && $mbox_stream ) imap_close( $mbox_stream );
+			if ( isset( $mbox_stream ) && $mbox_stream ) $this->close_mbox( $mbox_stream );
 			$result['status'] = false;
 			$result['message'] = $e->getMessage();
 		}
@@ -4235,13 +4252,12 @@ class imap_functions
                   imap_setflag_full($mbox_stream, $return['msg_no'], $flags_fixed, ST_UID);
                 }
         if($mbox_stream)
-            imap_close($mbox_stream);
+            $this->close_mbox($mbox_stream);
         return $return;
     }
 
     function show_decript($params){
         $source = $params['source'];
-        //error_log("source: $source\nversao: " . PHP_VERSION, 3, '/tmp/teste.log');
         $source = str_replace(" ", "+", $source,$i);
 
         if (version_compare(PHP_VERSION, '5.2.0', '>=')){
