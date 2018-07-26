@@ -39,6 +39,7 @@ class imap_functions
 		$this->imap_sentfolder  = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder']   ? $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder']   : str_replace("*","", $this->functions->getLang("Sent"));
 		$this->has_cid          = false;
 		$this->prefs            = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
+		$this->mbox							= false;
 		$this->imap_options     = '/novalidate-cert'.(
 			($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes')? '/tls' : '/notls'
 		);
@@ -91,6 +92,12 @@ class imap_functions
 	private function close_mbox( $conn, $expunge = false )
 	{
 		if( is_resource($conn) ){
+			$errors = imap_errors();
+			if(is_array($errors)){
+				if( preg_match('/SECURITY PROBLEM: insecure server advertised AUTH=PLAIN/i', $errors[0]) === false){
+				  throw new Exception('IMAP error detected');
+				}
+			}
 			if( !$expunge ){ 
 				imap_close( $conn ); 
 			} else {
@@ -183,15 +190,15 @@ class imap_functions
 				foreach($sort_array_msg as $msg_number => $value)
 				{
 					$temp = $this->get_info_head_msg($msg_number);
-					if(!$temp)
-						return false;
+					if(!$temp){ return false; }
 				
 					if($temp['Unseen'] == 'U' || $temp['Recent'] == 'N'){
 						$return['tot_unseen']++;
 					}
 				
-					if($i <= ($msg_range_end-$msg_range_begin))
+					if( $i <= ($msg_range_end-$msg_range_begin)){
 						$return[$i] = $temp;
+					}
 					$i++;
 				}
 			}
@@ -1607,14 +1614,15 @@ class imap_functions
 		$folder = $params['folder'];
 		$folder =  mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
 		$msgs_number = explode(",",$params['msgs_number']);
-		$border_ID = $params['border_ID'];
-
+		$border_ID = (isset($params['border_ID']) ? $params['border_ID'] : false );
 		$return = array();
 
-		if ($params['get_previous_msg']){
+		if( isset($params['get_previous_msg'])){
 			$return['previous_msg'] = $this->get_info_previous_msg($params);
 			// Fix problem in unserialize function JS.
-			$return['previous_msg']['body'] = str_replace(array('{','}'), array('&#123;','&#125;'), $return['previous_msg']['body']);
+			if(isset($return['previous_msg']['body'])){
+				$return['previous_msg']['body'] = str_replace(array('{','}'), array('&#123;','&#125;'), $return['previous_msg']['body']);
+			}
 		}
 
 		//$mbox_stream = $this->open_mbox($folder);
@@ -1744,20 +1752,16 @@ class imap_functions
 			$tmp = imap_mime_header_decode($from[0]->personal);
 			$result[$i]['from']['name'] = $tmp[0]->text;
 			$result[$i]['from']['email'] = $from[0]->mailbox . "@" . $from[0]->host;
-			//$result[$i]['from']['full'] ='"' . $result[$i]['from']['name'] . '" ' . '<' . $result[$i]['from']['email'] . '>';
-			if(!$result[$i]['from']['name'])
+			if(!$result[$i]['from']['name']){
 				$result[$i]['from']['name'] = $result[$i]['from']['email'];
+			}
 
-			/*$toaddress = imap_mime_header_decode($header->toaddress);
-			$result[$i]['toaddress'] = '';
-			foreach ($toaddress as $tmp)
-				$result[$i]['toaddress'] .= $tmp->text;*/
-			$to = $header->to;
+			$to = ( isset($header->to) ? $header->to : false );
 			$result[$i]['to'] = array();
-			$tmp = imap_mime_header_decode($to[0]->personal);
-			$result[$i]['to']['name'] = $tmp[0]->text;
-			$result[$i]['to']['email'] = $to[0]->mailbox . "@" . $to[0]->host;
-			$result[$i]['to']['full'] ='"' . $result[$i]['to']['name'] . '" ' . '<' . $result[$i]['to']['email'] . '>';
+			$tmp = ( isset($to[0]->personal) ? imap_mime_header_decode($to[0]->personal) : false );
+			$result[$i]['to']['name'] = ( isset($tmp[0]->text) ? $tmp[0]->text : false );
+			$result[$i]['to']['email'] = ( isset($to[0]->mailbox) && isset($to[0]->host) ? $to[0]->mailbox . "@" . $to[0]->host : false );
+			$result[$i]['to']['full'] = '"' . $result[$i]['to']['name'] . '" ' . '<' . $result[$i]['to']['email'] . '>';
 			$cc = ( isset($header->cc) ? $header->cc : false );
 			if ( ($cc) && (!$result[$i]['to']['name']) ){
 				$result[$i]['to']['name'] =  $cc[0]->personal;
@@ -1779,10 +1783,9 @@ class imap_functions
 		}
 		$result['quota'] = $this->get_quota(array('folder_id' => $folder));
 		$result['sort_box_type'] = $params['sort_box_type'];
-                if(!$this->mbox || !is_resource($this->mbox))
-                {
-                    $this->open_mbox($folder);
-                }
+		if( !$this->mbox || !is_resource($this->mbox) ){
+			$this->open_mbox($folder);
+		}
 
 		$result['msgs_to_delete'] = $msg_to_delete;
 		$result['offsetToGMT'] = $this->functions->CalculateDateOffset();
@@ -2143,7 +2146,7 @@ class imap_functions
 		$mail = new PHPMailer();
 		include_once("class.db_functions.inc.php");
 		$db = new db_functions();
-		$fromaddress = $params['input_from'] ? explode(';',$params['input_from']) : "";
+		$fromaddress = ( isset($params['input_from']) ? explode(';',$params['input_from']) : "" );
 		##
 		# @AUTHOR Rodrigo Souza dos Santos
 		# @DATE 2008/09/17$fileName
@@ -2247,7 +2250,7 @@ class imap_functions
 		$local_attachments      = isset( $params['local_attachments'] )?      $params['local_attachments']      : array();
 
 		//Test if must be saved in shared folder and change if necessary
-		if( $fromaddress[2] == 'y' ){
+		if( isset($fromaddress[2]) && $fromaddress[2] == 'y' ){
 			//build shared folder path
 			$newfolder = "user".$this->imap_delimiter.$fromaddress[3].$this->imap_delimiter.$this->imap_sentfolder;
 			if( $this->folder_exists($newfolder) ) $folder = $newfolder;
@@ -2805,7 +2808,7 @@ class imap_functions
 			}
         }
         //Este bloco tem a finalidade de transformar o CPF das pastas compartilhadas em common name
-        if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn']){
+        if(isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'])){
             if (substr($new_folder_name,0,4) == 'user'){
                 $this->ldap = new ldap_functions();
                 $tmp_folder_name = explode($this->imap_delimiter, $new_folder_name);
@@ -2822,7 +2825,9 @@ class imap_functions
 		{
 			$return['previous_msg'] = $this->get_info_previous_msg($params);
 			// Fix problem in unserialize function JS.
-			$return['previous_msg']['body'] = str_replace(array('{','}'), array('&#123;','&#125;'), $return['previous_msg']['body']);
+			if( isset($return['previous_msg']['body']) ){
+				$return['previous_msg']['body'] = str_replace(array('{','}'), array('&#123;','&#125;'), $return['previous_msg']['body']);
+			}
 		}
 
 		$mbox_stream = $this->open_mbox($folder);
@@ -3064,7 +3069,7 @@ class imap_functions
 	function set_messages_flag($params)
 	{
 		$folder = $params['folder'];
-		$msgs_to_set = $params['msgs_to_set'];
+		$msgs_to_set = ( isset($params['msgs_to_set']) ? $params['msgs_to_set']: false );
 		$flag = $params['flag'];
 		$return = array();
 		$return["msgs_to_set"] = $msgs_to_set;

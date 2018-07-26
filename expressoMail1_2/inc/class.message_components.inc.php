@@ -80,9 +80,11 @@
 
         function fetch_structure($mid, $sub_part = null, $sub_pid = null, $n = 0, $is_sub_part = false, $skip_part = false)
         {
-            if (!is_array($sub_part))
+            if(!is_array($sub_part))
             {
-                $this->structure[$mid] = imap_fetchstructure($this->mailbox, $mid, FT_UID);
+								if(is_resource($this->mailbox)){
+                	$this->structure[$mid] = imap_fetchstructure($this->mailbox, $mid, FT_UID);
+								}
             }
             if (isset($this->structure[$mid]->parts) || is_array($sub_part))
             {

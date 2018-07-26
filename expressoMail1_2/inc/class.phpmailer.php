@@ -1057,42 +1057,38 @@ class PHPMailer
     }
 
 
-    function write_message_type()
+  function write_message_type()
 	{
 		$result = "";
-        switch($this->message_type)
-        {
-            case "plain":$folder = mb_convert_encoding($folder, "UTF7-IMAP","ISO_8859-1");
-                $result .= $this->HeaderLine("Content-Transfer-Encoding", $this->Encoding);
-                $result .= sprintf("Content-Type: %s; charset=\"%s\"",
-                                    $this->ContentType, $this->CharSet);
-                return $result;
-            case "attachments":
-                // fall through
-            case "alt_attachments":
-                if($this->InlineImageExists())
-                {
-                    $result .= sprintf("Content-Type: %s;%s\ttype=\"text/html\";%s\tboundary=\"%s\"%s", 
-                                    "multipart/related", $this->LE, $this->LE, 
-                                    $this->boundary[1], $this->LE);
-                }
-                else
-                {
-                    $result .= $this->HeaderLine("Content-Type", "multipart/mixed;");
-                    $result .= $this->TextLine("\tboundary=\"" . $this->boundary[1] . '"');
-                }
-                return $result;
-            case "alt":
-                $result .= $this->HeaderLine("Content-Type", "multipart/alternative;");
-                $result .= $this->TextLine("\tboundary=\"" . $this->boundary[1] . '"');
-                return $result;
-        }
+		switch($this->message_type)
+		{
+			case "plain":
+				$result .= $this->HeaderLine("Content-Transfer-Encoding", $this->Encoding);
+				$result .= sprintf("Content-Type: %s; charset=\"%s\"", $this->ContentType, $this->CharSet);
+				return $result;
+			case "attachments":
+				// fall through
+			case "alt_attachments":
+				if($this->InlineImageExists())
+				{
+				    $result .= sprintf("Content-Type: %s;%s\ttype=\"text/html\";%s\tboundary=\"%s\"%s", 
+				                    "multipart/related", $this->LE, $this->LE, 
+				                    $this->boundary[1], $this->LE);
+				}
+				else
+				{
+				    $result .= $this->HeaderLine("Content-Type", "multipart/mixed;");
+				    $result .= $this->TextLine("\tboundary=\"" . $this->boundary[1] . '"');
+				}
+				return $result;
+			case "alt":
+				$result .= $this->HeaderLine("Content-Type", "multipart/alternative;");
+				$result .= $this->TextLine("\tboundary=\"" . $this->boundary[1] . '"');
+				return $result;
+		}
 
-        if($this->Mailer != "mail")
-            $result .= $this->LE.$this->LE;
-
-        return $result;
-    }
+		return ( $this->Mailer !== "mail" ? $result .= $this->LE.$this->LE : $result );
+  }
 
     /**
      * Assembles the message body.  Returns an empty string on failure.

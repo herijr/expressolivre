@@ -107,9 +107,11 @@
 		}								
 
 		function getReturnExecuteForm(){
-			$response = $_SESSION['response'];
-			$_SESSION['response'] = null;
-			return $response;
+			if(isset($_SESSION['response'])){
+				$response = $_SESSION['response'];
+				$_SESSION['response'] = null;
+				return $response;
+			}
 		}
 		function getLang($key){
 			if ( isset( $_SESSION['phpgw_info']['expressomail']['lang'][$key] ) )

@@ -73,7 +73,13 @@
 						'msgball[msgnum]='.$message.'&msgball[folder]=INBOX');
 				$data[] = array('text' => $text, 'link' => $link_msg);					
 			}
-					
+
+			$errors = imap_errors();
+			if(is_array($errors)){
+				if( preg_match('/SECURITY PROBLEM: insecure server advertised AUTH=PLAIN/i', $errors[0]) === false){
+				  throw new Exception('IMAP error detected');
+				}
+			}
 			imap_close($mbox_stream);
 			
 			$title = $current_name." - ".($num_new_messages > 1 ? lang("You have %1 new messages!","<font color=red>".$num_new_messages."</font>") : ($num_new_messages == 1 ? str_replace("1","<font color=red>1</font>",lang("you have 1 new message!")) : lang("you have no new messages")));			

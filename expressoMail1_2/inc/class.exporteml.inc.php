@@ -388,10 +388,20 @@ class ExportEml
 	
 	private function _closeImap()
 	{
-		if ( !$this->_imap_stream ) return false;
-		imap_close( $this->_imap_stream );
-		$this->_imap_stream = false;
-		return true;
+		$return = false;
+		
+		if( is_resource($this->_imap_stream) ){
+			$errors = imap_errors();
+			if(is_array($errors)){
+				if( preg_match('/SECURITY PROBLEM: insecure server advertised AUTH=PLAIN/i', $errors[0]) === false){
+				  throw new Exception('IMAP error detected');
+				}
+			}
+			imap_close( $this->_imap_stream );
+			$return = true;
+		}
+		
+		return $return;
 	}
 	
 	public function __destruct()

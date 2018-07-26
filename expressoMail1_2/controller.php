@@ -38,7 +38,7 @@ if ( isset( $_POST['_action'] ) ) {
 		$count_files = $_POST['countFiles'];
 		$array_files = array();
 		for ( $idx = 1; $idx <= $count_files; $idx++ ) {
-			if ( $_FILES['file_'.$idx] && !$_FILES['file_'.$idx]['error'] ) $array_files[] = $_FILES['file_'.$idx];
+			if ( isset($_FILES['file_'.$idx]) && !$_FILES['file_'.$idx]['error'] ) $array_files[] = $_FILES['file_'.$idx];
 		}
 		$_POST['FILES'] = $array_files;
 	}
