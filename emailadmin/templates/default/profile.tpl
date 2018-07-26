@@ -122,7 +122,17 @@
 							<label>{lang_imap_server_port}</label>
 							<input type="text" size="5" maxlength="5" name="imapport" value="{value_imapport}">
 						</div>
-
+						
+						<div>
+							<label>{lang_admin_imap_server_hostname_or_ip_address}</label>
+							<input type="text" size="40" name="imapAdminServer" value="{value_imapadminserver}">
+						</div>
+						
+						<div>
+							<label>{lang_admin_imap_server_port}</label>
+							<input type="text" size="5" name="imapAdminPort" value="{value_imapadminport}">
+						</div>
+						
 						<div>
 							<label>{lang_delimiter_imap}</label>
 							<select name="imapdelimiter">

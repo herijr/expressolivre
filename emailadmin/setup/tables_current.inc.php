@@ -31,6 +31,8 @@
 				'imapTLSAuthentication' => array('type' => 'varchar','precision' => '3'),
 				'imapTLSEncryption' => array('type' => 'varchar','precision' => '3'),
 				'imapEnableCyrusAdmin' => array('type' => 'varchar','precision' => '3'),
+				'imapAdminServer' => array('type' => 'varchar','precision' => '80'),
+				'imapAdminPort' => array('type' => 'int','precision' => '4'),
 				'imapAdminUsername' => array('type' => 'varchar','precision' => '40'),
 				'imapAdminPW' => array('type' => 'varchar','precision' => '40'),
 				'imapEnableSieve' => array('type' => 'varchar','precision' => '3'),

@@ -330,6 +330,8 @@ class ui
 			"lang_user_defined_accounts"	=> lang("users can define their own emailaccounts"),
 			"lang_vmailmgr" 				=> lang('Virtual MAIL ManaGeR'),				
 			"lang_global" 					=> lang("Global"),
+			"lang_admin_imap_server_hostname_or_ip_address"	=> lang("Admin IMAP server hostname or ip address"),
+			"lang_admin_imap_server_port" => lang("Admin imap server port"),
 		));
 	}
 

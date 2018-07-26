@@ -53,8 +53,10 @@ imap admin user	admin	pt-br	Usuário administrador do IMAP
 imap c-client version < 2001	emailadmin	pt-br	IMAP C-Cliente Versão < 2001
 imap/pop3 server name	emailadmin	pt-br	Nome do servidor IMAP/POP3
 imap server hostname or ip address	emailadmin	pt-br	Nome ou IP do servidor IMAP
+admin imap server hostname or ip address	emailadmin	pt-br	Nome ou IP do servidor IMAP de Administração
 imap server logintype	emailadmin	pt-br	Tipo de login do servidor IMAP
 imap server port	emailadmin	pt-br	Porta do servidor IMAP
+admin imap server port	emailadmin	pt-br	Porta do servidor IMAP de Administração
 in mbyte	emailadmin	pt-br	em Mbytes
 Invalid domain	emailadmin	pt-br	Domínio inválido
 ldap basedn	emailadmin	pt-br	DN Base do LDAP

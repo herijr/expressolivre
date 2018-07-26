@@ -39,7 +39,7 @@ class imap_functions
 			if (!isset($this->_profile[$key]))
 				$this->_profile[$key] = str_replace("*","", $this->functions->lang($value));
 		
-		$this->_imap = imap_open('{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'/novalidate-cert}', $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
+		$this->_imap = imap_open('{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'/novalidate-cert}', $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
 		
 		return $this->_profile;
 	}
@@ -64,7 +64,7 @@ class imap_functions
 		
 		$mailquota = ( $mailquota === false )? $this->_profile['defaultUserQuota'] : $mailquota;
 		
-		if (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid))
+		if (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapAdminServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid))
 		{
 			$error = imap_errors();
 			if ($error[0] == 'Mailbox already exists')
@@ -79,7 +79,7 @@ class imap_functions
 			return $result;
 		}
 
-		if ( (!empty($this->_profile['imapDefaultSentFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultSentFolder'])) )
+		if ( (!empty($this->_profile['imapDefaultSentFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapAdminServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultSentFolder'])) )
 		{
 			$error = imap_errors();
 			$result['status'] = false;
@@ -87,7 +87,7 @@ class imap_functions
 			return $result;
 		}
 
-		if ( (!empty($this->_profile['imapDefaultDraftsFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultDraftsFolder'])) )
+		if ( (!empty($this->_profile['imapDefaultDraftsFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapAdminServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultDraftsFolder'])) )
 		{
 			$error = imap_errors();
 			$result['status'] = false;
@@ -95,7 +95,7 @@ class imap_functions
 			return $result;
 		}
 
-		if ( (!empty($this->_profile['imapDefaultTrashFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultTrashFolder'])) )
+		if ( (!empty($this->_profile['imapDefaultTrashFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapAdminServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultTrashFolder'])) )
 		{
 			$error = imap_errors();
 			$result['status'] = false;
@@ -205,7 +205,7 @@ class imap_functions
 			return $result;
 		}
 		
-		if (!imap_deletemailbox($this->_imap, '{'.$this->_profile['imapServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid))
+		if (!imap_deletemailbox($this->_imap, '{'.$this->_profile['imapAdminServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid))
 		{
 			$result['status'] = false;
 			$result['msg'] = $this->functions->lang('it was not possible to delete users mailbox') . ".\n";
@@ -274,8 +274,8 @@ class imap_functions
 		}
 		
 		if (! @imap_renamemailbox($this->_imap,
-						'{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'}user' . $this->_profile['imapDelimiter'] . $old_mailbox,
-						'{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'}user' . $this->_profile['imapDelimiter'] . $new_mailbox) )
+						'{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'}user' . $this->_profile['imapDelimiter'] . $old_mailbox,
+						'{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'}user' . $this->_profile['imapDelimiter'] . $new_mailbox) )
 		{
 			$result['status'] = false;
 			$result['msg'] = $this->functions->lang('Server returns') . ': ' . imap_last_error();
@@ -291,8 +291,8 @@ class imap_functions
 				$result['msg'] .= $this->functions->lang("Error returning user quota.\n") . $this->functions->lang('Server returns') . ': ' . imap_last_error();
 				
 				@imap_renamemailbox($this->_imap,
-					'{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'}user' . $this->_profile['imapDelimiter'] . $new_mailbox,
-					'{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'}user' . $this->_profile['imapDelimiter'] . $old_mailbox);
+					'{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'}user' . $this->_profile['imapDelimiter'] . $new_mailbox,
+					'{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'}user' . $this->_profile['imapDelimiter'] . $old_mailbox);
 			}
 		}
 		
@@ -343,7 +343,7 @@ class imap_functions
 		
 		if ($return_setacl)
 		{
-			$mbox_stream = imap_open('{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].$imap_options .'}user'. $this->_profile['imapDelimiter'] . $uid, $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW']);
+			$mbox_stream = imap_open('{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].$imap_options .'}user'. $this->_profile['imapDelimiter'] . $uid, $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW']);
 			
 			$check = imap_mailboxmsginfo($mbox_stream);
 			$inbox_size = (string)(round ((($check->Size)/(1024*1024)), 2));
