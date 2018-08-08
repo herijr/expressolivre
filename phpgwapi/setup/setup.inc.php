@@ -14,7 +14,7 @@
 	$setup_info['phpgwapi']['name']      = 'phpgwapi';
 	$setup_info['phpgwapi']['title']     = 'API';
 	$setup_info['phpgwapi']['version']   = '2.2.6';
-	$setup_info['phpgwapi']['versions']['current_header'] = '2.2';
+	$setup_info['phpgwapi']['versions']['current_header'] = '2.3';
 	$setup_info['phpgwapi']['enable']    = 3;
 	$setup_info['phpgwapi']['app_order'] = 1;
 
@@ -40,7 +40,3 @@
 	$setup_info['phpgwapi']['tables'][]  = 'phpgw_vfs';
 	$setup_info['phpgwapi']['tables'][]  = 'phpgw_history_log';
 	$setup_info['phpgwapi']['tables'][]  = 'phpgw_async';
-
-
-
-

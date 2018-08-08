@@ -92,6 +92,12 @@
 				$var['HEADER_ADMIN_PASSWORD'] = $var['HEADER_ADMIN_PASS'];
 			}
 			$GLOBALS['header_template']->set_var($var);
+			
+			if ( empty($GLOBALS['header_template']->get_var('domains')) )
+			{
+				$GLOBALS['header_template']->set_var('domains', "/* no domains defined */");
+			}
+			
 			return $GLOBALS['header_template']->parse('out','header');
 		}
 

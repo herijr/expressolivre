@@ -9,7 +9,6 @@
 	*  Free Software Foundation; either version 2 of the License, or (at your  *
 	*  option) any later version.                                              *
 	\**************************************************************************/
-	/* $Id: header.inc.php.template,v 1.55.2.1 2004/08/03 14:05:35 reinerj Exp $ */
 
 	/**************************************************************************\
 	* !!!!!!! EDIT THESE LINES !!!!!!!!                                        *
@@ -20,46 +19,60 @@
 	ob_start();
 	define('PHPGW_SERVER_ROOT','{SERVER_ROOT}');
 	define('PHPGW_INCLUDE_ROOT','{INCLUDE_ROOT}');
-	$GLOBALS['phpgw_info']['server']['deny_all_logins'] = false;
+
+	/* Setup settings */
 	$GLOBALS['phpgw_info']['server']['header_admin_user'] = '{HEADER_ADMIN_USER}';
 	$GLOBALS['phpgw_info']['server']['header_admin_password'] = '{HEADER_ADMIN_PASSWORD}';
 	$GLOBALS['phpgw_info']['server']['setup_acl'] = '{SETUP_ACL}';
 
-	// Opcoes exclusivas a partir da versão 2.0 :: Configurar via setup/header
+	/* Misc settings */
 	$GLOBALS['phpgw_info']['server']['captcha'] = {CAPTCHA};
 	$GLOBALS['phpgw_info']['server']['num_badlogin'] = {NUM_BADLOGIN};
-	$GLOBALS['phpgw_info']['server']['use_token_login'] = {USE_TOKEN_EXPRESSO};
-    $GLOBALS['phpgw_info']['server']['atributoexpiracao'] = '{ATRIBUTOEXPIRACAO}';
-    $GLOBALS['phpgw_info']['server']['atributousuarios'] = '{ATRIBUTOUSUARIOS}';
+	$GLOBALS['phpgw_info']['server']['use_token_login'] = {USE_TOKEN_LOGIN};
+	$GLOBALS['phpgw_info']['server']['atributoexpiracao'] = '{ATRIBUTOEXPIRACAO}';
+	$GLOBALS['phpgw_info']['server']['atributousuarios'] = '{ATRIBUTOUSUARIOS}';
 	$GLOBALS['phpgw_info']['server']['certificado'] = {CERTIFICADO};
 	$GLOBALS['phpgw_info']['server']['use_assinar_criptografar'] = {USE_ASSINAR_CRIPTOGRAFAR};
-    $GLOBALS['phpgw_info']['server']['num_max_certs_to_cipher'] = {NUM_MAX_CERTS_TO_CIPHER};
-
-	// Opcoes exlusivas para o Expresso Livre
+	$GLOBALS['phpgw_info']['server']['num_max_certs_to_cipher'] = {NUM_MAX_CERTS_TO_CIPHER};
 	$GLOBALS['phpgw_info']['server']['use_https'] = {USE_HTTPS};
 	$GLOBALS['phpgw_info']['server']['sugestoes_email_to'] = '{SUGESTOES_EMAIL_TO}';
 	$GLOBALS['phpgw_info']['server']['domain_name'] = '{DOMAIN_NAME}';
-	
+
+	/* Turn this option true if you want to block the site-wide login */
+	$GLOBALS['phpgw_info']['server']['deny_all_logins'] = false;
+
+	/*
+	** This option restricts widgets only to the organizations supplied
+	** Ex: array( 'ou=celepar', 'ou=seed' ) or
+	** Ex: 'ou=celepar;ou=seed'
+	*/
+	$GLOBALS['phpgw_info']['server']['display_widgets_only'] = '';
+
 	// If you want to identify your App Server (recommended for multiple servers):
 	//$GLOBALS['phpgw_info']['server']['use_frontend_id']   = 1024;
 	//$GLOBALS['phpgw_info']['server']['use_frontend_name'] = '01';
-			
+
 	/* eGroupWare domain-specific db settings */{domains}
+
+	/* Do you want persistent connections (higher performance, but consumes more resources) */
 	$GLOBALS['phpgw_info']['server']['db_persistent'] = {DB_PERSISTENT};
 
 	/*
 	** eGroupWare can handle session management using the database or 
-	** the session support built into PHP4 which usually gives better
-	** performance. 
+	** the session support built into PHP4 which usually gives better performance. 
 	** Your choices are 'db' or 'php4'
 	*/
 	$GLOBALS['phpgw_info']['server']['sessions_type'] = '{SESSIONS_TYPE}';
 
-	/* Select which login template set you want, most people will use default */
-	$GLOBALS['phpgw_info']['login_template_set'] = 'default';
+	/*
+	** Select which login template set you want.
+	** Only 'news' is available for now
+	*/
+	$GLOBALS['phpgw_info']['login_template_set'] = 'news';
 
 	/* This is used to control mcrypt's use */
 	$GLOBALS['phpgw_info']['server']['mcrypt_enabled'] = {ENABLE_MCRYPT};
+
 	/* Set this to 'old' for versions < 2.4, otherwise the exact mcrypt version you use. */
 	$GLOBALS['phpgw_info']['server']['versions']['mcrypt'] = '{MCRYPT_VERSION}';
 
@@ -71,24 +84,24 @@
 	*/
 	$GLOBALS['phpgw_info']['server']['mcrypt_iv'] = '{MCRYPT_IV}';
 
-	if(!isset($GLOBALS['phpgw_info']['flags']['nocachecontrol']) || !$GLOBALS['phpgw_info']['flags']['nocachecontrol'])
-	{
-		header('Cache-Control: no-cache, must-revalidate');  // HTTP/1.1
-		header('Pragma: no-cache');                          // HTTP/1.0
-	}
-	else
-	{
-		// allow caching by browser
-		session_cache_limiter(PHP_VERSION >= 4.2 ? 'private_no_expire' : 'private');
-	}
-
-	/* debugging settings */
+	/* Debugging settings */
 	define('DEBUG_APP',  False);
 	define('DEBUG_API',  False);
 	define('DEBUG_DATATYPES',  True);
 	define('DEBUG_LEVEL',  3);
 	define('DEBUG_OUTPUT', 2); /* 1 = screen,  2 = DB. For both use 3. */
 	define('DEBUG_TIMER', False);
+
+	/**************************************************************************\
+	* Do not edit these lines                                                  *
+	\**************************************************************************/
+	include_once PHPGW_SERVER_ROOT.'/maintenance.php';
+	define('PHPGW_API_INC',PHPGW_INCLUDE_ROOT.'/phpgwapi/inc');
+	include(PHPGW_SERVER_ROOT.'/phpgwapi/setup/setup.inc.php');
+	$GLOBALS['phpgw_info']['server']['versions']['phpgwapi'] = $setup_info['phpgwapi']['version'];
+	$GLOBALS['phpgw_info']['server']['versions']['current_header'] = $setup_info['phpgwapi']['versions']['current_header'];
+	unset($setup_info);
+	$GLOBALS['phpgw_info']['server']['versions']['header'] = '2.3';
 
 	function perfgetmicrotime()
 	{
@@ -101,30 +114,31 @@
 		$GLOBALS['debug_timer_start'] = perfgetmicrotime();
 	}
 
-	/**************************************************************************\
-	* Do not edit these lines                                                  *
-	\**************************************************************************/
-	include_once PHPGW_SERVER_ROOT.'/maintenance.php';
-	define('PHPGW_API_INC',PHPGW_INCLUDE_ROOT.'/phpgwapi/inc');
-	include(PHPGW_SERVER_ROOT.'/phpgwapi/setup/setup.inc.php');
-	$GLOBALS['phpgw_info']['server']['versions']['phpgwapi'] = $setup_info['phpgwapi']['version'];
-	$GLOBALS['phpgw_info']['server']['versions']['current_header'] = $setup_info['phpgwapi']['versions']['current_header'];
-	unset($setup_info);
-	$GLOBALS['phpgw_info']['server']['versions']['header'] = '2.2';
+	/* Cache control settings */
+	if(!isset($GLOBALS['phpgw_info']['flags']['nocachecontrol']) || !$GLOBALS['phpgw_info']['flags']['nocachecontrol'])
+	{
+		header('Cache-Control: no-cache, must-revalidate');  // HTTP/1.1
+		header('Pragma: no-cache');                          // HTTP/1.0
+	}
+	else
+	{
+		// allow caching by browser
+		session_cache_limiter(PHP_VERSION >= 4.2 ? 'private_no_expire' : 'private');
+	}
+
 	/* This is a fix for NT */
 	if(!isset($GLOBALS['phpgw_info']['flags']['noapi']) || !$GLOBALS['phpgw_info']['flags']['noapi'] == True)
 	{
 		include(PHPGW_API_INC . '/functions.inc.php');
 	}
+
+	/* Securiting php sessions */
 	$connection_id = $GLOBALS['phpgw']->session->sessionid;
 	if (!strlen($connection_id) != 32){
 		include("header.session.inc.php");
 	}
 
-	/*
-	  Leave off the final php closing tag, some editors will add
-	  a \n or space after which will mess up cookies later on
-	*/
+	/* Leave off the final php closing tag, some editors will add a \n or space after which will mess up cookies later on */
 	<!-- BEGIN domain -->
 	$GLOBALS['phpgw_domain']['{DB_DOMAIN}'] = array(
 		'db_host' => '{DB_HOST}',
@@ -132,7 +146,6 @@
 		'db_name' => '{DB_NAME}',
 		'db_user' => '{DB_USER}',
 		'db_pass' => '{DB_PASS}',
-		// Look at the README file
 		'db_type' => '{DB_TYPE}',
 		// This will limit who is allowed to make configuration modifications
 		'config_user'   => '{CONFIG_USER}',

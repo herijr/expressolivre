@@ -9,8 +9,6 @@
   *  option) any later version.                                              *
   \**************************************************************************/
 
-  /* $Id: manageheader.php,v 1.1 2006/09/15 14:36:29 niltonneto Exp $ */
-
 	$phpgw_info = array();
 	$GLOBALS['phpgw_info']['flags'] = array(
 		'nocachecontrol' => True,
@@ -212,7 +210,7 @@
 			echo htmlentities($newheader);
 			echo '</pre><hr>';
 			echo '<form action="index.php" method="post">';
-			echo '<br>' . lang('After retrieving the file, put it into place as the header.inc.php.  Then, click "continue".') . '<br>';
+			echo '<br>' . lang('After retrieving the file, put it into place as the header.inc.php. Then, click "continue".') . '<br><br>';
 			echo '<input type="hidden" name="FormLogout" value="header">';
 			echo '<input type="submit" name="junk" value="'.lang('Continue').'">';
 			echo '</form>';
@@ -248,19 +246,19 @@
 			break;
 		default:
 			$GLOBALS['phpgw_setup']->html->show_header($GLOBALS['phpgw_info']['setup']['HeaderFormMSG'], False, 'header');
-			
+
 			$detected = '';
 
 			if(!get_var('ConfigLang',array('POST','COOKIE')))
 			{
 				$detected .= '<br><form action="manageheader.php" method="Post">Please Select your language '.lang_select(True,'en')."</form>\n";
 			}
-
-			$detected .= '<table border="0" width="100%" cellspacing="0" cellpadding="0">' . "\n";
-
-			$detected .= '<tr><td colspan="2"><p>' . $GLOBALS['phpgw_info']['setup']['PageMSG'] . '<br />&nbsp;</p></td></tr>';
 			
-			$detected .= '<tr class="th"><td colspan="2">' . lang('Analysis') . '</td></tr><tr><td colspan="2">'. "\n";
+			$detected .= '<table border="0" width="100%" cellspacing="0" cellpadding="0">';
+
+			$detected .= '<tr><td colspan="2"><p>' . $GLOBALS['phpgw_info']['setup']['PageMSG'] . '<br>&nbsp;</p></td></tr>';
+
+			$setup_tpl->set_var('lang_analysis',lang('Analysis'));
 
 			$supported_db = array();
 			if(extension_loaded('pgsql') || function_exists('pg_connect'))
@@ -290,7 +288,6 @@
 			{
 				$detected .= lang('No Microsoft SQL Server support found. Disabling') . '<br>' . "\n";
 			}
-/*
 			if(extension_loaded('oci8'))
 			{
 				$detected .= lang('You appear to have Oracle V8 (OCI) support enabled') . '<br>' . "\n";
@@ -308,14 +305,13 @@
 					$detected .= lang('No Oracle-DB support found. Disabling') . '<br>' . "\n";
 				}
 			}
-*/
 			if(!count($supported_db))
 			{
 				$detected .= '<b><p align="center" class="msg">'
 					. lang('Did not find any valid DB support!')
 					. "<br>\n"
 					. lang('Try to configure your php to support one of the above mentioned DBMS, or install eGroupWare by hand.')
-					. '</p></b><td></tr></table></body></html>';
+					. '</p></b></td></tr></table></body></html>';
 				echo $detected;
 				exit;
 			}
@@ -324,14 +320,14 @@
 			{
 				$detected .= '<b><p align="center" class="msg">'
 					. lang('You appear to be using PHP earlier than 4.1.0. eGroupWare now requires 4.1.0 or later'). "\n"
-					. '</p></b><td></tr></table></body></html>';
+					. '</p></b></td></tr></table></body></html>';
 				echo $detected;
 				exit;
 			}
 			else
 			{
-				$detected .= lang('You appear to be using PHP4. Enabling PHP4 sessions support') . '<br>' . "\n";
-				$supported_sessions_type[] = 'php4';	// makeing php4 sessions the default
+				$detected .= lang('You appear to be using PHP4 or later. Enabling PHP4 sessions support') . '<br>' . "\n";
+				$supported_sessions_type[] = 'php4';	// making php4 sessions the default
 				$supported_sessions_type[] = 'db';
 			}
 
@@ -343,7 +339,6 @@
 			}
 			$setup_tpl->set_var('js_default_db_ports',$js_default_db_ports);
 
-			/*
 			if(extension_loaded('xml') || function_exists('xml_parser_create'))
 			{
 				$detected .= lang('You appear to have XML support enabled') . '<br>' . "\n";
@@ -353,9 +348,9 @@
 			{
 				$detected .= lang('No XML support found. Disabling') . '<br>' . "\n";
 			}
-			*/
 
 			$no_guess = False;
+			$setup_tpl->set_var('lang_domains', lang('Domains'));
 			if(file_exists('../header.inc.php') && is_file('../header.inc.php') && is_readable('../header.inc.php'))
 			{
 				$detected .= lang('Found existing configuration file. Loading settings from the file...') . '<br>' . "\n";
@@ -386,7 +381,7 @@
 					$setup_tpl->parse('domains','domain',True);
 				}
 				else
-				{
+				{	
 					if(@$GLOBALS['phpgw_info']['server']['header_version'] != @$GLOBALS['phpgw_info']['server']['current_header_version'])
 					{
 						$detected .= lang("You're using an old header.inc.php version...") . '<br>' . "\n";
@@ -486,6 +481,8 @@
 				$setup_tpl->set_var('db_pass','');
 				$setup_tpl->set_var('config_user','admin');
 				$setup_tpl->set_var('config_pass','');
+				
+				/* Other default definitions */
 				$setup_tpl->set_var('use_https_0',' checked');
 
 				while(list($k,$v) = each($supported_db))
@@ -532,6 +529,7 @@
 				$GLOBALS['phpgw_info']['server']['include_root'] = $updir; 
 			}
 
+			$detected .= "<br>";
 			$setup_tpl->set_var('detected',$detected);
 			/* End of detected settings, now display the form with the detected or prior values */
 
@@ -547,7 +545,6 @@
 			}
 			$setup_tpl->set_var('header_admin_pass',@$GLOBALS['phpgw_info']['server']['header_admin_password']);
 			$setup_tpl->set_var('header_admin_password','');
-
 
 			if(@$GLOBALS['phpgw_info']['server']['db_persistent'])
 			{
@@ -589,15 +586,25 @@
 			$setup_tpl->set_var('lang_setup_acl',lang('Limit access to setup to the following addresses, networks or hostnames (e.g. 127.0.0.1,10.1.1,myhost.dnydns.org)'));
 			$setup_tpl->set_var('setup_acl',$GLOBALS['phpgw_info']['server']['setup_acl']);
 
-			// ExpressoLivre
+			if(@$GLOBALS['phpgw_info']['server']['use_token_login'])
+			{
+				$setup_tpl->set_var('use_token_login_yes',' selected');
+			}
+			else
+			{
+				$setup_tpl->set_var('use_token_login_no',' selected');
+			}
+
+			$setup_tpl->set_var('lang_usetokenlogin', lang('Use login token'));
+			$setup_tpl->set_var('lang_usetokenlogindescr', lang('select whether to use login form validation token'));
+
 			switch($GLOBALS['phpgw_info']['server']['use_https'])
 			{
 				case '0':
 				default:
 					$setup_tpl->set_var('use_https_0',' checked');
 					$setup_tpl->set_var('div_cert',' style="display:none" ');
-                                        $setup_tpl->set_var('div_criptox',' style="display:none" ');
-					
+					$setup_tpl->set_var('div_criptox',' style="display:none" ');
 					break;
 				case '1':
 					$setup_tpl->set_var('use_https_1',' checked');
@@ -609,21 +616,32 @@
 					break;
 			}
 			
+			$setup_tpl->set_var('lang_usehttps', lang('Use HTTPS?'));
+			$setup_tpl->set_var('lang_httpsdescr', lang('Just use https on the site if apache is configured for this. Door 443 MUST be released'));
+			$setup_tpl->set_var('lang_nohttps', lang('Do not use HTTPS on the site.'));
+			$setup_tpl->set_var('lang_loginhttps', lang('Use HTTPS only in Login.'));
+			$setup_tpl->set_var('lang_sitewidehttps', lang('Use HTTPS on Entire Site.'));
+			
 			switch($GLOBALS['phpgw_info']['server']['certificado'])
 			{
 				case '0':
 				default:
 					$setup_tpl->set_var('certificado_0',' checked');
 					$setup_tpl->set_var('div_cripto',' style="display:none" ');
-                                        $setup_tpl->set_var('div_criptox',' style="display:none" ');
+					$setup_tpl->set_var('div_criptox',' style="display:none" ');
 					$setup_tpl->set_var('cripto_options',' style="display:none" ');
 					break;
 				case '1':
 					$setup_tpl->set_var('certificado_1',' checked');
-                                        $setup_tpl->set_var('div_criptox',' style="" ');
+					$setup_tpl->set_var('div_criptox',' style="" ');
 					break;
 			}
-			
+
+			$setup_tpl->set_var('lang_usecertificate', lang('Use Digital Certificate (to identify the user in the login process)?'));
+			$setup_tpl->set_var('lang_certdescr', lang('To enable this item, use of HTTPS must be enabled.'));
+			$setup_tpl->set_var('lang_notusecert', lang('DO NOT Use Digital Certificate.'));
+			$setup_tpl->set_var('lang_usecert', lang('Use Digital Certificate.'));
+
 			switch($GLOBALS['phpgw_info']['server']['captcha'])
 			{
 				case '0':
@@ -639,29 +657,32 @@
 					$setup_tpl->set_var('div_badlogin',' style="display:none" ');
 			}
 
-
 			if($GLOBALS['phpgw_info']['server']['num_badlogin'])
 			{
 				$setup_tpl->set_var('num_badlogin',$GLOBALS['phpgw_info']['server']['num_badlogin']);
 			}			
 			else
 			{
-				$setup_tpl->set_var('num_badlogin','0');
+				$setup_tpl->set_var('num_badlogin','5');
 			}
-			
-			
+
+			$setup_tpl->set_var('lang_antitheft', lang('Anti-theft'));
+			$setup_tpl->set_var('lang_usecaptcha', lang('Use Anti-Theft (CAPTCHA)?'));
+			$setup_tpl->set_var('lang_notusecaptcha', lang('DO NOT Use Anti-Theft.'));
+			$setup_tpl->set_var('lang_triesbeforecaptcha', lang('Number of login failures before displaying the Anti-theft code?'));
+
 			switch($GLOBALS['phpgw_info']['server']['use_assinar_criptografar'])
 			{
 				case '0':
 				default:
 					$setup_tpl->set_var('use_assinar_criptografar_0',' checked');
-                                        $setup_tpl->set_var('cripto_options',' style="display:none" ');
+					$setup_tpl->set_var('cripto_options',' style="display:none" ');
 					break;
 				case '1':
 					$setup_tpl->set_var('use_assinar_criptografar_1',' checked');
 					break;
 			}
-			
+
 			if($GLOBALS['phpgw_info']['server']['num_max_certs_to_cipher'])
 			{
 				$setup_tpl->set_var('num_max_certs_to_cipher',$GLOBALS['phpgw_info']['server']['num_max_certs_to_cipher']);
@@ -670,6 +691,13 @@
 			{
 				$setup_tpl->set_var('num_max_certs_to_cipher','0');
 			}
+
+			$setup_tpl->set_var('lang_cryptosig', lang('Cryptography and Digital Signature'));
+			$setup_tpl->set_var('lang_enablesig', lang('Enable Digitally Sign / Encrypt?'));
+			$setup_tpl->set_var('lang_sigdescr', lang('To enable this item the use of HTTPS and Digital Certificate must have been enabled.'));
+			$setup_tpl->set_var('lang_dontenable', lang('DO NOT enable.'));
+			$setup_tpl->set_var('lang_doenable', lang('Enable'));
+			$setup_tpl->set_var('lang_maxrecipientes', lang('Maximum number of recipients for an encrypted message'));
 
 			if($GLOBALS['phpgw_info']['server']['atributoexpiracao'])
 			{
@@ -680,6 +708,10 @@
 				$setup_tpl->set_var('atributousuarios',$GLOBALS['phpgw_info']['server']['atributousuarios']);
 			}	
 
+			$setup_tpl->set_var('lang_passldapatrib', lang('Attribute name, in ldap, for password expiration control'));
+			$setup_tpl->set_var('lang_ldapuserclass', lang('Ldap class used to identify users'));
+
+
 			if(@$GLOBALS['phpgw_info']['server']['sugestoes_email_to'])
 			{
 				$setup_tpl->set_var('sugestoes_email_to',$GLOBALS['phpgw_info']['server']['sugestoes_email_to']);
@@ -689,17 +721,10 @@
 			{
 				$setup_tpl->set_var('domain_name',$GLOBALS['phpgw_info']['server']['domain_name']);
 			}
+			$setup_tpl->set_var('lang_suggestion',lang('Enter the email addresses, separated by commas, that should receive the suggestions sent by the users'));
+			$setup_tpl->set_var('lang_domainname',lang('Enter the suffix of your domain. The suffix will be concatenated with the user\'s organization to form the domain. Ex .: user@organizacao.dominio -> usuario@celepar.pr.gov.br, pr.gov.br is the suffix of the domain'));
 			
 			$errors = '';
-			if(!$found_dbtype)
-			{
-				/*
-				$errors .= '<br><font color="red">' . lang('Warning!') . '<br>'
-					. lang('The db_type in defaults (%1) is not supported on this server. using first supported type.',$GLOBALS['phpgw_info']['server']['db_type'])
-					. '</font>';
-				*/
-			}
-
 			if(is_writeable('../header.inc.php') ||
 				(!file_exists('../header.inc.php') && is_writeable('../')))
 			{
@@ -711,7 +736,7 @@
 			{
 				$errors .= '<br>'
 					. lang('Cannot create the header.inc.php due to file permission restrictions.<br> Instead you can %1 the file.',
-					'<input type="submit" name="action[download]" value="'.lang('Download').'">' . lang('or') . '&nbsp;<input type="submit" name="action[view]" value="'.lang('View').'">')
+					'<input type="submit" name="action[download]" value="'.lang('Download').'">&nbsp;' . lang('or') . '&nbsp;<input type="submit" name="action[view]" value="'.lang('View').'">')
 					. '</form>';
 			}
 			// set domain and password for the continue button
@@ -727,7 +752,7 @@
 			$setup_tpl->set_var('lang_settings',lang('Settings'));
 			$setup_tpl->set_var('lang_adddomain',lang('Add a domain'));
 			$setup_tpl->set_var('lang_serverroot',lang('Server Root'));
-			$setup_tpl->set_var('lang_includeroot',lang('Include Root (this should be the same as Server Root unless you know what you are doing)'));
+			$setup_tpl->set_var('lang_includeroot',lang('Include Root (this should be the same as Server Root)'));
 			$setup_tpl->set_var('lang_adminuser',lang('Admin user for header manager'));
 			$setup_tpl->set_var('lang_adminpass',lang('Admin password to header manager'));
 			$setup_tpl->set_var('lang_dbhost',lang('DB Host'));
@@ -755,7 +780,7 @@
 			$setup_tpl->set_var('lang_mcryptversiondescr',lang('Set this to "old" for versions &lt; 2.4, otherwise the exact mcrypt version you use.'));
 			$setup_tpl->set_var('lang_mcryptiv',lang('MCrypt initialization vector'));
 			$setup_tpl->set_var('lang_mcryptivdescr',lang('This should be around 30 bytes in length.<br>Note: The default has been randomly generated.'));
-			$setup_tpl->set_var('lang_finaldescr',lang('After retrieving the file, put it into place as the header.inc.php.  Then, click "continue".'));
+			$setup_tpl->set_var('lang_finaldescr',lang('After retrieving the file, put it into place as the header.inc.php. Then, click "continue".'));
 			$setup_tpl->set_var('lang_continue',lang('Continue'));
 			$setup_tpl->set_var('lang_Yes',lang('Yes'));
 			$setup_tpl->set_var('lang_No',lang('No'));
