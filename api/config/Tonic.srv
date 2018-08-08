@@ -19,9 +19,6 @@ UserAppsResource = /core/UserAppsResource.php
 [/UserApi]
 UserApiResource = /core/UserApiResource.php
 
-[/AvailableServers]
-AvailableServersResource = /availableServers/AvailableServersResource.php
-
 [/Mail/Folders]
 FoldersResource = /mail/FoldersResource.php
 
