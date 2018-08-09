@@ -82,7 +82,7 @@
 					$var[strtoupper($k)] = $v;
 				}
 			}
-			
+
 			/* Admin did not type a new header password, so use the old one from the hidden field,
 			 * which is already md5 encoded.
 			 */
@@ -92,12 +92,12 @@
 				$var['HEADER_ADMIN_PASSWORD'] = $var['HEADER_ADMIN_PASS'];
 			}
 			$GLOBALS['header_template']->set_var($var);
-			
-			if ( empty($GLOBALS['header_template']->get_var('domains')) )
+
+			if ( trim($GLOBALS['header_template']->get_var('domains')) === '' )
 			{
 				$GLOBALS['header_template']->set_var('domains', "/* no domains defined */");
 			}
-			
+
 			return $GLOBALS['header_template']->parse('out','header');
 		}
 
