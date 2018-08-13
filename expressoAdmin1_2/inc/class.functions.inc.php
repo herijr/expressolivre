@@ -58,15 +58,41 @@
      		return ($ip_long & $mask) == ($network_long & $mask);
 		}
 
+		function get_client_ip()
+		{
+			if ( array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) )
+			{
+				return  $_SERVER["HTTP_X_FORWARDED_FOR"];
+			}
+			else if ( array_key_exists('REMOTE_ADDR', $_SERVER) )
+			{
+				return $_SERVER["REMOTE_ADDR"];
+			}
+			else if ( array_key_exists('HTTP_CLIENT_IP', $_SERVER) )
+			{
+				return $_SERVER["HTTP_CLIENT_IP"];
+			}
+			return false;
+		}
+
 		function check_allow_address()
 		{
-			$networks = explode(",", $this->current_config['expressoAdmin_allowed_networks']);
-
-			foreach ($networks as $idx=>$network)
+			$client_ip = $this->get_client_ip();
+			
+			if ( $client_ip )
 			{
-				if ($this->net_match($network, $_SERVER['REMOTE_ADDR']))
+
+				$networks = ( isset($this->current_config['expressoAdmin_allowed_networks']) ? explode(",", $this->current_config['expressoAdmin_allowed_networks']) : false );
+
+				if ( $networks )
 				{
-					return true;
+					foreach ($networks as $idx=>$network)
+					{
+						if ($this->net_match($network, $client_ip))
+						{
+							return true;
+						}
+					}
 				}
 			}
 
