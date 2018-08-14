@@ -490,13 +490,13 @@ class ui
 		{
 			if( $_GET['action'] == 'next' )
 			{	
-				$next = ( (int)($_GET['next']) + 5 );
+				$next = ( (int)($_GET['next']) + 10 );
 				$limit = $next;
 			}
 			
 			if( $_GET['action'] == 'previous' )
 			{	
-				$previuos = ( $_GET['previous'] == 0 ) ? 0 : (int)($_GET['previous'] - 5 );
+				$previuos = ( $_GET['previous'] == 0 ) ? 0 : (int)($_GET['previous'] - 10 );
 				$limit = $previous;
 			}
 		}

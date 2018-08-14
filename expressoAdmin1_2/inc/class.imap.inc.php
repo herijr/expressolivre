@@ -29,8 +29,8 @@ class imap
 		if ( is_array( $perfil ) ) {
 			foreach ( $perfil as $key => $value ) {
 				switch ( $key ) {
-					case 'server'    : case 'imapServer'        : $this->_server    = $value; break;
-					case 'port'      : case 'imapPort'          : $this->_port      = $value; break;
+					case 'server'    : case 'imapAdminServer'   : $this->_server    = $value; break;
+					case 'port'      : case 'imapAdminPort'     : $this->_port      = $value; break;
 					case 'admin'     : case 'imapAdminUsername' : $this->_admin     = $value; break;
 					case 'passwd'    : case 'imapAdminPW'       : $this->_passwd    = $value; break;
 					case 'delimiter' : case 'imapDelimiter'     : $this->_delimiter = $value; break;

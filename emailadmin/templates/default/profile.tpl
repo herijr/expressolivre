@@ -122,17 +122,7 @@
 							<label>{lang_imap_server_port}</label>
 							<input type="text" size="5" maxlength="5" name="imapport" value="{value_imapport}">
 						</div>
-						
-						<div>
-							<label>{lang_admin_imap_server_hostname_or_ip_address}</label>
-							<input type="text" size="40" name="imapAdminServer" value="{value_imapadminserver}">
-						</div>
-						
-						<div>
-							<label>{lang_admin_imap_server_port}</label>
-							<input type="text" size="5" name="imapAdminPort" value="{value_imapadminport}">
-						</div>
-						
+
 						<div>
 							<label>{lang_delimiter_imap}</label>
 							<select name="imapdelimiter">
@@ -158,6 +148,8 @@
 
 					</fieldset>
 
+					<br>
+
 					<fieldset>
 						<legend>{lang_cyrus_imap_administration}</legend>
 
@@ -176,7 +168,19 @@
 							<input type="password" size="40" maxlength="40" name="imapadminpw" value="{value_imapadminpw}">
 						</div>
 
+						<div>
+							<label>{lang_admin_imap_server_hostname_or_ip_address}</label>
+							<input type="text" size="40" name="imapAdminServer" value="{value_imapadminserver}">
+						</div>
+						
+						<div>
+							<label>{lang_admin_imap_server_port}</label>
+							<input type="text" size="5" name="imapAdminPort" value="{value_imapadminport}">
+						</div>
+
 					</fieldset>
+
+					<br>
 
 					<fieldset>
 
@@ -199,6 +203,8 @@
 
 					</fieldset>
 
+					<br>
+
 					<fieldset>
 						<legend>{lang_spam_settings}</legend>
 
@@ -213,6 +219,8 @@
 						</div>
 
 					</fieldset>
+
+					<br>
 
 					<fieldset>
 						<legend>{lang_default_folders}</legend>

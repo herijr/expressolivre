@@ -18,7 +18,7 @@ cyrus imap server	emailadmin	pt-br	Servidor Cyrus IMAP
 cyrus user post spam	emailadmin	pt-br	Usuário do cyrus que irá postar a mensagem na pasta Spam (Padrão:anonymous)
 default	emailadmin	pt-br	padrão
 Delimiter of the IMAP server folders: (points to the logins, use / as delimiter.)	emailadmin	pt-br	Delimitador das pastas do servidor IMAP: (para pontos nos logins, use / como delimitador.)
-Default Folders	emailadmin	pt-br	Pastas padrões
+Default Folders	emailadmin	pt-br	Pastas padrão
 deliver extern	emailadmin	pt-br	entrega externa
 domainname	emailadmin	pt-br	nome do domínio
 do you really want to delete this profile	emailadmin	pt-br	Tem certeza que deseja apagar esse perfil ?

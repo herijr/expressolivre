@@ -155,7 +155,7 @@ class so
 		}
 		else
 		{
-			$this->db->query($query, __LINE__, __FILE__, $limit , 5 );
+			$this->db->query($query, __LINE__, __FILE__, $limit , 10 );
 		}
 
 		while( $this->db->next_record() )
