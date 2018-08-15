@@ -1,4 +1,4 @@
-[defaut]
+[default]
 groups_user = 1000
 imapDelimiter = "/"
 minimumSizeLogin = 4
