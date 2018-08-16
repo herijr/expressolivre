@@ -187,8 +187,8 @@
 		
 		function init()
 		{
-			$this->db =& $GLOBALS['phpgw']->db;
-			$this->security =& CreateObject('contactcenter.security_manager');
+			$this->db = $GLOBALS['phpgw']->db;
+			$this->security = CreateObject('contactcenter.security_manager');
 		}
 
 		/*!
