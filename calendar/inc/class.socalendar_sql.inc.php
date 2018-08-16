@@ -909,19 +909,17 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			return $retval;
 		}
 
-		function save_event(&$event)
+		function save_event( $event )
 		{
-
-			$GLOBALS['calendar']->bocalendar = CreateObject('calendar.bocalendar');
-
 			$locks = Array(
 				'phpgw_cal',
 				'phpgw_cal_user',
 				'phpgw_cal_repeats',
 				'phpgw_cal_extra'
-	// OLD-ALARM			'phpgw_cal_alarm'
 			);
+
 			$this->stream->lock($locks);
+
 			if($event['id'] == 0)
 			{
 				if(!$event['uid'])
@@ -962,21 +960,9 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			$enddate = $this->maketime($event['end']) - $GLOBALS['phpgw']->datetime->tz_offset;
 			$today = time() - $GLOBALS['phpgw']->datetime->tz_offset;
 
-            if ($event['type'] == 'hourAppointment')
-                    $type = 'H';
-            else if($event['type'] == 'privateHiddenFields'){
-                    $type = 'P';
-            }else
-                    $type = 'E';
-
-			/*
-			 *  
-			 * Os campos title, description e location
-			 * estao usando a funcao pg_escape_string
-			 * apos atualização do Postgres a function db_addslashes
-			 * deixou de funcionar.
-			 * 
-			*/
+			if( $event['type'] == 'hourAppointment'){ $type = 'H'; }
+			else if($event['type'] == 'privateHiddenFields'){ $type = 'P'; }
+			else { $type = 'E'; }
 
 			$sql = 'UPDATE phpgw_cal SET '
             		. 'owner='.(int)$event['owner'].', '

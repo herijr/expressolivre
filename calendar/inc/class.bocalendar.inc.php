@@ -1374,6 +1374,7 @@
 
 				$this->store_to_appsession($event);
 				$datetime_check = $this->validate_update($event);
+
 				print_debug('bo->validated_update() returnval',$datetime_check);
 				if($datetime_check)
 				{
@@ -3594,7 +3595,7 @@
 			}	
 
 			$GLOBALS['phpgw_info']['user']['preferences']['common']['tz_offset'] = $temp_tz_offset;
-			$GLBOALS['phpgw']->datetime->tz_offset = ((60 * 60) * $temp_tz_offset);
+			$GLOBALS['phpgw']->datetime->tz_offset = ((60 * 60) * $temp_tz_offset);
 			$GLOBALS['phpgw_info']['user']['preferences']['common']['timeformat'] = $temp_timeformat;
 			$GLOBALS['phpgw_info']['user']['preferences']['common']['dateformat'] = $temp_dateformat;
 			
