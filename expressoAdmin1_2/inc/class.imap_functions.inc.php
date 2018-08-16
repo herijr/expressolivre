@@ -103,6 +103,14 @@ class imap_functions
 			return $result;
 		}
 
+		if ( (!empty($this->_profile['imapDefaultSpamFolder'])) && (!imap_createmailbox($this->_imap, '{'.$this->_profile['imapAdminServer'].'}' . "user" . $this->_profile['imapDelimiter'] . $uid . $this->_profile['imapDelimiter'] . $this->_profile['imapDefaultSpamFolder'])) )
+		{
+			$error = imap_errors();
+			$result['status'] = false;
+			$result['msg'] = $this->functions->lang('Error on function') . " imap_functions->create(".$this->_profile['imapDefaultSpamFolder']."):" . $error[0];
+			return $result;
+		}
+
 		if (!imap_set_quota($this->_imap,"user" . $this->_profile['imapDelimiter'] . $uid, ($mailquota*1024))) 
 		{
 			$error = imap_errors();
