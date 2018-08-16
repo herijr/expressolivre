@@ -62,35 +62,6 @@ class SendResource extends MailAdapter {
 				if($totalSize > $uploadMaxFileSize){
 					Errors::runException("MAIL_NOT_SENT_LIMIT_EXCEEDED", $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['max_attachment_size']);
 				}
-
-				if($this->getExpressoVersion() != "2.2")
-				{
-
-					$fileInclude = API_DIRECTORY.'/../../../prototype/api/controller.php';
-					try {
-						require_once ($fileInclude);
-
-						Controller::addFallbackHandler(0,$this->fallBackHandler($e));
-					} catch (Exception $e) {
-						Errors::runException($e->getMessage());
-					}
-
-					$result = array();
-					$attachments_ids = array();
-						
-					foreach($files as $key => $value){
-						$value['disposition']  = isset($value['disposition']) ?
-							$value['disposition'] : 'attachment';
-						try{
-							$attachment = Controller::put( array( 'concept' =>  "mailAttachment" ), $value );
-							$attachments_ids[] = $attachment[0]['id'];
-						}catch(Exception $e){
-							Errors::runException($e->getMessage());
-						}
-					}
-					$params['attDisposition1'] 	= 'attachment';
-					$params['attachments'] 		= json_encode($attachments_ids);
-				}
 			}
 			$returncode = $this->getImap()->send_mail($params);
 			if (!$returncode || !(is_array($returncode) && $returncode['success'] == true))
