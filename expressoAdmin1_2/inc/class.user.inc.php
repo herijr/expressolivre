@@ -128,16 +128,20 @@
 						$user_info['accountStatus'] = 'active';
 					
 					// Cria user_info no caso de ter alias e forwarding email.
-					foreach ($params['mailalternateaddress'] as $index=>$mailalternateaddress)
-					{
-						if ($mailalternateaddress != '')
-							$user_info['mailAlternateAddress'][] = $mailalternateaddress;
+					if( isset($params['mailalternateaddress']) ){
+						foreach( $params['mailalternateaddress'] as $index => $mailalternateaddress)
+						{
+							if ($mailalternateaddress != '')
+								$user_info['mailAlternateAddress'][] = $mailalternateaddress;
+						}
 					}
 					
-					foreach ($params['mailforwardingaddress'] as $index=>$mailforwardingaddress)
-					{
-						if ($mailforwardingaddress != '')
-							$user_info['mailForwardingAddress'][] = $mailforwardingaddress;
+					if( isset($params['mailforwardingaddress']) ){
+						foreach ($params['mailforwardingaddress'] as $index => $mailforwardingaddress)
+						{
+							if ($mailforwardingaddress != '')
+								$user_info['mailForwardingAddress'][] = $mailforwardingaddress;
+						}
 					}
 					
 					if ($params['deliverymode'])
