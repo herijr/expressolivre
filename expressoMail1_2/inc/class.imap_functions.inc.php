@@ -4390,13 +4390,15 @@ class imap_functions
 		    $line2 = str_replace(" /vendor/cmu/cyrus-imapd/size (value.shared ",";",str_replace("* ANNOTATION ","",$line2)); 
 		    list($folder,$size) = explode(";",$line2); 
 		    $quota_used = str_replace(")","",$size); 
-		    $quotaPercent = (($quota_used / 1024) / $data["quota_root"]["quota_limit"])*100; 
-		    $folder = mb_convert_encoding($folder, "ISO-8859-1", "UTF7-IMAP"); 
+		    $quotaPercent = ( intval($quota_used) > 0 ) ? (($quota_used / 1024) / $data["quota_root"]["quota_limit"])*100 : 0 ; 
+
+				$folder = mb_convert_encoding($folder, "ISO-8859-1", "UTF7-IMAP"); 
+
 		    if(!preg_match('/user\\'.$this->imap_delimiter.$this->username.'\\'.$this->imap_delimiter.'/i',$folder)){ 
 			    $folder = $this->functions->getLang("Inbox"); 
-		    } 
-		    else 
-			    $folder = preg_replace('/user\\'.$this->imap_delimiter.$this->username.'\\'.$this->imap_delimiter.'/i','', $folder); 
+		    } else {
+		      $folder = preg_replace('/user\\'.$this->imap_delimiter.$this->username.'\\'.$this->imap_delimiter.'/i','', $folder); 
+		    }
 
 		    $data[$folder] = array("quota_percent" => sprintf("%.1f",round($quotaPercent,1)), "quota_used" => $quota_used); 
 	    } 
