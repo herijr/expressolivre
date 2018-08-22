@@ -11,13 +11,9 @@ class AttachmentResource extends MailAdapter {
 		$this->addResourceParam("folderID","string",true,"ID da pasta da mensagem.");
 		$this->addResourceParam("msgID","string",true,"ID da mensagem que contém o Anexo.");
 		$this->addResourceParam("attachmentID","string",true,"ID do Anexo.");
-
-		if($this->getExpressoVersion() == "2.2"){
-			$this->addResourceParam("attachmentIndex","string",true,"Índice do Anexo, parametro somente necessário para a versão 2.2 do Expresso.");
-			$this->addResourceParam("attachmentName","string",true,"Nome do arquivo anexado, parametro somente necessário para a versão 2.2 do Expresso.");
-			$this->addResourceParam("attachmentEncoding","string",true,"Codificação do Anexo, parametro somente necessário para a versão 2.2 do Expresso.");
-		}
-
+		$this->addResourceParam("attachmentIndex","string",true,"Índice do Anexo, parametro somente necessário para a versão 2.2 do Expresso.");
+		$this->addResourceParam("attachmentName","string",true,"Nome do arquivo anexado, parametro somente necessário para a versão 2.2 do Expresso.");
+		$this->addResourceParam("attachmentEncoding","string",true,"Codificação do Anexo, parametro somente necessário para a versão 2.2 do Expresso.");
 	}
 
 	public function post($request){		
