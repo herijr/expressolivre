@@ -1079,19 +1079,10 @@ class ldap_functions
 	function ldap_remove_photo($dn)
 	{
 		$attrs['jpegPhoto'] = array();
-		$res = ldap_mod_del($this->ldap, $dn, $attrs);
-		
-		if ($res)
-		{
-			$result['status'] = true;
-		}
-		else
-		{
-			$result['status'] = false;
-			$result['msg'] = $this->functions->lang('Error on function') . " ldap_functions->ldap_remove_photo ($dn)" . ".\n" . $this->functions->lang('Server returns') . ': ' . ldap_error($this->ldap);
-		}
-		
-		return $result;
+		if( !@ldap_mod_del( $this->ldap, $dn, $attrs ) ) {
+			return false;
+		} 
+		return true;
 	}	
 	
 	// Pode receber tanto um único memberUid quanto um array de memberUid's

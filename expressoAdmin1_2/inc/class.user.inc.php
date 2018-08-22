@@ -736,8 +736,9 @@
         
 				if (isset($new_values['delete_photo']) && $new_values['delete_photo'])
 				{
-					$this->ldap_functions->ldap_remove_photo($dn);
-					$this->db_functions->write_log("removed user photo",$dn);
+					if( $this->ldap_functions->ldap_remove_photo($dn) ){
+						$this->db_functions->write_log( "removed user photo", $dn );
+					}
 				}
 				elseif($_FILES['photo']['name'] != '')
 				{
