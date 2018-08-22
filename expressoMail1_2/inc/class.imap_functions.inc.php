@@ -157,11 +157,15 @@ class imap_functions
 			$msgs_info = imap_status($this->mbox,"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".mb_convert_encoding( $folder, "UTF7-IMAP", "ISO-8859-1" ) ,SA_ALL);
 
 
-			$return['tot_unseen'] = $search_box_type == "SEEN" ? 0 : $msgs_info->unseen;
+			$return['tot_unseen'] = $search_box_type == "SEEN" ? 0 : ( isset($msgs_info->unseen) ? $msgs_info->unseen : 0 );
 
 			$sort_array_msg = $this-> get_msgs($folder, $sort_box_type, $search_box_type, $sort_box_reverse,$msg_range_begin,$msg_range_end);
 
-			$num_msgs = ($search_box_type=="UNSEEN") ? $msgs_info->unseen : (($search_box_type=="SEEN") ? ($msgs_info->messages - $msgs_info->unseen) : $msgs_info->messages);
+			$num_msgs = 0;
+			if( isset($msgs_info->unseen) && isset($msgs_info->messages) ){
+				$num_msgs = (($search_box_type=="UNSEEN") ? $msgs_info->unseen : 
+												( ($search_box_type=="SEEN") ? ($msgs_info->messages - $msgs_info->unseen) : $msgs_info->messages ));
+			}
 
 			$i = 0;
 			if(is_array($sort_array_msg)){
