@@ -67,7 +67,7 @@
 				$this->page_info['actual_catalog'] = $catalogs[0];
 			}
 
-			$this->page_info['actual_catalog'] =& $this->bo->set_catalog($this->page_info['actual_catalog']);
+			$this->page_info['actual_catalog'] = $this->bo->set_catalog($this->page_info['actual_catalog']);
 
 
 			if($this->page_info['actual_catalog']['class'] == 'bo_group_manager')
@@ -2066,23 +2066,24 @@
 			$this->page_info['changed'] = true;
 
 			$result = $this->bo->catalog->remove_single_entry($id);
-
+			
 			if( $result )
 			{
-				if( $pos = array_search($id, $this->page_info['actual_entries']) )
-				{
-					unset($this->page_info['actual_entries'][$pos]);
+				if( isset($this->page_info['actual_entries']) && is_array($this->page_info['actual_entries'])){
+					if( $pos = array_search($id, $this->page_info['actual_entries']) ){
+						unset($this->page_info['actual_entries'][$pos]);
+					}
 				}
 
 				$temp = false;
-				
-				reset($this->page_info['actual_entries']);
-				
-				foreach($this->page_info['actual_entries'] as $t)
-				{
-					$temp[] = $t;
-				}
 
+				if( isset($this->page_info['actual_entries']) && is_array($this->page_info['actual_entries'])){
+					reset($this->page_info['actual_entries']);
+					foreach($this->page_info['actual_entries'] as $t) { 
+						$temp[] = $t; 
+					}
+				}
+				
 				$this->page_info['actual_entries'] = $temp;
 
 				if( !$mobile )
