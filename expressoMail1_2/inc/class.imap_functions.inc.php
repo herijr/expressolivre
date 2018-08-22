@@ -3930,17 +3930,17 @@ class imap_functions
 
 		$return = array();
 		$mbox_stream = $this->open_mbox();
-		$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
 
-		$i = 0;
-		foreach ($mbox_acl as $user => $acl)
-		{
-			if ($user != $this->username)
-			{
-				$return[$i]['uid'] = $user;
-				$return[$i]['cn'] = $this->ldap->uid2cn($user);
+		if( is_resource($mbox_stream) ){
+			$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
+			$i = 0;
+			foreach ($mbox_acl as $user => $acl) {
+				if ( $user !== $this->username ) {
+					$return[$i]['uid'] = $user;
+					$return[$i]['cn'] = $this->ldap->uid2cn($user);
+				}
+				$i++;
 			}
-			$i++;
 		}
 		return $return;
 	}
@@ -3970,35 +3970,20 @@ class imap_functions
 		$serverString = "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}";
 		$mailboxes_list = imap_getmailboxes($mbox_stream, $serverString, "user".$this->imap_delimiter.$this->username."*");
 
-		/*if (count($add_share))
-		{
-			foreach ($add_share as $index=>$uid)
-			{
-		        if (is_array($mailboxes_list))
-        		{
-                	foreach ($mailboxes_list as $key => $val)
-                	{
-                        $folder = str_replace($serverString, "", imap_utf7_decode($val->name));
-						imap_setacl ($mbox_stream, $folder, "$uid", "lrswipcda");
-                	}
-        		}
-			}
-		}*/
-
-                if (count($remove_share))
+    if (count($remove_share))
+    {
+        foreach ($remove_share as $index=>$uid)
+        {
+            if (is_array($mailboxes_list))
+            {
+                foreach ($mailboxes_list as $key => $val)
                 {
-                    foreach ($remove_share as $index=>$uid)
-                    {
-                        if (is_array($mailboxes_list))
-                        {
-                            foreach ($mailboxes_list as $key => $val)
-                            {
-                                $folder = str_replace($serverString, "", $val->name);
-                                imap_setacl ($mbox_stream, $folder, "$uid", "");
-                            }
-                        }
-                    }
+                    $folder = str_replace($serverString, "", $val->name);
+                    imap_setacl ($mbox_stream, $folder, "$uid", "");
                 }
+            }
+        }
+    }
 
 		return true;
 	}
@@ -4010,29 +3995,31 @@ class imap_functions
 		$return = array();
 		$return[$useracl] = 'false';
 		$mbox_stream = $this->open_mbox();
-		$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
 
-		foreach ($mbox_acl as $user => $acl)
-		{
-			if (($user != $this->username) && ($user == $useracl))
-			{
-				$return[$user] = $acl;
+		if( is_resource($mbox_stream) ){
+			$mbox_acl = imap_getacl( $mbox_stream, 'INBOX');
+			foreach ( $mbox_acl as $user => $acl) {
+				if( ($user != $this->username) && ($user == $useracl) ){ 
+					$return[$user] = $acl; 
+				}
 			}
 		}
+
 		return $return;
 	}
 
 	function getacltouser($user)
 	{
-		$return = array();
 		$mbox_stream = $this->open_mbox();
 		//Alterado, antes era 'imap_getacl($mbox_stream, 'user'.$this->imap_delimiter.$user);
 		//Afim de tratar as pastas compartilhadas, verificandos as permissoes de operacao sobre as mesmas
 		//No caso de se tratar da caixa do proprio usuario logado, utiliza a sintaxe abaixo
-		if(substr($user,0,4) != 'user')
-		$mbox_acl = imap_getacl($mbox_stream, 'user'.$this->imap_delimiter.$user);
-		else
-		  $mbox_acl = imap_getacl($mbox_stream, $user);
+		$mbox_acl = array();
+		if( is_resource($mbox_stream)){
+			$mbox_acl = ( (substr($user,0,4) != 'user') ? 
+											imap_getacl($mbox_stream, 'user'.$this->imap_delimiter.$user) :
+												 imap_getacl($mbox_stream, $user) );
+		}
 		return ( isset($mbox_acl[$this->username]) ? $mbox_acl[$this->username] : false );
 	}
 
