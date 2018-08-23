@@ -45,12 +45,15 @@ class WorkflowObjects
 		if (!defined('PHPGW_API_INC'))
 			define('PHPGW_API_INC', dirname(__FILE__) . '/../../phpgwapi/inc');
 
+		if (!defined('WF_SERVER_ROOT'))
+			define('WF_SERVER_ROOT', dirname(dirname(__FILE__)) . '/');
+
 		if ($requireGalaxia)
 		{
 			if (!function_exists('galaxia_get_config_values'))
 			{
-				require_once 'engine/config.ajax.inc.php' ;
-				require_once 'engine/class.ajax_config.inc.php' ;
+				require_once WF_SERVER_ROOT . 'inc/engine/config.ajax.inc.php' ;
+				require_once WF_SERVER_ROOT . 'inc/engine/class.ajax_config.inc.php' ;
 			}
 		}
 	}
