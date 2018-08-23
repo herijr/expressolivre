@@ -521,11 +521,12 @@ class so_userinterface
 		$query .= " 	AND ";
 		$query .= "		(f.funcionario_id IN ({$uids})) ";
 
-		$result = $this->db->query($query, array($organizationID))->GetArray(-1);
 		$employees = array();
+		$resultset = $this->db->query($query, array($organizationID));
+		$result = is_object($resultset) ? $resultset->GetArray(-1) : array();
 
 		/* filling return array with employee's information */
-        $result_count = count($result);
+		$result_count = count($result);
 		for ($i = 0; $i < $result_count; ++$i) {
 			$employees []= array(
 					'area'	 			=> $result[$i]['area'],
