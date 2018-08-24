@@ -16,15 +16,15 @@ class CreateUserResource extends AdminAdapter
 		$this->addResourceParam("accountProfile","string",true,"Perfil do usuário( Verifique se o perfil está disponível no servidor)");
 		$this->addResourceParam("accountPassword","string",true,"Senha do usuário");
 		$this->addResourceParam("accountRePassword","string",true,"Confirmação da senha do usuário");
-		$this->addResourceParam("accountPhone","string",true,"Telefone do usuário. Máscara padrão (00)0000-0000");
-		$this->addResourceParam("accountCpf","string",true,"CPF do usuário. Máscara padrão 000.000.000-00");
-		$this->addResourceParam("accountRg","string",true,"RG do usuário");
-		$this->addResourceParam("accountRgUf","string",true,"UF");
-		$this->addResourceParam("accountBirthDate","string",true,"Data de aniversário do usuário. Máscara padrão DD/MM/AAAA");
-		$this->addResourceParam("accountSex","string",true,"Sexo");
-		$this->addResourceParam("accountCity","string",true,"Cidade");
-		$this->addResourceParam("accountSt","string",true,"Estado");
-		$this->addResourceParam("accountDescription","string",true,"Descrição do usuário");
+		$this->addResourceParam("accountPhone","string",false,"Telefone do usuário. Máscara padrão (00)0000-0000");
+		$this->addResourceParam("accountCpf","string",false,"CPF do usuário. Máscara padrão 000.000.000-00");
+		$this->addResourceParam("accountRg","string",false,"RG do usuário");
+		$this->addResourceParam("accountRgUf","string",false,"UF");
+		$this->addResourceParam("accountBirthDate","string",false,"Data de aniversário do usuário. Máscara padrão DD/MM/AAAA");
+		$this->addResourceParam("accountSex","string",false,"Sexo");
+		$this->addResourceParam("accountCity","string",false,"Cidade");
+		$this->addResourceParam("accountSt","string",false,"Estado");
+		$this->addResourceParam("accountDescription","string",false,"Descrição do usuário");
 		$this->addResourceParam("accountJpegPhoto","file", false, "Foto do usuario");
 
 	}
