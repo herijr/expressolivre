@@ -148,7 +148,7 @@ class Log
      * @access public
      * @since Log 1.0
      */
-    function &factory($handler, $name = '', $ident = '', $conf = array(),
+    static public function factory($handler, $name = '', $ident = '', $conf = array(),
                       $level = PEAR_LOG_DEBUG)
     {
         $handler = strtolower($handler);
@@ -160,12 +160,12 @@ class Log
          * a failure as fatal.  The caller may have already included their own
          * version of the named class.
          */
-        if (!Log::_classExists($class)) {
+        if (!self::_classExists($class)) {
             include_once $classfile;
         }
 
         /* If the class exists, return a new instance of it. */
-        if (Log::_classExists($class)) {
+        if (self::_classExists($class)) {
             $obj = new $class($name, $ident, $conf, $level);
             return $obj;
         }

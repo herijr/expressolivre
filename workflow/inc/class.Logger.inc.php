@@ -113,7 +113,7 @@ class Logger
 		if(!is_array($logTypes) && !empty($logTypes))
 			$logTypes = array($logTypes);
 
-		$this->log =& Log::factory('composite');
+		$this->log = Log::factory('composite');
 		foreach($logTypes as $logType){
 			$this->addLogType($logType);
 		}
@@ -243,7 +243,7 @@ class Logger
 		}
 
 		$conf = array('mode' => 0600, 'timeFormat' => '%X %x');
-		$log =& Log::factory('file', $this->logPath.SEP.$this->logFileName, $this->curProcessName, $conf, $this->logLevel);
+		$log = Log::factory('file', $this->logPath.SEP.$this->logFileName, $this->curProcessName, $conf, $this->logLevel);
 		return $log;
 	}
 
