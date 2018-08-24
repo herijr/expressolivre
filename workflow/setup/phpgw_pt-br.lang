@@ -594,6 +594,8 @@ workflow preferences	workflow	pt-br	Preferências do Workflow
 workflow site configuration	workflow	pt-br	Configuração do Site Workflow
 workitem information	workflow	pt-br	Informação de Workitem
 workitems	workflow	pt-br	Workitems
+Workflow Application	common	pt-br	Módulo para Fluxos de Trabalho
+Based on Galaxia Workflow Engine	common	pt-br	Baseado no Motor de Workflow Galaxia
 you are not allowed to abort instance %1	workflow	pt-br	Você não tem permissão para abortar a instância %1
 you are not allowed to exception instance %1	workflow	pt-br	Você não tem permissão para colocar a intância %1 em exceção
 you are not allowed to grab instance %1	workflow	pt-br	Você não tem permissão para capturar a instância %1

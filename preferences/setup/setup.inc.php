@@ -9,13 +9,24 @@
 	*  option) any later version.                                              *
 	\**************************************************************************/
 
-
 	$setup_info['preferences']['name']      = 'preferences';
 	$setup_info['preferences']['title']     = 'Preferences';
 	$setup_info['preferences']['version']   = '2.2.1';
 	$setup_info['preferences']['app_order'] = 1;
-	$setup_info['preferences']['tables']    = '';
 	$setup_info['preferences']['enable']    = 2;
+	
+	$setup_info['preferences']['author'] = 'eGroupWare coreteam';
+
+	$setup_info['preferences']['maintainer'][] = array(
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
+	);
+
+	$setup_info['preferences']['license']  = 'GPL';
+	$setup_info['preferences']['description'] = 'Preferences Application';
+
+	$setup_info['preferences']['tables'] = '';
 
 	/* The hooks this app includes, needed for hooks registration */
 	$setup_info['preferences']['hooks'][] = 'deleteaccount';

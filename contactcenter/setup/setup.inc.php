@@ -21,17 +21,16 @@
 	$setup_info['contactcenter']['enable']    = 1;
 
 	$setup_info['contactcenter']['author'] = 'Raphael Derosso Pereira, Jonas Goes';
-	$setup_info['contactcenter']['note']   = 'Contact Center is the new eGW addressbook. It manages all contacts, companies and their informations';
+	
+	$setup_info['contactcenter']['maintainer'] = array(
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
+		);
+
 	$setup_info['contactcenter']['license']  = 'GPL';
-	$setup_info['contactcenter']['description'] =
-		'Contact Center is a modern addressbook application that introduces a new way to ' .
-		'do things in the Web Application World. Its key advantages are the possibility to ' .
-		'manage Contacts and Companies independently. Users can access 3 types of catalogs: ' .
-		'Personal (which manages people and companies), Global (LDAP or DB) and Aliens (shared Personal).';
-
-	$setup_info['contactcenter']['maintainer'] = 'Raphael Derosso Pereira';
-	$setup_info['contactcenter']['maintainer_email'] = 'raphaelpereira@users.sourceforge.net';
-
+	$setup_info['contactcenter']['description'] = 'Contact Center Application';
+		
 	/* The hooks this app includes, needed for hooks registration */
 	$setup_info['contactcenter']['hooks'][] = 'admin';
 	$setup_info['contactcenter']['hooks'][] = 'preferences';

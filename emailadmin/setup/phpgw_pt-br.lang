@@ -12,6 +12,7 @@ alternate email address	emailadmin	pt-br	endereço de correio eletrônico alternat
 Configuration for the service Cyrus IMAP	emailadmin	pt-br	Configuração para o serviço Cyrus IMAP
 Configuration for the service IMAP	emailadmin	pt-br	Configuração para o serviço IMAP
 Configuration for the SMTP service	emailadmin	pt-br	Configuração para o serviço SMTP
+Core Management MailServer Application	common	pt-br	Módulo de Administração do Serviço de Email
 create spam folder	emailadmin	pt-br	Criar a pasta Spam ao criar usuário
 cyrus imap server administration	emailadmin	pt-br	Administração do Servidor Cyrus IMAP
 cyrus imap server	emailadmin	pt-br	Servidor Cyrus IMAP

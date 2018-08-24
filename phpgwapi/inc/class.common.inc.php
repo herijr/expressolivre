@@ -1170,7 +1170,7 @@
 //					}
 				}
 			}
-			if ($GLOBALS['phpgw_info']['flags']['currentapp'] == 'home' || $GLOBALS['phpgw_info']['flags']['currentapp'] == 'preferences' || $GLOBALS['phpgw_info']['flags']['currentapp'] == 'about')
+			if ($GLOBALS['phpgw_info']['flags']['currentapp'] == 'home' || $GLOBALS['phpgw_info']['flags']['currentapp'] == 'about')
 			{
 				$app = $app_title = 'eGroupWare';
 			}

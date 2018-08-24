@@ -16,11 +16,16 @@
 	$setup_info['help']['app_order'] = 5;
 	$setup_info['help']['enable']    = 2;	// Invisible on top (navigation bar)
 
-	$setup_info['help']['author']    = 'William Merlotto';
-	$setup_info['help']['maintainer'] = 'William Merlotto - Nilton Neto';
-	$setup_info['help']['maintainer_email'] = '';
+	$setup_info['help']['author']    = 'William Merlotto, Nilton Emílio Bührer Neto';
+	
+	$setup_info['help']['maintainer'] = array(
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
+	);
+	
 	$setup_info['help']['license']   = 'GPL';
-	$setup_info['help']['description'] ='The new Expresso Online User Manual uses the Wiki app.';
+	$setup_info['help']['description'] ='Online User Manual Application';
 
 	/* Dependencies for this app to work */
 	$setup_info['help']['depends'][] = array(

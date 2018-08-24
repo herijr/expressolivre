@@ -1,0 +1,15 @@
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="left">
+      <a href="http://www.eGroupWare.org" target="_new"><img src="{phpgw_logo}" border="0" alt="eGroupWare"></a>
+    </td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td align="left">{phpgw_version}</td>
+  </tr>
+  <tr>
+    <td align="left">{phpgw_message}</td>
+</table>

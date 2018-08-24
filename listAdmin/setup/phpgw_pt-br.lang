@@ -17,6 +17,8 @@ Change password	listAdmin	pt-br	Usuário pode alterar a própria senha?
 Account Active	listAdmin	pt-br	A Conta ExpressoLivre está ativa?
 General Information	listAdmin	pt-br	Informações Gerais
 Email Config	listAdmin	pt-br	Configurações de E-mail
+EmailList Management Application	common	pt-br	Módulo de Administração de Listas de Divulgação
+Based on Mailman Application	common	pt-br	Baseado na aplicação MailMan
 Groups Permission	listAdmin	pt-br	Grupos
 Aplication Permission	listAdmin	pt-br	Aplicações
 Samba Config	listAdmin	pt-br	Configurações do SAMBA

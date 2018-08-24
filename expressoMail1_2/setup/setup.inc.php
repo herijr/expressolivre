@@ -13,19 +13,21 @@
 	$setup_info['expressoMail1_2']['title']     	= 'Expresso Mail';
 	$setup_info['expressoMail1_2']['version']   	= '2.2.6';
 	$setup_info['expressoMail1_2']['app_order'] 	= 2;
-	$setup_info['expressoMail1_2']['tables'][]		= 'phpgw_expressomail_contacts';
-    $setup_info['expressoMail1_2']['tables'][]		= 'phpgw_certificados';
 	$setup_info['expressoMail1_2']['enable']    	= 1;
 
-	$setup_info['expressoMail1_2']['author'] = 	'João Alfredo Knopik Junior'.
-												' (joao.alfredo@gmail.com / jakjr@celepar.pr.gov.br)<br>'.
-												'Nilton Emílio Bührer Neto'.
-												' (nilton.neto@gmail.com / niltonneto@celepar.pr.gov.br)';
-	$setup_info['expressoMail1_2']['maintainer'] =  'Empresa ou Instituição onde o seu Expresso está instalado.';
-	$setup_info['expressoMail1_2']['maintainer_email'] = '';
+	$setup_info['expressoMail1_2']['author'] = 'João Alfredo Knopik Junior, Nilton Emílio Bührer Neto';
+
+	$setup_info['expressoMail1_2']['maintainer'] = array(
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
+	);
 
 	$setup_info['expressoMail1_2']['license']  = 'GPL';
-	$setup_info['expressoMail1_2']['description'] = 'Módulo de Email, usando metodologia AJAX';
+	$setup_info['expressoMail1_2']['description'] = 'Email Application';
+
+	$setup_info['expressoMail1_2']['tables'][]		= 'phpgw_expressomail_contacts';
+	$setup_info['expressoMail1_2']['tables'][]		= 'phpgw_certificados';
 
 	/* The hooks this app includes, needed for hooks registration */
 	$setup_info['expressoMail1_2']['hooks'][] = 'preferences';

@@ -9,27 +9,24 @@
 	*  option) any later version.                                              *
 	\**************************************************************************/
 
-
 	$setup_info['admin']['name']      = 'admin';
 	$setup_info['admin']['title']      = 'Admin';
 	$setup_info['admin']['version']   = '2.2.1';
 	$setup_info['admin']['app_order'] = 1;
-	$setup_info['admin']['tables']    = '';
 	$setup_info['admin']['enable']    = 1;
 
-	$setup_info['admin']['author'][] = array(
-		'name'  => 'eGroupWare coreteam',
-		'email' => 'egroupware-developers@lists.sourceforge.net'
-	);
+	$setup_info['admin']['author'] = 'eGroupWare coreteam';
 
 	$setup_info['admin']['maintainer'][] = array(
-		'name'  => 'eGroupWare coreteam',
-		'email' => 'egroupware-developers@lists.sourceforge.net',
-		'url'   => 'www.egroupware.org'
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
 	);
 
 	$setup_info['admin']['license']  = 'GPL';
-	$setup_info['admin']['description'] = 'eGroupWare administration application';
+	$setup_info['admin']['description'] = 'Main Administration Application';
+
+	$setup_info['admin']['tables']    = '';
 
 	/* The hooks this app includes, needed for hooks registration */
 	$setup_info['admin']['hooks'] = array(

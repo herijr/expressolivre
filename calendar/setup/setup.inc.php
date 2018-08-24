@@ -9,7 +9,6 @@
 	*  option) any later version.                                              *
 	\**************************************************************************/
 
-
 	$setup_info['calendar']['name']    = 'calendar';
 	$setup_info['calendar']['title']    = 'Calendar';
 	$setup_info['calendar']['version'] = '2.2.6';
@@ -17,16 +16,16 @@
 	$setup_info['calendar']['enable']  = 1;
 
 	$setup_info['calendar']['author'] = 'Mark Peters';
-	$setup_info['calendar']['license']  = 'GPL';
-	$setup_info['calendar']['description'] =
-		'Powerful calendar with meeting request system and ACL security.';
-	$setup_info['calendar']['note'] =
-		'Bassed on Webcalendar by <a href="http://www.radix.net/~cknudsen" target="_blank">Craig Knudsen</a>.<p>
-		';
+	
 	$setup_info['calendar']['maintainer'] = array(
-		'name'  => 'Ralf Becker',
-		'email' => 'RalfBecker@outdoor-training.de'
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
 	);
+
+	$setup_info['calendar']['license']  = 'GPL';
+	$setup_info['calendar']['description'] = 'Calendar Application';
+	$setup_info['calendar']['note'] = 'Bassed on Webcalendar by Craig Knudsen';
 
 	$setup_info['calendar']['tables'][] = 'phpgw_cal';
 	$setup_info['calendar']['tables'][] = 'phpgw_cal_holidays';

@@ -10,17 +10,24 @@
 	\**************************************************************************/
 
 	/* Basic information about this app */
-	$setup_info['workflow']['name']			= 'workflow';
-	$setup_info['workflow']['title']		= 'Workflow Management';
-	$setup_info['workflow']['version']		= '2.5.1';
-	$setup_info['workflow']['app_order']	= 10;
-	$setup_info['workflow']['enable']		= 1;
-	$setup_info['workflow']['author']		= 'See changeLog for complete list of developers.';
-	$setup_info['workflow']['note']			= 'Workflow Engine';
-	$setup_info['workflow']['license']		= 'GPL';
-	$setup_info['workflow']['description']		= 'Workflow Management';
-	$setup_info['workflow']['maintainer']		= 'Mauricio Luiz Viani';
-	$setup_info['workflow']['maintainer_email']	= 'viani@celepar.pr.gov.br';
+	$setup_info['workflow']['name']      = 'workflow';
+	$setup_info['workflow']['title']     = 'Workflow Management';
+	$setup_info['workflow']['version']   = '2.5.1';
+	$setup_info['workflow']['app_order'] = 10;
+	$setup_info['workflow']['enable']    = 1;
+	
+	$setup_info['workflow']['author'] = 'Regis Leroy';
+	
+	$setup_info['workflow']['maintainer'][] = array(
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
+	);
+
+	$setup_info['workflow']['license']     = 'GPL';
+	$setup_info['workflow']['description'] = 'Workflow Application';
+	$setup_info['workflow']['note']        = 'Based on Galaxia Workflow Engine';
+
 	$setup_info['workflow']['tables']		= array(
 								'egw_wf_activities',
 								'egw_wf_activity_roles',

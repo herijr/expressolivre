@@ -17,6 +17,17 @@
 	$setup_info['news_admin']['app_order'] = 16;
 	$setup_info['news_admin']['enable']    = 1;
 
+	$setup_info['news_admin']['author'] = 'eGroupWare coreteam';
+
+	$setup_info['news_admin']['maintainer'][] = array(
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
+		);
+
+	$setup_info['news_admin']['license']  = 'GPL';
+	$setup_info['news_admin']['description'] = 'Bulletim Board Application';
+
 	/* The tables this app creates */
 	$setup_info['news_admin']['tables']    = array('phpgw_news','phpgw_news_export');
 
@@ -32,4 +43,3 @@
 		 'appname' => 'phpgwapi',
 		 'versions' => Array('2.2','2.5.1.1')
 	);
-

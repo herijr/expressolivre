@@ -38,11 +38,12 @@ Are you sure want to delete this holiday?	calendar	pt-br	Tem certeza que deseja 
 Are you sure want to delete this single occurence?	calendar	pt-br	Deseja apagar esta única ocorrência?
 Attributes	calendar	pt-br	Atributos
 Available users and groups	calendar	pt-br	Usuários e grupos disponíveis
-Bassed on Webcalendar by Craig Knudsen.	calendar	pt-br	Baseado no Webcalendar de Craig Knudsen.
+Bassed on Webcalendar by Craig Knudsen	common	pt-br	Baseado no Webcalendar de Craig Knudsen.
 before the event	calendar	pt-br	antes do evento
 brief description	calendar	pt-br	Breve descrição
 business	calendar	pt-br	Negócios
 calendar	common	pt-br	Calendário
+calendar application	common	pt-br	Módulo Calendário de Compromissos
 calendar event	calendar	pt-br	Evento do calendário
 calendar-fieldname	calendar	pt-br	Nome do campo
 calendar holiday management	admin	pt-br	Manutenção de feriados do Calendário

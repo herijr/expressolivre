@@ -21,6 +21,7 @@ report id	reports	pt-br	ID
 report description	reports	pt-br	Descrição
 report email	reports	pt-br	E-Mail
 report phone	reports	pt-br	Telefone
+Reports Application for Users, Groups and Lists	common	pt-br	Modulo Gerador de Relatórios de Usuários, Grupos e Listas
 reports title1	reports	pt-br	Relatório dos usuários do domínio
 reports title2	reports	pt-br	Relatório dos usuários da Organização
 reports title3	reports	pt-br	Relatório de cota dos usuários do domínio

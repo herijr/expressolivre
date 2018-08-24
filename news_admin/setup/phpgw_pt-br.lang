@@ -4,6 +4,7 @@ add new news	news_admin	pt-br	Adicionar Notícia
 add news item	news_admin	pt-br	Adicionar novo item
 all news	news_admin	pt-br	Todas as Notícias
 always	news_admin	pt-br	Disponíveis
+Bulletim Board Application	common	pt-br	Módulo de Notícias
 configuration	news_admin	pt-br	Configuração
 configure access permissions	common	pt-br	Configurar Permissões de Acesso
 configure rss exports	common	pt-br	Configurar arquivos RSS para exportação

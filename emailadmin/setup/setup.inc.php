@@ -18,18 +18,16 @@
 	$setup_info['emailadmin']['enable']    = 2;
 
 	$setup_info['emailadmin']['author'] = 'Lars Kneschke';
-	$setup_info['emailadmin']['license']  = 'GPL';
-	$setup_info['emailadmin']['description'] =
-		'A central Mailserver management application for EGroupWare.';
-	$setup_info['emailadmin']['note'] =
-		'';
+	
 	$setup_info['emailadmin']['maintainer'] = array(
-		'name'  => 'Lars Kneschke',
-		'email' => 'lkneschke@linux-at-work.de'
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
 	);
 
-
-
+	$setup_info['emailadmin']['license']  = 'GPL';
+	$setup_info['emailadmin']['description'] = 'Core Management MailServer Application';
+	
 	$setup_info['emailadmin']['tables'][]	= 'phpgw_emailadmin';
 	
 	/* The hooks this app includes, needed for hooks registration */
@@ -41,5 +39,3 @@
 		'appname'  => 'phpgwapi',
 		'versions' => Array('2.2')
 	);
-
-

@@ -6,25 +6,26 @@
 	*  option) any later version.													   *
 	\***********************************************************************************/
 
-	$setup_info['listAdmin']['name'] = 'listAdmin';
-	$setup_info['listAdmin']['title'] = 'Mailman Admin';
-	$setup_info['listAdmin']['version'] = '2.2.1';
+	$setup_info['listAdmin']['name']      = 'listAdmin';
+	$setup_info['listAdmin']['title']     = 'Mailman Admin';
+	$setup_info['listAdmin']['version']   = '2.2.1';
 	$setup_info['listAdmin']['app_order'] = 10;
-	$setup_info['listAdmin']['enable'] = 1;
+	$setup_info['listAdmin']['enable']    = 1;
 
-	$setup_info['listAdmin']['author'] = 'Rommel de Brito Cysne (rommel.cysne@serpro.gov.br)';
-	$setup_info['listAdmin']['license']  = 'GPL';
-	$setup_info['listAdmin']['description'] = 'Interface de administracao de listas de e-mail do Mailman.';
-	$setup_info['listAdmin']['note'] = '';
+	$setup_info['listAdmin']['author'] = 'Rommel de Brito Cysne';
+	
 	$setup_info['listAdmin']['maintainer'] = array(
-		'name'  => 'Rommel Cysne',
-		'email' => 'rommel.cysne@serpro.gov.br'
+		'name'  => 'ExpressoLivre coreteam',
+		'email' => 'webmaster@expressolivre.org',
+		'url'   => 'www.expressolivre.org'
 	);
-
+	
+	$setup_info['listAdmin']['license']  = 'GPL';
+	$setup_info['listAdmin']['description'] = 'EmailList Management Application';
+	$setup_info['listAdmin']['note'] = 'Based on Mailman Application';
 
 	/* The hooks this app includes, needed for hooks registration */
 	$setup_info['listAdmin']['hooks'][] = 'admin';
-
 
 	/* Dependencies for this app to work */
 	$setup_info['listAdmin']['depends'][] = array(
