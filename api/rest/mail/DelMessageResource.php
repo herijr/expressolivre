@@ -9,7 +9,7 @@ class DelMessageResource extends MailAdapter {
 		$this->addResourceParam("auth","string",true,"Chave de autenticação do Usuário.",false);
 
 		$this->addResourceParam("folderID","string",true,"ID da pasta que a mensagem que será excluída está.");
-		$this->addResourceParam("msgID","string",true,"ID da mensagem que será excluída.");
+		$this->addResourceParam("msgID","string",true,"IDs das mensagens a serem excluídas, separados por vírgula.");
 
 	}
 
