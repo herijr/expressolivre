@@ -20,11 +20,8 @@
 
 		var $public_functions = array(
 			'test'		=> True,
-			'import'		=> True,
-			'import_from_mail' => True
+			'import'		=> True
 		);
-
-
 
 		function uiicalendar()
 		{
@@ -74,10 +71,6 @@
 			{
 				echo $title.' = '.$val."<br>\n";
 			}
-		}
-
-		function import_from_mail($calendar) {
-			return $this->bo->import(explode("\n",$calendar),true);
 		}
 		
 		function get_error_message($error_number) {

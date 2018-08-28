@@ -1824,7 +1824,6 @@ function draw_message(info_msg, ID){
 	input_current_folder.value = info_msg.msg_folder;
 	td2.appendChild(input_current_folder);
 	// fim
-	// ALEXANDRE LUIZ CORREIA
 	if(info_msg.toaddress2 != null )
 	{
 		toaddress_array[ID] = info_msg.toaddress2.split(",");
@@ -1969,7 +1968,7 @@ function draw_message(info_msg, ID){
 	tr5.appendChild(subject);
 	tbody_message_others_options.appendChild(tr5);
 	if ( info_msg.attachments && info_msg.attachments.length > 0 ){
-	var tr6 = document.createElement("TR");
+		var tr6 = document.createElement("TR");
 		tr6.className = "tr_message_header";
 		var td6 = document.createElement("TD");
 		td6.innerHTML = get_lang("Attachments: ");
@@ -1990,9 +1989,9 @@ function draw_message(info_msg, ID){
 				var del_attachments = document.createElement("A");
 				del_attachments.setAttribute("href", "javascript:remove_all_attachments('"+info_msg.msg_folder+"','"+parseInt( info_msg.msg_number )+"')");
 				del_attachments.innerHTML = get_lang('remove all attachments');
-                                attachments.appendChild(del_attachments);
+				attachments.appendChild(del_attachments);
 			}
-                        attachments.appendChild(document.createElement('BR'));
+			attachments.appendChild(document.createElement('BR'));
 		}
 
 		attachments.id = "attachments_" + ID;
@@ -2002,21 +2001,6 @@ function draw_message(info_msg, ID){
 			$(link_attachment).data([ info_msg.msg_folder, info_msg.msg_number, info_msg.attachments[i].name, info_msg.attachments[i].pid, info_msg.attachments[i].encoding ]);
 			link_attachment.innerHTML = url_decode(info_msg.attachments[i].name);
 			link_attachment.innerHTML += " ("+borkb(info_msg.attachments[i].fsize)+")";
-			
-			if((url_decode(info_msg.attachments[i].name).indexOf(".ics")!=-1) ||
-					(url_decode(info_msg.attachments[i].name).indexOf(".vcard")!=-1))
-			{
-				//Link para importar calendário
-				var link_import_attachment = new Image();
-				link_import_attachment.src = "templates/"+template+"/images/new.png";
-				link_import_attachment.setAttribute("onclick","javascript:import_calendar('"+info_msg.msg_folder+"&msg_number="+parseInt( info_msg.msg_number )+"&msg_part="+info_msg.attachments[i].pid+"&idx_file="+i+"&encoding="+info_msg.attachments[i].encoding+"'); return false;");
-				link_import_attachment.title = get_lang("Import to calendar");
-				link_import_attachment.align = "top";
-				link_import_attachment.style.marginLeft = "5px";
-				link_import_attachment.style.cursor = "pointer";
-				link_attachment.appendChild(link_import_attachment);
-			}
-			
 			link_attachment.innerHTML += '<br/>';
 			attachments.appendChild(link_attachment);
 		}
@@ -2024,7 +2008,6 @@ function draw_message(info_msg, ID){
 		tr6.appendChild(attachments);
 		tbody_message_others_options.appendChild(tr6);
 	}
-
 
 	var div = document.createElement("DIV");
 	div.id = "div_message_scroll_"+ID;
@@ -2132,30 +2115,27 @@ function draw_message(info_msg, ID){
 		}
 	}
 
-	for (var i=0; i<info_msg.attachments.length; i++)
+	if( info_msg.hash_vcalendar !== undefined )
 	{
-		if ( ( url_decode(info_msg.attachments[i].name ).indexOf(".ics")!=-1 ) ||
-				( url_decode(info_msg.attachments[i].name ).indexOf( ".vcard" ) !=-1 ) )
-		{
-			var link_attachment = document.createElement( "a" );
-			link_attachment.setAttribute( "href", "javascript:import_calendar('"+info_msg.msg_folder+"&msg_number="+info_msg.msg_number+"&msg_part="+info_msg.attachments[i].pid+"&idx_file="+i+"&encoding="+info_msg.attachments[i].encoding+"');" );
-
-			//Link para importar calendário
-			var link_import_attachment = new Image();
-			link_import_attachment.src = "templates/"+template+"/images/new.png";
-			link_import_attachment.align = "top";
-			link_import_attachment.style.marginLeft = "5px";
-			link_import_attachment.style.cursor = "pointer";
-
-			var h2 = document.createElement( "h2" );
-			h2.innerHTML = 'Adicionar ao meu Expresso';
-			h2.appendChild(link_import_attachment);
+		var div_vcalendar = $("<div>")
+			.css('margin','10px 5px 5px 2px')
+			.css('border','1px solid #eff0f1')
+			.css("height","140px")
+			.css("width", "350px")
+			.css("font-size","11pt")
+			.css("color", "black")
+			.css("background-color","#eff0f1")
+			.css("box-shadow","5px 5px 8px #888888")
+			.css("cursor","pointer")
+			.off("click").on("click", function(){ import_calendar( url_decode(info_msg.hash_vcalendar) ); })
+			.html(
+						"<div style='margin:5px;'>"+
+						"<p><img align='middle' style='margin:2px;' src='templates/default/images/hash_vcalendar.png'>"+
+						"Adicionar evento ao meu Expresso</p>" +
+						"</div>"
+					);
 		
-			link_attachment.appendChild( h2 );
-
-			div.appendChild( link_attachment );
-			div.appendChild( document.createElement( 'br' ) );
-		}
+		$(div).append(div_vcalendar);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////

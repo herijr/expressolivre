@@ -1,9 +1,13 @@
 <?php
 
+require_once __DIR__ .'/../../api/vendor/autoload.php';
+
 include_once("class.functions.inc.php");
 include_once("class.ldap_functions.inc.php");
 include_once("class.exporteml.inc.php");
 include_once("class.db_functions.inc.php");
+
+use Sabre\VObject;
 
 class imap_functions
 {
@@ -157,7 +161,7 @@ class imap_functions
 			$msgs_info = imap_status($this->mbox,"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".mb_convert_encoding( $folder, "UTF7-IMAP", "ISO-8859-1" ) ,SA_ALL);
 
 
-			$return['tot_unseen'] = $search_box_type == "SEEN" ? 0 : ( isset($msgs_info->unseen) ? $msgs_info->unseen : 0 );
+			$return['tot_unseen'] = $search_box_type == "SEEN" ? 0 : ( isset($msgs_info->unseen) ? $msgs_info->unseen : false );
 
 			$sort_array_msg = $this-> get_msgs($folder, $sort_box_type, $search_box_type, $sort_box_reverse,$msg_range_begin,$msg_range_end);
 
@@ -639,8 +643,12 @@ class imap_functions
 		$header_src = imap_fetchheader( $this->mbox, $msg_number, FT_UID );
 
 		$return_get_body = $this->get_body_msg( $msg_number, $msg_folder );
-		
 		$body = $return_get_body['body'];
+		
+		if( isset($return_get_body['hash_vcalendar']))
+		{
+			$return['hash_vcalendar'] = $return_get_body['hash_vcalendar'];
+		}
 		
 		if ( $return_get_body['body'] == 'isCripted' ) {
 			$return['source']       = $header_src."\r\n\r\n".imap_body( $this->mbox, $msg_number, FT_UID | FT_PEEK );
@@ -961,10 +969,27 @@ class imap_functions
 	function get_body_msg($msg_number, $msg_folder)
 	{
 		include_once("class.message_components.inc.php");
+		$db = new db_functions();
 		$msg = new message_components($this->mbox);
 		$msg->fetch_structure($msg_number);
+		$vCalImported = false;
 		$return = array();
-		$return['attachments'] = $this-> download_attachment($msg,$msg_number);
+		$return['attachments'] = $this->download_attachment($msg,$msg_number);
+		
+		if( is_array($return['attachments']) && count($return['attachments']) > 0 ){
+			foreach($return['attachments'] as $attached ){
+				if( isset($attached['name']) ){
+					if( preg_match( "/([^\s]+(\.(?i)(ics|vcard))$)/i", $attached['name'] ) ){
+						$fileContent = base64_decode(imap_fetchbody($this->mbox, $msg_number, $attached['pid'], FT_UID));
+						if( !$vCalImported ){
+							$return['hash_vcalendar'] = $db->import_vcard( $fileContent, $msg_number );
+							$vCalImported = true;
+						}
+					}
+				}
+			}
+		}
+		
 		if(!$this->has_cid)
 		{
 			$return['thumbs']  = $this->get_thumbs($msg,$msg_number,$msg_folder);
@@ -1003,8 +1028,8 @@ class imap_functions
 
 					$content = $this->decodeBody( 
 						imap_body( $this -> mbox, $msg_number, FT_UID ), 
-						$msg -> encoding[ $msg_number ][ 0 ], 
-						$msg -> charset[ $msg_number ][ 0 ] 
+						$msg->encoding[$msg_number][0], 
+						$msg->charset[$msg_number][0] 
 					); 
 
 					if ( strtolower( $msg -> structure[ $msg_number ] -> subtype ) == 'plain' ) 
@@ -1015,40 +1040,40 @@ class imap_functions
 						$content = str_replace( array( ' #$&lt;$# ', ' #$&gt;$# ' ), array( '&lt;', '&gt;' ), $content ); 
 						$content = '<pre>' . $content . '</pre>'; 
 						$content = str_replace("\x00", '', $content);
-                                                $return[ 'body' ] = $content;
-
+						$return[ 'body' ] = $content;
 						return $return; 
 					} 
 				}
 		}
 		else
-		{ //Complicated message, multiple parts
+		{ 
+			//Complicated message, multiple parts
 			$html_body = '';
 			$content = '';
 			$has_multipart = true;
-                        $is_alternative = false;
+			$is_alternative = false;
 			$this->has_cid = false;
-                        $alternative_content;
-                        array_shift($return['signature']);
-			if (strtolower($msg->structure[$msg_number]->subtype) == "related")
+			$alternative_content = '';
+			array_shift($return['signature']);
+			if (strtolower($msg->structure[$msg_number]->subtype) == "related"){
 				$this->has_cid = true;
+			}
 
+			$show_only_html = false;
 			if (strtolower($msg->structure[$msg_number]->subtype) == "alternative") {
-                                $is_alternative = true;
-				$show_only_html = false;
+				$is_alternative = true;
 				foreach($msg->pid[$msg_number] as $values => $msg_part) {
 					$file_type = strtolower($msg->file_type[$msg_number][$values]);
-					if($file_type == "text/html")
-						$show_only_html = true;
+					if($file_type == "text/html"){ 
+						$show_only_html = true; 
+					}
 				}
 			}
-			else
-				$show_only_html = false;
 
 			foreach($msg->pid[$msg_number] as $values => $msg_part)
 			{
-
 				$file_type = strtolower($msg->file_type[$msg_number][$values]);
+				
 				if($file_type == "message/rfc822" || $file_type == "multipart/alternative") 
 				{ 
 					// Show only 'text/html' part, when message/rfc822 format contains 'text/plain' alternative part. 
@@ -1059,50 +1084,126 @@ class imap_functions
 							$has_multipart = false; 
 						} 
 				} 	
-
-				if(($file_type == "text/plain"
-					|| $file_type == "text/html")
-						&& $file_type != 'attachment')
+				
+				if( $file_type !== 'attachment')
 				{
-
-				       
-				       if($this->prefs['max_msg_size'] == "1")
-					    $max_size = 1048576;
-					else
-					    $max_size = 102400;
-
+					$max_size = ($this->prefs['max_msg_size'] == "1") ? 1048576 : 102400;
 					if($file_type == "text/plain" && !$show_only_html && $has_multipart)
 					{
 						// if TXT file size > 100kb, then it will not expand.
 						if(!($file_type == "text/plain" && $msg->fsize[$msg_number][$values] > $max_size)) {
-							 $content .= htmlentities($this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values])); 
+							$content .= htmlentities($this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values])); 
 							$content = '<pre>' . $content . '</pre>';
 						}
 					}
 					// if HTML attachment file size > 300kb, then it will not expand.
-					else if($file_type == "text/html"  && $msg->fsize[$msg_number][$values] < $max_size*3)
+					else if($file_type == "text/html"  && $msg->fsize[$msg_number][$values] < $max_size * 3 )
 					{
-                                            if ($is_alternative)
-                                            {
-                                                $alternative_content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
-                                            }
-                                            else
-                                                {
-                                                    $content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
-                                                    $show_only_html = true;
-                                                }
+						if( $is_alternative ){
+							$alternative_content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
+						} else {
+							$content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
+							$show_only_html = true;
+						}
+					} 
+
+					if( $file_type == "text/calendar" && $msg->fsize[$msg_number][$values] < $max_size * 3 ){ 
+
+						if( !$vCalImported ){
+
+							$vcalendar = $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
+
+							$cal = Sabre\VObject\Reader::read($vcalendar,0, 'ISO-8859-1');
+
+							$event = current( $cal->select('VEVENT') );
+
+							$content = '<div style="padding:2px 3px; margin:6px 2px 10px 2px; width:80%;font-family:Arial,Sans-serif;background-color:#fff;font-size:12px">';
+							$content .= '<div style="margin:10px 0px">';
+							$content .= '<span style="font-weight:bold;">'.$event->SUMMARY.'</span>';
+							$content .= '</div>';
+
+							if(isset($event->ORGANIZER)){
+								$content .= "<div style='margin:5px 0px'>";
+								$content .= "<span style='font-weight:bold'>".$this->functions->getLang("organizer")." </span> " . ( isset($event->ORGANIZER['CN']) ? $event->ORGANIZER['CN'] : "") . " ( " . preg_replace("/mailto:/i", "",$event->ORGANIZER ) . " )";
+								$content .= "</div>";
+							}
+						
+							if(isset($event->ATTENDEE)){
+								$content .= '<div style="margin:10px 0px;font-size:13px">';
+								$content .= "<span style='font-weight:bold'>".$this->functions->getLang("attendees")."</span><br>";
+								foreach($event->ATTENDEE as $attendee ){
+									if(isset($attendee['CN']))
+										$content .= " - " .$attendee['CN'] . " ( " . preg_replace("/mailto:/i", "", $attendee) . " ) <br>";
+								}
+								$content .= "</div>";
+							}
+						
+							$dtStart = null;
+							$dtEnd = null;
+							
+							$dateStart = $event->DTSTART.'';//get date from ical
+							if( preg_match('/Z/',$dateStart) ){
+								$dateStart = str_replace('T', '', $dateStart);//remove T
+								$dateStart = str_replace('Z', '', $dateStart);//remove Z
+								$d    = date('d', strtotime($dateStart));//get date day
+								$m    = date('m', strtotime($dateStart));//get date month
+								$y    = date('Y', strtotime($dateStart));//get date year
+								$now = date('Y-m-d G:i:s');//current date and time
+								$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
+								$dtStart = new DateTime( $eventdate );
+								$dtStart->sub(new DateInterval('PT3H'));
+							} else {
+								$dateStart = str_replace('T', '', $dateStart);//remove T
+								$d    = date('d', strtotime($dateStart));//get date day
+								$m    = date('m', strtotime($dateStart));//get date month
+								$y    = date('Y', strtotime($dateStart));//get date year
+								$now = date('Y-m-d G:i:s');//current date and time
+								$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
+								$dtStart = new DateTime( $eventdate );
+							}
+
+							$dateEnd = $event->DTEND.'';//get date from ical
+							if( preg_match('/Z/',$dateEnd) ){
+								$dateEnd = str_replace('T', '', $dateEnd);//remove T
+								$dateEnd = str_replace('Z', '', $dateEnd);//remove Z
+								$d    = date('d', strtotime($dateEnd));//get date day
+								$m    = date('m', strtotime($dateEnd));//get date month
+								$y    = date('Y', strtotime($dateEnd));//get date year
+								$now = date('Y-m-d G:i:s');//current date and time
+								$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
+								$dtEnd = new DateTime( $eventdate );
+								$dtEnd->sub(new DateInterval('PT3H'));
+							} else {
+								$dateEnd = str_replace('T', '', $dateEnd);//remove T
+								$d    = date('d', strtotime($dateEnd));//get date day
+								$m    = date('m', strtotime($dateEnd));//get date month
+								$y    = date('Y', strtotime($dateEnd));//get date year
+								$now = date('Y-m-d G:i:s');//current date and time
+								$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
+								$dtEnd = new DateTime( $eventdate );
+							}
+
+							if( isset($event->LOCATION) && trim($event->LOCATION) !== "" ){
+								$content .= '<div style="padding:5px 2px;"><span style="font-weight:bold;">'.$this->functions->getLang("location").' :</b> ' . $event->LOCATION . '</div>';
+							}
+							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">'.$this->functions->getLang("start time").' </b> : ' . date("d/m/Y - H:m", $dtStart->getTimestamp() ) . '</div>';
+							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">'.$this->functions->getLang("end time").' </b> : ' . date("d/m/Y - H:m", $dtEnd->getTimestamp() ) . "</div>";
+							$content .= "</div>";
+							$return['hash_vcalendar'] = $db->import_vcard( $vcalendar, $msg_number );
+							$vCalImported = true;
+						}
 					}
-				}
-				 else if($file_type == "message/delivery-status" || $file_type == "message/feedback-report"){ 
+				} else if($file_type == "message/delivery-status" || $file_type == "message/feedback-report") { 
+					
 					$content .= "<hr align='left' width='95%' style='border:1px solid #DCDCDC'>";
 					$content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]); 
-                    $content = '<pre>' . $content . '</pre>'; 
-				}
-				else if($file_type == "message/rfc822" || $file_type == "text/rfc822-headers"){
+          $content = '<pre>' . $content . '</pre>'; 
+					
+				} else if($file_type == "message/rfc822" || $file_type == "text/rfc822-headers") {
 
 					include_once("class.imap_attachment.inc.php");
 					$att = new imap_attachment();
-					$attachments =  $att -> get_attachment_info($this->mbox,$msg_number);
+					$attachments =  $att->get_attachment_info($this->mbox,$msg_number);
 					if($attachments['number_attachments'] > 0) { 
 						foreach($attachments ['attachment'] as $index => $attachment) 
 						{ 
@@ -1126,13 +1227,13 @@ class imap_functions
 									. $this -> replace_links( $this -> decode_string( $obj -> to[ 0 ] -> mailbox . '@' . $obj -> to[ 0 ] -> host ) ) 
 									. '</td></tr>'; 
 
-								if ( isset( $obj->cc ) && $obj->cc ) 
+								if ( isset( $obj->cc ) && $obj->cc ) {
 									$content .= '<tr><td><b>' . $this -> functions -> getLang( 'CC' ) . ':</b></td><td>' 
 										. $this -> replace_links( $this -> decode_string( $obj -> cc[ 0 ] -> mailbox . '@' . $obj -> cc[ 0 ] -> host ) ) 
-										. '</td></tr>'; 
-
+										. '</td></tr>';
+								}
+										 
 								$content .= '</table><br>'; 
-
 
 								$id = ( ( strtolower( $attachment[ 'type' ] ) == 'delivery-status' ) ? false : true ); 
 								$is_plain = isset( $msg->structure[$msg_number]->parts[1]->parts[0]->subtype ) &&
@@ -1145,7 +1246,7 @@ class imap_functions
 								} 
 
 								$body = $this->decodeBody( 
-									imap_fetchbody( 
+									imap_fetchbody(
 										$this->mbox, 
 										$msg_number, 
 										( $attachment['part_in_msg'] + ( ( int ) $id ) ) . ".1", 
@@ -1155,15 +1256,13 @@ class imap_functions
 									$msg->charset[ $msg_number ][ $values ] 
 								); 
 
-								if ( $is_plain ) 
-								{ 
+								if ( $is_plain )  { 
 									$body = str_replace( array( '<', '>' ), array( ' #$<$# ', ' #$>$# ' ), $body ); 
 									$body = htmlentities( $body ); 
 									$body = $this -> replace_links( $body ); 
 									$body = str_replace( array( ' #$&lt;$# ', ' #$&gt;$# ' ), array( '&lt;', '&gt;' ), $body ); 
 									$body = '<pre>' . $body . '</pre>'; 
-								} 
-
+								}
 								$content .= $body; 
 								break; 
 							}
@@ -1171,10 +1270,10 @@ class imap_functions
 					}
 				}
 			}
-                        if ($is_alternative && !empty($alternative_content))
-                        {
-                            $content .= $alternative_content;
-                        }
+			if ($is_alternative && !empty($alternative_content))
+			{
+				$content .= $alternative_content;
+			}
 			if($file_type == "text/plain" && ($show_only_html &&  $msg_part == 1) ||  (!$show_only_html &&  $msg_part == 3)){
 				if(strtolower($msg->structure[$msg_number]->subtype) == "mixed" &&  $msg_part == 1)
 					$content .= nl2br(imap_base64(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID)));
@@ -3934,8 +4033,10 @@ class imap_functions
 		if( is_resource($mbox_stream) ){
 			$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
 			$i = 0;
-			foreach ($mbox_acl as $user => $acl) {
-				if ( $user !== $this->username ) {
+			foreach ($mbox_acl as $user => $acl)
+			{
+				if ($user != $this->username)
+				{
 					$return[$i]['uid'] = $user;
 					$return[$i]['cn'] = $this->ldap->uid2cn($user);
 				}
@@ -3995,16 +4096,13 @@ class imap_functions
 		$return = array();
 		$return[$useracl] = 'false';
 		$mbox_stream = $this->open_mbox();
-
 		if( is_resource($mbox_stream) ){
-			$mbox_acl = imap_getacl( $mbox_stream, 'INBOX');
-			foreach ( $mbox_acl as $user => $acl) {
-				if( ($user != $this->username) && ($user == $useracl) ){ 
-					$return[$user] = $acl; 
-				}
+			$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
+			foreach ($mbox_acl as $user => $acl)
+			{
+				if (($user != $this->username) && ($user == $useracl)){ $return[$user] = $acl; }
 			}
 		}
-
 		return $return;
 	}
 

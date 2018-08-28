@@ -1,0 +1,10 @@
+{
+    "name": "api/expresso",
+    "description": "Api rest Expresso Livre",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+			"php": ">=5.3.3",
+        "sabre/vobject": "^3.5"
+		}
+}

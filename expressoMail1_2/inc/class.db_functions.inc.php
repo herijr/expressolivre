@@ -393,44 +393,36 @@ class db_functions
 		$this->db->delete('phpgw_expressomail_contacts',$where,$line,$file);	
 	}
 	
-	function import_vcard($params){
-			
-		include_once('class.imap_functions.inc.php');
-		$objImap = new imap_functions();
-		$msg_number = $params['msg_number'];
-		$idx_file = $params['idx_file'];
-		$msg_part = $params['msg_part'];
-		$msg_folder = $params['msg_folder'];
-		$encoding = strtolower($params['encoding']);
-		$fileContent = "";
+	function import_vcard( $vcalendar, $msgNumber ){
+		
+		if( isset($_SESSION['phpgw_info']['expressomail']['user']['account_id']) ){
+			$owner = $_SESSION['phpgw_info']['expressomail']['user']['account_id'];
+		}
 
-		if($msg_number && $msg_part && $msg_folder && (intval($idx_file == '0' ? '1' : $idx_file))) {
-			$mbox_stream = $objImap->open_mbox($msg_folder);   	
-			$fileContent = imap_fetchbody($mbox_stream, $msg_number, $msg_part, FT_UID);
-			include_once('class.imap_attachment.inc.php');
-			$imap_attachment = new imap_attachment();
-			$a = $imap_attachment->download_attachment($mbox_stream, $msg_number);
-			$filename = $a[$idx_file]['name'];
+		if( isset($GLOBALS['phpgw_info']['user']['account_id']) ){
+			$owner = $GLOBALS['phpgw_info']['user']['account_id'];
 		}
-		else
-			$filename = $idx_file;
-					
-		if($fileContent) {
-			if($encoding == 'base64')
-				$calendar = imap_base64($fileContent);
-			else if($encoding == 'quoted-printable')
-				$calendar = quoted_printable_decode($fileContent);
-			else
-				$calendar = $fileContent;
-		}
-		// It's necessary to access calendar method. 
-		include_once(PHPGW_INCLUDE_ROOT.'/header.inc.php'); 
+		
+		$hash = sha1($vcalendar).( $msgNumber ? sha1($msgNumber) : "" ).sha1($owner);
+
+		$select = 'SELECT hash, owner 
+								FROM phpgw_cal_invite 
+									WHERE hash = \''.$hash.'\' AND owner = \''.$owner.'\';';
+
+		$this->db->query( $select, __LINE__, __FILE__);
+
+		if( !$this->db->next_record() )
+		{
+			$insert = 'INSERT INTO phpgw_cal_invite ( hash, contents, owner ) '.
+									'values (\''.$hash.'\',\''.base64_encode($vcalendar).'\', \''.$owner.'\' );';
 			
-		$uiicalendar = CreateObject("calendar.uiicalendar");
-		return $uiicalendar = $uiicalendar->import_from_mail($calendar);
+			return ( $this->db->query( $insert ,__LINE__,__FILE__) ? $hash : false );
+		}
+
+		return $hash;
 	}
 
-    function insert_certificate($email,$certificate,$serialnumber,$authoritykeyidentifier=null)
+  function insert_certificate($email,$certificate,$serialnumber,$authoritykeyidentifier=null)
 	{
 		if(!$email || !$certificate || !$serialnumber || !$authoritykeyidentifier)
 			return false;

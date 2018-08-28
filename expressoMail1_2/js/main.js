@@ -2876,14 +2876,21 @@ function select_import_folder(dialogImport)
 	else
 		wfolders.makeWindow('null','import');
 }
-function import_calendar(data){
-	function handler_import_calendar(data){
-		if(data === true){
-			write_msg(get_lang("The event was imported successfully."));
-		}
-	}
+function import_calendar(hash_vcalendar){
 	if(confirm(get_lang("Do you confirm this import to your Calendar?"))){
-			cExecute('$this.db_functions.import_vcard&msg_folder='+data,handler_import_calendar);
+		$.ajax({
+				type    : "GET",
+				url     : "/api/rest/vcalendar/import?event="+hash_vcalendar,
+				success : function( data )
+				{
+					var _data = $.parseJSON( data );
+					if( eval( _data.result ) ){
+						write_msg(get_lang("The event was imported successfully."));
+					} else {
+						write_msg(get_lang("The event was not imported."));
+					}
+				}
+		});
 	}
 }
 function hack_sent_queue(data,rowid_message) {

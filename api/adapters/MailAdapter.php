@@ -177,7 +177,7 @@ class MailAdapter extends ExpressoAdapter {
 		if($info_msg['status_get_msg_info'] == 'false'){
 			return false;
 		}
-		
+
 		$msg['msgID']    = $info_msg['msg_number'];
 		$msg['folderID'] = $info_msg['msg_folder'];
 		//$msg['msgDate']	 =  $info_msg['fulldate'];
@@ -237,7 +237,11 @@ class MailAdapter extends ExpressoAdapter {
 		$msg['msgDraft']	= $info_msg['Draft'] == "X" ? "1" : "0";
 		$msg['msgSeen'] 	= $info_msg['Unseen'] == "U" ? "0" : "1";				
 		$msg['msgSize'] 	= $info_msg['Size'];
-		$msg['msgBody']		= ($info_msg['body'] ? mb_convert_encoding($info_msg['body'],"UTF8", "ISO_8859-1") : "");		
+		$msg['msgBody']		= ($info_msg['body'] ? mb_convert_encoding($info_msg['body'],"UTF8", "ISO_8859-1") : "");
+
+		if( isset($info_msg['hash_vcalendar']) ){
+			$msg['msgHashVcalendar'] = $info_msg['hash_vcalendar'];
+		}
 		
 		return $msg;		
 	}

@@ -5,6 +5,7 @@
 /.htaccess
 /widgets
 /bootstrap.php
+/api/config/DB.php
 /api/config/profileCreateUser.ini
 /api/config/profileHomeServer.ini
 /api/config/profileProtectedFields.ini

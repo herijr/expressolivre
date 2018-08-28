@@ -97,6 +97,9 @@ DelEventResource = /calendar/DelEventResource.php
 [/Calendar/EventCategories]
 EventCategoriesResource = /calendar/EventCategoriesResource.php
 
+[/vcalendar/import(/.*)?]
+EventImportResource = /calendar/EventImportResource.php
+
 [/Services/Chat]
 ChatResource = /services/ChatResource.php
 
@@ -129,4 +132,3 @@ RenameUserResource = /admin/RenameUserResource.php
 
 [/Admin/UpdateUser]
 UpdateUserResource = /admin/UpdateUserResource.php
-

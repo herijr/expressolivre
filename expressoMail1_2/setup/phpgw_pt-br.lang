@@ -558,6 +558,7 @@ Test Word: Hello %1 %2 %3 %4, Bye!	expressoMail1_2	pt-br	Teste de Palavra: Oi %1
 The %1 folder is not created. It is necessary to finish your request.	expressoMail1_2	pt-br	Sua pasta \"%1\" não está criada. É necessário criá-la para que funcione corretamente.
 The Anti Pop-Up is enabled. Allow this site (%1) for print.	expressoMail1_2	pt-br	O anti Pop-Up está ativado. Desative-o para este site (%1)!
 The event was imported successfully.	expressoMail1_2	pt-br	O compromisso foi importado com sucesso.
+The event was not imported.	expressoMail1_2	pt-br	O evento não foi importado.
 The expresso imap server is currently down, expresso noticed you have offline mail module installed, would you like to use it?	expressoMail1_2	pt-br	O servidor de caixas está aparentemente fora do ar. O expresso notou que você possui o módulo de e-mails offline instalado. Deseja utilizá-lo?
 The extension %1 is incorrect.	expressoMail1_2	pt-br	O ramal %1 está incorretamente cadastrado.
 The field \"%1\" of the message it contains	expressoMail1_2	pt-br	O campo \"%1\" da mensagem contém
@@ -740,3 +741,9 @@ Start the Expresso Messenger automatically	expressoMail1_2	pt-br	Iniciar o Expre
 Current box only	expressoMail1_2	pt-br	Somente caixa atual
 Inbox only	expressoMail1_2	pt-br	Somente caixa de entrada
 All boxes	expressoMail1_2	pt-br	Todas caixas
+location	expressoMail1_2	pt-br	Localização
+start time	expressoMail1_2	pt-br	Hora Início
+end time	expressoMail1_2	pt-br	Hora Fim
+attendees	expressoMail1_2	pt-br	Participantes
+calendar event	expressoMail1_2	pt-br	Evento de Calendário
+organizer	expressoMail1_2	pt-br	Organizado por
