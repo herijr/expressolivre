@@ -4,8 +4,9 @@ WORKSPACE=$(pwd)
 docker pull expressolivre/database
 docker pull expressolivre/mailboxes
 docker pull expressolivre/ldap
-docker pull expressolivre/frontend-des
-docker pull expressolivre/frontend-des-php7
+docker pull expressolivre/frontend-des:php5.3
+docker pull expressolivre/frontend-des:php5.6
+docker pull expressolivre/frontend-des:php7.0
 docker pull memcached
 
 # Server Ldap
@@ -31,16 +32,23 @@ docker exec -it database.expresso service postgresql start
 # Server Memcached
 docker run --name memcache.expresso -v /etc/localtime:/etc/localtime -d memcached memcached -m 64
 
+# Server Frontend - PHP 5.3
+docker run -itd --name frontend-php5.3.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p 8081:80 expressolivre/frontend-des:php5.3
+docker exec -it frontend-php5.3.expresso service rsyslog restart
+docker exec -it frontend-php5.3.expresso service apache2 restart
+docker exec -it frontend-php5.3.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
+docker exec -it frontend-php5.3.expresso ./tmp/check_service.sh
+
 # Server Frontend - PHP 5.6
-docker run -itd --name frontend-80.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p 80:80 expressolivre/frontend-des
-docker exec -it frontend-80.expresso service rsyslog restart
-docker exec -it frontend-80.expresso service apache2 restart
-docker exec -it frontend-80.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
-docker exec -it frontend-80.expresso ./tmp/check_service.sh
+docker run -itd --name frontend-php5.6.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p 80:80 expressolivre/frontend-des:php5.6
+docker exec -it frontend-php5.6.expresso service rsyslog restart
+docker exec -it frontend-php5.6.expresso service apache2 restart
+docker exec -it frontend-php5.6.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
+docker exec -it frontend-php5.6.expresso ./tmp/check_service.sh
 
 # Server Frontend - PHP 7.0
-docker run -itd --name frontend-8080.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p 8080:80 expressolivre/frontend-des-php7
-docker exec -it frontend-8080.expresso service rsyslog restart
-docker exec -it frontend-8080.expresso service apache2 restart
-docker exec -it frontend-8080.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
-docker exec -it frontend-8080.expresso ./tmp/check_service.sh
+docker run -itd --name frontend-php7.0.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p 8080:80 expressolivre/frontend-des:php7.0
+docker exec -it frontend-php7.0.expresso service rsyslog restart
+docker exec -it frontend-php7.0.expresso service apache2 restart
+docker exec -it frontend-php7.0.expresso cp /tmp/header.inc.php /var/www/expresso/header.inc.php
+docker exec -it frontend-php7.0.expresso ./tmp/check_service.sh
