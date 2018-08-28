@@ -229,13 +229,13 @@
 		'egw_wf_user_cache' => array(
 				'fd' => array(
 					'uidnumber'			=> array('type' => 'int', 'precision' => '4', 'nullable' => False),
-					'uid'				=> array('type' => 'varchar', 'precision' => '30', 'nullable' => True),
-					'cn'				=> array('type' => 'varchar', 'precision' => '100', 'nullable' => True),
-					'givenname'			=> array('type' => 'varchar', 'precision' => '30', 'nullable' => True),
-					'sn'				=> array('type' => 'varchar', 'precision' => '70', 'nullable' => True),
+					'uid'				=> array('type' => 'varchar', 'precision' => '70', 'nullable' => True),
+					'cn'				=> array('type' => 'varchar', 'precision' => '200', 'nullable' => True),
+					'givenname'			=> array('type' => 'varchar', 'precision' => '100', 'nullable' => True),
+					'sn'				=> array('type' => 'varchar', 'precision' => '100', 'nullable' => True),
 					'mail'				=> array('type' => 'varchar', 'precision' => '80', 'nullable' => True),
 					'accountstatus'		=> array('type' => 'varchar', 'precision' => '80', 'nullable' => True),
-					'dn'				=> array('type' => 'varchar', 'precision' => '150', 'nullable' => True),
+					'dn'				=> array('type' => 'varchar', 'precision' => '500', 'nullable' => True),
 					'employeenumber'	=> array('type' => 'int', 'precision' => '4', 'nullable' => True),
 					'cpf'				=> array('type' => 'varchar', 'precision' => '15', 'nullable' => True),
 					'telephonenumber'	=> array('type' => 'varchar', 'precision' => '50', 'nullable' => True),

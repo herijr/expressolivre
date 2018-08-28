@@ -381,4 +381,22 @@
 		return $GLOBALS['setup_info']['workflow']['currentver'];
 	}
 
+	$test[] = '2.5.1';
+	function workflow_upgrade2_5_1()
+	{
+		$workflowHostInfo = extractDatabaseParameters();
+
+		if ($GLOBALS['phpgw']->ADOdb->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], $workflowHostInfo['dbname']))
+		{
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE egw_wf_user_cache ALTER COLUMN uid TYPE VARCHAR(70)');
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE egw_wf_user_cache ALTER COLUMN cn TYPE VARCHAR(200)');
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE egw_wf_user_cache ALTER COLUMN givenname TYPE VARCHAR(100)');
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE egw_wf_user_cache ALTER COLUMN sn TYPE VARCHAR(100)');
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE egw_wf_user_cache ALTER COLUMN dn TYPE VARCHAR(500)');
+		}
+
+		$GLOBALS['setup_info']['workflow']['currentver'] = '2.5.2';
+		return $GLOBALS['setup_info']['workflow']['currentver'];
+	}
+
 ?>
