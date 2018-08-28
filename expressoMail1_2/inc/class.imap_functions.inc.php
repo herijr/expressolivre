@@ -375,7 +375,7 @@ class imap_functions
 		$invalid_format = false;
 		$filename = $params['FILES'][0]['name'];
 		$params["folder"] = mb_convert_encoding($params["folder"], "UTF7-IMAP","ISO-8859-1");
-		$quota = imap_get_quotaroot($this->mbox, $params["folder"]);
+		$quota = @imap_get_quotaroot($this->mbox, $params["folder"]);
 		if((($quota['limit'] - $quota['usage'])*1024) <= $params['FILES'][0]['size']){
 			return array( 'error' => $this->functions->getLang("fail in import:").
 							" ".$this->functions->getLang("Over quota"));
@@ -2856,7 +2856,7 @@ class imap_functions
 				$mbox		= @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}INBOX", $accountID, $pass) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
 				if(!$mbox)
 					return imap_last_error();
-				$quota 	= imap_get_quotaroot($mbox_stream, "INBOX");
+				$quota 	= @imap_get_quotaroot($mbox_stream, "INBOX");
 				if(! imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, 2.1 * $quota['usage'])) {
 					if($mbox_stream)
 						$this->close_mbox($mbox_stream);
@@ -3314,7 +3314,7 @@ class imap_functions
 		if(!$this->mbox || !is_resource($this->mbox))
 			$this->mbox = $this->open_mbox();
 
-		$quota = imap_get_quotaroot( $this->mbox, $folder_id );
+		$quota = @imap_get_quotaroot( $this->mbox, $folder_id );
 		if ( $this->mbox && is_resource( $this->mbox ) ) $this->close_mbox( $this->mbox );
 		
 		// Auto raise to default user quota, configured in expressoAdmin
