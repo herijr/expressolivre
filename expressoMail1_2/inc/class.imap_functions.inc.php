@@ -1981,13 +1981,14 @@ class imap_functions
 
 			$i = 0;
 			
-			$ignoreFolder  = "}DELETED".$this->imap_delimiter;
-			$ignoreFolder .= "user".$this->imap_delimiter;
+			$ignoreFolder  = '}DELETED'.$this->imap_delimiter;
+			$ignoreFolder .= 'user'.$this->imap_delimiter;
 			$ignoreFolder .= $this->username.$this->imap_delimiter;
-
+			$ignoreFolder  = preg_quote( $ignoreFolder, '/' );
+			
 			foreach( $folders_list as $key => $folder )
 			{
-				if( preg_match( '/'.preg_quote($ignoreFolder).'/',$folder->name ) ) continue;
+				if( preg_match( '/'.$ignoreFolder.'/',$folder->name ) ) continue;
 				
         $status = imap_status( $mbox_stream, $folder->name, SA_UNSEEN );
         
