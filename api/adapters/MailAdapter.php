@@ -33,15 +33,17 @@ class MailAdapter extends ExpressoAdapter {
 		}
 	}
 	
-	protected function getImap(){
-		if($this->imap == null) {
-			$c = CreateObject('phpgwapi.config','expressoMail1_2');
-			$c->read_repository();
-			$current_config = $c->config_data;
-			$boemailadmin	= CreateObject('emailadmin.bo');
-			$emailadmin_profile = $boemailadmin->getProfileList();
-			$_SESSION['phpgw_info']['expressomail']['email_server'] = $boemailadmin->getProfile($emailadmin_profile[0]['profileid']);
-			
+	protected function loadConfigUser(){
+
+		$configUser = CreateObject('phpgwapi.config','expressoMail1_2');
+		$configUser->read_repository();
+		$current_config = $configUser->config_data;
+		$boemailadmin	= CreateObject('emailadmin.bo');
+		$emailadmin_profile = $boemailadmin->getProfileList();
+		$this->imapDelimiter = $emailadmin_profile[0]['imapdelimiter'];
+		$_SESSION['phpgw_info']['expressomail']['email_server'] = $boemailadmin->getProfile($emailadmin_profile[0]['profileid']);
+
+		if( !isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']) ){
 			$preferences = $GLOBALS['phpgw']->preferences->read();
 			$_SESSION['phpgw_info']['user']['preferences']['expressoMail'] = $preferences['expressoMail'];
 			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['outoffice'] = $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['outoffice'];
@@ -60,18 +62,30 @@ class MailAdapter extends ExpressoAdapter {
 			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['from_to_sent'] = $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['from_to_sent'] ? $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['from_to_sent'] : "0";
 			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['return_recipient_deafault'] = $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['return_recipient_deafault'] ? $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['return_recipient_deafault'] : "0";			
 			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['quick_search_default'] = $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['quick_search_default'] ? $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['quick_search_default'] : 1;
-			
-			
-			$this->loadLang( $GLOBALS['phpgw_info']['user']['preferences']['common']['lang']);														
+		}
+
+		if( !isset($_SESSION['phpgw_info']['expressomail']) ){
+			$_SESSION['phpgw_info']['expressomail']['email_server'] = $boemailadmin->getProfile($emailadmin_profile[0]['profileid']);
+		}
+		
+		if( !isset($_SESSION['phpgw_info']['expressomail']['user']) ){
 			$_SESSION['phpgw_info']['expressomail']['user']['userid'] = $GLOBALS['phpgw_info']['user']['userid'];
 			$_SESSION['phpgw_info']['expressomail']['user']['passwd'] = $GLOBALS['phpgw_info']['user']['passwd'];
 			$_SESSION['phpgw_info']['expressomail']['user']['email'] = $GLOBALS['phpgw']->preferences->values['email'];
-			
-			$this->imapDelimiter = $emailadmin_profile[0]['imapdelimiter'];
-			
+		}
+	}
+	
+	protected function getImap(){
+		
+		if( $this->imap == null ) {
+
+			$this->loadConfigUser();
+
+			$this->loadLang( $GLOBALS['phpgw_info']['user']['preferences']['common']['lang']);
+
 			$this->imap = CreateObject("expressoMail1_2.imap_functions");
-			
-			if($this->defaultFolders == null) {
+
+			if( $this->defaultFolders == null ) {
 				$sent   = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'] = empty($_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder']) ?
 							$this->imap->functions->getLang("Sent") : $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'];
 				$spam   = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder'] = empty($_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']) ?
@@ -87,10 +101,10 @@ class MailAdapter extends ExpressoAdapter {
 						'INBOX'.$this->imapDelimiter.$sent   => 1,
 						'INBOX'.$this->imapDelimiter.$drafts => 4,
 						'INBOX'.$this->imapDelimiter.$trash  => 3
-					);					
+					);
 			}
 		}
-				
+
 		return $this->imap;
 	}
 		

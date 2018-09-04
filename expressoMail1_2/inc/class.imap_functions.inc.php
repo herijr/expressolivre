@@ -3128,11 +3128,13 @@ class imap_functions
 					ob_end_clean();
 					
 					$mail->AddStringAttachment( $fileContent, $attach['name'], "base64", $this->get_file_type($attach['name']) );
+				} else {
+					if( isset($attach['isbase64']) && $attach['isbase64'] ){
+						$mail->AddStringAttachment( base64_decode($attach['source']), $attach['name'], "base64", $this->get_file_type($attach['name']) );
+					} else {
+						$mail->AddAttachment($attach['tmp_name'], $attach['name'], "base64", $this->get_file_type($attach['name']));
+					}
 				}
-				else {
-					$mail->AddAttachment($attach['tmp_name'], $attach['name'], "base64", $this->get_file_type($attach['name']));
-				}
-				// optional name
 			}
 		}
 

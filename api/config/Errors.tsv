@@ -39,6 +39,7 @@
 2032		MAIL_FOLDER_ID_EMPTY			FolderID empty
 2033		MAIL_MSG_ID_EMPTY				Message empty
 2034		MAIL_FLAGTYPE_EMPTY				Flag message empty
+2035		MAIL_NOT_SAVED_DRAFTS			Email was not saved in drafts folder.
 
 1014		CALENDAR_INVALID_START_DATE		Invalid start date.
 1015		CALENDAR_INVALID_END_DATE		Invalid end date.
