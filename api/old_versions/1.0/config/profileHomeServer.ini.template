@@ -1,3 +1,0 @@
-[home.server]
-OU_LDAP = http://ip/api/rest
-DEFAULT = http://default/api/rest
