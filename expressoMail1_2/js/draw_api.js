@@ -1078,16 +1078,16 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
 			else{
 				if(headers_msgs.to.email != null && headers_msgs.to.email.toLowerCase() != Element("user_email").value)
 					td_element24.innerHTML = "<img valign='center' src ='templates/"+template+"/images/sent.gif' title='"+get_lang('Sent')+"'>";
-				
-				if (headers_msgs.to) {
-					if (headers_msgs.to.name != null)
+
+				if( headers_msgs.to ){
+					if(  headers_msgs.to.name != null && ( typeof(headers_msgs.to.name) == "string" &&  $.trim(headers_msgs.to.name) !== "" ) ){
 						td_element3.innerHTML += headers_msgs.to.name;
-					else if(headers_msgs.to.email != null) {
+					} else if(headers_msgs.to.email != null) {
 						td_element3.innerHTML += headers_msgs.to.email;
-					}
-					else {
+					} else {
 						td_element3.innerHTML += get_lang("without destination");
 					}
+				
 				}
 			}
 		} else {
