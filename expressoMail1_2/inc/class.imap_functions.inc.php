@@ -3005,26 +3005,29 @@ class imap_functions
 		$toaddress = $params['input_to'];
 		$ccaddress = $params['input_cc'];
 		$ccoaddress = $params['input_cco'];
-		$return_receipt = $params['input_return_receipt'];
-		$is_important = $params['input_important_message'];
+		$replytoaddress = ( isset($params['input_replyto']) ? $params['input_replyto'] : "" );
+		$return_receipt = ( isset($params['input_return_receipt']) ? $params['input_return_receipt'] : "" );
+		$is_important = ( isset($params['input_important_message']) ? $params['input_important_message'] : "" );
 		$subject = $params['input_subject'];
 		$msg_uid = $params['msg_id'];
 		$body = $params['body'];
 		$body = str_replace("%nbsp;","&nbsp;",$params['body']);
 		$body = preg_replace("/\n/"," ",$body);
 		$body = preg_replace("/\r/","",$body);
-		$forwarding_attachments = $params['forwarding_attachments'];
-		$attachments = $params['FILES'];
-		$return_files = $params['FILES'];
+		$forwarding_attachments = ( isset($params['forwarding_attachments']) ? $params['forwarding_attachments'] : false );
+		$attachments = ( isset($params['FILES']) ? $params['FILES'] : array() );
+		$return_files = ( isset($params['FILES'])? $params['FILES'] :  array() );
 		
 		$folder = $params['folder'];
 		$folder = mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
 		// Fix problem with cyrus delimiter changes.
 		// Dots in names: enabled/disabled.
-		$folder = @preg_replace("#INBOX/#i", "INBOX".$this->imap_delimiter, $folder);
-		$folder = @preg_replace("#INBOX.#i", "INBOX".$this->imap_delimiter, $folder);
+		$folder = preg_replace("#INBOX/#i", "INBOX".$this->imap_delimiter, $folder);
+		$folder = preg_replace("#INBOX.#i", "INBOX".$this->imap_delimiter, $folder);
+		$folder = trim($folder);
+		
 		// End Fix.
-		if(strtoupper($folder) == 'INBOX/DRAFTS') $mail->SaveMessageAsDraft = $folder;
+		if(strtoupper($folder) === 'INBOX/DRAFTS'){ $mail->SaveMessageAsDraft = $folder; }
 
 		$mail->SaveMessageInFolder = $folder;
 		$mail->SMTPDebug = false;
@@ -3040,24 +3043,24 @@ class imap_functions
 
 		$this->add_recipients("to", $toaddress, $mail);
 		$this->add_recipients("cc", $ccaddress, $mail);
-    	$this->add_recipients("cco", $ccoaddress, $mail);
+		$this->add_recipients("cco", $ccoaddress, $mail);
 		$mail->AddReplyTo($replytoaddress);
 		$mail->Subject = $subject;
 		$mail->IsHTML(true);
 		$mail->Body = $body;
 		
 		// Important message
-		if($is_important)
-			$mail->isImportant();
+		if( trim($is_important) !== "" ){ $mail->isImportant(); }
 
 		// Disposition-Notification-To
-		if ($return_receipt)
+		if( trim($return_receipt) !== "" ){
 			$mail->ConfirmReadingTo = $_SESSION['phpgw_info']['expressomail']['user']['email'];
+		}
 
 		$return_forward = $this->buildEmbeddedImages($mail,$msg_uid,$forwarding_attachments); 
 
 		// Build Forwarding Attachments!!!
-		if (count($forwarding_attachments) > 0)
+		if( $forwarding_attachments && count($forwarding_attachments) > 0 )
 		{
 			foreach($forwarding_attachments as $forwarding_attachment)
 			{
@@ -3078,17 +3081,19 @@ class imap_functions
 			}
 		}
 
-		if ((count($return_forward) > 0) && (count($return_files) > 0))
+		if ((count($return_forward) > 0) && (count($return_files) > 0)){
 			$return_files = array_merge_recursive($return_forward,$return_files);
-		else
-			if (count($return_files) < 1)
+		} else {
+			if ( count($return_files) < 1 ){
 				$return_files = $return_forward;
+			}
+		}
 
 		//	Build Uploading Attachments!!!
 		$sizeof_attachments = count($attachments);
 		if ($sizeof_attachments) {
 			foreach ($attachments as $numb => $attach) {
-				if ($numb == ($sizeof_attachments-1) && $params['insertImg'] == 'true' ) { // Auto-resize image
+				if( $numb == ($sizeof_attachments-1) && ( isset($params['insertImg']) && $params['insertImg'] == 'true' ) ) { // Auto-resize image
 					list($width, $height,$image_type) = getimagesize($attach['tmp_name']);
 					switch ($image_type) {
 						// Do not corrupt animated gif
@@ -3107,12 +3112,10 @@ class imap_functions
 					if ($width < $max_resolution && $height < $max_resolution){
 						$new_width = $width;
 						$new_height = $height;
-					}
-					else if ($width > $max_resolution){
+					} else if ($width > $max_resolution){
 						$new_width = $max_resolution;
 						$new_height = $height*($new_width/$width);
-					}
-					else {
+					} else {
 						$new_height = $max_resolution;
 						$new_width = $width*($new_height/$height);
 					}
@@ -3133,10 +3136,9 @@ class imap_functions
 			}
 		}
 
-
-
-		if(!empty($mail->AltBody))
-            $mail->ContentType = "multipart/alternative";
+		if( !empty($mail->AltBody) ){ 
+			$mail->ContentType = "multipart/alternative"; 
+		}
 
 		$mail->error_count = 0; // reset errors
 		$mail->SetMessageType();
@@ -3146,31 +3148,30 @@ class imap_functions
 		$mbox_stream = $this->open_mbox($folder);
 		$new_header = str_replace("\n", "\r\n", $header);
 		$new_body = str_replace("\n", "\r\n", $body);
-		$return['append'] = imap_append($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, $new_header . $new_body, "\\Seen \\Draft");
+		$return['save_draft'] = imap_append($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, $new_header . $new_body, "\\Seen \\Draft");
 		$status = imap_status($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, SA_UIDNEXT);
 		$return['msg_no'] = $status->uidnext - 1;
 		$return['folder_id'] = $folder;
 
-		if($mbox_stream)
-			$this->close_mbox($mbox_stream);
-		if (is_array($return_files))
+		if( $mbox_stream ){ $this->close_mbox($mbox_stream); }
+
+		if (is_array($return_files)){
 			foreach ($return_files as $index => $_attachment) {
 				if (array_key_exists("name",$_attachment)){
-				unset($return_files[$index]);
-				$return_files[$index] = $_attachment['name']."_SIZE_".$return_files[$index][1] = $_attachment['size'];
-			}
-			else
-			{
-				unset($return_files[$index]);
-				$return_files[$index] = $_attachment[2]."_SIZE_". $return_files[$index][1] = $_attachment[5];
+					unset($return_files[$index]);
+					$return_files[$index] = $_attachment['name']."_SIZE_".$return_files[$index][1] = $_attachment['size'];
+				} else {
+					unset($return_files[$index]);
+					$return_files[$index] = $_attachment[2]."_SIZE_". $return_files[$index][1] = $_attachment[5];
+				}
 			}
 		}
 
 		$return['files'] = serialize($return_files);
 		$return["subject"] = $subject;
 
-		if (!$return['append']) {
-			$return['append'] = imap_last_error();
+		if( !$return['save_draft'] ){
+			$return['save_draft'] = imap_last_error();
 			$return['has_error'] = true;
 		}
 		

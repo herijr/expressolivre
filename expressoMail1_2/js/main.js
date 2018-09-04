@@ -1972,18 +1972,18 @@ function return_save(data,border_id,folder_name,folder_id,message_id)
 {
 	Element("send_button_"+border_id).style.visibility="visible";
 	var handler_delete_msg = function(data){ refresh(preferences.alert_new_msg); };
-
-	if (data.append != true || !data)
+	
+	if (data.save_draft != true || !data)
 	{
 		RichTextEditor.saveFlag = 0;
-		if (! data.append)
+		if (! data.save_draft)
 			if(data == 'Post-Content-Length')
 				write_msg(get_lang('The size of this message has exceeded  the limit (%1B).', preferences.max_attachment_size ? preferences.max_attachment_size : Element('upload_max_filesize').value));
 			else
 				write_msg(get_lang('ERROR saving your message.'));
 		else
 		{
-			if (data.append.match(/^(.*)TRYCREATE(.*)$/))
+			if (data.save_draft.match(/^(.*)TRYCREATE(.*)$/))
 			{
 				connector.loadScript('TreeS');
 				alert(get_lang('There is not %1 folder, Expresso is creating it for you... Please, repeat your request later.',draftsfolder));
@@ -1993,7 +1993,7 @@ function return_save(data,border_id,folder_name,folder_id,message_id)
 				setTimeout('save_msg('+border_id+')',3000);
 			}
 			else
-				write_msg(data.append);
+				write_msg('*');//data.save_draft);
 		}
 	}
 	else
@@ -2106,7 +2106,7 @@ function return_save(data,border_id,folder_name,folder_id,message_id)
 		if (message_id)
 		{
 			cExecute ("$this.imap_functions.delete_msgs&folder="+openTab.imapBox[border_id]+"&msgs_number="+message_id,handler_delete_msg);
-			if (openTab.imapBox[0] == "INBOX/"+draftsfolder)
+			if (openTab.imapBox[0] == "INBOX" + cyrus_delimiter + draftsfolder)
 			{
 				//Update mailbox
 						var tr_msg = document.getElementById(message_id);
@@ -2142,7 +2142,7 @@ function save_msg(border_id,withImage){
 	if (openTab.imapBox[border_id] && openTab.type[border_id] < 6) //Gets the imap folder
 		var folder_id = openTab.imapBox[border_id];
 	else
-		var folder_id = "INBOX/"+draftsfolder;
+		var folder_id = "INBOX" + cyrus_delimiter + draftsfolder;
 
 	if (folder_id == 'INBOX') // and folder name from border
 		var folder_name = get_lang(folder_id);
@@ -2179,18 +2179,15 @@ function save_msg(border_id,withImage){
 	input_insertImg.name = "insertImg";
 	input_insertImg.value = withImage;
 
-
-	if (is_ie)
-        {
+	if( is_ie )
+	{
 		var i = 0;
 		while (document.forms(i).name != "form_message_"+border_id){i++}
 		form = document.forms(i);
+	} else {
+		form = document.forms["form_message_"+border_id];
 	}
-	else
-        {    
-            form = document.forms["form_message_"+border_id];
-        }
-        
+
 	form.appendChild(textArea);
 	form.appendChild(input_folder);
 	form.appendChild(input_msgid);
@@ -2209,7 +2206,7 @@ function return_saveas(data,border_id,folder_name)
 {
 	if(!verify_session(data))
 		return;
-	if (data.append)
+	if (data.save_draft)
 	{
 		delete_border(border_id,null);
 		write_msg(get_lang('Your message was save as draft in folder %1.', folder_name));
