@@ -2003,7 +2003,7 @@ class imap_functions
         if( $folderUser != "INBOX" && $folderUser != "" )
         {
 					if( is_resource($mbox_stream) ){
-						$Permission = imap_getacl( $mbox_stream, $folderUser );
+						$Permission = @imap_getacl( $mbox_stream, $folderUser );
 					}
 				}
 
@@ -4035,7 +4035,7 @@ class imap_functions
 		$mbox_stream = $this->open_mbox();
 
 		if( is_resource($mbox_stream) ){
-			$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
+			$mbox_acl = @imap_getacl($mbox_stream, 'INBOX');
 			$i = 0;
 			foreach ($mbox_acl as $user => $acl)
 			{
@@ -4101,7 +4101,7 @@ class imap_functions
 		$return[$useracl] = 'false';
 		$mbox_stream = $this->open_mbox();
 		if( is_resource($mbox_stream) ){
-			$mbox_acl = imap_getacl($mbox_stream, 'INBOX');
+			$mbox_acl = @imap_getacl($mbox_stream, 'INBOX');
 			foreach ($mbox_acl as $user => $acl)
 			{
 				if (($user != $this->username) && ($user == $useracl)){ $return[$user] = $acl; }
@@ -4119,8 +4119,8 @@ class imap_functions
 		$mbox_acl = array();
 		if( is_resource($mbox_stream)){
 			$mbox_acl = ( (substr($user,0,4) != 'user') ? 
-											imap_getacl($mbox_stream, 'user'.$this->imap_delimiter.$user) :
-												 imap_getacl($mbox_stream, $user) );
+											@imap_getacl($mbox_stream, 'user'.$this->imap_delimiter.$user) :
+												 @imap_getacl($mbox_stream, $user) );
 		}
 		return ( isset($mbox_acl[$this->username]) ? $mbox_acl[$this->username] : false );
 	}
