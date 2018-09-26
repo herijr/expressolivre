@@ -169,7 +169,7 @@
 						array_walk( $extra_vars, function( &$v, $i ){ $v = $i.'='.$v; } );
 						$extra_vars = implode( '&', $extra_vars );
 					}
-					$forward = 'http://' . nearest_to_me() . $GLOBALS['phpgw']->link( $forward.( $extra_vars? '?'.$extra_vars : '' ) );
+					$forward = 'http'.(isset($_SERVER['HTTPS'])?'s':'').'://' . nearest_to_me() . $GLOBALS['phpgw']->link( $forward.( $extra_vars? '?'.$extra_vars : '' ) );
 					echo "<script language='Javascript1.3'>location.href='".$forward."'</script>";
 				}
 				else
