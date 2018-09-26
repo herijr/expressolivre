@@ -32,7 +32,23 @@
 		{
 			if( $_GET['cd'] != '66' )
 			{
-				$GLOBALS['phpgw']->redirect_link('/home.php');
+				$forward = isset($_GET['phpgw_forward']) ? urldecode($_GET['phpgw_forward']) : @$_POST['phpgw_forward'];
+				if ( !$forward ) {
+					$extra_vars['cd'] = 'yes';
+					$forward = '/home.php';
+				} else {
+					list($forward,$extra_vars) = explode('?',$forward,2);
+				}
+				if( $GLOBALS['phpgw_info']['server']['use_https'] != 2 ) {
+					if ( is_array( $extra_vars ) ) {
+						array_walk( $extra_vars, function( &$v, $i ){ $v = $i.'='.$v; } );
+						$extra_vars = implode( '&', $extra_vars );
+					}
+					$forward = 'http://' . nearest_to_me() . $GLOBALS['phpgw']->link( $forward.( $extra_vars? '?'.$extra_vars : '' ) );
+					echo "<script language='Javascript1.3'>location.href='".$forward."'</script>";
+				} else {
+					$GLOBALS['phpgw']->redirect_link($forward,$extra_vars);
+				}
 			}
 		}
 
