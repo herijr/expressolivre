@@ -108,6 +108,13 @@
 			$this->redirect($this->session->link($url, $extravars));
 		}
 
+		function redirect_forward( $url = '/home.php?cd=yes' )
+		{
+			list( $forward, $extra_vars ) = explode( '?', ( ( isset( $_GET['phpgw_forward'] ) ? urldecode( $_GET['phpgw_forward'] ) : @$_POST['phpgw_forward'] )?: $url ), 2 );
+			$GLOBALS['phpgw']->redirect_link( $forward, $extra_vars );
+			exit;
+		}
+
 		/**
 		* Repost Prevention Detection
 		*

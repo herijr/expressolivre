@@ -145,25 +145,8 @@
 			{
 				$GLOBALS['phpgw']->translation->autoload_changed_langfiles();
 			}
-			$forward = isset($_GET['phpgw_forward']) ? urldecode($_GET['phpgw_forward']) : @$_POST['phpgw_forward'];
-			if (!$forward)
-			{
-				$extra_vars['cd'] = 'yes';
-				$forward = '/home.php';
-			}
-			else
-			{
-				list($forward,$extra_vars) = explode('?',$forward,2);
-			}
-			if ($GLOBALS['phpgw_info']['server']['use_https'] != 2)
-			{
-				$forward = 'http://'.$_SERVER['HTTP_HOST'].($GLOBALS['phpgw']->link($forward.'?cd=yes'));
-				echo "<script language='Javascript1.3'>location.href='".$forward."'</script>";
-			}
-			else
-			{
-				$GLOBALS['phpgw']->redirect_link($forward,$extra_vars);
-			}
+
+			$GLOBALS['phpgw']->redirect_forward();
 		}
 	}
 	else
