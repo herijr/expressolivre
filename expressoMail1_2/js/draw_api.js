@@ -2021,45 +2021,67 @@ function draw_message(info_msg, ID){
 	div.appendChild(table_message_others_options);
 	var imgTag = info_msg.body.match(/(<img[^>]*src[^>=]*=['"]?[^'">]*["']?[^>]*>)|(<[^>]*(style[^=>]*=['"][^>]*background(-image)?:[^:;>]*url\()[^>]*>)/gi);
 	var newBody = info_msg.body;
-	if(!info_msg.showImg && imgTag)
-	{
-		var domains = '';
-		var blocked = false;
-		var forbidden = true;
 
-		if (preferences.notification_domains != null && typeof(preferences.notification_domains) != 'undefined')
-		{
-			domains = preferences.notification_domains.split(',');
-			for(var j = 0; j < imgTag.length; j++)
-			{
-				for (var i = 0; i < domains.length; i++)
-				{
-					if (imgTag[j].match(/cid:([\w\d]){5,}/) || imgTag[j].match(/src=\"\.\/inc\/show_embedded_attach\.php/g))
-					{
-						forbidden = false;
-						continue;
-					}
-					imgSource = imgTag[j].match(/=['"](http:\/\/)+[^'"\/]*/);
-					if (imgSource && imgSource.toString().substr(5).match(domains[i]))
-						forbidden = false;
-				}
-				if (forbidden)
-				{
-					newBody = newBody.replace(imgTag[j],"<img src='templates/"+template+"/images/forbidden.jpg'>");
-					blocked=true;
-				}
+	if (
+		( !info_msg.showImg ) &&
+		imgTag &&
+		preferences.notification_domains != null &&
+		typeof(preferences.notification_domains) != 'undefined'
+	) {
+		var domains = preferences.notification_domains.split(',');
+		jQuery.each( domains, function( i, v ) { domains[i] = new RegExp( jQuery.ui.autocomplete.escapeRegex( v.trim() )+'$' ); } );
+
+		var quoteprt = function( str ) { return '"'+str.replace( /"/g,'\\\"' )+'"'; };
+
+		var domainBlocked = function( img_tag, domains ) {
+
+			var delim = img_tag.toLowerCase().match( /src=\\?(['"])?/i );
+			delim = ( delim && delim[1] )? delim[1] : ' ';
+
+			img_tag = img_tag.replace( new RegExp( jQuery.ui.autocomplete.escapeRegex( '\\'+delim ), 'g' ), '§' ).replace( /\\/g, '' );
+
+			var img_src = img_tag.match( new RegExp( 'src=['+delim+']?([^'+delim+']*)', 'i' ) );
+			img_src = ( img_src && img_src[1] )? img_src[1].replace( /§/g, delim ) : false;
+			if ( !img_src ) return lang( 'unknown' );
+
+			if ( img_src.search( /^.\/inc\/show_embedded_attach\.php/ ) == 0 ) return false;
+
+			var img_scheme = img_src.match( /^([a-z]+):[//]*(.*)/ );
+			if ( !( img_scheme && img_scheme[1] ) ) return quoteprt( img_src.substring( 0, 25 ) );
+
+			if ( img_scheme[1] == 'cid' && img_scheme[2] && img_scheme[2].search( /^[\w.@_*#$-]+$/ ) >= 0 )return false;
+
+			if ( img_scheme[1].search(/https?/i) >= 0 && img_scheme[2] ) {
+				for ( var i = 0; i < domains.length; i++ )
+					if ( img_scheme[2].replace( /\/.*/, '' ).match( domains[i] ) ) return false;
+				return img_scheme[2].replace( /\/.*/, '' );
 			}
-			if (blocked)
-			{
-				var showImgLink = document.createElement('DIV');
-				showImgLink.id="show_img_link_"+ID;
-				showImgLink.onclick = function(){show_msg_img(info_msg.msg_number,info_msg.msg_folder)};
-				showImgLink.className="show_img_link";
-				showImgLink.innerHTML = get_lang("Show images from")+": "+info_msg.from.email;
-				td.appendChild(showImgLink);
+
+			if ( img_scheme[1] == 'data' && img_scheme[2] )
+				return quoteprt( 'data:'+img_scheme[2].replace( /,.*/, '' ) );
+
+			return quoteprt( img_src.substring( 0, 25 ) );
+		};
+
+		var blocked = [];
+		for ( var j = 0; j < imgTag.length; j++ ) {
+			var domain = domainBlocked( imgTag[j], domains );
+			if ( domain ) {
+				newBody = newBody.replace( imgTag[j], "<img src='templates/"+template+"/images/forbidden.jpg'>" );
+				blocked.push( domain );
 			}
 		}
+
+		if ( blocked.length > 0 ) {
+			var showImgLink = document.createElement('DIV');
+			showImgLink.id="show_img_link_"+ID;
+			showImgLink.onclick = function(){show_msg_img(info_msg.msg_number,info_msg.msg_folder)};
+			showImgLink.className="show_img_link";
+			showImgLink.innerHTML = get_lang("Show images from")+": "+info_msg.from.email+' ( '+jQuery.unique( blocked ).join(', ')+' )';
+			td.appendChild(showImgLink);
+		}
 	}
+
 	td.appendChild(div);
 	tr.appendChild(td)
 	tbody_message.appendChild(tr);
