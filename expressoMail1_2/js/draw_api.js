@@ -17,7 +17,7 @@ var tabTypes = {
 	'edit':5
 	}
 var currentTab,numBox = 0; // Open Tab and num of mailboxes opened at context
-// Objeto Map, talvez o ideal fosse adicionar este objeto à Api do egroupware, e carregá-lo
+// Objeto Map, talvez o ideal fosse adicionar este objeto ï¿½ Api do egroupware, e carregï¿½-lo
 // aqui no expressoMail.
 function Map()
 {
@@ -53,155 +53,145 @@ Map.prototype.get = function(key)
 var translatedFolders = new Map();
 
 function draw_tree_folders(folders){
+
 	// Check if the tree folders alredy exist.
-		translatedFolders = new Map();
+	translatedFolders = new Map();
+
 	if (Element('dftree_tree_folders')){
-		if (!expresso_offline) {
-			var update_tree_folders = function(data){
-				build_quota(data);
-				var unseen_in_mailbox = 0;
-				var unseen_in_shared_folders = 0;
-				for (var i=0; i<data.length; i++){
-					if ( data[i].folder_unseen > 0 )
-					{
-						unseen_in_mailbox = parseInt( unseen_in_mailbox + data[ i ].folder_unseen );
-						if ( data[i].folder_id.indexOf( 'INBOX' ) !== 0 )
-							unseen_in_shared_folders = parseInt( unseen_in_shared_folders + data[ i ].folder_unseen );
-					}
 
-					var folder_unseen = Element('dftree_'+data[i].folder_id+'_unseen');
-
-					if ((folder_unseen) && (data[i].folder_unseen > 0))
-					{
-						folder_unseen.innerHTML = data[i].folder_unseen;
-					}
-					else if (data[i].folder_unseen > 0)
-					{
-						tree_folders.getNodeById(data[i].folder_id).alter({caption:lang_folder(data[i].folder_name) + '<font style=color:red>&nbsp(</font><span id="dftree_'+data[i].folder_id+'_unseen" style=color:red>'+data[i].folder_unseen+'</span><font style=color:red>)</font>'});
-						tree_folders.getNodeById(data[i].folder_id)._refresh();
-					}
-					else if (data[i].folder_unseen <= 0)
-					{
-						tree_folders.getNodeById(data[i].folder_id).alter({caption:lang_folder(data[i].folder_name)});
-						tree_folders.getNodeById(data[i].folder_id)._refresh();
-					}
-
-					if(data[i].folder_id == current_folder){
-						var old_new_m = isNaN(parseInt(Element('new_m').innerHTML)) ? parseInt(Element('new_m').firstChild.innerHTML) : parseInt(Element('new_m').innerHTML);
-						Element('new_m').innerHTML = data[i].folder_unseen ? '<font color="RED">'+data[i].folder_unseen+'</font>' : 0;
-						draw_paging(Element('tot_m').innerHTML);
-						redim_borders();
-					}
+		var update_tree_folders = function (data) {
+			build_quota(data);
+			var unseen_in_mailbox = 0;
+			var unseen_in_shared_folders = 0;
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].folder_unseen > 0) {
+					unseen_in_mailbox = parseInt(unseen_in_mailbox + data[i].folder_unseen);
+					if (data[i].folder_id.indexOf('INBOX') !== 0)
+						unseen_in_shared_folders = parseInt(unseen_in_shared_folders + data[i].folder_unseen);
 				}
 
-				var display_unseen_in_mailbox = tree_folders.getNodeById( 'root' );
-				display_unseen_in_mailbox.alter({caption:get_lang("My Folders")});
-				display_unseen_in_mailbox._refresh();
+				var folder_unseen = Element('dftree_' + data[i].folder_id + '_unseen');
 
-				var display_unseen_in_shared_folders = tree_folders.getNodeById( 'user' );
-				if ( display_unseen_in_shared_folders )
-				{
-					if ( unseen_in_shared_folders )
-						display_unseen_in_shared_folders.alter({caption:'<font style=color:red>[</font><span id="dftree_user_unseen" style="color:red">' + unseen_in_shared_folders +'</span><font style=color:red>]</font> ' + get_lang("Shared folders")});
-					else
-						display_unseen_in_shared_folders.alter({caption:get_lang("Shared folders")});
-					display_unseen_in_shared_folders._refresh();
+				if ((folder_unseen) && (data[i].folder_unseen > 0)) {
+					folder_unseen.innerHTML = data[i].folder_unseen;
+				}
+				else if (data[i].folder_unseen > 0) {
+					tree_folders.getNodeById(data[i].folder_id).alter({ caption: lang_folder(data[i].folder_name) + '<font style=color:red>&nbsp(</font><span id="dftree_' + data[i].folder_id + '_unseen" style=color:red>' + data[i].folder_unseen + '</span><font style=color:red>)</font>' });
+					tree_folders.getNodeById(data[i].folder_id)._refresh();
+				}
+				else if (data[i].folder_unseen <= 0) {
+					tree_folders.getNodeById(data[i].folder_id).alter({ caption: lang_folder(data[i].folder_name) });
+					tree_folders.getNodeById(data[i].folder_id)._refresh();
+				}
+
+				if (data[i].folder_id == current_folder) {
+					var old_new_m = isNaN(parseInt(Element('new_m').innerHTML)) ? parseInt(Element('new_m').firstChild.innerHTML) : parseInt(Element('new_m').innerHTML);
+					Element('new_m').innerHTML = data[i].folder_unseen ? '<font color="RED">' + data[i].folder_unseen + '</font>' : 0;
+					draw_paging(Element('tot_m').innerHTML);
+					redim_borders();
 				}
 			}
-			cExecute ("$this.imap_functions.get_folders_list&folder="+current_folder, update_tree_folders);
+
+			var display_unseen_in_mailbox = tree_folders.getNodeById('root');
+			display_unseen_in_mailbox.alter({ caption: get_lang("My Folders") });
+			display_unseen_in_mailbox._refresh();
+
+			var display_unseen_in_shared_folders = tree_folders.getNodeById('user');
+			if (display_unseen_in_shared_folders) {
+				if (unseen_in_shared_folders)
+					display_unseen_in_shared_folders.alter({ caption: '<font style=color:red>[</font><span id="dftree_user_unseen" style="color:red">' + unseen_in_shared_folders + '</span><font style=color:red>]</font> ' + get_lang("Shared folders") });
+				else
+					display_unseen_in_shared_folders.alter({ caption: get_lang("Shared folders") });
+				display_unseen_in_shared_folders._refresh();
+			}
 		}
+		
+		cExecute("$this.imap_functions.get_folders_list&folder=" + current_folder, update_tree_folders);
 
 		return;
-	}
-	else{
-		if (!expresso_offline)
-		{
-                    tree_folders = new dFTree({name: 'tree_folders'});
 
-                    var n_root = new dNode({id:'root', caption: get_lang("My Folders")});
-                    tree_folders.add(n_root,'anything'); //Places the root; second argument can be anything.
+	} else {
 
-                    var unseen_in_mailbox = 0;
-                    var unseen_in_shared_folders = 0;
-                    for (var i=0; i<folders.length; i++)
-                    {
-                        if (folders[i].folder_unseen > 0)
-                        {
-                                unseen_in_mailbox = parseInt( unseen_in_mailbox + folders[ i ].folder_unseen );
-                                if ( folders[i].folder_id.indexOf( 'INBOX' ) !== 0 )
-                                        unseen_in_shared_folders = parseInt( unseen_in_shared_folders + folders[ i ].folder_unseen );
+		tree_folders = new dFTree({ name: 'tree_folders' });
 
-                                var nn = new dNode({id:folders[i].folder_id, caption:lang_folder(folders[i].folder_name) + '<font style=color:red>&nbsp(</font><span id="dftree_'+folders[i].folder_id+'_unseen" style=color:red>'+folders[i].folder_unseen+'</span><font style=color:red>)</font>', onClick:"change_folder('"+folders[i].folder_id+"','"+folders[i].folder_name+"')", plusSign:folders[i].folder_hasChildren});
+		var n_root = new dNode({ id: 'root', caption: get_lang("My Folders") });
+		tree_folders.add(n_root, 'anything'); //Places the root; second argument can be anything.
 
-                                if( folders[i].folder_name.toLowerCase() == 'inbox' )
-                                        Element('new_m').innerHTML = '<font style="color:red">' + folders[i].folder_unseen + '</font>';
-                        }
-                        else
-                            var nn = new dNode({id:folders[i].folder_id, caption:lang_folder(folders[i].folder_name), onClick:"change_folder('"+folders[i].folder_id+"','"+folders[i].folder_name+"')", plusSign:folders[i].folder_hasChildren});
+		var unseen_in_mailbox = 0;
+		var unseen_in_shared_folders = 0;
+		for (var i = 0; i < folders.length; i++) {
+			if (folders[i].folder_unseen > 0) {
+				unseen_in_mailbox = parseInt(unseen_in_mailbox + folders[i].folder_unseen);
+				if (folders[i].folder_id.indexOf('INBOX') !== 0)
+					unseen_in_shared_folders = parseInt(unseen_in_shared_folders + folders[i].folder_unseen);
 
-                        if (folders[i].folder_parent == '')
-                                folders[i].folder_parent = 'root';
-                        else if (folders[i].folder_parent == 'user')
-                        {
+				var nn = new dNode({ id: folders[i].folder_id, caption: lang_folder(folders[i].folder_name) + '<font style=color:red>&nbsp(</font><span id="dftree_' + folders[i].folder_id + '_unseen" style=color:red>' + folders[i].folder_unseen + '</span><font style=color:red>)</font>', onClick: "change_folder('" + folders[i].folder_id + "','" + folders[i].folder_name + "')", plusSign: folders[i].folder_hasChildren });
 
-                            if (!tree_folders.getNodeById('user'))
-                            {
-                                tmpFolderId = folders[i].folder_id.split(cyrus_delimiter).pop();
-                                if (tmpFolderId != folders[i].folder_name)
-                                {
-                                        translatedFolders.add(tmpFolderId, folders[i].folder_name);
-                                }
-                                var n_root_shared_folders = new dNode({id:'user', caption:get_lang("Shared folders"), plusSign:true});
-                                tree_folders.add(n_root_shared_folders,'root');
-                            }
-                        }
-                        tree_folders.add(nn,folders[i].folder_parent);
-                    }
+				if (folders[i].folder_name.toLowerCase() == 'inbox')
+					Element('new_m').innerHTML = '<font style="color:red">' + folders[i].folder_unseen + '</font>';
+			}
+			else
+				var nn = new dNode({ id: folders[i].folder_id, caption: lang_folder(folders[i].folder_name), onClick: "change_folder('" + folders[i].folder_id + "','" + folders[i].folder_name + "')", plusSign: folders[i].folder_hasChildren });
+
+			if (folders[i].folder_parent == '')
+				folders[i].folder_parent = 'root';
+			else if (folders[i].folder_parent == 'user') {
+
+				if (!tree_folders.getNodeById('user')) {
+					tmpFolderId = folders[i].folder_id.split(cyrus_delimiter).pop();
+					if (tmpFolderId != folders[i].folder_name) {
+						translatedFolders.add(tmpFolderId, folders[i].folder_name);
+					}
+					var n_root_shared_folders = new dNode({ id: 'user', caption: get_lang("Shared folders"), plusSign: true });
+					tree_folders.add(n_root_shared_folders, 'root');
+				}
+			}
+			if (folders[i].folder_parent != 'root') {
+				var node_parent = tree_folders.getNodeById(folders[i].folder_parent);
+				node_parent.plusSign = true;
+				tree_folders.alter(node_parent);
+			}
+			tree_folders.add(nn, folders[i].folder_parent);
 		}
 
-       var handlerChannel = function(data)
-       {
-    	   
-                if ( data == null || typeof(data) == 'string')
-                {    
-                	return false;
-                }
+		var handlerChannel = function (data) {
 
-                var nodeParent  = document.getElementById('content_folders');
-                var treeRss     = new dFTree({name: 'treeRss'});
-                var root_rss    = new dNode({id:'news_root', caption: get_lang("News")});
-                    
-                treeRss.add(root_rss,'anything');
+			if (data == null || typeof (data) == 'string') {
+				return false;
+			}
 
-                for( i=0; i < data.length; i++ )
-                {
-                    var nodeNews = new dNode(
-                    {
-                            id: "NEWS/"+data[i].name,
-                            caption: data[i].name,
-                            onClick: "open_rss('"+data[i].rss_url+"')",
-                            plusSign: 0
-                     });
-                     treeRss.add(nodeNews,"news_root");
-                }
-                    
-                treeRss.draw( nodeParent );
-                    
-                with ( document.getElementById('lnews_roottreeRss') )
-                {
-                     style.backgroundImage   = "url(templates/"+template+"/images/menu/rss.png)";
-                     style.marginLeft        = "2px";
-                }
+			var nodeParent = document.getElementById('content_folders');
+			var treeRss = new dFTree({ name: 'treeRss' });
+			var root_rss = new dNode({ id: 'news_root', caption: get_lang("News") });
 
-                if( nodeParent.firstChild.id != ("dftree_" + treeRss.name ) )
-                {
-                     var _folder     = Element(nodeParent.firstChild.id);
-                     var _rssNews    = Element("dftree_" + treeRss.name );
-                        
-                     nodeParent.insertBefore( _rssNews, _folder );
-                }
-                    
-	   }
+			treeRss.add(root_rss, 'anything');
+
+			for (i = 0; i < data.length; i++) {
+				var nodeNews = new dNode(
+					{
+						id: "NEWS/" + data[i].name,
+						caption: data[i].name,
+						onClick: "open_rss('" + data[i].rss_url + "')",
+						plusSign: 0
+					});
+				treeRss.add(nodeNews, "news_root");
+			}
+
+			treeRss.draw(nodeParent);
+
+			with (document.getElementById('lnews_roottreeRss')) {
+				style.backgroundImage = "url(templates/" + template + "/images/menu/rss.png)";
+				style.marginLeft = "2px";
+			}
+
+			if (nodeParent.firstChild.id != ("dftree_" + treeRss.name)) {
+				var _folder = Element(nodeParent.firstChild.id);
+				var _rssNews = Element("dftree_" + treeRss.name);
+
+				nodeParent.insertBefore(_rssNews, _folder);
+			}
+
+		}
        
        if( eval(enabledReadRSS ) == true )
        {	
@@ -210,113 +200,38 @@ function draw_tree_folders(folders){
     	     cExecute('$this.rss.getChannels',handlerChannel);
     	   }, 2000);
        }
-       
-		/**
-		* Pastas locais
-		*/
-		if (preferences.use_local_messages==1 || expresso_offline) {
-			if (!window.google || !google.gears) {
-				if (!expresso_local_messages.installGears())
-					preferences.use_local_messages=0;
-			}
-			else{
-				if (!window.google || !google.gears) {
-				temp = confirm(get_lang("To use local messages you have to install google gears. Would you like to be redirected to gears installation page?"));
-				if (temp) {
-					location.href = "http://gears.google.com/?action=install&message="+
-					"Para utilizar o recurso de mensagens locais, instale o google gears&return=" +
-					document.location.href;
-				}
-				else {
-					preferences.use_local_messages=0;
-				}
-			}
-			else{
-				if (expresso_offline)
-					tree_folders = new dFTree({
-						name: 'tree_folders'
-					});
-				var root_local = new dNode({
-					id: "local_root",
-					caption: get_lang('local folders')
-				});
-				tree_folders.add(root_local, "root"); //coloca root local
-				var local_folders = expresso_local_messages.list_local_folders();
-				for (var i in local_folders) { //Coloca as pastas locais.
-					var node_root = "local_root";
-					var new_caption = local_folders[i][0];
-					if (local_folders[i][0].indexOf("/") != "-1") {
-						final_pos = local_folders[i][0].lastIndexOf("/");
-						node_root = "local_" + local_folders[i][0].substr(0, final_pos);
-						new_caption = local_folders[i][0].substr(final_pos + 1);
-					}
-					if (local_folders[i][1] > 0)
-						var nodeLocal = new dNode({
-							id: "local_" + local_folders[i][0],
-							caption: lang_folder(new_caption) + '<font style=color:red>&nbsp(</font><span id="local_unseen" style=color:red>' + local_folders[i][1] + '</span><font style=color:red>)</font>',
-							onClick: "change_folder('local_" + local_folders[i][0] + "','" + new_caption + "')",
-							plusSign: local_folders[i][2]
-						});
-					else
-						var nodeLocal = new dNode({
-							id: "local_" + local_folders[i][0],
-							caption: lang_folder(new_caption),
-							onClick: "change_folder('local_" + local_folders[i][0] + "','" + new_caption + "')",
-							plusSign: local_folders[i][2]
-						});
-						tree_folders.add(nodeLocal, node_root);
-					}
-				}
-			}
-		}
 
 		tree_folders.draw(Element('content_folders'));
-		if (!expresso_offline) {
-			n_root.changeState();
-			tree_folders.getNodeById('INBOX')._select();
-		}
-		else {
-			root_local.changeState();
-			tree_folders.getNodeById('local_Inbox')._select();
-		}
+
+		n_root.changeState();
+
+		tree_folders.getNodeById('INBOX')._select();
 
 		var trash_span=document.getElementById('lINBOX/'+trashfolder+'tree_folders');
 		var draft_span=document.getElementById('lINBOX/'+draftsfolder+'tree_folders');
 		var sent_span=document.getElementById('l'+this.preferences.save_in_folder+'tree_folders');
 		var sent_span_default=document.getElementById('lINBOX/'+sentfolder+'tree_folders');
 		var spam_span=document.getElementById('lINBOX/'+spamfolder+'tree_folders');
-		//local folders
-		var sent_local_conf = this.preferences.save_in_folder.replace("INBOX/","local_");
-		var sent_local_conf_span=document.getElementById('l'+sent_local_conf+'tree_folders');
-		var trash_local_span=document.getElementById('llocal_'+trashfolder+'tree_folders');
-		var draft_local_span=document.getElementById('llocal_'+draftsfolder+'tree_folders');
-		var sent_span_default=document.getElementById('llocal_'+sentfolder+'tree_folders');
 
+		if (trash_span){
+			trash_span.style.backgroundImage = "url(../phpgwapi/templates/" + template + "/images/foldertree_trash.png)";
+		}
 
-		if (trash_span)
-			trash_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_trash.png)";
+		if (draft_span){
+			draft_span.style.backgroundImage = "url(../phpgwapi/templates/" + template + "/images/foldertree_draft.png)"
+		}
 
-		if (draft_span)
-			draft_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_draft.png)"
+		if (sent_span){
+			sent_span.style.backgroundImage = "url(../phpgwapi/templates/" + template + "/images/foldertree_sent.png)";
+		}
+		
+		if (spam_span){
+			spam_span.style.backgroundImage = "url(../phpgwapi/templates/" + template + "/images/foldertree_spam.png)";
+		}
 
-		if (sent_span)
-			sent_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_sent.png)";
-		if (spam_span)
-			spam_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_spam.png)";
-
-		if (sent_span_default)
-			sent_span_default.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_sent.png)";
-		//Local folders
-
-		if (sent_local_conf_span)
-			sent_local_conf_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_sent.png)";
-		if (trash_local_span)
-			trash_local_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_trash.png)";
-		if (draft_local_span)
-			draft_local_span.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_draft.png)"
-		if (sent_span_default)
-			sent_span_default.style.backgroundImage="url(../phpgwapi/templates/"+template+"/images/foldertree_sent.png)";
-
+		if (sent_span_default){
+			sent_span_default.style.backgroundImage = "url(../phpgwapi/templates/" + template + "/images/foldertree_sent.png)";
+		}
 
 		draw_paging(Element('tot_m').innerHTML);
 		if(document.getElementById("nINBOX/"+trashfolder+"tree_folders"))
@@ -347,11 +262,7 @@ function draw_tree_folders(folders){
 			document.getElementById("nINBOX/"+spamfolder+"tree_folders").appendChild(spam);
 		}
 
-
-		if(!expresso_offline)
-			var display_unseen_in_mailbox = tree_folders.getNodeById( 'root' );
-		else
-			var display_unseen_in_mailbox = tree_folders.getNodeById( 'local_root' );
+		var display_unseen_in_mailbox = tree_folders.getNodeById( 'root' );
 		display_unseen_in_mailbox.alter({caption:get_lang("My Folders")});
 		display_unseen_in_mailbox._refresh();
 
@@ -366,29 +277,26 @@ function draw_tree_folders(folders){
 		}
 	}
 
-	if (!expresso_offline) {
-		var folder_create = "";
-		var nm1 = "";
-		if(tree_folders._folderPr.length > 0){
-			folder_create = tree_folders._folderPr.join(';');
-		}
-		if(folder_create != ""){
-			if(confirm(get_lang("There are folders with invalid format. If you want to fix now, click on button OK."))){
-				var handler_correct_folders = function(data){
-					//Timeout to release HTTPRequest , loadScript and update tree folders.
-					if(data){
-						write_msg(get_lang('The folders were fixed with success.'));
-						setTimeout("connector.loadScript('TreeShow');ttreeBox.update_folder();",500);
-					}
+	var folder_create = "";
+	var nm1 = "";
+	if (tree_folders._folderPr.length > 0) {
+		folder_create = tree_folders._folderPr.join(';');
+	}
+	if (folder_create != "") {
+		if (confirm(get_lang("There are folders with invalid format. If you want to fix now, click on button OK."))) {
+			var handler_correct_folders = function (data) {
+				//Timeout to release HTTPRequest , loadScript and update tree folders.
+				if (data) {
+					write_msg(get_lang('The folders were fixed with success.'));
+					setTimeout("connector.loadScript('TreeShow');ttreeBox.update_folder();", 500);
 				}
-				cExecute("$this.imap_functions.create_extra_mailbox",handler_correct_folders,"nw_folders="+folder_create);
 			}
-			else{
-				write_msg(get_lang('Warning: The folders with invalid format will be unavailable.'));
-			}
+			cExecute("$this.imap_functions.create_extra_mailbox", handler_correct_folders, "nw_folders=" + folder_create);
+		}
+		else {
+			write_msg(get_lang('Warning: The folders with invalid format will be unavailable.'));
 		}
 	}
-
 }
 
 function draw_tree_local_folders() {
@@ -908,7 +816,7 @@ function draw_box(headers_msgs, msg_folder, alternate){
 	connector.loadScript("QuickAddTelephone");
 }
 
-// Passar o parâmetro offset para esta função
+// Passar o parï¿½metro offset para esta funï¿½ï¿½o
 function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
                 if (typeof offsetToGMT == 'undefined')
                 {
@@ -1280,7 +1188,7 @@ function draw_message(info_msg, ID){
         var folder_id = ID.match(/\d+/)[0];
         var folder;
 
-        //Correção para fazer funcionar e-mails assinados no formato encapsulado.
+        //Correï¿½ï¿½o para fazer funcionar e-mails assinados no formato encapsulado.
        // folder_id = info_msg.original_ID ? info_msg.original_ID: info_msg.msg_number;
         if ((folder = document.getElementById(info_msg.original_ID)) == null)
         //if ((folder = document.getElementById(info_msg.msg_number)) == null)
@@ -2130,7 +2038,7 @@ function draw_message(info_msg, ID){
 				var anchor_pattern = "http://"+location.host+location.pathname+"#"; 
 				
 				if ( ( links.item( i ).href.indexOf( 'javascript:' ) !== 0 ) && 
-					(links.item( i ).href.indexOf(anchor_pattern) !== 0) ) //se não for âncora
+					(links.item( i ).href.indexOf(anchor_pattern) !== 0) ) //se nï¿½o for ï¿½ncora
 						links.item( i ).setAttribute( 'target', '_blank' );
 			}
 		}catch(e){
@@ -2510,7 +2418,7 @@ function draw_new_message(border_ID){
 	}
 	td_to.appendChild(input_to);
 
-	var forwarded_local_message = document.createElement("INPUT"); //Hidden para indicar se é um forward de uma mensagem local
+	var forwarded_local_message = document.createElement("INPUT"); //Hidden para indicar se ï¿½ um forward de uma mensagem local
 	forwarded_local_message.id = "is_local_forward"+ID;
 	forwarded_local_message.name = "is_local_forward";
 	forwarded_local_message.type = "HIDDEN";
@@ -3204,7 +3112,7 @@ function draw_search(headers_msgs){
 
 	var tbody = Element('tbody_box');
 	for (var i=0; i<(headers_msgs.length); i++){
-            // passa parâmetro offset
+            // passa parï¿½metro offset
 		var tr = this.make_tr_message(headers_msgs[i], headers_msgs[i].msg_folder);
 		if (tr)
 			tbody.appendChild(tr);
@@ -3423,8 +3331,8 @@ function show_div_address_full(id, type) {
 		var isOverLimit = (_address.length > 100);
 
 		if(isOverLimit) {
-			alert("Esse campo possui muitos endereços ("+_address.length+" destinatários).\r\n"+
-			"Para evitar o travamento do navegador, o botão 'Adicionar Contato' foi desabilitado!");
+			alert("Esse campo possui muitos endereï¿½os ("+_address.length+" destinatï¿½rios).\r\n"+
+			"Para evitar o travamento do navegador, o botï¿½o 'Adicionar Contato' foi desabilitado!");
 		}
 
 		for(var idx = 1 ; idx  < _address.length;idx++) {
