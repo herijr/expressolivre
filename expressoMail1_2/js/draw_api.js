@@ -1941,7 +1941,14 @@ function draw_message(info_msg, ID){
 
 		var quoteprt = function( str ) { return '"'+str.replace( /"/g,'\\\"' )+'"'; };
 
-		var domainBlocked = function( img_tag, domains ) {
+		var testDomain = function( url ) {
+			url = url.replace( /.*\/\//, '' ).replace( /\/.*/, '' );
+			for ( var i = 0; i < domains.length; i++ )
+				if ( url.match( domains[i] ) ) return false;
+			return url;
+		};
+
+		var domainBlocked = function( img_tag ) {
 
 			var delim = img_tag.toLowerCase().match( /src=\\?(['"])?/i );
 			delim = ( delim && delim[1] )? delim[1] : ' ';
@@ -1950,7 +1957,7 @@ function draw_message(info_msg, ID){
 
 			var img_src = img_tag.match( new RegExp( 'src=['+delim+']?([^'+delim+']*)', 'i' ) );
 			img_src = ( img_src && img_src[1] )? img_src[1].replace( /§/g, delim ) : false;
-			if ( !img_src ) return lang( 'unknown' );
+			if ( !img_src ) return get_lang( 'unknown' );
 
 			if ( img_src.search( /^.\/inc\/show_embedded_attach\.php/ ) == 0 ) return false;
 
@@ -1960,9 +1967,7 @@ function draw_message(info_msg, ID){
 			if ( img_scheme[1] == 'cid' && img_scheme[2] && img_scheme[2].search( /^[\w.@_*#$-]+$/ ) >= 0 )return false;
 
 			if ( img_scheme[1].search(/https?/i) >= 0 && img_scheme[2] ) {
-				for ( var i = 0; i < domains.length; i++ )
-					if ( img_scheme[2].replace( /\/.*/, '' ).match( domains[i] ) ) return false;
-				return img_scheme[2].replace( /\/.*/, '' );
+				return testDomain( img_scheme[2] );
 			}
 
 			if ( img_scheme[1] == 'data' && img_scheme[2] )
@@ -1971,9 +1976,17 @@ function draw_message(info_msg, ID){
 			return quoteprt( img_src.substring( 0, 25 ) );
 		};
 
+		var checkDomain = function( img_tag ) {
+			var domain, domain_result;
+			if ( ( domain = img_tag.toLowerCase().match( /(https?:)?\/\/[^/?'" )]*/g ) ) && domain.length )
+				for ( var k = 0; k < domain.length; k++ )
+					if ( !( domain_result = testDomain( domain[k] ) ) ) return domain_result;
+			return domainBlocked( img_tag );
+		};
+
 		var blocked = [];
 		for ( var j = 0; j < imgTag.length; j++ ) {
-			var domain = domainBlocked( imgTag[j], domains );
+			var domain = checkDomain( imgTag[j] );
 			if ( domain ) {
 				newBody = newBody.replace( imgTag[j], "<img src='templates/"+template+"/images/forbidden.jpg'>" );
 				blocked.push( domain );
