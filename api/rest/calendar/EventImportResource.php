@@ -23,9 +23,9 @@ class EventImportResource extends CatalogAdapter {
 			$hashEvent = trim(preg_replace("/[^a-z0-9A-Z]/", "", $hashEvent));
 						
 			$db = NewADOConnection( DBDRIVER );
-			$db->pConnect( DBHOST, DBUSER , DBPASS, DBNAME );
-			$query = "SELECT * FROM phpgw_cal_invite WHERE hash = '".$hashEvent."' AND imported_at is null"; 
-		
+			$db->connect("host='".DBHOST."' port='".DBPORT."' user='".DBUSER."' password='".DBPASS."' dbname='".DBNAME."'");
+			$query = sprintf( "SELECT * FROM phpgw_cal_invite WHERE hash = '%s' AND imported_at is null", $hashEvent ); 
+					
 			$rsVCalendar = $db->Execute( $query )->getRows();
 			
 			if( is_array($rsVCalendar) && isset($rsVCalendar[0]['contents']) ){
