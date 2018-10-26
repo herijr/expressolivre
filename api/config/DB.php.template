@@ -1,7 +1,8 @@
-<?php 
+<?php
 
-defined("DBDRIVER")or define('DBDRIVER','pgsql');
-defined("DBHOST")or define('DBHOST','database.expresso');
-defined("DBNAME")or define('DBNAME','expresso');
-defined("DBUSER")or define('DBUSER','postgres');
-defined("DBPASS")or define('DBPASS','');
+defined("DBDRIVER") or define('DBDRIVER','pgsql');
+defined("DBHOST") or define('DBHOST','database.expresso');
+defined("DBPORT") or define('DBPORT','5432');
+defined("DBNAME") or define('DBNAME','expresso');
+defined("DBUSER") or define('DBUSER','postgres');
+defined("DBPASS") or define('DBPASS','');
