@@ -133,10 +133,8 @@
 	}
 
 	/* Securiting php sessions */
-	$connection_id = $GLOBALS['phpgw']->session->sessionid;
-	if (!strlen($connection_id) != 32){
-		include("header.session.inc.php");
-	}
+	$connection_id = isset( $GLOBALS['phpgw']->session->sessionid )? $GLOBALS['phpgw']->session->sessionid : false;
+	if ( $connection_id === false ) include_once( 'header.session.inc.php' );
 
 	/* Leave off the final php closing tag, some editors will add a \n or space after which will mess up cookies later on */
 	<!-- BEGIN domain -->
