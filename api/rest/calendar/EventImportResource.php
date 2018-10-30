@@ -24,7 +24,7 @@ class EventImportResource extends CatalogAdapter {
 						
 			$db = NewADOConnection( DBDRIVER );
 			$db->connect("host='".DBHOST."' port='".DBPORT."' user='".DBUSER."' password='".DBPASS."' dbname='".DBNAME."'");
-			$query = sprintf( "SELECT * FROM phpgw_cal_invite WHERE hash = '%s' AND imported_at is null", $hashEvent ); 
+			$query = sprintf( "SELECT * FROM phpgw_cal_invite WHERE hash = '%s' AND imported_at is null", pg_escape_string($hashEvent) ); 
 					
 			$rsVCalendar = $db->Execute( $query )->getRows();
 			
