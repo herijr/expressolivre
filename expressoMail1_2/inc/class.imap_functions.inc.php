@@ -1756,8 +1756,8 @@ class imap_functions
 				while ( ( $line = fgets( $socket ) ) && ord( $line[0] ) === 42 )
 					$folders[] = rtrim( array_pop( explode( ' ', $line, 5 ) ) );
 				$folders = array_diff( $folders, array(
-					'INBOX/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
-					'INBOX/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpam'],
+					'INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
+					'INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpam'],
 				) );
 				break;
 		}
@@ -3011,7 +3011,7 @@ class imap_functions
 		$folder = trim($folder);
 		
 		// End Fix.
-		if(strtoupper($folder) === 'INBOX/DRAFTS'){ $mail->SaveMessageAsDraft = $folder; }
+		if(strtoupper($folder) === 'INBOX'.$this->imap_delimiter.'DRAFTS'){ $mail->SaveMessageAsDraft = $folder; }
 
 		$mail->SaveMessageInFolder = $folder;
 		$mail->SMTPDebug = false;
