@@ -2064,7 +2064,7 @@ function draw_message(info_msg, ID){
 			.css('margin','10px 5px 5px 2px')
 			.css('border','1px solid #eff0f1')
 			.css("height","140px")
-			.css("width", "350px")
+			.css("width", "400px")
 			.css("font-size","11pt")
 			.css("color", "black")
 			.css("background-color","#eff0f1")
