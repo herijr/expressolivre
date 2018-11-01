@@ -1012,7 +1012,10 @@
 
 			$l_cal = (@isset($params['cal']) && $params['cal']?$params['cal']:$_POST['cal']);
 			$l_participants = (@$params['participants']?$params['participants']:$_POST['participants']);
+			
 			$this->ex_participants = (@$params['ex_participants']?$params['ex_participants']:$_POST['ex_participants']);
+			$this->ex_participants = implode(", ", array_map( "trim", explode(",", $this->ex_participants )));
+			
 			$l_categories = (@$params['categories']?$params['categories']:$_POST['categories']);
 			$l_start = (@isset($params['start']) && $params['start']?$params['start']:$_POST['start']);
 			$l_end = (@isset($params['end']) && $params['end']?$params['end']:$_POST['end']);
