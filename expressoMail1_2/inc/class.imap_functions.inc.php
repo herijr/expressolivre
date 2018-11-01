@@ -154,7 +154,7 @@ class imap_functions
 		
 		$return['folder'] = $folder;
 		
-		//Para enviar o offset entre o timezone definido pelo usuï¿½rio e GMT
+		//Para enviar o offset entre o timezone definido pelo usuário e GMT
 		$return['offsetToGMT'] = $this->functions->CalculateDateOffset();
 		
 		if(!$search_box_type || $search_box_type=="UNSEEN" || $search_box_type=="SEEN") {
@@ -224,20 +224,20 @@ class imap_functions
 		$imap_attachment = new imap_attachment();
 		//if ($this->prefs['use_important_flag'] )
 		//{
-			/*Como eu preciso do atributo Importance para saber se o email ï¿½
-			 * importante ou nï¿½o, uso abaixo a funï¿½ï¿½o imap_fetchheader e busco
-			 * o atributo importance nela. Isso faz com que eu acesse o cabeï¿½alho
+			/*Como eu preciso do atributo Importance para saber se o email é
+			 * importante ou não, uso abaixo a função imap_fetchheader e busco
+			 * o atributo importance nela. Isso faz com que eu acesse o cabeçalho
 			 * duas vezes e de duas formas diferentes, mas em contrapartida, eu
-			 * nï¿½o preciso reimplementar o mï¿½todo utilizando o fetchheader.
-			 * Como as mensagens sï¿½o renderizadas em um nï¿½mero pequeno por vez,
-			 * nï¿½o parece ter perda considerï¿½vel de performance.
+			 * não preciso reimplementar o método utilizando o fetchheader.
+			 * Como as mensagens são renderizadas em um número pequeno por vez,
+			 * não parece ter perda considerável de performance.
 			 */
 
 			$tempHeader = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
 			$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
                 //}
-                // Reimplementado cï¿½digo para identificaï¿½ï¿½o dos e-mails assinados e cifrados
-                // no mï¿½todo getMessageType(). Mï¿½rio Cï¿½sar Kolling <mario.kolling@serpro.gov.br>
+                // Reimplementado código para identificação dos e-mails assinados e cifrados
+                // no método getMessageType(). Mário César Kolling <mario.kolling@serpro.gov.br>
                 $head_array['ContentType'] = $this->getMessageType($msg_number, $tempHeader);
                 $head_array['Importance'] = $flag==0?"Normal":$importance[1];
 
@@ -284,7 +284,7 @@ class imap_functions
 			$head_array['from']['name'] = $head_array['from']['email'];
 		$to = (isset($header->to) ? $header->to : false);
 		$head_array['to'] = array();
-		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que nï¿½o possuem o campo "para", vï¿½m com o recipiente preenchido, porï¿½m com um recipiente a mais alegando erro de sintaxe.
+		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que não possuem o campo "para", vêm com o recipiente preenchido, porém com um recipiente a mais alegando erro de sintaxe.
 			$head_array['to']['name'] = $head_array['to']['email'] = NULL;
 		}
 		else {
@@ -359,8 +359,8 @@ class imap_functions
 			return $this->htmlspecialchars_encode($string);
 	}
 	/**
-	* Funï¿½ï¿½o que importa arquivos .eml exportados pelo expresso para a caixa do usuï¿½rio. Testado apenas
-	* com .emls gerados pelo expresso, e o arquivo pode ser um zip contendo vï¿½rios emls ou um .eml.
+	* Função que importa arquivos .eml exportados pelo expresso para a caixa do usuário. Testado apenas
+	* com .emls gerados pelo expresso, e o arquivo pode ser um zip contendo vários emls ou um .eml.
 	*/
 	function import_msgs($params) {
 		if(!$this->mbox)
@@ -451,9 +451,9 @@ class imap_functions
 		}
 	}
         /*
-		Remove os anexos de uma mensagem. A estratï¿½gia para isso ï¿½ criar uma mensagem nova sem os anexos, mantendo apenas
-		a primeira parte do e-mail, que ï¿½ o texto, sem anexos.
-		O mï¿½todo considera que o email ï¿½ multpart.
+		Remove os anexos de uma mensagem. A estratégia para isso é criar uma mensagem nova sem os anexos, mantendo apenas
+		a primeira parte do e-mail, que é o texto, sem anexos.
+		O método considera que o email é multpart.
 	*/
 	function remove_attachments($params) {
 		include_once("class.message_components.inc.php");
@@ -463,7 +463,7 @@ class imap_functions
 		$header = "";
 
 		$headertemp = explode("\n",imap_fetchheader($this->mbox, imap_msgno($this->mbox, $params["msg_num"])));
-		foreach($headertemp as $head) {//Se eu colocar todo o header do email dï¿½ pau no append, entï¿½o procuro apenas o que interessa.
+		foreach($headertemp as $head) {//Se eu colocar todo o header do email dá pau no append, então procuro apenas o que interessa.
 			$head1 = explode(":",$head);
 			if ( (strtoupper($head1[0]) == "TO") ||
 					(strtoupper($head1[0]) == "FROM") ||
@@ -473,9 +473,9 @@ class imap_functions
 		}
 
 		$msg = new message_components($this->mbox);
-		$msg->fetch_structure($params["msg_num"]);/* O fetchbody tava trazendo o email com problemas na acentuaï¿½ï¿½o.
-							     Entï¿½o uso essa classe para verificar a codificaï¿½ï¿½o e o charset,
-							     para que o mï¿½todo decodeBody do expresso possa trazer tudo certinho*/
+		$msg->fetch_structure($params["msg_num"]);/* O fetchbody tava trazendo o email com problemas na acentuação.
+							     Então uso essa classe para verificar a codificação e o charset,
+							     para que o método decodeBody do expresso possa trazer tudo certinho*/
 
 		$all_body_type = strtolower($msg->file_type[$params["msg_num"]][0]);
 		$all_body_encoding = $msg->encoding[$params["msg_num"]][0];
@@ -513,7 +513,7 @@ class imap_functions
 								$all_body_encoding, $all_body_charset
 								)
 						)
-						, "\\Seen"); //Append do novo email, sï¿½ com header e conteï¿½do sem anexos.			
+						, "\\Seen"); //Append do novo email, só com header e conteúdo sem anexos.			
 		}else{	
 			$status = imap_append($this->mbox,
 					"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$params["folder"],
@@ -528,7 +528,7 @@ class imap_functions
 								$all_body_encoding, $all_body_charset
 								)
 						)
-						, "\\Seen"); //Append do novo email, sï¿½ com header e conteï¿½do sem anexos.
+						, "\\Seen"); //Append do novo email, só com header e conteúdo sem anexos.
 		}
 
 		if(!$status)
@@ -598,7 +598,7 @@ class imap_functions
 			//ini_set("display_errors","1");
 			$msg_info = $this->get_info_msg($new_params);
 
-			$this->mbox = $this->open_mbox($params['folder']); //Nï¿½o sei porque, mas se nï¿½o abrir de novo a caixa dï¿½ erro.
+			$this->mbox = $this->open_mbox($params['folder']); //Não sei porque, mas se não abrir de novo a caixa dá erro.
 			$msg_info['header'] = $this->get_info_head_msg($msg_number);
 
 			$attach_params["num_msg"] = $msg_number;
@@ -974,44 +974,46 @@ class imap_functions
 		$msg->fetch_structure($msg_number);
 		$vCalImported = false;
 		$return = array();
-		$return['attachments'] = $this->download_attachment($msg, $msg_number);
-
-		if (is_array($return['attachments']) && count($return['attachments']) > 0) {
-			foreach ($return['attachments'] as $attached) {
-				if (isset($attached['name'])) {
-					if (preg_match("/([^\s]+(\.(?i)(ics|vcard))$)/i", $attached['name'])) {
+		$return['attachments'] = $this->download_attachment($msg,$msg_number);
+		
+		if( is_array($return['attachments']) && count($return['attachments']) > 0 ){
+			foreach($return['attachments'] as $attached ){
+				if( isset($attached['name']) ){
+					if( preg_match( "/([^\s]+(\.(?i)(ics|vcard))$)/i", $attached['name'] ) ){
 						$fileContent = base64_decode(imap_fetchbody($this->mbox, $msg_number, $attached['pid'], FT_UID));
-						if (!$vCalImported) {
-							$return['hash_vcalendar'] = $db->import_vcard($fileContent, $msg_number);
+						if( !$vCalImported ){
+							$return['hash_vcalendar'] = $db->import_vcard( $fileContent, $msg_number );
 							$vCalImported = true;
 						}
 					}
 				}
 			}
 		}
-
-		if (!$this->has_cid) {
-			$return['thumbs'] = $this->get_thumbs($msg, $msg_number, $msg_folder);
-			$return['signature'] = $this->get_signature($msg, $msg_number, $msg_folder);
+		
+		if(!$this->has_cid)
+		{
+			$return['thumbs']  = $this->get_thumbs($msg,$msg_number,$msg_folder);
+			$return['signature'] = $this->get_signature($msg,$msg_number,$msg_folder);
 		}
 
-		if (!isset($msg->structure[$msg_number]->parts)) //Simple message, only 1 piece
+		if(!isset($msg->structure[$msg_number]->parts)) //Simple message, only 1 piece
 		{
-			$is_pkcs7 = preg_match('/^(?:x-|)pkcs7-mime$/', strtolower($msg->structure[$msg_number]->subtype));
-
-			if ($is_pkcs7 && (count($return['signature']) == 0)) {
-				$return['body'] = 'isCripted';
+			$is_pkcs7 = preg_match( '/^(?:x-|)pkcs7-mime$/', strtolower( $msg->structure[$msg_number]->subtype ) );
+			
+			if( $is_pkcs7 && (count($return['signature']) == 0 ) ){
+				$return['body']='isCripted';
 				return $return;
 			}
-
+			
 			$attachment = array(); //No attachments
-
-			if ($is_pkcs7) {
-				$return['body'] = 'isSigned';
+			
+			if ( $is_pkcs7 )
+			{
+				$return['body']='isSigned';
 				$headers = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
 				$header_body_array = explode('MIME-Version: 1.0', $headers);
-				$show_pkcs7 = $header_body_array[0] . 'MIME-Version: 1.0' . chr(0x0D) . chr(0x0A) . $return['signature'][0];
-				$return['source'] = $show_pkcs7;
+				$show_pkcs7 = $header_body_array[0] . 'MIME-Version: 1.0' . chr(0x0D) .chr(0x0A). $return['signature'][0];
+				$return['source']=$show_pkcs7;
 				array_shift($return['signature']);
 				$return['signature'];
 				//$return['signature'] = $this->get_signature($msg,$msg_number,$msg_folder);
@@ -1021,27 +1023,30 @@ class imap_functions
 
 			$content = ''; 
 			// If simple message is subtype 'html' or 'plain', then get content body. 
-			if (strtolower($msg->structure[$msg_number]->subtype) == "html" ||
-				strtolower($msg->structure[$msg_number]->subtype) == 'plain') {
+			if(strtolower($msg->structure[$msg_number]->subtype) == "html" ||  
+				strtolower( $msg -> structure[ $msg_number ] -> subtype ) == 'plain'){ 
 
-				$content = $this->decodeBody(
-					imap_body($this->mbox, $msg_number, FT_UID),
-					$msg->encoding[$msg_number][0],
-					$msg->charset[$msg_number][0]
-				);
+					$content = $this->decodeBody( 
+						imap_body( $this -> mbox, $msg_number, FT_UID ), 
+						$msg->encoding[$msg_number][0], 
+						$msg->charset[$msg_number][0] 
+					); 
 
-				if (strtolower($msg->structure[$msg_number]->subtype) == 'plain') {
-					$content = str_replace(array('<', '>'), array(' #$<$# ', ' #$>$# '), $content);
-					$content = htmlentities($content);
-					$content = $this->replace_links($content);
-					$content = str_replace(array(' #$&lt;$# ', ' #$&gt;$# '), array('&lt;', '&gt;'), $content);
-					$content = '<pre>' . $content . '</pre>';
-					$content = str_replace("\x00", '', $content);
-					$return['body'] = $content;
-					return $return;
+					if ( strtolower( $msg -> structure[ $msg_number ] -> subtype ) == 'plain' ) 
+					{ 
+						$content = str_replace( array( '<', '>' ), array( ' #$<$# ', ' #$>$# ' ), $content ); 
+						$content = htmlentities( $content ); 
+						$content = $this -> replace_links( $content ); 
+						$content = str_replace( array( ' #$&lt;$# ', ' #$&gt;$# ' ), array( '&lt;', '&gt;' ), $content ); 
+						$content = '<pre>' . $content . '</pre>'; 
+						$content = str_replace("\x00", '', $content);
+						$return[ 'body' ] = $content;
+						return $return; 
+					} 
 				}
-			}
-		} else { 
+		}
+		else
+		{ 
 			//Complicated message, multiple parts
 			$html_body = '';
 			$content = '';
@@ -1050,227 +1055,236 @@ class imap_functions
 			$this->has_cid = false;
 			$alternative_content = '';
 			array_shift($return['signature']);
-			if (strtolower($msg->structure[$msg_number]->subtype) == "related") {
+			if (strtolower($msg->structure[$msg_number]->subtype) == "related"){
 				$this->has_cid = true;
 			}
 
 			$show_only_html = false;
 			if (strtolower($msg->structure[$msg_number]->subtype) == "alternative") {
 				$is_alternative = true;
-				foreach ($msg->pid[$msg_number] as $values => $msg_part) {
+				foreach($msg->pid[$msg_number] as $values => $msg_part) {
 					$file_type = strtolower($msg->file_type[$msg_number][$values]);
-					if ($file_type == "text/html") {
-						$show_only_html = true;
+					if($file_type == "text/html"){ 
+						$show_only_html = true; 
 					}
 				}
 			}
 
-			foreach ($msg->pid[$msg_number] as $values => $msg_part) {
+			foreach($msg->pid[$msg_number] as $values => $msg_part)
+			{
 				$file_type = strtolower($msg->file_type[$msg_number][$values]);
-
-				if ($file_type == "message/rfc822" || $file_type == "multipart/alternative") { 
+				
+				if($file_type == "message/rfc822" || $file_type == "multipart/alternative") 
+				{ 
 					// Show only 'text/html' part, when message/rfc822 format contains 'text/plain' alternative part. 
-					if (array_key_exists($values + 1, $msg->file_type[$msg_number]) &&
-						strtolower($msg->file_type[$msg_number][$values + 1]) == 'text/plain' &&
-						array_key_exists($values + 2, $msg->file_type[$msg_number]) &&
-						strtolower($msg->file_type[$msg_number][$values + 2]) == 'text/html') {
-						$has_multipart = false;
-					}
-				}
-
-				if ($file_type !== 'attachment') {
+					if(array_key_exists($values+1, $msg->file_type[$msg_number]) && 
+						strtolower($msg->file_type[$msg_number][$values+1]) == 'text/plain' && 
+						array_key_exists($values+2, $msg->file_type[$msg_number]) && 
+						strtolower($msg->file_type[$msg_number][$values+2]) == 'text/html') { 
+							$has_multipart = false; 
+						} 
+				} 	
+				
+				if( $file_type !== 'attachment')
+				{
 					$max_size = ($this->prefs['max_msg_size'] == "1") ? 1048576 : 102400;
-					if ($file_type == "text/plain" && !$show_only_html && $has_multipart) {
+					if($file_type == "text/plain" && !$show_only_html && $has_multipart)
+					{
 						// if TXT file size > 100kb, then it will not expand.
-						if (!($file_type == "text/plain" && $msg->fsize[$msg_number][$values] > $max_size)) {
-							$content .= htmlentities($this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]));
+						if(!($file_type == "text/plain" && $msg->fsize[$msg_number][$values] > $max_size)) {
+							$content .= htmlentities($this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values])); 
 							$content = '<pre>' . $content . '</pre>';
 						}
 					}
 					// if HTML attachment file size > 300kb, then it will not expand.
-					else if ($file_type == "text/html" && $msg->fsize[$msg_number][$values] < $max_size * 3) {
-						if ($is_alternative) {
+					else if($file_type == "text/html"  && $msg->fsize[$msg_number][$values] < $max_size * 3 )
+					{
+						if( $is_alternative ){
 							$alternative_content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
 						} else {
 							$content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
 							$show_only_html = true;
 						}
-					}
+					} 
 
-					if ($file_type == "text/calendar" && $msg->fsize[$msg_number][$values] < $max_size * 3) {
+					if( $file_type == "text/calendar" && $msg->fsize[$msg_number][$values] < $max_size * 3 ){ 
 
-						if (!$vCalImported) {
+						if( !$vCalImported ){
 
 							$vcalendar = $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
 
-							$cal = Sabre\VObject\Reader::read($vcalendar, 0, 'ISO-8859-1');
+							$cal = Sabre\VObject\Reader::read($vcalendar,0, 'ISO-8859-1');
 
-							$event = current($cal->select('VEVENT'));
+							$event = current( $cal->select('VEVENT') );
 
 							$content = '<div style="padding:2px 3px; margin:6px 2px 10px 2px; width:80%;font-family:Arial,Sans-serif;background-color:#fff;font-size:12px">';
 							$content .= '<div style="margin:10px 0px">';
-							$content .= '<span style="font-weight:bold;">' . $event->SUMMARY . '</span>';
+							$content .= '<span style="font-weight:bold;">'.$event->SUMMARY.'</span>';
 							$content .= '</div>';
 
-							if (isset($event->ORGANIZER)) {
+							if(isset($event->ORGANIZER)){
 								$content .= "<div style='margin:5px 0px'>";
-								$content .= "<span style='font-weight:bold'>" . $this->functions->getLang("organizer") . " </span> " . (isset($event->ORGANIZER['CN']) ? $event->ORGANIZER['CN'] : "") . " ( " . preg_replace("/mailto:/i", "", $event->ORGANIZER) . " )";
+								$content .= "<span style='font-weight:bold'>".$this->functions->getLang("organizer")." </span> " . ( isset($event->ORGANIZER['CN']) ? $event->ORGANIZER['CN'] : "") . " ( " . preg_replace("/mailto:/i", "",$event->ORGANIZER ) . " )";
 								$content .= "</div>";
 							}
-
-							if (isset($event->ATTENDEE)) {
+						
+							if(isset($event->ATTENDEE)){
 								$content .= '<div style="margin:10px 0px;font-size:13px">';
-								$content .= "<span style='font-weight:bold'>" . $this->functions->getLang("attendees") . "</span><br>";
-								foreach ($event->ATTENDEE as $attendee) {
-									if (isset($attendee['CN']))
-										$content .= " - " . $attendee['CN'] . " ( " . preg_replace("/mailto:/i", "", $attendee) . " ) <br>";
+								$content .= "<span style='font-weight:bold'>".$this->functions->getLang("attendees")."</span><br>";
+								foreach($event->ATTENDEE as $attendee ){
+									if(isset($attendee['CN']))
+										$content .= " - " .$attendee['CN'] . " ( " . preg_replace("/mailto:/i", "", $attendee) . " ) <br>";
 								}
 								$content .= "</div>";
 							}
-
+						
 							$dtStart = null;
 							$dtEnd = null;
-
-							$dateStart = $event->DTSTART . '';//get date from ical
-							if (preg_match('/Z/', $dateStart)) {
+							
+							$dateStart = $event->DTSTART.'';//get date from ical
+							if( preg_match('/Z/',$dateStart) ){
 								$dateStart = str_replace('T', '', $dateStart);//remove T
 								$dateStart = str_replace('Z', '', $dateStart);//remove Z
-								$d = date('d', strtotime($dateStart));//get date day
-								$m = date('m', strtotime($dateStart));//get date month
-								$y = date('Y', strtotime($dateStart));//get date year
+								$d    = date('d', strtotime($dateStart));//get date day
+								$m    = date('m', strtotime($dateStart));//get date month
+								$y    = date('Y', strtotime($dateStart));//get date year
 								$now = date('Y-m-d G:i:s');//current date and time
 								$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
-								$dtStart = new DateTime($eventdate);
+								$dtStart = new DateTime( $eventdate );
 								$dtStart->sub(new DateInterval('PT3H'));
 							} else {
 								$dateStart = str_replace('T', '', $dateStart);//remove T
-								$d = date('d', strtotime($dateStart));//get date day
-								$m = date('m', strtotime($dateStart));//get date month
-								$y = date('Y', strtotime($dateStart));//get date year
+								$d    = date('d', strtotime($dateStart));//get date day
+								$m    = date('m', strtotime($dateStart));//get date month
+								$y    = date('Y', strtotime($dateStart));//get date year
 								$now = date('Y-m-d G:i:s');//current date and time
 								$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
-								$dtStart = new DateTime($eventdate);
+								$dtStart = new DateTime( $eventdate );
 							}
 
-							$dateEnd = $event->DTEND . '';//get date from ical
-							if (preg_match('/Z/', $dateEnd)) {
+							$dateEnd = $event->DTEND.'';//get date from ical
+							if( preg_match('/Z/',$dateEnd) ){
 								$dateEnd = str_replace('T', '', $dateEnd);//remove T
 								$dateEnd = str_replace('Z', '', $dateEnd);//remove Z
-								$d = date('d', strtotime($dateEnd));//get date day
-								$m = date('m', strtotime($dateEnd));//get date month
-								$y = date('Y', strtotime($dateEnd));//get date year
+								$d    = date('d', strtotime($dateEnd));//get date day
+								$m    = date('m', strtotime($dateEnd));//get date month
+								$y    = date('Y', strtotime($dateEnd));//get date year
 								$now = date('Y-m-d G:i:s');//current date and time
 								$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
-								$dtEnd = new DateTime($eventdate);
+								$dtEnd = new DateTime( $eventdate );
 								$dtEnd->sub(new DateInterval('PT3H'));
 							} else {
 								$dateEnd = str_replace('T', '', $dateEnd);//remove T
-								$d = date('d', strtotime($dateEnd));//get date day
-								$m = date('m', strtotime($dateEnd));//get date month
-								$y = date('Y', strtotime($dateEnd));//get date year
+								$d    = date('d', strtotime($dateEnd));//get date day
+								$m    = date('m', strtotime($dateEnd));//get date month
+								$y    = date('Y', strtotime($dateEnd));//get date year
 								$now = date('Y-m-d G:i:s');//current date and time
 								$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
-								$dtEnd = new DateTime($eventdate);
+								$dtEnd = new DateTime( $eventdate );
 							}
 
-							if (isset($event->LOCATION) && trim($event->LOCATION) !== "") {
-								$content .= '<div style="padding:5px 2px;"><span style="font-weight:bold;">' . $this->functions->getLang("location") . ' :</b> ' . $event->LOCATION . '</div>';
+							if( isset($event->LOCATION) && trim($event->LOCATION) !== "" ){
+								$content .= '<div style="padding:5px 2px;"><span style="font-weight:bold;">'.$this->functions->getLang("location").' :</b> ' . $event->LOCATION . '</div>';
 							}
-							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">' . $this->functions->getLang("start time") . ' </b> : ' . date("d/m/Y - H:m", $dtStart->getTimestamp()) . '</div>';
-							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">' . $this->functions->getLang("end time") . ' </b> : ' . date("d/m/Y - H:m", $dtEnd->getTimestamp()) . "</div>";
+							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">'.$this->functions->getLang("start time").' </b> : ' . date("d/m/Y - H:m", $dtStart->getTimestamp() ) . '</div>';
+							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">'.$this->functions->getLang("end time").' </b> : ' . date("d/m/Y - H:m", $dtEnd->getTimestamp() ) . "</div>";
 							$content .= "</div>";
-							$return['hash_vcalendar'] = $db->import_vcard($vcalendar, $msg_number);
+							$return['hash_vcalendar'] = $db->import_vcard( $vcalendar, $msg_number );
 							$vCalImported = true;
 						}
 					}
-				} else if ($file_type == "message/delivery-status" || $file_type == "message/feedback-report") {
-
+				} else if($file_type == "message/delivery-status" || $file_type == "message/feedback-report") { 
+					
 					$content .= "<hr align='left' width='95%' style='border:1px solid #DCDCDC'>";
-					$content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
-					$content = '<pre>' . $content . '</pre>';
-
-				} else if ($file_type == "message/rfc822" || $file_type == "text/rfc822-headers") {
+					$content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]); 
+          $content = '<pre>' . $content . '</pre>'; 
+					
+				} else if($file_type == "message/rfc822" || $file_type == "text/rfc822-headers") {
 
 					include_once("class.imap_attachment.inc.php");
 					$att = new imap_attachment();
-					$attachments = $att->get_attachment_info($this->mbox, $msg_number);
-					if ($attachments['number_attachments'] > 0) {
-						foreach ($attachments['attachment'] as $index => $attachment) {
-							if (in_array(strtolower($attachment['type']), array('delivery-status', 'rfc822', 'rfc822-headers', 'plain'))) {
-								$obj = imap_rfc822_parse_headers(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values]);
+					$attachments =  $att->get_attachment_info($this->mbox,$msg_number);
+					if($attachments['number_attachments'] > 0) { 
+						foreach($attachments ['attachment'] as $index => $attachment) 
+						{ 
+							if ( in_array( strtolower( $attachment[ 'type' ] ), array( 'delivery-status', 'rfc822', 'rfc822-headers', 'plain' ) ) ) 
+							{ 
+								$obj = imap_rfc822_parse_headers( imap_fetchbody( $this -> mbox, $msg_number, $msg_part, FT_UID ), $msg -> encoding[ $msg_number ][ $values ] ); 
 
-								$content .= '<hr align="left" width="95%" style="border:1px solid #DCDCDC">';
-								$content .= '<br><table  style="margin:2px;border:1px solid black;background:#EAEAEA">';
+								$content .= '<hr align="left" width="95%" style="border:1px solid #DCDCDC">'; 
+								$content .= '<br><table  style="margin:2px;border:1px solid black;background:#EAEAEA">'; 
 
-								$content .= '<tr><td><b>' . $this->functions->getLang("Subject")
-									. ':</b></td><td>' . $this->decode_string($obj->subject) . '</td></tr>';
+								$content .= '<tr><td><b>' . $this->functions->getLang("Subject") 
+									. ':</b></td><td>' .$this->decode_string($obj->subject) . '</td></tr>'; 
 
-								$content .= '<tr><td><b>' . $this->functions->getLang('From') . ':</b></td><td>'
-									. $this->replace_links($this->decode_string($obj->from[0]->mailbox . '@' . $obj->from[0]->host))
-									. '</td></tr>';
+								$content .= '<tr><td><b>' . $this -> functions -> getLang( 'From' ) . ':</b></td><td>' 
+									. $this -> replace_links( $this -> decode_string( $obj -> from[ 0 ] -> mailbox . '@' . $obj -> from[ 0 ] -> host) ) 
+									. '</td></tr>'; 
 
-								$content .= '<tr><td><b>' . $this->functions->getLang("Date") . ':</b></td><td>' . $obj->date . '</td></tr>';
+								$content .= '<tr><td><b>' . $this->functions->getLang("Date") . ':</b></td><td>' . $obj->date . '</td></tr>'; 
 
-								$content .= '<tr><td><b>' . $this->functions->getLang('TO') . ':</b></td><td>'
-									. $this->replace_links($this->decode_string($obj->to[0]->mailbox . '@' . $obj->to[0]->host))
-									. '</td></tr>';
+								$content .= '<tr><td><b>' . $this -> functions -> getLang( 'TO' ) . ':</b></td><td>' 
+									. $this -> replace_links( $this -> decode_string( $obj -> to[ 0 ] -> mailbox . '@' . $obj -> to[ 0 ] -> host ) ) 
+									. '</td></tr>'; 
 
-								if (isset($obj->cc) && $obj->cc) {
-									$content .= '<tr><td><b>' . $this->functions->getLang('CC') . ':</b></td><td>'
-										. $this->replace_links($this->decode_string($obj->cc[0]->mailbox . '@' . $obj->cc[0]->host))
+								if ( isset( $obj->cc ) && $obj->cc ) {
+									$content .= '<tr><td><b>' . $this -> functions -> getLang( 'CC' ) . ':</b></td><td>' 
+										. $this -> replace_links( $this -> decode_string( $obj -> cc[ 0 ] -> mailbox . '@' . $obj -> cc[ 0 ] -> host ) ) 
 										. '</td></tr>';
 								}
+										 
+								$content .= '</table><br>'; 
 
-								$content .= '</table><br>';
+								$id = ( ( strtolower( $attachment[ 'type' ] ) == 'delivery-status' ) ? false : true ); 
+								$is_plain = isset( $msg->structure[$msg_number]->parts[1]->parts[0]->subtype ) &&
+									strtolower( $msg->structure[$msg_number]->parts[1]->parts[0]->subtype ) == 'plain';
+								if ( $is_plain )
+								{ 
+									$id = !$id; 
+									if ( $msg->structure[$msg_number]->parts[1]->parts[0]->encoding == 4 ) 
+										$msg->encoding[ $msg_number ][ $values ] = 'quoted-printable'; 
+								} 
 
-								$id = ((strtolower($attachment['type']) == 'delivery-status') ? false : true);
-								$is_plain = isset($msg->structure[$msg_number]->parts[1]->parts[0]->subtype) &&
-									strtolower($msg->structure[$msg_number]->parts[1]->parts[0]->subtype) == 'plain';
-								if ($is_plain) {
-									$id = !$id;
-									if ($msg->structure[$msg_number]->parts[1]->parts[0]->encoding == 4)
-										$msg->encoding[$msg_number][$values] = 'quoted-printable';
-								}
-
-								$body = $this->decodeBody(
+								$body = $this->decodeBody( 
 									imap_fetchbody(
-										$this->mbox,
-										$msg_number,
-										($attachment['part_in_msg'] + (( int )$id)) . ".1",
-										FT_UID
-									),
-									$msg->encoding[$msg_number][$values],
-									$msg->charset[$msg_number][$values]
-								);
+										$this->mbox, 
+										$msg_number, 
+										( $attachment['part_in_msg'] + ( ( int ) $id ) ) . ".1", 
+										FT_UID 
+									), 
+									$msg->encoding[ $msg_number ][ $values ], 
+									$msg->charset[ $msg_number ][ $values ] 
+								); 
 
-								if ($is_plain) {
-									$body = str_replace(array('<', '>'), array(' #$<$# ', ' #$>$# '), $body);
-									$body = htmlentities($body);
-									$body = $this->replace_links($body);
-									$body = str_replace(array(' #$&lt;$# ', ' #$&gt;$# '), array('&lt;', '&gt;'), $body);
-									$body = '<pre>' . $body . '</pre>';
+								if ( $is_plain )  { 
+									$body = str_replace( array( '<', '>' ), array( ' #$<$# ', ' #$>$# ' ), $body ); 
+									$body = htmlentities( $body ); 
+									$body = $this -> replace_links( $body ); 
+									$body = str_replace( array( ' #$&lt;$# ', ' #$&gt;$# ' ), array( '&lt;', '&gt;' ), $body ); 
+									$body = '<pre>' . $body . '</pre>'; 
 								}
-								$content .= $body;
-								break;
+								$content .= $body; 
+								break; 
 							}
 						}
 					}
 				}
 			}
-			if ($is_alternative && !empty($alternative_content)) {
+			if ($is_alternative && !empty($alternative_content))
+			{
 				$content .= $alternative_content;
 			}
-			if ($file_type == "text/plain" && ($show_only_html && $msg_part == 1) || (!$show_only_html && $msg_part == 3)) {
-				if (strtolower($msg->structure[$msg_number]->subtype) == "mixed" && $msg_part == 1)
+			if($file_type == "text/plain" && ($show_only_html &&  $msg_part == 1) ||  (!$show_only_html &&  $msg_part == 3)){
+				if(strtolower($msg->structure[$msg_number]->subtype) == "mixed" &&  $msg_part == 1)
 					$content .= nl2br(imap_base64(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID)));
-				else if (!strtolower($msg->structure[$msg_number]->subtype) == "mixed")
+				else if(!strtolower($msg->structure[$msg_number]->subtype) == "mixed")
 					$content .= nl2br(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID));
 			}
 		}
 		// Force message with flag Seen (imap_fetchbody not works correctly)
 		$params = array('folder' => $msg_folder, "msgs_to_set" => $msg_number, "flag" => "seen");
 		$this->set_messages_flag($params);
-		$content = $this->process_embedded_images($msg, $msg_number, $content, $msg_folder);
+		$content = $this->process_embedded_images($msg,$msg_number,$content, $msg_folder);
 		$content = $this->replace_special_characters($content);
 
 		if (preg_match('/charset=(\'|\")?(utf8|utf-8)/i', $content)) {
@@ -1485,10 +1499,10 @@ class imap_functions
 
 		$body = $this-> replace_links($body);
 
-		//Remoï¿½ï¿½o de tags <span></span> para correï¿½ï¿½o de erro no firefox 
+		//Remoção de tags <span></span> para correção de erro no firefox 
 		$body = mb_eregi_replace("<span><span>","",$body); 
 		$body = mb_eregi_replace("</span></span>","",$body); 
-		//Correï¿½ï¿½o para compatibilizaï¿½ï¿½o com Outlook, ao visualizar a mensagem 
+		//Correção para compatibilização com Outlook, ao visualizar a mensagem 
 		$body = mb_ereg_replace('<!--\[','<!-- [',$body); 
 		$body = mb_ereg_replace('&lt;!\[endif\]--&gt;', '<![endif]-->', $body);
 		$body = str_replace("\x00", '', $body);
@@ -1548,7 +1562,7 @@ class imap_functions
 		$body = preg_replace_callback( $pattern, $replace, $body ); 
 		 */ 
 
-		// PHP 5.2.x - Remover assim que possï¿½vel 
+		// PHP 5.2.x - Remover assim que possível 
 		$body = preg_replace_callback( $pattern, 
 			create_function( 
 				'$matches', 
@@ -1654,7 +1668,7 @@ class imap_functions
 
                             $this->db = new db_functions();
                             
-                            // TODO: testar se existe um certificado no banco e verificar qual ï¿½ o mais atual.
+                            // TODO: testar se existe um certificado no banco e verificar qual é o mais atual.
                             if(!$certificado->dados['EXPIRADO'] && !$certificado->dados['REVOGADO'] && count($certificado->erros_ssl) < 1)
                                 $this->db->insert_certificate(strtolower($certificado->dados['EMAIL']), $certificado->cert_assinante, $certificado->dados['SERIALNUMBER'], $certificado->dados['AUTHORITYKEYIDENTIFIER']);
 			}
@@ -1790,13 +1804,13 @@ class imap_functions
 		$i = 0;
 		foreach($msgs_to_exec as $msg_number)
 		{
-			/*A funï¿½ï¿½o imap_headerinfo nï¿½o traz o cabeï¿½alho completo, e sim alguns
-			* atributos do cabeï¿½alho. Como eu preciso do atributo Importance
-			* para saber se o email ï¿½ importante ou nï¿½o, uso abaixo a funï¿½ï¿½o
+			/*A função imap_headerinfo não traz o cabeçalho completo, e sim alguns
+			* atributos do cabeçalho. Como eu preciso do atributo Importance
+			* para saber se o email é importante ou não, uso abaixo a função
 			* imap_fetchheader e busco o atributo importance nela para passar
-			* para as funï¿½ï¿½es ajax. Isso faz com que eu acesse o cabeï¿½alho
+			* para as funções ajax. Isso faz com que eu acesse o cabeçalho
 			* duas vezes e de duas formas diferentes, mas em contrapartida, eu
-			* nï¿½o preciso reimplementar o mï¿½todo utilizando o fetchheader.
+			* não preciso reimplementar o método utilizando o fetchheader.
 			*/
     
 			$tempHeader = @imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
@@ -1880,11 +1894,11 @@ class imap_functions
 	}
 
 	/**
-	 * Mï¿½todo que faz a verificaï¿½ï¿½o do Content-Type do e-mail e verifica se ï¿½ um e-mail normal,
+	 * Método que faz a verificação do Content-Type do e-mail e verifica se é um e-mail normal,
 	 * assinado ou cifrado.
-	 * @author Mï¿½rio Cï¿½sar Kolling <mario.kolling@serpro.gov.br>
-	 * @param $headers Uma String contendo os Headers do e-mail retornados pela funï¿½ï¿½o imap_imap_fetchheader
-	 * @param $msg_number O nï¿½mero da mesagem
+	 * @author Mário César Kolling <mario.kolling@serpro.gov.br>
+	 * @param $headers Uma String contendo os Headers do e-mail retornados pela função imap_imap_fetchheader
+	 * @param $msg_number O número da mesagem
 	 * @return Retorna o tipo da mensagem (normal, signature, cipher).
 	 */
 	function getMessageType( $msg_number, $headers = false )
@@ -1905,11 +1919,11 @@ class imap_functions
 	 /**
      * Metodo que retorna todas as pastas do usuario logado.
      * @param $params array opcional para repassar os argumentos ao metodo.
-     * Se usar $params['noSharedFolders'] = true, ira retornar todas as pastas do usuï¿½rio logado,
+     * Se usar $params['noSharedFolders'] = true, ira retornar todas as pastas do usuário logado,
      * excluindo as compartilhadas para ele.
-     * Se usar $params['folderType'] = "default" irï¿½ retornar somente as pastas defaults
-     * Se usar $params['folderType'] = "personal" irï¿½ retornar somente as pastas pessoais
-     * Se usar $params['folderType'] = null irï¿½ retornar todas as pastas
+     * Se usar $params['folderType'] = "default" irá retornar somente as pastas defaults
+     * Se usar $params['folderType'] = "personal" irá retornar somente as pastas pessoais
+     * Se usar $params['folderType'] = null irá retornar todas as pastas
      * @return Retorna um array contendo as seguintes informacoes de cada pasta: folder_unseen,
      * folder_id, folder_name, folder_parent e folder_hasChildren.
      */
@@ -2322,7 +2336,7 @@ class imap_functions
         else
         {
             $body = $params['body'];
-	    //Compatibilizaï¿½ï¿½o com Outlook, ao encaminhar a mensagem
+	    //Compatibilização com Outlook, ao encaminhar a mensagem
 	    $body = mb_ereg_replace('<!--\[','<!-- [',$body);
         }
 		//echo "<script language=\"javascript\">javascript:alert('".$body."');</script>";
@@ -3735,20 +3749,20 @@ class imap_functions
 // 	Fix the search problem with special characters!!!!
 	function remove_accents($string) {
 		return strtr($string,
-	 	"?ï¿½??ï¿½?ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ï¿½",
+	 	"?Ó??ó?Ý?úÁÀÃÂÄÇÉÈÊËÍÌ?ÎÏÑÕÔÓÒÖÚÙ?ÛÜ?áàãâäçéèêëíì?îïñóòõôöúù?ûüýÿ",
 	 	"SOZsozYYuAAAAACEEEEIIIIINOOOOOUUUUUsaaaaaceeeeiiiiinooooouuuuuyy");
 	}
 
-        function make_search_date($date){
+	function make_search_date($date){
 
-            //TODO: Adaptar a data de acordo com o locale do sistema.
-            list($day,$month,$year) = explode("/", $date);
-            $before?$day=(int)$day+1:$day=(int)$day;
-            $timestamp = mktime(0,0,0,(int)$month,$day,(int)$year);
-            $search_date = date('d-M-Y',$timestamp);
-            return $search_date;
+		//TODO: Adaptar a data de acordo com o locale do sistema.
+		list($day,$month,$year) = explode("/", $date);
+		$before?$day=(int)$day+1:$day=(int)$day;
+		$timestamp = mktime(0,0,0,(int)$month,$day,(int)$year);
+		$search_date = date('d-M-Y',$timestamp);
+		return $search_date;
 
-        }
+	}
 
 	function search_msg( $params = false )
 	{
@@ -4282,7 +4296,7 @@ class imap_functions
 	}
 
 //Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Insere emails no imap a partir do fonte do mesmo. Se o argumento timestamp for passado ele utiliza do script python
-///expressoMail1_2/imap.py para inserir uma msg com o horï¿½rio correto pois isso nï¿½o ï¿½ porssï¿½vel com a funï¿½ï¿½o imap_append do php.
+///expressoMail1_2/imap.py para inserir uma msg com o horário correto pois isso não é porssível com a função imap_append do php.
 
     function insert_email($source,$folder,$timestamp,$flags){
         $username = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
@@ -4337,12 +4351,12 @@ class imap_functions
 
         if (version_compare(PHP_VERSION, '5.2.0', '>=')){
             if(!$source = base64_decode($source,true))
-                return "error ".$source."Espaï¿½os ".$i;
+                return "error ".$source."Espaços ".$i;
 
         }
         else {
             if(!$source = base64_decode($source))
-                return "error ".$source."Espaï¿½os ".$i;
+                return "error ".$source."Espaços ".$i;
         }
 
         $insert = $this->insert_email($source,'INBOX'.$this->imap_delimiter.'decifradas');
@@ -4378,7 +4392,7 @@ class imap_functions
     }
 
 //Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Trata fontes de emails enviados via POST para o servidor por um xmlhttprequest, as partes codificados com
-//Base64 os "+" sï¿½o substituidos por " " no envio e essa funï¿½ï¿½o arruma esse efeito.
+//Base64 os "+" são substituidos por " " no envio e essa função arruma esse efeito.
 
     function treat_base64_from_post($source){
             $offset = 0;
@@ -4404,7 +4418,7 @@ class imap_functions
             return $source;
     }
 
-//Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Recebe os fontes dos emails a serem desarquivados, separa e envia cada um para funï¿½ï¿½o insert_mail.
+//Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Recebe os fontes dos emails a serem desarquivados, separa e envia cada um para função insert_mail.
 
     function unarchive_mail($params)
     {
