@@ -115,8 +115,6 @@
 	if(!isset($GLOBALS['phpgw_info']['flags']['noapi']) || !$GLOBALS['phpgw_info']['flags']['noapi'] == True)
 	{
 		include(PHPGW_API_INC . '/functions.inc.php');
-		include(PHPGW_API_INC . '/xml_functions.inc.php');
-		include(PHPGW_API_INC . '/soap_functions.inc.php');
 	}
 
 	/*

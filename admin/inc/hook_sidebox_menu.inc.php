@@ -29,12 +29,7 @@
 		{
 			$file['Site Configuration']         = $GLOBALS['phpgw']->link('/index.php','menuaction=admin.uiconfig.index&appname=admin');
 		}
-/*		
-		if (! $GLOBALS['phpgw']->acl->check('peer_server_access',1,'admin'))
-		{
-			$file['Peer Servers']               = $GLOBALS['phpgw']->link('/index.php','menuaction=admin.uiserver.list_servers');
-		}
-*/
+
 		if (! $GLOBALS['phpgw']->acl->check('applications_access',1,'admin'))
 		{
 			$file['Applications']               = $GLOBALS['phpgw']->link('/index.php','menuaction=admin.uiapplications.get_list');
