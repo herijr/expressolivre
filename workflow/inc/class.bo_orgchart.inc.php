@@ -522,7 +522,7 @@ class bo_orgchart extends bo_ajaxinterface
 	 */
 	function listArea($params)
 	{
-		$result = $this->so->getArea($params['organizacao_id'], $params['area_id']);
+		$result = $this->so->getArea($params['organizacao_id'], $params['area_id'], $params['only_active']);
 		$this->disconnect_all();
 
 		return $result;

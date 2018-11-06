@@ -946,10 +946,12 @@ class so_orgchart
 	/**
 	 * Lista as áreas de uma organização.
 	 * @param int $organizationID O ID da organização.
+	 * @param int $areaID O ID da área. Por padrão, são recuperadas todas as áreas.
+	 * @param int $onlyActive Indica se devem ser recuperadas apenas as áreas ativas ou todas.
 	 * @return array Lista das áreas de uma organização.
 	 * @access public
 	 */
-	function getArea($organizationID, $areaID = -1)
+	function getArea($organizationID, $areaID = -1, $onlyActive = 0)
 	{
 		$this->_checkAccess($organizationID);
 
@@ -963,7 +965,15 @@ class so_orgchart
 			$values[]= $areaID;
 		}
 
-		$query = "SELECT a.area_id, a.centro_custo_id, a.organizacao_id, a.area_status_id, a.titular_funcionario_id, a.superior_area_id, a.sigla, a.descricao, a.ativa, a.auxiliar_funcionario_id, s.funcionario_id as substituto_funcionario_id FROM area a LEFT OUTER JOIN substituicao s ON ((a.area_id = s.area_id) AND (CURRENT_DATE BETWEEN s.data_inicio AND s.data_fim)) WHERE organizacao_id = ? " . $area_condition . " ORDER BY sigla";
+		// if we are looking for active areas only
+		$active_condition = "";
+		if (!empty($onlyActive)) {
+			$active_condition = " AND a.ativa = 'S' ";
+		}
+
+		$query  = "SELECT a.area_id, a.centro_custo_id, a.organizacao_id, a.area_status_id, a.titular_funcionario_id, a.superior_area_id, a.sigla, a.descricao, a.ativa, a.auxiliar_funcionario_id, s.funcionario_id as substituto_funcionario_id ";
+		$query .= "FROM area a LEFT OUTER JOIN substituicao s ON ((a.area_id = s.area_id) AND (CURRENT_DATE BETWEEN s.data_inicio AND s.data_fim)) ";
+		$query .= "WHERE organizacao_id = ? " . $area_condition . $active_condition . " ORDER BY sigla";
 		$result = $this->db->query($query, $values);
 		$this->_checkError($result);
 

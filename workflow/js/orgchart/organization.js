@@ -964,7 +964,7 @@ function loadAddSubstitutionUI(organizationID)
 
 		}
 	}
-	objArea.generateComboBox({'organizacao_id': organizationID}, $('comboArea'), true, area_id, areas_callback);
+	objArea.generateComboBox({'organizacao_id': organizationID, 'area_id': '-1', 'only_active': '1'}, $('comboArea'), true, area_id, areas_callback);
 }
 
 function getEmployeeInfoTimer(e, employeeID, organizationID)
