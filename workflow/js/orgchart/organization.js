@@ -241,7 +241,7 @@ CadastroAjax.prototype =
 	{
 		if (!name)
 			name = this.combo['id'];
-		
+
 		combo = this.combo;
 
 		var comboResult = function(data)
@@ -250,11 +250,19 @@ CadastroAjax.prototype =
 				return;
 
 			var newFormat = new Array();
-			if (includeNull)
-				newFormat['NULL'] = "Nenhum";
+			if (includeNull){
+				firstItem = new Array();
+				firstItem['id'] = 'NULL';
+				firstItem['value'] = "Nenhum";
+				newFormat.push(firstItem);
+			}
 
-			for (var i = 0; i < data.length; i++)
-				newFormat[data[i][combo['id']]] = data[i][combo['name']];
+			for (var i = 0; i < data.length; i++){
+				nextItem = new Array();
+				nextItem['id'] = data[i][combo['id']];
+				nextItem['value'] = data[i][combo['name']];
+				newFormat.push(nextItem);
+			}
 
 			if ((newFormat.length > 0) || includeNull)
 			{
@@ -585,9 +593,17 @@ function loadAreaEmployees(organizationID, areaID, div)
 
 function loadAddEmployeeStatusUI(organizationID)
 {
+	var itemSim = new Array();
+	var itemNao = new Array();
+
+	itemSim['id'] = 'S';
+	itemSim['value'] = 'Sim';
+	itemNao['id'] = 'N';
+	itemNao['value'] = 'Não';
+
 	var valoresSimNao = new Array();
-	valoresSimNao['S'] = 'Sim';
-	valoresSimNao['N'] = 'Não';
+	valoresSimNao.push(itemSim);
+	valoresSimNao.push(itemNao);
 
 	var content;
 	content = '<h2 id="modalTitle">Adicionar Status de Funcionário</h2>';
@@ -688,9 +704,17 @@ function loadAddCostCenterUI(organizationID)
 
 function loadAddLocalUI(organizationID)
 {
+	var itemSim = new Array();
+	var itemNao = new Array();
+
+	itemSim['id'] = 'S';
+	itemSim['value'] = 'Sim';
+	itemNao['id'] = 'N';
+	itemNao['value'] = 'Não';
+
 	var valoresSimNao = new Array();
-	valoresSimNao['S'] = 'Sim';
-	valoresSimNao['N'] = 'Não';
+	valoresSimNao.push(itemSim);
+	valoresSimNao.push(itemNao);
 
 	var content;
 	content = '<h2 id="modalTitle">Adicionar Localidade</h2>';
@@ -786,9 +810,17 @@ function loadAddEmployeeUI(organizationID, callback)
 
 function loadAddAreaUI(organizationID)
 {
+	var itemSim = new Array();
+	var itemNao = new Array();
+
+	itemSim['id'] = 'S';
+	itemSim['value'] = 'Sim';
+	itemNao['id'] = 'N';
+	itemNao['value'] = 'Não';
+
 	var valoresSimNao = new Array();
-	valoresSimNao['S'] = 'Sim';
-	valoresSimNao['N'] = 'Não';
+	valoresSimNao.push(itemSim);
+	valoresSimNao.push(itemNao);
 
 	var content;
 	content = '<h2 id="modalTitle">Adicionar Área</h2>';
@@ -901,7 +933,7 @@ function loadAddSubstitutionUI(organizationID)
 		$(area_id).onchange = function () {
 			if ($('SubstitutionList'))
 				$('SubstitutionList').remove();
-			
+
 			var info_callback = function (data) {
 
 				// just to be sure

@@ -63,9 +63,11 @@ function constructSelectBox(name, items, selected)
 	var output = '';
 
 	output = '<select name="' + name + '" id="' + name  + '">';
-	for (i in items)
-		if (typeof items[i] != "function")
-			output += '<option value="' + i + '"' +  ((i == selected) ? ' selected' : '') + '>' + items[i] + '</option>';
+	for (i in items){
+		if (typeof items[i] != "function"){
+			output += '<option value="' + items[i].id + '"' +  ((items[i].id == selected) ? ' selected' : '') + '>' + items[i].value + '</option>';
+		}
+	}
 	output += '</select>';
 
 	return output;

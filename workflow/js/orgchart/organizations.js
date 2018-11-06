@@ -45,9 +45,17 @@ function listOrganizations()
 
 function loadAddOrganizationUI()
 {
+	var itemSim = new Array();
+	var itemNao = new Array();
+
+	itemSim['id'] = 'S';
+	itemSim['value'] = 'Sim';
+	itemNao['id'] = 'N';
+	itemNao['value'] = 'Não';
+
 	var valoresSimNao = new Array();
-	valoresSimNao['S'] = 'Sim';
-	valoresSimNao['N'] = 'Não';
+	valoresSimNao.push(itemSim);
+	valoresSimNao.push(itemNao);
 
 	var content;
 	content = '<h2 id="modalTitle">Adicionar Organização</h2>';
