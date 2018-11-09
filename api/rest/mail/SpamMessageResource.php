@@ -4,12 +4,12 @@ class SpamMessageResource extends MailAdapter {
 
 	public function setDocumentation() {
 
-		$this->setResource("Mail","Mail/SpamMessages","Retorna as mensagens do usuÃ¡rio.",array("POST"));
+		$this->setResource("Mail","Mail/SpamMessages","Marca uma mensagem como spam ou não spam.",array("POST"));
 		$this->setIsMobile(true);
-		$this->addResourceParam("auth","string",true,"Chave de autenticaÃ§Ã£o do UsuÃ¡rio.",false);
+		$this->addResourceParam("auth","string",true,"Chave de autenticação do Usuário.",false);
 		$this->addResourceParam("folderID","string",true,"Pasta base retornar as mensagens.",true,"INBOX");
-		$this->addResourceParam("msgID","string",true,"Msg(s) ID(s),se for mais de um separados por vÃ­rgula",true);
-		$this->addResourceParam("spam","string",true,"1 - SPAM, 2 - NÃ£o Ã© SPAM",true);
+		$this->addResourceParam("msgID","string",true,"Msg(s) ID(s),se for mais de um separados por ví­rgula",true);
+		$this->addResourceParam("spam","string",true,"1 - SPAM, 2 - NÂO É SPAM",true);
 	}
 
 	public function post($request)

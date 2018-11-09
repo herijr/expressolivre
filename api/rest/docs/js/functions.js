@@ -1,15 +1,11 @@
-(function()
-{
+(function () {
 
-	function clientREST()
-	{
-		$(document).ready(function()
-		{
-
+	function clientREST() {
+		$(document).ready(function () {
 			prettyPrint();
 		})
 	}
 
-	window.client = new clientREST();	
+	window.client = new clientREST();
 
 })();

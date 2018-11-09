@@ -1,3 +1,6 @@
 [home.server]
 OU_LDAP = http://ip/api/rest
 DEFAULT = http://default/api/rest
+
+[documentation]
+BASE_URL = http://localhost/api/rest

@@ -27,14 +27,12 @@ class DocumentationResource extends ExpressoAdapter {
 				if ($class_doc["id"] != "") {
 					$documentation[$class_doc["id"]] = $class_doc; 
 				}
-				//array_push($documentation,$class_doc);
 			}
 
 		}
 		$errors = Errors::getInstance();
 		$all_errors = $errors->getErrors();
 		$result = array("resources" => $documentation, "possible_errors" => $all_errors);
-		//print_r($result);
  		
  		$this->setResult($result);
 

@@ -1,68 +1,61 @@
 <h2 class="right-side">Sobre a API</h2>
 <div id="page_content">
+	<p>
+		Esta API fornece recursos para comunica&ccedil;&atilde;o com sistemas e aplicativos externos. foi desenvolvida utilizando o padr&atilde;o rest 
+		e implementando o retorno dos dados ao consumidor utilizando o protocolo json-rpc de acordo com a especifica&ccedil;&atilde;o da vers&atilde;o 2.0. 
+		A api cont&eacute;m diversas funcionalidades e para cada uma delas &eacute; definido um recurso que pode receber par&acirc;metros obrigat&oacute;rios 
+		ou opcionais para o seu funcionamento. Atrav&eacute;s desta documenta&ccedil;&atilde;o &eacute; poss&iacute;vel interagir com a api do expresso, 
+		e testar o envio e recebimento de dados.
+	</p>
 
-	Esta API &eacute; respons&aacute;vel pelo funcionamento com sistemas e aplicativos externos e foi desenvolvida utilizando o padr&atilde;o REST e implementando o retorno dos dados ao consumidor utilizando o protocolo <a href="http://www.jsonrpc.org/">JSON-RPC</a> de acordo com a especifica&ccedil;&atilde;o da <a href="http://www.jsonrpc.org/specification">vers&atilde;o 2.0</a>. A API cont&eacute;m diversas funcionalidades e para cada uma delas &eacute; definido um recurso que pode receber par&acirc;metros obrigat&oacute;rios ou opcionais para o seu funcionamento.
-	<br><br>
-	Disponibilizamos esta documenta&ccedil;&atilde;o para caso exista a necessidade de utilizar a API do Expresso para desenvolver outros aplicativos que se comuniquem com o Expresso.
-	<br>
-	<br><i><b>IMPORTANTE:</b> Fique a vontade para desenvolver e realizar testes na API, por&eacute;m entre em contato com os administradores do Expresso para informar quando o seu aplicativo estiver utilizando a API do Expresso em <b>ambiente de produ&ccedil;&atilde;o</b>. Sua aplica&ccedil;&atilde;o ter&aacute; que se adequar as novidades e altera&ccedil;oes nos recursos da API, desta forma poderemos avis&aacute;-los com antecedencia quando essas altera&ccedil;&otilde;es ocorrerem, per&iacute;odos de manuten&ccedil;&atilde;o, e  controlarmos se as requisi&ccedil;&otilde;es est&atilde;o sendo realizadas de forma eficiente. Caso o contr&aacute;rio seu acesso <b>poder&aacute; ser bloqueado sem aviso-pr&eacute;vio</b>.</i>
-	<br><br>
-
+	<p>
+		Importante: sinta-se &agrave; vontade para desenvolver e realizar testes com a api do expresso, por&eacute;m informe aos administradores do expresso 
+		quando sua aplica&ccedil;&atilde;o estiver rodando em produ&ccedil;&atilde;o, facilitando avis&aacute;-lo quando uma atualiza&ccedil;&atilde;o relevante 
+		for realizada na api.
+	</p>
+	
 	<h3>COMO FUNCIONA A API</h3>
-	<div>
-		<br>
-		<p>
-			Para cada instala&ccedil;&atilde;o do Expresso a API pode estar localizada em um contexto diferente, como por exemplo para o servidor expresso.pr.gov.br a URL de contexto 	da API &eacute;: <b>http://api.expresso.pr.gov.br/</b>
-		</p>
-		<p>
-			Para acessar um recurso da API, sua aplica&ccedil;&atilde;o cliente dever&aacute; realizar uma requisi&ccedil;&atilde;o HTTP pelos m&eacute;todos (GET,POST,PUT ou DELETE) para a URL_DA_API + NOME_DO_RECURSO, passando os par&acirc;metros definidos nesta documenta&ccedil;&atilde;o. Cada recurso possui um conjunto de par&acirc;metros (obrigatorios e/ou opicionais) que s&atilde;o necess&aacute;rios para atender as requisi&ccedil;&otilde;es enviadas ao servidor do Expresso.
-		</p>
-		<p>
-			
-		</p>
-		
-		<p>
-			Com exce&ccedil;&atilde;o dos recursos: <i><b>ExpressoVersion</b></i>, <i><b>Documentation</b></i> e <i><b>AvailableServers</b></i> todos os outros recursos necessitam de uma autentica&ccedil;&atilde;o. A autentica&ccedil;&atilde;o &eacute; feita no recurso <i><b>Login</b></i> no qual &eacute; enviado como parametro o usu&aacute;rio e senha, o recurso retornar&aacute; uma chave de acesso <b><i>(auth)</i></b> que dever&aacute; ser enviada como par&acirc;metro na chamada para os outros recursos.
-		</p>
-		<p>
+	<p>
+		Para acessar um recurso da api, sua aplica&ccedil;&atilde;o cliente dever&aacute; realizar uma requisi&ccedil;&atilde;o http 
+		pelos m&eacute;todos (get,post,put ou delete) para a url_da_api + nome_do_recurso, passando os par&acirc;metros definidos nesta 
+		documenta&ccedil;&atilde;o. Cada recurso possui um conjunto de par&acirc;metros (obrigatorios e/ou opicionais) que s&atilde;o necess&aacute;rios 
+		para atender as requisi&ccedil;&otilde;es enviadas ao servidor do expresso. 
+	</p>
+	
+	<p>
+		A maioria dos recursos necessita de autentica&ccedil;&atilde;o para funcionar. a autentica&ccedil;&atilde;o &eacute; feita atrav&eacute;s do recurso login, 
+		passando-se como par&acirc;metros o usu&aacute;rio e a senha. O login retornar&aacute; uma chave de acesso (auth) que dever&aacute; ser enviada como 
+		par&acirc;metro na chamada para os outros recursos.
+	</p>
+
+	<p>
 		Exemplo: 
-			<br>
-			<img src='./images/exemplo_api.png'>
-		</p>
-	</div>
-	<h3>AMBIENTE CELEPAR</h3>
+		<br>
+		<img src='./images/exemplo_api.png'>
+	</p>
+	<h3>AMBIENTE EXPRESSO</h3>
 	<br>
-	No ambiente da Celepar temos uma API instalada para cada ambiente Expresso, caso tenha d&uacute;vidas sobre qual API utilizar, entre em contato com os administradores do Expresso.
+		Est&atilde;o dispon&iacute;veis os seguintes ambientes Expresso, cada qual com a sua api espec&iacute;fica:
 	<br><br>
 	<table style='width: 100%;' class="table_blue">
-	<thead>
-		<th>Ambiente Expresso</th><th>API</th>
-	</thead>
-	<tr>
-		<td>https://expresso.pr.gov.br/</td><td><b><i>https://api.expresso.pr.gov.br/</i></b></td>
-	</tr>
-		<td>https://municipios.pr.gov.br/</td><td><b><i>https://api.expresso.pr.gov.br/municipios/</i></b></td>
-	</tr>
-	<tr>
-		<td>https://seed.pr.gov.br/</td><td><b><i>https://api.expresso.pr.gov.br/seed/</i></b></td>
-	</tr>
-	<tr>
-		<td>https://sefa.pr.gov.br/</td><td><b><i>https://api.expresso.pr.gov.br/sefa/</i></b></td>
-	</tr>
-	<tr>
-		<td>https://sesp.pr.gov.br/</td><td><b><i>https://api.expresso.pr.gov.br/sesp/</i></b></td>
-	</tr>
-	
+		<thead>
+			<th>Ambientes Expresso - API</th>
+		</thead>
+		<% for(var i in apis_expresso ){ %>
+			<tr>
+				<td>
+					<%= apis_expresso[i] %>
+				</td>
+			</tr>
+		<% } %>
 	</table>
 	<br><br>
-	<h3>RECURSOS DISPONÍVEIS</h3>
+	<h3>RECURSOS DISPON&Iacute;VEIS</h3>
 	<div>
+		<br/>
 		<p>
-			<br>
 			Atualmente os seguintes recursos est&atilde;o disponibilizados:
 		</p>
-
-
 		<table style='width: 100%;' class="table_blue">
 		<thead>
 			<th>Recurso</th><th>Descri&ccedil;&atilde;o</th>
@@ -71,8 +64,5 @@
 			<tr><td><%=(resources[i].rest)%></td><td><i><%=resources[i].description%></i></td></tr>
 		<% } %>
 		</table>
-
 	</div>
-
-	
 </div>
