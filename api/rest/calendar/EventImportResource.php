@@ -118,7 +118,7 @@ class EventImportResource extends CatalogAdapter
 				$addEvent['description'] = $description;
 				$addEvent['location'] = '' . $event->LOCATION . '';
 				$addEvent['reference'] = 0;
-				$addEvent['ex_participants'] = implode(" ,", $mailExternalParticipants);
+				$addEvent['ex_participants'] = implode(", ", $mailExternalParticipants);
 				$addEvent['last_status'] = "N";
 				$addEvent['last_update'] = $dateNow;
 
