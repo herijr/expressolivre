@@ -25,134 +25,115 @@ function setBorderAttributes(ID)
 	this.sequence = ID; 
 }
 
-function alternate_border(ID)
-{
-	if ( typeof win == 'object' && win.close && win.close.constructor == Function )
-		win.close( );
+function alternate_border(ID) {
+	
+	if (typeof win == 'object' && win.close && win.close.constructor == Function){
+		win.close();
+	}
 
-	if (! Element('border_id_'+ID))
+	if (!Element('border_id_' + ID)){
 		return false; // Not possible to alternate
-	
+	}
+
 	show_hide_span_paging(ID);
-	
+
 	spanD = Element("span_D");
-	
-	if (spanD)
+
+	if (spanD){
 		spanD.style.display = (openTab.type[ID] == 0 ? '' : 'none');
-	
-	if( document.getElementById('divScrollMain_0') != null )
-	{
-		var _RSS = document.getElementById('divScrollMain_0');
-	}	
-	
-	var footer_menu = Element("footer_menu");	
+	}
+
+	var footer_menu = Element("footer_menu");
+
 	if (footer_menu) {
 
-		var attrRSS = _RSS.getAttribute("rss");
-		
-		if( attrRSS == "rss" )
-		{
-			footer_menu.style.display = "none";	
-		}
-		else
-		{
+		if( $("div#content_id_"+ID.toString()+".conteudo").find("input#send_button_"+ID.toString()).length > 0 ){
+			footer_menu.style.display = 'none';	
+		} else {
 			footer_menu.style.display = (openTab.type[ID] != 4 ? '' : 'none');
-		}
-				
-		var options_search = Element('span_options');
-		if (options_search){
-			var spans_search = options_search.getElementsByTagName("span");
-			var span_search;
-			for (i = 0; i < spans_search.length; i++){
-				span_search = spans_search[i];
-				span_search.className == 'message_options_import'?span_search.style.display = (openTab.type[ID] == 0 ? '' : 'none'):'';
-				(span_search.title  == get_lang("Archive") || span_search.title == get_lang("Unarchive"))?span_search.style.display = (openTab.type[ID] == 0 ? '' : 'none'):'';
+
+			var options_search = Element('span_options');
+
+			if (options_search) {
+				var spans_search = options_search.getElementsByTagName("span");
+				var span_search;
+				for (i = 0; i < spans_search.length; i++) {
+					span_search = spans_search[i];
+					span_search.className == 'message_options_import' ? span_search.style.display = (openTab.type[ID] == 0 ? '' : 'none') : '';
+					(span_search.title == get_lang("Archive") || span_search.title == get_lang("Unarchive")) ? span_search.style.display = (openTab.type[ID] == 0 ? '' : 'none') : '';
+				}
 			}
 		}
-
 	}
 
 	var len = BordersArray.length;
-	for (var i=0; i < len; i++)
-	{
+	for (var i = 0; i < len; i++) {
 		m = document.getElementById(BordersArray[i].border_id);
-		if ((m)&&(m.className == 'menu-sel'))
-		{
+		if ((m) && (m.className == 'menu-sel')) {
 			m.className = 'menu';
-			c = document.getElementById("content_id_"+BordersArray[i].sequence);
+			c = document.getElementById("content_id_" + BordersArray[i].sequence);
 			c.style.display = 'none';
-			if(Element("font_border_id_"+BordersArray[i].sequence))
-				Element("font_border_id_"+BordersArray[i].sequence).className = 'font-menu';	
-			var body = Element('body_'+BordersArray[i].sequence);
-			if (body)
-			{
-				try
-				{
-					if (Element('viewsource_rt_checkbox_' + ID).checked)
-					{  
+			if (Element("font_border_id_" + BordersArray[i].sequence))
+				Element("font_border_id_" + BordersArray[i].sequence).className = 'font-menu';
+			var body = Element('body_' + BordersArray[i].sequence);
+			if (body) {
+				try {
+					if (Element('viewsource_rt_checkbox_' + ID).checked) {
 						connector.loadScript("rich_text_editor");
 						RichTextEditor.viewsource(false);
 					}
-				}
-				catch(e)
-				{
+				} catch (e) {
 					//alert(e.message)
 				}
 			}
 		}
 	}
 
-	m = Element("border_id_"+ID);
-	if (m)
-		m.className = 'menu-sel';
-	if(Element("font_border_id_" + ID))
-		Element("font_border_id_" + ID).className = 'font-menu-sel';
-	var c = Element("content_id_"+ID)
-	if (c)
-		c.style.display = '';
+	m = Element("border_id_" + ID);
+	if (m){ m.className = 'menu-sel'; }
+	
+	if (Element("font_border_id_" + ID)){ Element("font_border_id_" + ID).className = 'font-menu-sel'; }
+	
+	var c = Element("content_id_" + ID)
+	if (c) { c.style.display = ''; }
 
-	body = document.getElementById('body_'+ ID);
-	if (body){
-		try{
-			if(ID){
+	body = document.getElementById('body_' + ID);
+	if (body) {
+		try {
+			if (ID) {
 				connector.loadScript("rich_text_editor");
-				if(typeof(RichTextEditor) == 'undefined'){
-					setTimeout('alternate_border(\''+ID+'\');',500);
+				if (typeof (RichTextEditor) == 'undefined') {
+					setTimeout('alternate_border(\'' + ID + '\');', 500);
 					return false;
 				}
 				RichTextEditor.loadEditor(ID);
 			}
-			body.contentWindow.document.designMode="on";
-		}
-		catch(e){
+			body.contentWindow.document.designMode = "on";
+		} catch (e) {
 			//alert(e.message);
 		}
 	}
 
 	// hide the DropDrowContact, if necessary
 	window_DropDownContacts = Element('tipDiv');
-	if ((window_DropDownContacts)&&(window_DropDownContacts.style.visibility != 'hidden')){
+	if ((window_DropDownContacts) && (window_DropDownContacts.style.visibility != 'hidden')) {
 		window_DropDownContacts.style.visibility = 'hidden';
 	}
 
-	if (typeof(ID) == 'number')
-	{
-        numBox=ID;
- 	}
-	else
-	{
-		if (ID.match("search_"))
-			numBox=ID.substr(7);
+	if (typeof (ID) == 'number') {
+		numBox = ID;
+	} else {
+		if (ID.match("search_")){ numBox = ID.substr(7); }
 	}
 
-	currentTab=ID;
-	
-	if( document.getElementById('to_'+ID) && document.getElementById('to_'+ID).type == "textarea"){
-		document.getElementById('to_'+ID).focus();
+	currentTab = ID;
+
+	if (document.getElementById('to_' + ID) && document.getElementById('to_' + ID).type == "textarea") {
+		document.getElementById('to_' + ID).focus();
 	}
-	
+
 	redraw_mark_as_spam();
-	
+
 	return ID;
 }
 
@@ -375,21 +356,7 @@ function delete_border(ID, msg_sent)
 		}
 	if(j == 1)
 	{	
-		if( document.getElementById('divScrollMain_0') != null )
-		{
-			var _RSS = document.getElementById('divScrollMain_0');
-		}	
-		
-		var attrRSS = _RSS.getAttribute("rss");
-		
-		if( attrRSS == "rss" )
-		{
-			Element("footer_menu").style.display = 'none';			
-		}
-		else
-		{
-			Element("footer_menu").style.display = '';
-		}		
+		Element("footer_menu").style.display = '';
 	}
 	
 	BordersArray = new_BordersArray;
