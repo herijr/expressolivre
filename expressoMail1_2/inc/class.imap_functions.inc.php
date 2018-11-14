@@ -966,6 +966,88 @@ class imap_functions
 		return $return;
 	}
 
+	function vCalImport ( $vcalendar ){
+
+		$cal = Sabre\VObject\Reader::read($vcalendar,0, 'ISO-8859-1');
+
+		$event = current( $cal->select('VEVENT') );
+
+		$content = '<div style="padding:2px 3px; margin:6px 2px 10px 2px; width:80%;font-family:Arial,Sans-serif;background-color:#fff;font-size:12px">';
+		$content .= '<div style="margin:10px 0px">';
+		$content .= '<span style="font-weight:bold;">'.$event->SUMMARY.'</span>';
+		$content .= '</div>';
+
+		if(isset($event->ORGANIZER)){
+			$content .= "<div style='margin:5px 0px'>";
+			$content .= "<span style='font-weight:bold'>".$this->functions->getLang("organizer")." </span> " . ( isset($event->ORGANIZER['CN']) ? $event->ORGANIZER['CN'] : "") . " ( " . preg_replace("/mailto:/i", "",$event->ORGANIZER ) . " )";
+			$content .= "</div>";
+		}
+	
+		if(isset($event->ATTENDEE)){
+			$content .= '<div style="margin:10px 0px;font-size:13px">';
+			$content .= "<span style='font-weight:bold'>".$this->functions->getLang("attendees")."</span><br>";
+			foreach($event->ATTENDEE as $attendee ){
+				if(isset($attendee['CN']))
+					$content .= " - " .$attendee['CN'] . " ( " . preg_replace("/mailto:/i", "", $attendee) . " ) <br>";
+			}
+			$content .= "</div>";
+		}
+	
+		$dtStart = null;
+		$dtEnd = null;
+		
+		$dateStart = $event->DTSTART.'';//get date from ical
+		if( preg_match('/Z/',$dateStart) ){
+			$dateStart = str_replace('T', '', $dateStart);//remove T
+			$dateStart = str_replace('Z', '', $dateStart);//remove Z
+			$d    = date('d', strtotime($dateStart));//get date day
+			$m    = date('m', strtotime($dateStart));//get date month
+			$y    = date('Y', strtotime($dateStart));//get date year
+			$now = date('Y-m-d G:i:s');//current date and time
+			$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
+			$dtStart = new DateTime( $eventdate );
+			$dtStart->sub(new DateInterval('PT3H'));
+		} else {
+			$dateStart = str_replace('T', '', $dateStart);//remove T
+			$d    = date('d', strtotime($dateStart));//get date day
+			$m    = date('m', strtotime($dateStart));//get date month
+			$y    = date('Y', strtotime($dateStart));//get date year
+			$now = date('Y-m-d G:i:s');//current date and time
+			$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
+			$dtStart = new DateTime( $eventdate );
+		}
+
+		$dateEnd = $event->DTEND.'';//get date from ical
+		if( preg_match('/Z/',$dateEnd) ){
+			$dateEnd = str_replace('T', '', $dateEnd);//remove T
+			$dateEnd = str_replace('Z', '', $dateEnd);//remove Z
+			$d    = date('d', strtotime($dateEnd));//get date day
+			$m    = date('m', strtotime($dateEnd));//get date month
+			$y    = date('Y', strtotime($dateEnd));//get date year
+			$now = date('Y-m-d G:i:s');//current date and time
+			$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
+			$dtEnd = new DateTime( $eventdate );
+			$dtEnd->sub(new DateInterval('PT3H'));
+		} else {
+			$dateEnd = str_replace('T', '', $dateEnd);//remove T
+			$d    = date('d', strtotime($dateEnd));//get date day
+			$m    = date('m', strtotime($dateEnd));//get date month
+			$y    = date('Y', strtotime($dateEnd));//get date year
+			$now = date('Y-m-d G:i:s');//current date and time
+			$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
+			$dtEnd = new DateTime( $eventdate );
+		}
+
+		if( isset($event->LOCATION) && trim($event->LOCATION) !== "" ){
+			$content .= '<div style="padding:5px 2px;"><span style="font-weight:bold;">'.$this->functions->getLang("location").' :</b> ' . $event->LOCATION . '</div>';
+		}
+		$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">'.$this->functions->getLang("start time").' </b> : ' . date("d/m/Y - H:i:s", $dtStart->getTimestamp() ) . '</div>';
+		$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">'.$this->functions->getLang("end time").' </b> : ' . date("d/m/Y - H:i:s", $dtEnd->getTimestamp() ) . "</div>";
+		$content .= "</div>";
+
+		return $content;
+	}
+
 	function get_body_msg($msg_number, $msg_folder)
 	{
 		include_once("class.message_components.inc.php");
@@ -975,7 +1057,7 @@ class imap_functions
 		$vCalImported = false;
 		$return = array();
 		$return['attachments'] = $this->download_attachment($msg,$msg_number);
-		
+
 		if( is_array($return['attachments']) && count($return['attachments']) > 0 ){
 			foreach($return['attachments'] as $attached ){
 				if( isset($attached['name']) ){
@@ -1022,31 +1104,47 @@ class imap_functions
 			}
 
 			$content = ''; 
-			// If simple message is subtype 'html' or 'plain', then get content body. 
-			if(strtolower($msg->structure[$msg_number]->subtype) == "html" ||  
-				strtolower( $msg -> structure[ $msg_number ] -> subtype ) == 'plain'){ 
+			
+			// If simple message is subtype 'html' or 'plain' or 'calendar', then get content body. 
+			switch (strtolower($msg->structure[$msg_number]->subtype)) {
+				case "calendar":
+				case "html":
+				case "plain":
+					$content = $this->decodeBody(
+						imap_body($this->mbox, $msg_number, FT_UID),
+						$msg->encoding[$msg_number][0],
+						$msg->charset[$msg_number][0]
+					);
+					break;
+			}
 
-					$content = $this->decodeBody( 
-						imap_body( $this -> mbox, $msg_number, FT_UID ), 
-						$msg->encoding[$msg_number][0], 
-						$msg->charset[$msg_number][0] 
-					); 
+			if (strtolower($msg->structure[$msg_number]->subtype) == 'plain') {
+				$content = str_replace(array('<', '>'), array(' #$<$# ', ' #$>$# '), $content);
+				$content = htmlentities($content);
+				$content = $this->replace_links($content);
+				$content = str_replace(array(' #$&lt;$# ', ' #$&gt;$# '), array('&lt;', '&gt;'), $content);
+				$content = '<pre>' . $content . '</pre>';
+				$content = str_replace("\x00", '', $content);
+				$return['body'] = $content;
+				return $return;
+			}
 
-					if ( strtolower( $msg -> structure[ $msg_number ] -> subtype ) == 'plain' ) 
-					{ 
-						$content = str_replace( array( '<', '>' ), array( ' #$<$# ', ' #$>$# ' ), $content ); 
-						$content = htmlentities( $content ); 
-						$content = $this -> replace_links( $content ); 
-						$content = str_replace( array( ' #$&lt;$# ', ' #$&gt;$# ' ), array( '&lt;', '&gt;' ), $content ); 
-						$content = '<pre>' . $content . '</pre>'; 
-						$content = str_replace("\x00", '', $content);
-						$return[ 'body' ] = $content;
-						return $return; 
-					} 
+			if( strtolower($msg->structure[$msg_number]->subtype) == 'calendar' )
+			{
+				if( !$vCalImported ){
+
+					$vcalendar = $content;
+
+					$content = $this->vCalImport( $content );
+					
+					$return['hash_vcalendar'] = $db->import_vcard( $vcalendar, $msg_number );
+					
+					$vCalImported = true;
 				}
-		}
-		else
-		{ 
+			}
+		
+		} else {
+
 			//Complicated message, multiple parts
 			$html_body = '';
 			$content = '';
@@ -1073,7 +1171,7 @@ class imap_functions
 			foreach($msg->pid[$msg_number] as $values => $msg_part)
 			{
 				$file_type = strtolower($msg->file_type[$msg_number][$values]);
-				
+
 				if($file_type == "message/rfc822" || $file_type == "multipart/alternative") 
 				{ 
 					// Show only 'text/html' part, when message/rfc822 format contains 'text/plain' alternative part. 
@@ -1084,7 +1182,7 @@ class imap_functions
 							$has_multipart = false; 
 						} 
 				} 	
-				
+
 				if( $file_type !== 'attachment')
 				{
 					$max_size = ($this->prefs['max_msg_size'] == "1") ? 1048576 : 102400;
@@ -1112,92 +1210,20 @@ class imap_functions
 						if( !$vCalImported ){
 
 							$vcalendar = $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
-
-							$cal = Sabre\VObject\Reader::read($vcalendar,0, 'ISO-8859-1');
-
-							$event = current( $cal->select('VEVENT') );
-
-							$content = '<div style="padding:2px 3px; margin:6px 2px 10px 2px; width:80%;font-family:Arial,Sans-serif;background-color:#fff;font-size:12px">';
-							$content .= '<div style="margin:10px 0px">';
-							$content .= '<span style="font-weight:bold;">'.$event->SUMMARY.'</span>';
-							$content .= '</div>';
-
-							if(isset($event->ORGANIZER)){
-								$content .= "<div style='margin:5px 0px'>";
-								$content .= "<span style='font-weight:bold'>".$this->functions->getLang("organizer")." </span> " . ( isset($event->ORGANIZER['CN']) ? $event->ORGANIZER['CN'] : "") . " ( " . preg_replace("/mailto:/i", "",$event->ORGANIZER ) . " )";
-								$content .= "</div>";
-							}
-						
-							if(isset($event->ATTENDEE)){
-								$content .= '<div style="margin:10px 0px;font-size:13px">';
-								$content .= "<span style='font-weight:bold'>".$this->functions->getLang("attendees")."</span><br>";
-								foreach($event->ATTENDEE as $attendee ){
-									if(isset($attendee['CN']))
-										$content .= " - " .$attendee['CN'] . " ( " . preg_replace("/mailto:/i", "", $attendee) . " ) <br>";
-								}
-								$content .= "</div>";
-							}
-						
-							$dtStart = null;
-							$dtEnd = null;
+		
+							$content = $this->vCalImport( $vcalendar );
 							
-							$dateStart = $event->DTSTART.'';//get date from ical
-							if( preg_match('/Z/',$dateStart) ){
-								$dateStart = str_replace('T', '', $dateStart);//remove T
-								$dateStart = str_replace('Z', '', $dateStart);//remove Z
-								$d    = date('d', strtotime($dateStart));//get date day
-								$m    = date('m', strtotime($dateStart));//get date month
-								$y    = date('Y', strtotime($dateStart));//get date year
-								$now = date('Y-m-d G:i:s');//current date and time
-								$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
-								$dtStart = new DateTime( $eventdate );
-								$dtStart->sub(new DateInterval('PT3H'));
-							} else {
-								$dateStart = str_replace('T', '', $dateStart);//remove T
-								$d    = date('d', strtotime($dateStart));//get date day
-								$m    = date('m', strtotime($dateStart));//get date month
-								$y    = date('Y', strtotime($dateStart));//get date year
-								$now = date('Y-m-d G:i:s');//current date and time
-								$eventdate = date('Y-m-d G:i:s', strtotime($dateStart));//user friendly date
-								$dtStart = new DateTime( $eventdate );
-							}
-
-							$dateEnd = $event->DTEND.'';//get date from ical
-							if( preg_match('/Z/',$dateEnd) ){
-								$dateEnd = str_replace('T', '', $dateEnd);//remove T
-								$dateEnd = str_replace('Z', '', $dateEnd);//remove Z
-								$d    = date('d', strtotime($dateEnd));//get date day
-								$m    = date('m', strtotime($dateEnd));//get date month
-								$y    = date('Y', strtotime($dateEnd));//get date year
-								$now = date('Y-m-d G:i:s');//current date and time
-								$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
-								$dtEnd = new DateTime( $eventdate );
-								$dtEnd->sub(new DateInterval('PT3H'));
-							} else {
-								$dateEnd = str_replace('T', '', $dateEnd);//remove T
-								$d    = date('d', strtotime($dateEnd));//get date day
-								$m    = date('m', strtotime($dateEnd));//get date month
-								$y    = date('Y', strtotime($dateEnd));//get date year
-								$now = date('Y-m-d G:i:s');//current date and time
-								$eventdate = date('Y-m-d G:i:s', strtotime($dateEnd));//user friendly date
-								$dtEnd = new DateTime( $eventdate );
-							}
-
-							if( isset($event->LOCATION) && trim($event->LOCATION) !== "" ){
-								$content .= '<div style="padding:5px 2px;"><span style="font-weight:bold;">'.$this->functions->getLang("location").' :</b> ' . $event->LOCATION . '</div>';
-							}
-							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">'.$this->functions->getLang("start time").' </b> : ' . date("d/m/Y - H:i:s", $dtStart->getTimestamp() ) . '</div>';
-							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">'.$this->functions->getLang("end time").' </b> : ' . date("d/m/Y - H:i:s", $dtEnd->getTimestamp() ) . "</div>";
-							$content .= "</div>";
 							$return['hash_vcalendar'] = $db->import_vcard( $vcalendar, $msg_number );
+							
 							$vCalImported = true;
 						}
 					}
+
 				} else if($file_type == "message/delivery-status" || $file_type == "message/feedback-report") { 
 					
 					$content .= "<hr align='left' width='95%' style='border:1px solid #DCDCDC'>";
 					$content .= $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]); 
-          $content = '<pre>' . $content . '</pre>'; 
+          			$content = '<pre>' . $content . '</pre>'; 
 					
 				} else if($file_type == "message/rfc822" || $file_type == "text/rfc822-headers") {
 
