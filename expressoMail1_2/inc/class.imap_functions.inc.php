@@ -1186,8 +1186,8 @@ class imap_functions
 							if( isset($event->LOCATION) && trim($event->LOCATION) !== "" ){
 								$content .= '<div style="padding:5px 2px;"><span style="font-weight:bold;">'.$this->functions->getLang("location").' :</b> ' . $event->LOCATION . '</div>';
 							}
-							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">'.$this->functions->getLang("start time").' </b> : ' . date("d/m/Y - H:m", $dtStart->getTimestamp() ) . '</div>';
-							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">'.$this->functions->getLang("end time").' </b> : ' . date("d/m/Y - H:m", $dtEnd->getTimestamp() ) . "</div>";
+							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold;">'.$this->functions->getLang("start time").' </b> : ' . date("d/m/Y - H:i:s", $dtStart->getTimestamp() ) . '</div>';
+							$content .= '<div style="padding:5px 2px;;"><span style="font-weight:bold">'.$this->functions->getLang("end time").' </b> : ' . date("d/m/Y - H:i:s", $dtEnd->getTimestamp() ) . "</div>";
 							$content .= "</div>";
 							$return['hash_vcalendar'] = $db->import_vcard( $vcalendar, $msg_number );
 							$vCalImported = true;
