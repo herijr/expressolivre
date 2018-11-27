@@ -194,52 +194,35 @@ var ttreeBox = new function()
 	}
 	
 	// Funcao para renomear a pasta;
-	this.rename = function( rename )
-	{
-		var old_box  = ttree.FOLDER;
-		var aux = old_box.split( cyrus_delimiter );
-		var rename_new = '';
+	this.rename = function (newName) {
 		
-		if ( old_box == 'root' ) {
-			alert( get_lang( 'Select a folder!' ) );
-			return false;
-		}
-		
-		if ( aux.length == 1 ) {
-			alert( get_lang( 'It\'s not possible rename the folder: ')+aux[0]+'.' );
-			rename = '';
-			return false;
+		var current = ttree.FOLDER;
+
+		var rename = newName;
+
+		if ($.trim(current) === 'root') {
+			alert(get_lang('Select a folder!'));
 		} else {
-			if ( this.verify_names( aux[1] ) ) {
-				alert( get_lang( 'It\'s not possible rename the folder: ')+aux[1]+'.' );
-				rename = '';
-				return false;
-			} else {
-				if ( !this.verify( rename ) ) {
-					alert( get_lang( 'Type without spaces, dots or special characters!' ) );
-					rename = '';
-					return false;
+
+			var handler_return = function (data) {
+
+				if( data ){
+
+					connector.purgeCache();
+
+					ttreeBox.name_folder = 'root';
+
+					ttreeBox.update_folder();
 				} else {
-					aux.pop();
-					aux.push( rename );
-					for ( var i=0; i < aux.length; i++ ) {
-						if ( i == 0) rename_new = aux[i];
-						else rename_new += cyrus_delimiter+aux[i];
-					}
+					write_msg(get_lang("It's not possible rename this folder!"));
 				}
 			}
-		}
-		
-		if ( rename != '' ) {
-			var handler_return = function( data )
-			{
-				connector.purgeCache();
-				ttreeBox.name_folder = 'root';
-				ttreeBox.update_folder();
-			}
+
 			var args = '$this.imap_functions.ren_mailbox';
-			var params = 'rename='+rename_new+'&current='+old_box;
-			cExecute( args, handler_return, params );
+
+			var params = 'rename=' + rename + '&current=' + current;
+
+			cExecute(args, handler_return, params);
 		}
 	}
 	
