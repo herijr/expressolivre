@@ -1941,84 +1941,7 @@ class imap_functions
 		
 		return 'normal';
 	}
-
-	private function foldersListParser($folders_list)
-	{
-		if (is_array($folders_list)) {
-
-			$folders_list = array_slice($folders_list, 0, $this->foldersLimit);
-
-			reset($folders_list);
-
-			$ignoreFolder = '}DELETED' . $this->imap_delimiter;
-			$ignoreFolder .= 'user' . $this->imap_delimiter;
-			$ignoreFolder .= $this->username . $this->imap_delimiter;
-			$ignoreFolder = preg_quote($ignoreFolder, $this->imap_delimiter);
-
-			$list = array();
-			$folderParents = array();
-			$i = 0;
-
-			foreach ($folders_list as $key => $folder) {
-
-				if (preg_match('/' . $ignoreFolder . '/', $folder->name)) {
-					continue;
-				}
-
-				$folderName = mb_convert_encoding($folder->name, "ISO-8859-1", "UTF7-IMAP");
-
-				$folderName = preg_split('/(?=(INBOX|user))/i', $folder->name);
-
-				$list[] = array(
-					"folder_label" => preg_replace('/^INBOX?(\/|\.)/', '', $folderName[1]),
-					"folder_id" => $folderName[1],
-					"folder_name" => $folder->name,
-					"folder_attributes" => intval($folder->attributes),
-					"folder_delimiter" => $folder->delimiter,
-					"folder_parents" => '',
-				);
-
-				if (intval($folder->attributes) == 32 && preg_match("/[^INBOX]/i", $folderName[1])) {
-					$folderParents[] = $folderName[1];
-				}
-			}
-
-			$this->ldap = new ldap_functions();
-
-			foreach ($folderParents as $pFolder) {
-
-				$parent = addcslashes($pFolder, '/.');
-
-				foreach ($list as $key => $folder) {
-
-					if (preg_match('/' . $parent . '/', $folder['folder_id'])) {
-						if (preg_match('/^INBOX?(\/|\.).*/', $folder['folder_id'])) {
-							if (preg_match('/^' . $parent . '?(\/|\.)/', $folder['folder_id'])) {
-								$list[$key]['folder_label'] = preg_replace('/' . $parent . '?(\/|\.)/', '', $folder['folder_id']);
-								$list[$key]['folder_parents'] = $pFolder;
-							}
-						} else if (preg_match('/^user?(\/|\.).*/', $folder['folder_id'])) {
-							if (substr($folder['folder_id'], 0, strripos($folder['folder_id'], '/')) === "user") {
-								$list[$key]['folder_label'] = $this->ldap->uid2cn(preg_replace('/^user?(\/|\.)/', '', $folder['folder_label']));
-								$list[$key]['folder_parents'] = "user";
-							} else {
-								if (preg_match('/' . $parent . '?(\/|\.)/', $folder['folder_id'])) {
-									$folder['folder_label'] = preg_replace('/' . $parent . '?(\/|\.)/', '', $folder['folder_id']);
-								} else {
-									$folder['folder_label'] = substr($folder['folder_id'], strripos($folder['folder_id'], $this->imap_delimiter) + 1);
-								}
-								$list[$key]['folder_label'] = $folder['folder_label'];
-								$list[$key]['folder_parents'] = substr($folder['folder_id'], 0, strripos($folder['folder_id'], $this->imap_delimiter));
-							}
-						}
-					}
-				}
-			}
-
-			return $list;
-		}
-	} 
-
+	
 	 /**
      * Metodo que retorna todas as pastas do usuario logado.
      * @param $params array opcional para repassar os argumentos ao metodo.
@@ -2037,8 +1960,9 @@ class imap_functions
 
 		$migrateMB = $db->getMigrateMailBox();
 
-		if ($migrateMB)
+		if ($migrateMB) {
 			return array("migrate_execution" => "true", "migrate_status" => $migrateMB['status'], "migrate_queue" => $migrateMB['queue']);
+		}
 
 		$mbox_stream = $this->open_mbox();
 
@@ -2052,9 +1976,9 @@ class imap_functions
 		$spam = $inbox . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder'];
 		$sent = $inbox . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'];
 		$uid2cn = isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn']) ?
-			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'] : false;
-		
-		// Free others requests 
+		$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'] : false;
+
+		// Free others requests
 		session_write_close();
 
 		$serverString = "{" . $this->imap_server . ":" . $this->imap_port . $this->imap_options . "}";
@@ -2070,36 +1994,86 @@ class imap_functions
 		$resultDefault = array();
 
 		if (is_array($folders_list)) {
-			
-			$listFolders = $this->foldersListParser($folders_list);
+			$folders_list = array_slice($folders_list, 0, $this->foldersLimit);
+
+			reset($folders_list);
+
+			$this->ldap = new ldap_functions();
 
 			$i = 0;
 
-			foreach ($listFolders as $folder) {
+			$ignoreFolder = '}DELETED' . $this->imap_delimiter;
+			$ignoreFolder .= 'user' . $this->imap_delimiter;
+			$ignoreFolder .= $this->username . $this->imap_delimiter;
+			$ignoreFolder = preg_quote($ignoreFolder, '/');
 
-				$aclMailbox = true;
+			$folderParents = array();
 
-				if (strtoupper($folder['folder_id']) !== "INBOX" && $folder['folder_id'] !== "") {
+			foreach ($folders_list as $key => $folder) {
+				if (preg_match('/' . $ignoreFolder . '/', $folder->name)) {
+					continue;
+				}
+
+				$status = imap_status($mbox_stream, $folder->name, SA_UNSEEN);
+
+				$tmp_folder_id = explode("}", $folder->name);
+
+				$pos = strpos($tmp_folder_id[1], $this->imap_delimiter, 5);
+
+				$folderUser = trim(substr($tmp_folder_id[1], 0, $pos ?: 0));
+
+				$Permission = true;
+
+				if (strtoupper($folderUser) !== "INBOX" && $folderUser !== "") {
 					if (is_resource($mbox_stream)) {
-						$aclMailbox = @imap_getacl($mbox_stream, $folder['folder_id']);
+						$Permission = @imap_getacl($mbox_stream, $folderUser);
 					}
-				}				
+				}
 
-				if( $aclMailbox ){
+				if ($Permission) {
+					$tmp_folder_id[1] = mb_convert_encoding($tmp_folder_id[1], "ISO-8859-1", "UTF7-IMAP");
 
-					if ($folder['folder_id'] == ('INBOX' . $this->imap_delimiter . 'decifradas')) {
+					if ($tmp_folder_id[1] == 'INBOX' . $this->imap_delimiter . 'decifradas') {
 						continue;
 					}
 
-					$status = imap_status( $mbox_stream, $folder['folder_name'], SA_UNSEEN );
-
-					$result[$i]['folder_id'] = $folder['folder_id'];
-					$result[$i]['folder_name'] = $folder['folder_label'];
-					$result[$i]['folder_parent'] = $folder['folder_parents'];
 					$result[$i]['folder_unseen'] = (isset($status->unseen) ? $status->unseen : false);
-					$result[$i]['folder_hasChildren'] = (intval($folder['folder_attributes'] && strtoupper($folder['folder_label']) != 'INBOX') == 32 ? 1 : 0);
 
-					switch ($folder['folder_label']) {
+					$folder_id = $tmp_folder_id[1];
+
+					$result[$i]['folder_id'] = $folder_id;
+
+					$tmp_folder_parent = explode($this->imap_delimiter, $folder_id);
+
+					$result[$i]['folder_name'] = array_pop($tmp_folder_parent);
+
+					$result[$i]['folder_name'] = $result[$i]['folder_name'] == 'INBOX' ? 'Inbox' : $result[$i]['folder_name'];
+
+					// SharedBox
+					$sharedBox = strtolower(substr($folder_id, 0, 4));
+
+					if ($uid2cn && $sharedBox === "user") {
+						$sharedBoxName = $folder_id;
+
+						if (substr_count($sharedBoxName, $this->imap_delimiter) == 1) {
+							if ($cn = $this->ldap->uid2cn($result[$i]['folder_name'])) {
+								$result[$i]['folder_name'] = $cn;
+							}
+						}
+					}
+
+					$tmp_folder_parent = implode($this->imap_delimiter, $tmp_folder_parent);
+
+					$result[$i]['folder_parent'] = $tmp_folder_parent == 'INBOX' ? '' : $tmp_folder_parent;
+
+					if (intval($folder->attributes) == 32 && strtoupper($result[$i]['folder_name']) != 'INBOX') {
+						$result[$i]['folder_hasChildren'] = 1;
+						$folderParents[] = $result[$i]['folder_id'];
+					} else {
+						$result[$i]['folder_hasChildren'] = 0;
+					}
+
+					switch ($tmp_folder_id[1]) {
 						case $inbox:
 						case $sent:
 						case $drafts:
@@ -2110,8 +2084,8 @@ class imap_functions
 						default:
 							$resultMine[] = $result[$i];
 					}
-					$i++;
 				}
+				$i++;
 			}
 		}
 
@@ -2137,7 +2111,7 @@ class imap_functions
 		foreach ($array_tmp as $key => $folder_id) {
 			$result2[] = $resultMine[$key];
 		}
-		
+
 		// Sorting resultDefault
 		$resultDefault2 = array();
 		foreach ($resultDefault as $key => $folder_id) {
@@ -2164,17 +2138,37 @@ class imap_functions
 			}
 		}
 
-		if ($params && isset($params['folderType']) && $params['folderType'] && $params['folderType'] == 'default')
+		if ($params && isset($params['folderType']) && $params['folderType'] && $params['folderType'] == 'default') {
 			return array_merge($resultDefault2, $arr_quota_info);
+		}
 
-		if ($params && isset($params['folderType']) && $params['folderType'] && $params['folderType'] == 'personal')
+		if ($params && isset($params['folderType']) && $params['folderType'] && $params['folderType'] == 'personal') {
 			return array_merge($result2, $arr_quota_info);
+		}
 
 		// Merge default folders and personal
 		$result2 = array_merge($resultDefault2, $result2);
 
+		foreach ($result2 as $key => $mailbox) {
+			if (trim($mailbox['folder_parent']) !== "") {
+				if (array_search($mailbox['folder_parent'], $folderParents) === false) {
+					if (preg_match('/^user/i', $mailbox['folder_parent'])) {
+						if (trim($result2[$key]['folder_parent']) === 'user') {
+							continue;
+						}
+						preg_match('/^user?(\/).*?(\/)/', $result2[$key]['folder_id'], $findParts);
+						$result2[$key]['folder_parent'] = current($findParts);
+						$result2[$key]['folder_parent'] = substr($result2[$key]['folder_parent'], 0, strlen($result2[$key]['folder_parent']) - 1);
+					} else {
+						$result2[$key]['folder_parent'] = '';
+					}
+				}
+			}
+		}
+
 		return array_merge($result2, $arr_quota_info);
 	}
+
 
 	function create_mailbox($arr)
 	{
@@ -2247,51 +2241,26 @@ class imap_functions
 		return $result;
 	}
 
-	function ren_mailbox($mailbox)
+	function ren_mailbox($arr)
 	{
-		$listFolders = $this->get_folders_list();
+		$namebox = $arr['current'];
+		$new_box = $arr['rename'];
+		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
+		$mbox_stream = $this->open_mbox();
+		//$ren_folder = imap_renamemailbox($mbox_stream,"{".$imap_server."}INBOX.$namebox","{".$imap_server."}INBOX.$new_box");
 
-$folder = current(array_filter($listFolders, function ($a) use ($mailbox) {
-    return $a['folder_id'] == $mailbox['current'];
-}));
+		$result = "Ok";
+		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP","UTF-8");
+		$new_box = mb_convert_encoding($new_box, "UTF7-IMAP","UTF-8");
 
-
-		$result = false;
-
-		if (count($folder) > 0) {
-
-			if (preg_match('/^(INBOX|user).*/', $folder['folder_id'])) {
-
-				$conn = $this->open_mbox();
-
-				if (is_resource($conn)) {
-
-					$aclMailbox = @imap_getacl($conn, $folder['folder_id']);
-
-					$acl = (is_array($aclMailbox) ? current($aclMailbox) : false);
-
-					if ($acl && preg_match('/^lrswipkxte.*/', $acl)) {
-
-						$currentBox = $folder['folder_id'];
-						$newNameBox = (trim($folder['folder_parent']) !== "" ? $folder['folder_parent'] : "INBOX");
-						$newNameBox .= $this->imap_delimiter . $mailbox['rename'];
-
-						$currentBox = mb_convert_encoding($currentBox, "UTF7-IMAP", mb_detect_encoding($currentBox, "UTF-8, ISO-8859-1", true));
-						$newNameBox = mb_convert_encoding($newNameBox, "UTF7-IMAP", mb_detect_encoding($newNameBox, "UTF-8, ISO-8859-1", true));
-
-						$currentBox = "{" . $this->imap_server . ":" . $this->imap_port . "}" . $currentBox;
-						$newNameBox = "{" . $this->imap_server . ":" . $this->imap_port . "}" . $newNameBox;
-
-						$result = (!imap_renamemailbox($conn, $currentBox, $newNameBox) ? imap_errors() : true);
-
-					}
-
-					$this->close_mbox($conn);
-				}
-			}
+		if(!imap_renamemailbox($mbox_stream,"{".$imap_server."}$namebox","{".$imap_server."}$new_box"))
+		{
+			$result = imap_errors();
 		}
-
+		if($mbox_stream)
+			$this->close_mbox($mbox_stream);
 		return $result;
+
 	}
 
 	function get_num_msgs($params)
