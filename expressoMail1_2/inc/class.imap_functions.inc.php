@@ -2153,12 +2153,7 @@ class imap_functions
 			if (trim($mailbox['folder_parent']) !== "") {
 				if (array_search($mailbox['folder_parent'], $folderParents) === false) {
 					if (preg_match('/^user/i', $mailbox['folder_parent'])) {
-						if (trim($result2[$key]['folder_parent']) === 'user') {
-							continue;
-						}
-						preg_match('/^user?(\/).*?(\/)/', $result2[$key]['folder_id'], $findParts);
-						$result2[$key]['folder_parent'] = current($findParts);
-						$result2[$key]['folder_parent'] = substr($result2[$key]['folder_parent'], 0, strlen($result2[$key]['folder_parent']) - 1);
+						$result2[$key]['folder_parent'] = 'user';
 					} else {
 						$result2[$key]['folder_parent'] = '';
 					}
