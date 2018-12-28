@@ -2018,15 +2018,11 @@ class imap_functions
 
 				$tmp_folder_id = explode("}", $folder->name);
 
-				$pos = strpos($tmp_folder_id[1], $this->imap_delimiter, 5);
-
-				$folderUser = trim(substr($tmp_folder_id[1], 0, $pos ?: 0));
-
 				$Permission = true;
 
-				if (strtoupper($folderUser) !== "INBOX" && $folderUser !== "") {
+				if( preg_match('/^user?(\/|\.).*/', $tmp_folder_id[1]) ){
 					if (is_resource($mbox_stream)) {
-						$Permission = @imap_getacl($mbox_stream, $folderUser);
+						$Permission = @imap_getacl($mbox_stream, $tmp_folder_id[1]);
 					}
 				}
 
