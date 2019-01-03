@@ -103,7 +103,7 @@ class UserApiResource extends ExpressoAdapter {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Connection: Keep-Alive' ) );
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Keep-Alive','Expect:'));
 
 		$result = curl_exec($ch);
 
