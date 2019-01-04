@@ -2018,69 +2018,60 @@ class imap_functions
 
 				$tmp_folder_id = explode("}", $folder->name);
 
-				$Permission = true;
+				$tmp_folder_id[1] = mb_convert_encoding($tmp_folder_id[1], "ISO-8859-1", "UTF7-IMAP");
 
-				if( preg_match('/^user?(\/|\.).*/', $tmp_folder_id[1]) ){
-					if (is_resource($mbox_stream)) {
-						$Permission = @imap_getacl($mbox_stream, $tmp_folder_id[1]);
-					}
+				if ($tmp_folder_id[1] == 'INBOX' . $this->imap_delimiter . 'decifradas') {
+					continue;
 				}
 
-				if ($Permission) {
-					$tmp_folder_id[1] = mb_convert_encoding($tmp_folder_id[1], "ISO-8859-1", "UTF7-IMAP");
+				$result[$i]['folder_unseen'] = (isset($status->unseen) ? $status->unseen : false);
 
-					if ($tmp_folder_id[1] == 'INBOX' . $this->imap_delimiter . 'decifradas') {
-						continue;
-					}
+				$folder_id = $tmp_folder_id[1];
 
-					$result[$i]['folder_unseen'] = (isset($status->unseen) ? $status->unseen : false);
+				$result[$i]['folder_id'] = $folder_id;
 
-					$folder_id = $tmp_folder_id[1];
+				$tmp_folder_parent = explode($this->imap_delimiter, $folder_id);
 
-					$result[$i]['folder_id'] = $folder_id;
+				$result[$i]['folder_name'] = array_pop($tmp_folder_parent);
 
-					$tmp_folder_parent = explode($this->imap_delimiter, $folder_id);
+				$result[$i]['folder_name'] = $result[$i]['folder_name'] == 'INBOX' ? 'Inbox' : $result[$i]['folder_name'];
 
-					$result[$i]['folder_name'] = array_pop($tmp_folder_parent);
+				// SharedBox
+				$sharedBox = strtolower(substr($folder_id, 0, 4));
 
-					$result[$i]['folder_name'] = $result[$i]['folder_name'] == 'INBOX' ? 'Inbox' : $result[$i]['folder_name'];
+				if ($uid2cn && $sharedBox === "user") {
+					$sharedBoxName = $folder_id;
 
-					// SharedBox
-					$sharedBox = strtolower(substr($folder_id, 0, 4));
-
-					if ($uid2cn && $sharedBox === "user") {
-						$sharedBoxName = $folder_id;
-
-						if (substr_count($sharedBoxName, $this->imap_delimiter) == 1) {
-							if ($cn = $this->ldap->uid2cn($result[$i]['folder_name'])) {
-								$result[$i]['folder_name'] = $cn;
-							}
+					if (substr_count($sharedBoxName, $this->imap_delimiter) == 1) {
+						if ($cn = $this->ldap->uid2cn($result[$i]['folder_name'])) {
+							$result[$i]['folder_name'] = $cn;
 						}
 					}
-
-					$tmp_folder_parent = implode($this->imap_delimiter, $tmp_folder_parent);
-
-					$result[$i]['folder_parent'] = $tmp_folder_parent == 'INBOX' ? '' : $tmp_folder_parent;
-
-					if (intval($folder->attributes) == 32 && strtoupper($result[$i]['folder_name']) != 'INBOX') {
-						$result[$i]['folder_hasChildren'] = 1;
-						$folderParents[] = $result[$i]['folder_id'];
-					} else {
-						$result[$i]['folder_hasChildren'] = 0;
-					}
-
-					switch ($tmp_folder_id[1]) {
-						case $inbox:
-						case $sent:
-						case $drafts:
-						case $spam:
-						case $trash:
-							$resultDefault[] = $result[$i];
-							break;
-						default:
-							$resultMine[] = $result[$i];
-					}
 				}
+
+				$tmp_folder_parent = implode($this->imap_delimiter, $tmp_folder_parent);
+
+				$result[$i]['folder_parent'] = $tmp_folder_parent == 'INBOX' ? '' : $tmp_folder_parent;
+
+				if (intval($folder->attributes) == 32 && strtoupper($result[$i]['folder_name']) != 'INBOX') {
+					$result[$i]['folder_hasChildren'] = 1;
+					$folderParents[] = $result[$i]['folder_id'];
+				} else {
+					$result[$i]['folder_hasChildren'] = 0;
+				}
+
+				switch ($tmp_folder_id[1]) {
+					case $inbox:
+					case $sent:
+					case $drafts:
+					case $spam:
+					case $trash:
+						$resultDefault[] = $result[$i];
+						break;
+					default:
+						$resultMine[] = $result[$i];
+				}
+
 				$i++;
 			}
 		}
