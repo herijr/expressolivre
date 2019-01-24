@@ -93,12 +93,12 @@
 
 		if (!$post_select_sector)
 		{
-			if($sector->sector_name == $user_sector)
+			if(strtolower($sector->sector_name) == strtolower($user_sector))
 				$combo_sector .= ' selected';
 		}
 		else
 		{
-			if($sector->sector_context == $post_select_sector)
+			if(strtolower($sector->sector_context) == strtolower($post_select_sector))
 				$combo_sector .= ' selected';
 		}
 		$combo_sector .= '>' .$sector->sector_name.'</option>'."\n";
