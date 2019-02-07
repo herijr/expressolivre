@@ -299,11 +299,13 @@ function changeType(value){
 		document.getElementById('user_signature').value = html_signature.GetHTML();
 		document.getElementById(\"text_signature\").style.display = '';
 		document.getElementById(\"html_signature\").style.display = 'none';
+		document.getElementsByName('html_signature')[0].disabled = true;
 	}
 	else if(value == 'html'){
 		html_signature.SetHTML(document.getElementById('user_signature').value);
 		document.getElementById(\"text_signature\").style.display = 'none';
 		document.getElementById(\"html_signature\").style.display  = '';
+		document.getElementsByName('html_signature')[0].disabled = false;
 	}
 }
 function get_html_translation_table(table, quote_style) {

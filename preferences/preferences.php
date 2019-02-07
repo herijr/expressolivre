@@ -9,6 +9,15 @@
 	*  option) any later version.                                              *
 	\**************************************************************************/
 
+function strip_DataURIscheme( &$str ) {
+	ini_set( 'pcre.backtrack_limit', '100000000' );
+	$old_size = strlen( $str );
+	$str =
+		preg_replace( '/(<[^>]*)data:[^, \'\"]*,[^ \'\">]*/', '$1',
+			preg_replace( '/(url\([^)]*)data:[^, \'\"]*,[^ \'\")]*/', '$1', $str ) );
+	if ( $old_size !== strlen( $str ) ) return true;
+	return false;
+}
 
 	$GLOBALS['phpgw_info']['flags'] = array(
 		'noheader'                => True,
@@ -23,10 +32,6 @@
 	{
 		$GLOBALS['phpgw']->redirect_link('/preferences/index.php');
 	}
-	
-	$user    = get_var('user',Array('POST'));
-	$forced  = get_var('forced',Array('POST'));
-	$default = get_var('default',Array('POST'));
 
 	$t = CreateObject('phpgwapi.Template',$GLOBALS['phpgw']->common->get_tpl_dir('preferences'));
 	$t->set_file(array(
@@ -37,7 +42,33 @@
         $t->set_block('preferences','script','scripthandle');
 	$t->set_block('preferences','help_row','help_rowhandle');
 	$t->set_var(array('rowhandle' => '','help_rowhandle' => '','messages' => ''));
-	
+
+	if ( isset( $_POST['user']['signature'] ) && strip_DataURIscheme( $_POST['user']['signature'] ) )
+		$t->set_var('messages','
+		<style>
+			.action_info_th {
+				font-family: Verdana, Arial, Helvetica, sans-serif;
+				font-size: 11px;
+				padding: 1px 10px 0px 10px;
+				border-style: inset;
+				border-color: gray;
+				background-color: rgb(250, 209, 99);
+				border-width: 1px;
+				-moz-border-radius: 6px 6px 6px 6px;
+				border-radius: 6px;
+			}
+		</style>
+		<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tr><th width="40%"></th>
+			<th class="action_info_th" nowrap="">'.lang( 'embedded images are not allowed by the server ' ).'</th>
+			<th width="40%"></th>
+		</table>
+		');
+
+	$user    = get_var('user',Array('POST'));
+	$forced  = get_var('forced',Array('POST'));
+	$default = get_var('default',Array('POST'));
+
 	if ($_GET['appname'] != 'preferences')
 	{
 		$GLOBALS['phpgw']->translation->add_app('preferences');	// we need the prefs translations too
@@ -510,7 +541,7 @@
 	$GLOBALS['phpgw']->common->phpgw_header();
 	echo parse_navbar();
 
-	$t->set_var('messages',$error);
+	if ($error ) $t->set_var('messages',$error);
 	$t->set_var('action_url',$GLOBALS['phpgw']->link('/preferences/preferences.php','appname=' . $_GET['appname']));
 	$t->set_var('th_bg',  $GLOBALS['phpgw_info']['theme']['th_bg']);
 	$t->set_var('th_text',$GLOBALS['phpgw_info']['theme']['th_text']);

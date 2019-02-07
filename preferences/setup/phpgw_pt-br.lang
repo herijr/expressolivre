@@ -27,6 +27,7 @@ description can not exceed 255 characters in length !	preferences	pt-br	A Descri
 Disable the execution a bugfixscript for Internet Explorer 5.5 and higher to show transparency in PNG-images?	preferences	pt-br	Desativar a execução do script de correção de bug para o Internet Explorer 5.5 e superiores para exibir transparências em imagens PNG?
 do you prefer a 24 hour time format, or a 12 hour one with am/pm attached.	preferences	pt-br	Você prefere o formato de 24 horas, ou 12 horas acompanhado de am/pm?
 edit custom fields	preferences	pt-br	Editar campos personalizados
+embedded images are not allowed by the server	common	pt-br	Imagens incorporadas não são permitidas pelo servidor
 enter your actual password	preferences	pt-br	Digite sua senha atual
 enter your new password	preferences	pt-br	Digite sua nova senha
 error: there was a problem finding the preference file for %1 in %2	preferences	pt-br	Erro: Houve um problema ao tentar encontrar o arquivo de preferencias para %1 em %2
