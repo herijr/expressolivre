@@ -58,6 +58,9 @@ class wf_ldap
 	 */
 	function get_entry($account_id, $account_type = "u")
 	{
+		if(!(int)($account_id))
+			return false;
+
 		if ($account_type == "u")
 		{
 			return $this->cachedLDAP->getEntryByID($account_id);

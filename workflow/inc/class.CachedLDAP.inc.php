@@ -337,6 +337,9 @@ class CachedLDAP
 	*/
 	function getEntryByID($userID)
 	{
+		if(!(int)$userID)
+			return false;
+
 		return $this->getEntry('uidnumber', (int) $userID);
 	}
 
