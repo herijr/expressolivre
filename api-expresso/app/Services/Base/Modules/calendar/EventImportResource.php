@@ -2,7 +2,7 @@
 
 namespace App\Services\Base\Modules\calendar;
 
-require_once __DIR__.'/../../../../../../api-expresso/bootstrap/app.php';
+require_once dirname( __FILE__ ) . '/../../../../../../api-expresso/bootstrap/app.php';
 
 use App\Models\Calendar\PhpgwCalModel;
 use App\Models\Calendar\PhpgwCalUserModel;

@@ -18,10 +18,10 @@ class UserApiResource extends ExpressoAdapter {
 
  		$this->setParams($request);
 
-		if( !file_exists( __DIR__ . '/../../Config/profileHomeServer.ini') ){
+		if( !file_exists( dirname( __FILE__ ) . '/../../Config/profileHomeServer.ini') ){
 			return Errors::runException(2201);
 		} else {
-			$profiles	= parse_ini_file( __DIR__ . '/../../Config/profileHomeServer.ini', true);
+			$profiles	= parse_ini_file( dirname( __FILE__ ) . '/../../Config/profileHomeServer.ini', true);
 			$profileValues = array();
 			foreach( $profiles['home.server'] as $key => $values ){
 				$profileValues[] = trim($values);

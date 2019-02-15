@@ -9,7 +9,7 @@ if ( !isset( $_SESSION['phpgw_info']['expressomail']['server']['db_name'] ) ) {
 	$_SESSION['phpgw_info']['expressomail']['server']['db_pass'] = $GLOBALS['phpgw_info']['server']['db_pass'];
 	$_SESSION['phpgw_info']['expressomail']['server']['db_type'] = $GLOBALS['phpgw_info']['server']['db_type'];
 } else {
-	define( 'PHPGW_INCLUDE_ROOT', __DIR__.'/../..');
+	define( 'PHPGW_INCLUDE_ROOT', dirname( __FILE__ ) . '/../..');
 	define( 'PHPGW_API_INC', PHPGW_INCLUDE_ROOT.'/phpgwapi/inc' );
 	include_once( PHPGW_API_INC.'/class.db_egw.inc.php' );
 }

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../../lib/tonic.php';
+require_once dirname( __FILE__ ) . '/../../lib/tonic.php';
 
 /* Test resource definitions */
 

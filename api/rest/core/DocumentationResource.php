@@ -35,8 +35,8 @@ class DocumentationResource extends ExpressoAdapter
 
 		$apis = array();
 
-		if (file_exists(__DIR__ . '/../../config/profileHomeServer.ini')) {
-			$serversAPI = parse_ini_file(__DIR__ . '/../../config/profileHomeServer.ini', true);
+		if (file_exists(dirname( __FILE__ ) . '/../../config/profileHomeServer.ini')) {
+			$serversAPI = parse_ini_file(dirname( __FILE__ ) . '/../../config/profileHomeServer.ini', true);
 			$apis = array_values(array_unique($serversAPI['home.server']));
 		}
 

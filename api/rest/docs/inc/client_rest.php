@@ -1,8 +1,8 @@
 <?php
 
-	if (file_exists(__DIR__ . '/../../../config/profileHomeServer.ini')) {
+	if (file_exists(dirname( __FILE__ ) . '/../../../config/profileHomeServer.ini')) {
 
-		$config	= parse_ini_file(__DIR__ . '/../../../config/profileHomeServer.ini', true);
+		$config	= parse_ini_file(dirname( __FILE__ ) . '/../../../config/profileHomeServer.ini', true);
 
 		if(isset($config['documentation']['BASE_URL'])){
 

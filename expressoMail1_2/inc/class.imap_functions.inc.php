@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ .'/../../api/vendor/autoload.php';
+require_once dirname( __FILE__ ) .'/../../api/vendor/autoload.php';
 
 include_once("class.functions.inc.php");
 include_once("class.ldap_functions.inc.php");

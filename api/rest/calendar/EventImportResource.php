@@ -1,10 +1,10 @@
 <?php
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once dirname( __FILE__ ) . '/../../vendor/autoload.php';
 
-require_once __DIR__ . '/../../../phpgwapi/inc/adodb/adodb.inc.php';
+require_once dirname( __FILE__ ) . '/../../../phpgwapi/inc/adodb/adodb.inc.php';
 
-require_once __DIR__ . '/../../config/DB.php';
+require_once dirname( __FILE__ ) . '/../../config/DB.php';
 
 use Sabre\VObject;
 

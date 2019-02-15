@@ -14,7 +14,7 @@ class Errors {
 	
 	function __construct(){
 		$this->errors = array();
-		if($handle = fopen( __DIR__ . "/../Config/Errors.tsv", "r")){
+		if($handle = fopen( dirname( __FILE__ ) . "/../Config/Errors.tsv", "r")){
 			while (!feof($handle)) {
 				$line = trim(fgets($handle,1024));
 				if($line == null || $line[0] == "#")

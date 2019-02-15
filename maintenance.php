@@ -11,6 +11,6 @@ if ( $GLOBALS['phpgw_info']['server']['deny_all_logins'] ) {
 			exit;
 		}
 	}
-	echo file_get_contents( __DIR__.'/maintenance.html' );
+	echo file_get_contents( dirname( __FILE__ ) . '/maintenance.html' );
 	exit;
 }

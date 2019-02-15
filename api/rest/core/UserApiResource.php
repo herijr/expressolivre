@@ -15,11 +15,11 @@ class UserApiResource extends ExpressoAdapter {
 		// to Receive POST Params (use $this->params)
  		parent::post($request);
 
-		if( !file_exists( __DIR__ . '/../../config/profileHomeServer.ini') ){
+		if( !file_exists( dirname( __FILE__ ) . '/../../config/profileHomeServer.ini') ){
 			Errors::runException(2201);
 		} else {
 
-			$profiles	= parse_ini_file( __DIR__ . '/../../config/profileHomeServer.ini', true);
+			$profiles	= parse_ini_file( dirname( __FILE__ ) . '/../../config/profileHomeServer.ini', true);
 			$profileValues = array();
 
 			foreach( $profiles['home.server'] as $key => $value ) {

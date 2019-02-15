@@ -267,7 +267,7 @@ class AdminAdapter extends ExpressoAdapter
 	{
 		$default = false;
 
-		if( file_exists( __DIR__ . '/../Config/profileProtectedFields.ini') )
+		if( file_exists( dirname( __FILE__ ) . '/../Config/profileProtectedFields.ini') )
 		{
 			$default = $this->readProfile('profileProtectedFields.ini', 'protected-fields');
 		}
@@ -279,7 +279,7 @@ class AdminAdapter extends ExpressoAdapter
 	{
 		$default = false;
 
-		if( file_exists( __DIR__ . '/../Config/profileCreateUser.ini') )
+		if( file_exists( dirname( __FILE__ ) . '/../Config/profileCreateUser.ini') )
 		{
 			$default = $this->readProfile('profileCreateUser.ini', $profileUser);
 		}
@@ -292,7 +292,7 @@ class AdminAdapter extends ExpressoAdapter
 		$default	= "";
 		$homeServer = false;
 		
-		if( file_exists( __DIR__ . '/../Config/profileHomeServer.ini') )
+		if( file_exists( dirname( __FILE__ ) . '/../Config/profileHomeServer.ini') )
 		{
 			$profileHomeServer = $this->readProfile('profileHomeServer.ini');
 
@@ -316,7 +316,7 @@ class AdminAdapter extends ExpressoAdapter
 	{
 		$default	= false;
 
-		$profiles	= parse_ini_file( __DIR__ . '/../Config/'.$profile, true);
+		$profiles	= parse_ini_file( dirname( __FILE__ ) . '/../Config/'.$profile, true);
 
 		foreach( $profiles as $key => $values )
 		{

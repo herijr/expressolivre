@@ -38,8 +38,8 @@ class ExpressoAdapter {
 				)
 			);
 
-			require_once( __DIR__ . '/../../../../../header.inc.php');
-			require_once( __DIR__ . '/../../../../../phpgwapi/inc/class.xmlrpc_server.inc.php');
+			require_once( dirname( __FILE__ ) . '/../../../../../header.inc.php');
+			require_once( dirname( __FILE__ ) . '/../../../../../phpgwapi/inc/class.xmlrpc_server.inc.php');
 		}
 		//define('PHPGW_TEMPLATE_DIR', ExecMethod('phpgwapi.phpgw.common.get_tpl_dir', 'phpgwapi'));
 		$this->expressoVersion = substr($GLOBALS['phpgw_info']['server']['versions']['phpgwapi'],0,3);
@@ -233,7 +233,7 @@ class ExpressoAdapter {
 
 	protected function getUserApps($user_id = ""){
 		// Load Granted Apps for Web Service
-		$config = parse_ini_file( __DIR__ . '/../Config/user.ini',true);
+		$config = parse_ini_file( dirname( __FILE__ ) . '/../Config/user.ini',true);
 		$apps 	= $config['Applications.mapping'];
 		// Load Granted Apps for User
 		$contactApps = array();
