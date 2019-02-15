@@ -197,12 +197,12 @@ class MailAdapter extends ExpressoAdapter {
 		//$msg['msgDate']	 =  $info_msg['fulldate'];
 		$msg['msgDate']  =  $info_msg['msg_day']." ".$info_msg['msg_hour'];
 		if($info_msg['from']) {
-			$msg['msgFrom']['fullName'] 	= $info_msg['from']['name'];
-			$msg['msgFrom']['mailAddress'] 	= $info_msg['from']['email'];
+			$msg['msgFrom']['fullName'] 	= mb_convert_encoding($info_msg['from']['name'],"UTF8", "ISO_8859-1");
+			$msg['msgFrom']['mailAddress'] 	= mb_convert_encoding($info_msg['from']['email'],"UTF8", "ISO_8859-1");
 		}
 		if($info_msg['sender'] != null){
 			$msg['msgSender']['fullName'] 	= $info_msg['sender']['name'];
-			$msg['msgSender']['mailAddress']= $info_msg['sender']['email'];
+			$msg['msgSender']['mailAddress']= mb_convert_encoding($info_msg['sender']['email'],"UTF8", "ISO_8859-1");
 		}		
 		if($info_msg['toaddress2'] != null){
 			$toaddresses = explode(",",$info_msg['toaddress2']);

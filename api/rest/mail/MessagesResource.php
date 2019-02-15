@@ -125,7 +125,7 @@ class MessagesResource extends MailAdapter {
 
 					$msg['msgDate']	= gmdate('d/m/Y H:i', $imap_msg['timestamp']);
 					$msg['msgFrom']['fullName'] = mb_convert_encoding($imap_msg['from']['name'],"UTF8", "ISO_8859-1");
-					$msg['msgFrom']['mailAddress'] = $imap_msg['from']['email'];
+					$msg['msgFrom']['mailAddress'] = mb_convert_encoding($imap_msg['from']['email'],"UTF8", "ISO_8859-1");
 					$msg['msgTo'] = array();
 					if($this->getExpressoVersion() != "2.2") {
 						foreach($imap_msg['to'] as $to){

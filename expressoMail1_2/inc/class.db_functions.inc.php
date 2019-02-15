@@ -1,6 +1,7 @@
 <?php
+
 if ( !isset( $_SESSION['phpgw_info']['expressomail']['server']['db_name'] ) ) {
-	include_once( __DIR__.'/../../header.inc.php' );
+	include_once( dirname( __FILE__ ) . '/../../header.inc.php' );
 	$_SESSION['phpgw_info']['expressomail']['server']['db_name'] = $GLOBALS['phpgw_info']['server']['db_name'];
 	$_SESSION['phpgw_info']['expressomail']['server']['db_host'] = $GLOBALS['phpgw_info']['server']['db_host'];
 	$_SESSION['phpgw_info']['expressomail']['server']['db_port'] = $GLOBALS['phpgw_info']['server']['db_port'];
@@ -22,7 +23,7 @@ class db_functions
 	var $user_id;
 	var $related_ids; 
 	
-	function db_functions(){
+	function db_functions() {
 		$this->db = new db_egw();		
 		$this->db->Halt_On_Error = 'no';
 		$this->db->connect(
