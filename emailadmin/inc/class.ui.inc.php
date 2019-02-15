@@ -384,7 +384,7 @@ class ui
 					foreach ( (array)unserialize( $domain['organization_units'] ) as $ou ) if ( $ou ) $ous .= '<p>'.$ou.'</p>';
 					$extras = '';
 					foreach ( (array)unserialize( $domain['extras'] ) as $key => $val ) if ( $key )
-						$extras.= '<p>'.lang( $key ).' = <q name="'.$key.'">'.$val.'</q></p>';
+						$extras.= '<p>'.lang( $key ).' = <q>'.htmlentities( $val ).'</q><input type="hidden" name="'.$key.'" value="'.htmlentities( $val ).'"></p>';
 
 					$rowsTable .= '<tr data-id="'.$domain['domainid'].'">';
 					$rowsTable .= '<td class="nowrap" name="description">'.$profileData['description'].'</td>';
@@ -392,14 +392,13 @@ class ui
 					$rowsTable .= '<td menu_action="delete" domainid="'.$domain['domainid'].'" title="'.lang('delete').'">'.lang('delete').'</td>';
 					$rowsTable .= '<td menu_action="move" domainid="'.$domain['domainid'].'" title="'.lang('move').'">'.lang('move').'</td>';
 					$rowsTable .= '<td menu_action="edit" name="ous" title="'.lang('edit').'">'.( empty( $ous )?'-':$ous ).'</td>';
-					$rowsTable .= '<td menu_action="edit" name="extras" title="'.lang('edit').'">'.( empty( $extras)?'-':$extras).'</td>';
+					$rowsTable .= '<td menu_action="edit" name="extras" title="'.lang('edit').'">'.( empty( $extras)?'-':$extras ).'</td>';
 					$rowsTable .= '</tr>';
 				}
 
 				$countDomains = count($domains);
 			}
 		}
-
 		$this->template->set_var( array( 
 			"action_url"			=> $GLOBALS['phpgw']->link('/index.php','menuaction=emailadmin.ui.listDomains'),
 			"countDomains"			=> $countDomains,
@@ -435,7 +434,10 @@ class ui
 			"lang_profile"			=> lang("profile"),
 			"link_back_page" 		=> $GLOBALS['phpgw']->link('/index.php','menuaction=emailadmin.ui.listConfigurations'),
 			"rowsTable"				=> $rowsTable,
-			'extras_vars_keys_json' => preg_replace( '/^{/', '{ ', json_encode( array( 'defaultUserQuota' => utf8_encode( lang( 'defaultUserQuota' ) ) ) ) ),
+			'extras_vars_keys_json' => preg_replace( '/^{/', '{ ', json_encode( array(
+				'defaultUserQuota'     => utf8_encode( lang( 'defaultUserQuota' ) ),
+				'defaultUsersignature' => utf8_encode( lang( 'defaultUsersignature' ) ),
+			) ) ),
 		));	
 
 		$this->template->set_block("body","main");

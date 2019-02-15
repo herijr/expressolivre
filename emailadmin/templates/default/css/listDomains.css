@@ -64,3 +64,4 @@
 #selectable_extras tr:hover { background-color: #c5dbec; cursor: pointer; }
 #selectable_extras tr.selected { background-color: #79b7e7; }
 #selectable_extras td { overflow: hidden; border: 1px solid #ddd; }
+#selectable_extras td.value { display: block; max-height: 200px; overflow: auto; }

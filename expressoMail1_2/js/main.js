@@ -1176,7 +1176,9 @@ function new_message(type, border_ID){
 	}
 	if(typeof(preferences.signature) == 'undefined')
 		preferences.signature = "";
+
 	var signature = preferences.type_signature == 'html' ? preferences.signature : preferences.signature.replace(/\n/g, "<br>");
+
 	if(type!="new" && type!="edit")
 		data.is_local_message = (document.getElementById("is_local_"+border_ID).value=="1")?true:false;
 	switch(type){
@@ -1188,7 +1190,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if (preferences.use_signature == "1"){
+			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1"){
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
 			}
 			else{
@@ -1225,7 +1227,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if (preferences.use_signature == "1") {
+			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + block_quoted_body + "</body></html>");
 			}
 			else {
@@ -1278,7 +1280,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if (preferences.use_signature == "1") {
+			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
 			}
 			else {
@@ -1334,7 +1336,7 @@ function new_message(type, border_ID){
 			var body = document.getElementById("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if (preferences.use_signature == "1") {
+			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + block_quoted_body + "</body></html>");
 			}
 			else {
@@ -1420,7 +1422,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if (preferences.use_signature == "1") {
+			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + make_forward_body(data.body, data.to, data.date, data.subject, data.to_all, data.cc) + "</body></html>");
 			}
 			else {
@@ -1466,7 +1468,7 @@ function new_message(type, border_ID){
 			var body = document.getElementById("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if (preferences.use_signature == "1") {
+			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
 			}
 			else {
@@ -1560,6 +1562,14 @@ function new_message(type, border_ID){
 			});
 			break;
 		default:
+	}
+
+	$('img#signature').toggle( !preferences.auto_signature );
+	if ( preferences.auto_signature ) {
+		var doc = document.getElementById('signature_ro_'+new_border_ID).contentWindow.document;
+		doc.open();
+		doc.write( signature );
+		doc.close();
 	}
 
 	// IM Module Enabled
@@ -1853,6 +1863,11 @@ function send_message(ID, folder, folder_name){
 		write_msg(document.getElementById('user_is_blocked_to_send_email_message').value);
 		return;
 	}
+	var _subject = trim(Element("subject_"+ID).value);
+	if((_subject.length == 0) && !confirm(get_lang("Send this message without a subject?"))) {
+		Element("subject_"+ID).focus();
+		return;
+	}
 
 	if ( document.getElementById('viewsource_rt_checkbox_' + ID).checked == true )
 		document.getElementById('viewsource_rt_checkbox_' + ID).click();
@@ -1874,7 +1889,10 @@ function send_message(ID, folder, folder_name){
 	textArea.style.display='none';
 	textArea.name = "body";
 	body = document.getElementById("body_"+ID);
-	textArea.value = ( ( mail_as_plain ) ? (is_ie ? body.contentWindow.document.body.innerHTML : body.previousSibling.value) : ( '<body>\r\n' + body.contentWindow.document.body.innerHTML + '\r\n</body>' ) );
+	textArea.value = ( mail_as_plain?
+		( ( is_ie ? body.contentWindow.document.body.innerHTML : body.previousSibling.value )+( preferences.auto_signature? '\n\n'+RichTextEditor.stripHTML( preferences.signature ) : '' ) ) :
+		( '<body>\r\n'+body.contentWindow.document.body.innerHTML+( preferences.auto_signature? '<br>'+preferences.signature : '' )+'\r\n</body>' )
+	);
 	var input_folder = document.createElement("INPUT");
 	input_folder.style.display='none';
 	input_folder.name = "folder";
@@ -1913,13 +1931,7 @@ function send_message(ID, folder, folder_name){
 	mail_type.setAttribute('type', 'hidden');
 	mail_type.name = 'type';
 	mail_type.value = ( mail_as_plain ) ? 'plain' : 'html';
-	form.appendChild(mail_type); 
-
-	var _subject = trim(Element("subject_"+ID).value);
-	if((_subject.length == 0) && !confirm(get_lang("Send this message without a subject?"))) {
-		Element("subject_"+ID).focus();
-		return;
-	}
+	form.appendChild(mail_type);
 
 	if (expresso_offline) {
 		stringEmail = Element("to_"+ID).value;

@@ -15,14 +15,8 @@ cRichTextEditor.prototype.loadEditor = function(ID) {
 
 	if(this.table.parentNode)
 		this.table.parentNode.removeChild(this.table);
-	
-	if( parentDiv.firstChild )
-	{
-		if (!parentDiv.firstChild.hasChildNodes()) 
-			parentDiv.insertBefore(this.table,parentDiv.firstChild);
-	}
-	else
-		parentDiv.appendChild(this.table);
+
+	$(parentDiv).prepend( this.table );
 
 	var mail_as_plain = document.getElementById( 'textplain_rt_checkbox_' + this.id );
 	this.table.style.visibility = ( mail_as_plain && mail_as_plain.checked ) ? 'hidden' : 'visible';
@@ -45,10 +39,11 @@ cRichTextEditor.prototype.createElementEditor = function(pObj)
 		iframe = document.createElement("IFRAME");
 		iframe.id = pObj;
 		iframe.name = pObj;
-		iframe.width = "99%";
+		iframe.width = "100%";
 		iframe.height = 300;
 		iframe.setAttribute("unselectable","on");
 		iframe.setAttribute("tabIndex","1");
+		iframe.setAttribute( 'frameborder', '0' );
 
 		config_events( iframe, 'onload', function( )
 		{
@@ -66,7 +61,9 @@ cRichTextEditor.prototype.createElementEditor = function(pObj)
 			}
 		});
 
-		parentDiv.appendChild(iframe);
+		var div_iframe = $('<div style="border: 2px solid; border-color: #111 #b2b2c1 #b2b2c1 #111;">').append( iframe );
+		if ( preferences.auto_signature ) div_iframe.append( $('<iframe id="signature_ro_'+this.id+'" width="100%" frameborder="0">') );
+		parentDiv.appendChild( div_iframe[0] );
 
 		var source = document.createElement( 'input' );
 		source.id = 'viewsource_rt_checkbox_' + this.id;
@@ -155,6 +152,10 @@ cRichTextEditor.prototype.viewsource = function(source) {
 			document.getElementById("table_richtext_toolbar").style.visibility="visible";  
 		}
 	}
+}
+
+cRichTextEditor.prototype.stripHTML = function( text_html ) {
+	return $('<textarea />').html( text_html ).text().replace( /[\r\n\t]*/mg, '' ).replace( /<br\s*\/?>/mg, '\n' ).replace( /(<([^>]+)>)/ig, '' );
 }
 
 cRichTextEditor.prototype.plain = function(source) {

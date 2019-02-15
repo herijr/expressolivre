@@ -16,8 +16,8 @@ function openDomainDialog( event ) {
 			params.ous.push( $(this).html() );
 		} );
 		params.extras      = {};
-		$(parent).find( 'td[name=extras] q' ).each( function() {
-			params.extras[$(this).attr('name')] = $(this).html();
+		$(parent).find( 'td[name=extras] input' ).each( function() {
+			params.extras[$(this).attr('name')] = $(this).val();
 		} );
 	}
 	
@@ -123,15 +123,23 @@ function openDomainDialog( event ) {
 		}
 	});
 }
+
+function htmlentities( str ) {
+	return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+		return '&#'+i.charCodeAt(0)+';';
+	});
+}
 function addExtraValue( key, value ) {
 	if ( key.length <= 0 || value.length <= 0 ) return;
 	var sel = $('#selectable_extras td[name='+key+']')
-	if ( sel.length > 0 ) $(sel).html( value );
-	else {
+	if ( sel.length > 0 ){
+		$(sel).html( htmlentities( value ) );
+		$('#selectable_extras td input[name='+key+']').val( value );
+	} else {
 		$('#selectable_extras').append(
 			$('<tr>')
-				.append( $('<td>').html( extras_vars_keys[key] ) )
-				.append( $('<td>').attr('name',key).html( value ) )
+				.append( $('<td>').html( extras_vars_keys[key] ).append( $('<input>').attr('name',key).attr('type','hidden').val( value ) ) )
+				.append( $('<td>').attr('name',key).attr('class','value').html( htmlentities( value ) ) )
 				.on( 'click', function(e){ $(e.currentTarget).toggleClass( "selected" ); })
 		);
 	}
@@ -233,8 +241,8 @@ function addDomains( dialog )
 		} );
 
 		var extras = {};
-		$('#selectable_extras td[name]').each( function() {
-			extras[$(this).attr('name')] = $(this).html();
+		$('#selectable_extras td input').each( function() {
+			extras[$(this).attr('name')] = $(this).val();
 		} );
 		
 		var params = {
@@ -266,7 +274,13 @@ function addDomains( dialog )
 						// Update extras
 						var td = $('#tables_domains tr[data-id='+this.params.domainid+'] td[name=extras]');
 						$(td).html( ( Object.keys(this.params.extras).length > 0 )? '' : '-' );
-						$.each( this.params.extras, function( idx, val ) { $(td).append( $('<p>').html(extras_vars_keys[idx]+' = ').append( $('<q>').attr('name',idx).html( val ) ) ) } );
+						$.each( this.params.extras, function( idx, val ) {
+							$(td).append(
+								$('<p>').html(extras_vars_keys[idx]+' = ')
+								.append( $('<q>').html( htmlentities( val ) ) )
+								.append( $('<input>').attr('name',idx).attr('type','hidden').val( val ) )
+							);
+						} );
 						
 						alert( $('input[type=hidden][name=lang_edited_domain]').val() );
 					}

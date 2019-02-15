@@ -14,8 +14,9 @@ class so
 {
 	var $db;
 	var $tables;
+	var $current_account = false;
 
-	function so()
+	public function __construct()
 	{
 		$this->db = $GLOBALS['phpgw']->db;
 		
@@ -89,40 +90,88 @@ class so
 
 	function getProfile( $mode, $value )
 	{
-		$where = array('key' => (($mode == 'id')? 'phpgw_emailadmin.profileid' : 'phpgw_emailadmin_domains.domain'), 'value' => $value);
 		$query = 'SELECT phpgw_emailadmin.* FROM phpgw_emailadmin'.
 			(($mode == 'mail')? ' INNER JOIN phpgw_emailadmin_domains ON (phpgw_emailadmin.profileid = phpgw_emailadmin_domains.profileid)' : '').
 			' WHERE ('.(($mode == 'mail')? 'phpgw_emailadmin_domains.domain' : 'phpgw_emailadmin.profileid').' = \''.$value.'\' )';
 		$this->db->query($query, __LINE__, __FILE__);
 		return $this->db->next_record()? array_merge(
 			$this->colMap( $this->db->row() ),
-			array( 'defaultUserQuota' => $this->getDefaultUserQuota( ( $mode === 'mail' )? $value : '' ) )
+			array(
+				'defaultUserQuota'     => $this->getDefaultUserQuota( ( $mode === 'mail' )? $value : '' ),
+				'defaultUsersignature' => $this->getDefaultSignature( $value ),
+			)
 		) : false;
 	}
 
 	function getDefaultUserQuota( $domain = '' )
 	{
-		$domain = preg_replace( '/.*@/', '', trim( $domain ) );
 		if ( !isset( $_SESSION['phpgw_info']['expresso']['expressoAdmin'] ) ) {
 			$c = CreateObject('phpgwapi.config','expressoAdmin1_2');
 			$c->read_repository();
 			$_SESSION['phpgw_info']['expresso']['expressoAdmin'] = $c->config_data;
 		}
+		if ( ( $result = $this->getExtras( $domain, 'defaultUserQuota' ) ) !== false ) return $result;
+		return isset( $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] )?
+		(int)$_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] : 20;
+	}
+
+	function getDefaultSignature( $domain = '' )
+	{
+		$signature = $this->getExtras( $domain, 'defaultUsersignature' );
+		if ( !$signature ) return false;
+
+		if ( !isset( $_SESSION['phpgw_info']['workflow']['server_root'] ) ) {
+			require_once PHPGW_SERVER_ROOT.'/workflow/inc/common.inc.php';
+			Factory::getInstance('WorkflowMacro')->prepareEnvironment();
+		}
+
+		require_once PHPGW_SERVER_ROOT.'/workflow/inc/class.so_adminaccess.inc.php';
+		require_once PHPGW_SERVER_ROOT.'/workflow/inc/local/classes/class.wf_orgchart.php';
+		require_once PHPGW_SERVER_ROOT.'/workflow/inc/class.so_orgchart.inc.php';
+
+		$GLOBALS['ajax']->acl = &Factory::getInstance( 'so_adminaccess', Factory::getInstance('WorkflowObjects')->getDBGalaxia()->Link_ID );
+		$orgchart = new wf_orgchart();
+		if ( ( $employeeInfo = $orgchart->getEmployee( $this->getCurrentAccount() ) ) === false ) return false;
+
+		$orgchart = new so_orgchart();
+		$data     = $orgchart->getEmployeeInfo( $this->getCurrentAccount() , $employeeInfo['organizacao_id'] );
+		if ( isset( $data['error'] ) ) return false;
+
+		foreach ( $data['info'] as $field )
+			$signature = preg_replace( '/%'.preg_quote( strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $field['name'] ) ) ).'%/i', htmlentities( $field['value'] ), $signature );
+
+		return $signature;
+	}
+
+	protected function getCurrentAccount()
+	{
+		if ( $this->current_account !== false ) return $this->current_account;
+		return $this->current_account= (
+			isset( $GLOBALS['phpgw_info']['user']['account_id']                  )? $GLOBALS['phpgw_info']['user']['account_id'] :
+			isset( $GLOBALS['phpgw']->accounts->data['account_id']               )? $GLOBALS['phpgw']->accounts->data['account_id'] :
+			isset( $_SESSION['phpgw_info']['expresso']['user']['account_id']     )? $_SESSION['phpgw_info']['expresso']['user']['account_id'] :
+			isset( $_SESSION['phpgw_info']['expressomail']['user']['account_id'] )? $_SESSION['phpgw_info']['expressomail']['user']['account_id'] :
+			isset( $_SESSION['phpgw_session']['account_id']                      )? $_SESSION['phpgw_session']['account_id'] :
+			false
+		);
+	}
+
+	function getExtras( $domain, $key )
+	{
+		$domain = preg_replace( '/.*@/', '', trim( $domain ) );
 		while ( !empty( $domain ) ) {
 			$this->db->query(
 				'SELECT extras '.
 				'FROM phpgw_emailadmin_domains '.
-				'WHERE domain = \''.$this->db->db_addslashes( $domain ).'\' AND extras like \'%"defaultUserQuota"%\''
+				'WHERE domain = \''.$this->db->db_addslashes( $domain ).'\' AND extras like \'%"'.$this->db->db_addslashes( $key ).'"%\''
 			);
-			while ( $this->db->next_record() )
-			{
+			while ( $this->db->next_record() ) {
 				$extras = unserialize( $this->db->f( 'extras' ) );
-				if ( isset( $extras['defaultUserQuota'] ) ) return $extras['defaultUserQuota'];
+				if ( isset( $extras[$key] ) ) return $extras[$key];
 			}
 			$domain = ( strpos( $domain, '.' ) === false )? '' : trim( preg_replace( '/^[^.]*\./', '', $domain ) );
 		}
-		return isset( $_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] )?
-		(int)$_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] : 20;
+		return false;
 	}
 
     function getDomains( $domain )
@@ -175,6 +224,8 @@ class so
 
 	function saveDomains( $params )
 	{
+		foreach ( (array)$params['extras'] as $key => $value ) if ( is_string( $value ) ) $params['extras'][$key] = utf8_decode( $value );
+
 		if( $params['action'] == 'edit' )
 		{
 			$query = 'UPDATE phpgw_emailadmin_domains SET'.

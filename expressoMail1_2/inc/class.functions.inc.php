@@ -120,8 +120,14 @@
 				return ($key . '*');
 		}
 
-		function get_preferences()	{
-			return $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
+		function get_preferences() {
+			$result = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
+			if ( $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUsersignature'] ) {
+				$result['auto_signature'] = true;
+				$result['signature']      = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUsersignature'];
+				$result['type_signature'] = 'html';
+			}
+			return $result;
 		}
 		// Unicode Conversor: convert everything from UTF-8 into an NCR[Numeric Character Reference]
 		function utf8_to_ncr($content)	{

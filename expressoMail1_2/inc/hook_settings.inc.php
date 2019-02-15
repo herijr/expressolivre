@@ -273,12 +273,14 @@ if($GLOBALS['phpgw_info']['server']['use_assinar_criptografar'])
     }
 }
 
+$auto_signature = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUsersignature'];
+
 $default = array(
 	'text' => lang('simple text'),
 	'html' => lang('rich text')
 );
-create_check_box('Insert signature automatically in new messages?','use_signature','');
-create_select_box('Signature Type','type_signature',$default,'','','','onchange="javascript:changeType(this.value);" onload="javascript:alert(this.value);"');
+create_check_box( 'Insert signature automatically in new messages?', 'use_signature', '', null, null, null, !$auto_signature);
+create_select_box( 'Signature Type', 'type_signature', $default, '', '', '', 'onchange="javascript:changeType(this.value);" onload="javascript:alert(this.value);"', !$auto_signature);
 
 if ($type == 'user' || $type == ''){
 	$oFCKeditor = new FCKeditor('html_signature');
