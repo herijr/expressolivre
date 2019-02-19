@@ -1566,10 +1566,12 @@ function new_message(type, border_ID){
 
 	$('img#signature').toggle( !preferences.auto_signature );
 	if ( preferences.auto_signature ) {
-		var doc = document.getElementById('signature_ro_'+new_border_ID).contentWindow.document;
+		var iframe = document.getElementById('signature_ro_'+new_border_ID);
+		var doc    = iframe.contentWindow.document;
 		doc.open();
-		doc.write( signature );
+		doc.write( '<body style="margin: 0;">'+signature+'</body>' );
 		doc.close();
+		iframe.style.height = doc.body.scrollHeight+'px';
 	}
 
 	// IM Module Enabled

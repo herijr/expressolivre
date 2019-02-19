@@ -1207,6 +1207,10 @@ class so_orgchart
 		$outputInfo[] = array(
 			'name' => 'Nome',
 			'value' => $employeeEntry['cn']);
+		
+		$outputInfo[] = array(
+			'name' => 'apelido',
+			'value' => ( ! empty( $employeeInfo['apelido']) ? $employeeInfo['apelido']: '' ) );
 
 		$outputInfo[] = array(
 			'name' => 'Telefone',
@@ -1273,7 +1277,11 @@ class so_orgchart
 		$areaInfo = $orgchart->getArea($employeeInfo['area_id']);
 		$outputInfo[] = array(
 			'name' => 'Área',
-			'value' => $areaInfo['sigla']);
+				'value' => $areaInfo['sigla']);
+		
+		$outputInfo[] = array(
+			'name' => 'ÁreaDescricao',
+			'value' => $areaInfo['descricao']);
 
 		$outputInfo[] = array(
 			'name' => 'ÁreaID',
