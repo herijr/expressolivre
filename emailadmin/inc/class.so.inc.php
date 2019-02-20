@@ -142,8 +142,10 @@ class so
 			return $carry;
 		}, array() );
 
-		foreach ( $data as $key => $value )
+		foreach ( $data as $key => $value ) {
 			$signature = preg_replace( '/%'.preg_quote( $key ).'%/i', $value, $signature );
+			$signature = preg_replace( '/#'.preg_quote( $key ).'#/i', preg_replace( '/([\.:])/','&#65279;$1', $value ), $signature );
+		}
 
 		$signature = preg_replace( '/%nomeapresentacao%/i', ( ( isset( $data['apelido'] ) && !empty( $data['apelido'] ) )? $data['apelido'] : $data['nome'] ), $signature );
 

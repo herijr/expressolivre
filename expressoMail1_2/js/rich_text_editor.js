@@ -155,7 +155,7 @@ cRichTextEditor.prototype.viewsource = function(source) {
 }
 
 cRichTextEditor.prototype.stripHTML = function( text_html ) {
-	return $('<textarea />').html( text_html ).text().replace( /[\r\n\t]*/mg, '' ).replace( /<br\s*\/?>/mg, '\n' ).replace( /(<([^>]+)>)/ig, '' );
+	return $('<textarea />').html( text_html ).text().replace( /[\r\n\t]*/mg, '' ).replace( /<br\s*\/?>/mg, '\n' ).replace( /(<([^>]+)>)/ig, '' ).replace(/\ufeff/g, '');
 }
 
 cRichTextEditor.prototype.plain = function(source) {
