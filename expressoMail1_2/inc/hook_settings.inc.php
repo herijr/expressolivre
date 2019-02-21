@@ -273,7 +273,7 @@ if($GLOBALS['phpgw_info']['server']['use_assinar_criptografar'])
     }
 }
 
-$auto_signature = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUsersignature'];
+$auto_signature = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserSignature'];
 
 $default = array(
 	'text' => lang('simple text'),

@@ -122,9 +122,9 @@
 
 		function get_preferences() {
 			$result = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
-			if ( $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUsersignature'] ) {
+			if ( $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserSignature'] ) {
 				$result['auto_signature'] = true;
-				$result['signature']      = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUsersignature'];
+				$result['signature']      = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserSignature'];
 				$result['type_signature'] = 'html';
 			}
 			return $result;

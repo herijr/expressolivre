@@ -98,7 +98,7 @@ class so
 			$this->colMap( $this->db->row() ),
 			array(
 				'defaultUserQuota'     => $this->getDefaultUserQuota( ( $mode === 'mail' )? $value : '' ),
-				'defaultUsersignature' => $this->getDefaultSignature( $value ),
+				'defaultUserSignature' => $this->getDefaultSignature( $value ),
 			)
 		) : false;
 	}
@@ -117,7 +117,7 @@ class so
 
 	function getDefaultSignature( $domain = '' )
 	{
-		$signature = $this->getExtras( $domain, 'defaultUsersignature' );
+		$signature = $this->getExtras( $domain, 'defaultUserSignature' );
 		if ( !$signature ) return false;
 
 		if ( !isset( $_SESSION['phpgw_info']['workflow']['server_root'] ) ) {
@@ -138,7 +138,7 @@ class so
 		if ( isset( $data['error'] ) ) return false;
 
 		$data = array_reduce( $data['info'], function( $carry, $item ) {
-			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item['name']) )] = htmlentities( isset( $item['value']['count'] )? $item['value'][0] : $item['value'] );
+			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item['name']) )] = htmlentities( is_array( $item['value'] )? $item['value'][0] : $item['value'] );
 			return $carry;
 		}, array() );
 
@@ -146,8 +146,6 @@ class so
 			$signature = preg_replace( '/%'.preg_quote( $key ).'%/i', $value, $signature );
 			$signature = preg_replace( '/#'.preg_quote( $key ).'#/i', preg_replace( '/([\.:])/','&#65279;$1', $value ), $signature );
 		}
-
-		$signature = preg_replace( '/%nomeapresentacao%/i', ( ( isset( $data['apelido'] ) && !empty( $data['apelido'] ) )? $data['apelido'] : $data['nome'] ), $signature );
 
 		return $signature;
 	}

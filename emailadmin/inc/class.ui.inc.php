@@ -436,7 +436,7 @@ class ui
 			"rowsTable"				=> $rowsTable,
 			'extras_vars_keys_json' => preg_replace( '/^{/', '{ ', json_encode( array(
 				'defaultUserQuota'     => utf8_encode( lang( 'defaultUserQuota' ) ),
-				'defaultUsersignature' => utf8_encode( lang( 'defaultUsersignature' ) ),
+				'defaultUserSignature' => utf8_encode( lang( 'defaultUserSignature' ) ),
 			) ) ),
 		));	
 

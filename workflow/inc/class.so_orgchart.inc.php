@@ -1210,7 +1210,13 @@ class so_orgchart
 		
 		$outputInfo[] = array(
 			'name' => 'apelido',
-			'value' => ( ! empty( $employeeInfo['apelido']) ? $employeeInfo['apelido']: '' ) );
+			'value' => ( !empty( $employeeInfo['apelido'] )? $employeeInfo['apelido'] : '' ),
+		);
+		
+		$outputInfo[] = array(
+			'name' => 'nomeapresentacao',
+			'value' => ( !empty( $employeeInfo['apelido'] )? $employeeInfo['apelido'] : $employeeEntry['cn'] ),
+		);
 
 		$outputInfo[] = array(
 			'name' => 'Telefone',
