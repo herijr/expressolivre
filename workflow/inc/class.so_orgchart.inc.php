@@ -902,11 +902,11 @@ class so_orgchart
 		}
 
 		$query = "UPDATE funcionario SET area_id = ?, centro_custo_id = ?, localidade_id = ?, funcionario_status_id = ?, cargo_id = ?, nivel = ?, funcionario_categoria_id = ?, titulo = ?, apelido = ?, funcao = ?, data_admissao =? WHERE (funcionario_id = ?) AND (organizacao_id = ?)";
-			
+
 		$result = $this->db->query($query, array($areaID, $costCenterID, $localID, $employeeStatusID, $jobTitleID, $level, $employeeCategoryID, $title,$nickname, $jobDesc, $admission_date, $employeeID, $organizationID));
-		
+
 		$this->_checkError($result);
-		
+
 		return (($result === false) ? false : true);
 	}
 
@@ -1197,41 +1197,50 @@ class so_orgchart
 
 		$outputInfo[] = array(
 			'name' => 'Mobile',
+			'field' => 'mobilephone',
 			'value' => ( ! empty( $mobile ) ? $mobile : '' ) );
 
 		$outputInfo[] = array(
 			'name' => 'homePhone',
+			'field' => 'homephone',
 			'value' => ( ! empty( $homePhone ) ? $homePhone : '' ) );
 
 
 		$outputInfo[] = array(
 			'name' => 'Nome',
+			'field' => 'fullname',
 			'value' => $employeeEntry['cn']);
-		
+
 		$outputInfo[] = array(
 			'name' => 'apelido',
+			'field' => 'nickname',
 			'value' => ( !empty( $employeeInfo['apelido'] )? $employeeInfo['apelido'] : '' ),
 		);
-		
+
 		$outputInfo[] = array(
 			'name' => 'nomeapresentacao',
+			'field' => 'presentationname',
 			'value' => ( !empty( $employeeInfo['apelido'] )? $employeeInfo['apelido'] : $employeeEntry['cn'] ),
 		);
 
 		$outputInfo[] = array(
 			'name' => 'Telefone',
+			'field' => 'jobphone',
 			'value' => ( ! empty( $employeeEntry['telephonenumber'] ) ? $employeeEntry['telephonenumber'] : '' ) );
 
 		$outputInfo[] = array(
 			'name' => 'Matrícula',
+			'field' => 'employeenumber',
 			'value' => ( ! empty( $employeeNumber ) ? $employeeNumber : '' ) );
 
 		$outputInfo[] = array(
 			'name' => 'UIDNumber',
+			'field' => 'uidnumber',
 			'value' => $employeeID);
 
 		$outputInfo[] = array(
 			'name' => 'Status',
+			'field' => 'status',
 			'value' => $employeeStatusInfo['descricao']);
 
 		if (!empty($employeeInfo['funcionario_categoria_id']))
@@ -1239,6 +1248,7 @@ class so_orgchart
 			$categoryInfo = $orgchart->getEmployeeCategory($employeeInfo['funcionario_categoria_id']);
 			$outputInfo[] = array(
 				'name' => 'Vínculo',
+				'field' => 'category',
 				'value' => $categoryInfo['descricao']);
 		}
 
@@ -1250,6 +1260,7 @@ class so_orgchart
 
 		$outputInfo[] = array(
 			'name' => 'Título',
+			'field' => 'jobtitle',
 			'value' => ( $titulo ? $titulo : '' )
 		);
 
@@ -1266,6 +1277,7 @@ class so_orgchart
 
 		$outputInfo[] = array(
 			'name' => 'Cargo',
+			'field' => 'jobrole',
 			'value' => ( $cargo ? $cargo : '' )
 		);
 
@@ -1277,53 +1289,65 @@ class so_orgchart
 
 		$outputInfo[] = array(
 			'name' => 'Nível',
+			'field' => 'level',
 			'value' => ( $nivel ? $nivel : '' )
 		);
 
 		$areaInfo = $orgchart->getArea($employeeInfo['area_id']);
 		$outputInfo[] = array(
 			'name' => 'Área',
-				'value' => $areaInfo['sigla']);
-		
+			'field' => 'area',
+			'value' => $areaInfo['sigla']);
+
 		$outputInfo[] = array(
 			'name' => 'ÁreaDescricao',
+			'field' => 'areadescription',
 			'value' => $areaInfo['descricao']);
 
 		$outputInfo[] = array(
 			'name' => 'ÁreaID',
+			'field' => 'areaid',
 			'value' => $employeeInfo['area_id']);
 
 		$localInfo = $orgchart->getLocal($employeeInfo['localidade_id']);
 		$outputInfo[] = array(
 			'name' => 'Localidade',
+			'field' => 'location',
 			'value' => $localInfo['descricao']);
 
 		$outputInfo[] = array(
 			'name' => 'Empresa',
+			'field' => 'company',
 			'value' => ( ! empty( $localInfo['empresa'] ) ? $localInfo['empresa'] : '') );;
 
 		$outputInfo[] = array(
 			'name' => 'Endereço',
+			'field' => 'address',
 			'value' => ( ! empty( $localInfo['endereco'] ) ? $localInfo['endereco'] : '') );
 
 		$outputInfo[] = array(
 			'name' => 'Complemento',
+			'field' => 'addressaddon',
 			'value' => ( ! empty( $localInfo['complemento'] ) ? $localInfo['complemento'] : '') );;
 
 		$outputInfo[] = array(
 			'name' => 'Cep',
+			'field' => 'zipcode',
 			'value' => ( ! empty( $localInfo['cep'] ) ? $localInfo['cep'] : '') );
 
 		$outputInfo[] = array(
 			'name' => 'Bairro',
+			'field' => 'district',
 			'value' => ( ! empty( $localInfo['bairro'] ) ? $localInfo['bairro'] : '') );
 
 		$outputInfo[] = array(
 			'name' => 'Cidade',
+			'field' => 'city',
 			'value' => ( ! empty( $localInfo['cidade'] ) ? $localInfo['cidade'] : '') );
 
 		$outputInfo[] = array(
 			'name' => 'UF',
+			'field' => 'uf',
 			'value' => ( ! empty( $localInfo['uf'] ) ? $localInfo['uf'] : '') );
 
 		if (!empty($employeeInfo['centro_custo_id']))
@@ -1332,16 +1356,19 @@ class so_orgchart
 			$costCenterInfo = $orgchart->getCostCenter($areaInfo['centro_custo_id']);
 		$outputInfo[] = array(
 			'name' => 'Centro de Custo',
+			'field' => 'billing',
 			'value' => $costCenterInfo['descricao']);
 
 		$outputInfo[] = array(
 			'name' => 'e-mail',
+			'field' => 'mail',
 			'value' => $employeeEntry['mail']);
 
 		$organizationInfo = $orgchart->getOrganization( $employeeInfo['organizacao_id'] );
 
 		$outputInfo[] = array(
 			'name' => 'sitio',
+			'field' => 'site',
 			'value' => $organizationInfo['sitio']);
 
 		return array('info' => $outputInfo);

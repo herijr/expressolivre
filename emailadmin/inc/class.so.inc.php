@@ -138,7 +138,7 @@ class so
 		if ( isset( $data['error'] ) ) return false;
 
 		$data = array_reduce( $data['info'], function( $carry, $item ) {
-			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item['name']) )] = htmlentities( is_array( $item['value'] )? $item['value'][0] : $item['value'] );
+			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item['field']) )] = htmlentities( is_array( $item['value'] )? $item['value'][0] : $item['value'] );
 			return $carry;
 		}, array() );
 
