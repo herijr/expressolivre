@@ -735,8 +735,6 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 				return False;
 			}
 
-			$datetime = mktime(0,0,0,$startMonth,$startDay,$startYear) - $tz_offset;
-
 			$user_where = ' AND (phpgw_cal_user.cal_login in (';
 			if(is_array($owner_id) && count($owner_id))
 			{
@@ -745,7 +743,7 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			else
 			{
 				//$user_where .= $this->user;
-                                $user_where .= $this->user . ') OR (phpgw_cal.owner=' . $this->user;
+				$user_where .= $this->user . ') OR (phpgw_cal.owner=' . $this->user;
 			}
 			$member_groups = $GLOBALS['phpgw']->accounts->membership($this->user);
 			@reset($member_groups);
@@ -754,7 +752,7 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 				$member[] = $group_info['account_id'];
 			}
 			@reset($member);
-	//		$user_where .= ','.implode(',',$member);
+			//		$user_where .= ','.implode(',',$member);
 			$user_where .= ')) ';
 
 			if($this->debug)
@@ -762,30 +760,24 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 				echo '<!-- '.$user_where.' -->'."\n";
 			}
 
-			$startDate = 'AND ( ( (phpgw_cal.datetime >= '.$datetime.') ';
+			$ini     = mktime( 0, 0, 0, $startMonth, $startDay, $startYear     ) - $tz_offset;
+			$ini_lim = mktime( 0, 0, 0, $startMonth, $startDay, $startYear - 1 ) - $tz_offset;
+			
+			$end     = ( $endYear != 0 && $endMonth != 0 && $endDay != 0 )? ( mktime( 23, 59, 59, (int)$endMonth, (int)$endDay, (int)$endYear ) - $tz_offset ) : false;
+			$end_lim = ( $end === false )? ( mktime( 23, 59, 59, $startMonth, $startDay, $startYear + 2 ) - $tz_offset ) : (mktime( 23, 59, 59, (int)$endMonth, (int)$endDay, (int)($endYear)+1 ) - $tz_offset );
 
-			$enddate = '';
-			if($endYear != 0 && $endMonth != 0 && $endDay != 0)
-			{
-				$edatetime = mktime(23,59,59,(int)$endMonth,(int)$endDay,(int)$endYear) - $tz_offset;
-				$endDate .= 'AND (phpgw_cal.edatetime <= '.$edatetime.') ) '
-					. 'OR ( (phpgw_cal.datetime <= '.$datetime.') '
-					. 'AND (phpgw_cal.edatetime >= '.$edatetime.') ) '
-					. 'OR ( (phpgw_cal.datetime >= '.$datetime.') '
-					. 'AND (phpgw_cal.datetime <= '.$edatetime.') '
-					. 'AND (phpgw_cal.edatetime >= '.$edatetime.') ) '
-					. 'OR ( (phpgw_cal.datetime <= '.$datetime.') '
-					. 'AND (phpgw_cal.edatetime >= '.$datetime.') '
-					. 'AND (phpgw_cal.edatetime <= '.$edatetime.') ';
-			}
-			$endDate .= ') ) ';
+			$interval  = 'AND ( ( ( phpgw_cal.datetime  BETWEEN '.$ini.' AND '.(($end === false)? $end_lim : $end ).' ) ';
 
-			$order_by = 'ORDER BY phpgw_cal.datetime ASC, phpgw_cal.edatetime ASC, phpgw_cal.priority ASC';
+			$interval .= ( $end === false )? ' ) ) ' : ' OR ( phpgw_cal.edatetime BETWEEN '.$ini.' AND '.$end.' ) ) OR '.
+				'( ( phpgw_cal.datetime  BETWEEN '.$ini_lim.' AND '.$ini    .' ) AND ( phpgw_cal.edatetime BETWEEN '.$ini    .' AND '.$end_lim.' ) ) OR '.
+				'( ( phpgw_cal.edatetime BETWEEN '.$end    .' AND '.$end_lim.' ) AND ( phpgw_cal.datetime  BETWEEN '.$ini_lim.' AND '.$end    .' ) ) )' ;
+
+			$order_by = ' ORDER BY phpgw_cal.datetime ASC, phpgw_cal.edatetime ASC, phpgw_cal.priority ASC';
 			if($this->debug)
 			{
-				echo "SQL : ".$user_where.$startDate.$endDate.$extra."<br>\n";
+				echo "SQL : ".$user_where.$interval.$extra."<br>\n";
 			}
-			return $this->get_event_ids(False,$user_where.$startDate.$endDate.$extra.$order_by);
+			return $this->get_event_ids(False,$user_where.$interval.$extra.$order_by);
 		}
 
 		function append_event()
