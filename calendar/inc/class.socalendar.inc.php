@@ -27,7 +27,7 @@
 		var $filter;
 		var $cat_id;
 		
-		function socalendar($param)
+		public function __construct( $param )
 		{
 			$this->db = $GLOBALS['phpgw']->db;
 			if(!is_object($GLOBALS['phpgw']->datetime))
@@ -107,71 +107,51 @@
 			}
 		}
 
-		function list_repeated_events($syear,$smonth,$sday,$eyear,$emonth,$eday,$owner_id=0)
+		function get_event_ids( $from = false, $join = false, $where = false, $order = false )
 		{
-			if(!$owner_id)
-			{
-				$owner_id = $this->is_group ? $this->g_owner : $this->owner;
-			}
-			if($GLOBALS['phpgw_info']['server']['calendar_type'] != 'sql' ||
-				!count($owner_id))	// happens with empty groups
-			{
-				return Array();
-			}
-
-			$starttime = mktime(0,0,0,$smonth,$sday,$syear) - $GLOBALS['phpgw']->datetime->tz_offset;
-			$endtime = mktime(23,59,59,$emonth,$eday,$eyear) - $GLOBALS['phpgw']->datetime->tz_offset;
-			$sql = "AND phpgw_cal_user.cal_login IN (".
-				(is_array($owner_id) ? implode(',',$owner_id) : $owner_id).')';
-
-//			$member_groups = $GLOBALS['phpgw']->accounts->membership($this->user);
-//			@reset($member_groups);
-//			while(list($key,$group_info) = each($member_groups))
-//			{
-//				$member[] = $group_info['account_id'];
-//			}
-//			@reset($member);
-//			$sql .= ','.implode(',',$member).') ';
-//			$sql .= 'AND (phpgw_cal.datetime <= '.$starttime.') ';
-//			$sql .= 'AND (((phpgw_cal_repeats.recur_enddate >= '.$starttime.') AND (phpgw_cal_repeats.recur_enddate <= '.$endtime.')) OR (phpgw_cal_repeats.recur_enddate=0))) '
-			$sql .= ' AND (phpgw_cal_repeats.recur_enddate >= '.$starttime.' OR phpgw_cal_repeats.recur_enddate=0) '
-				. (strpos($this->filter,'private')?'AND phpgw_cal.is_public=0 ':'')
-				. ($this->cat_id?"AND phpgw_cal.category like '%".$this->cat_id."%' ":'')
-				. 'ORDER BY phpgw_cal.datetime ASC, phpgw_cal.edatetime ASC, phpgw_cal.priority ASC';
-
-			if($this->debug)
-			{
-				echo '<!-- SO list_repeated_events : SQL : '.$sql.' -->'."\n";
-			}
-
-			return $this->get_event_ids(True,$sql);
+			return $this->cal->get_event_ids( $from, $join, $where, $order );
 		}
 
-		function list_events_keyword($keywords,$members='')
+		function list_repeated_events( $syear, $smonth, $sday,$eyear, $emonth, $eday, $owner_id = 0 )
 		{
-			if (!$members)
-			{
-				$members[] = $this->owner;
-			}
-			$sql = 'AND (phpgw_cal_user.cal_login IN ('.implode(',',$members).')) AND '.
-				'(phpgw_cal_user.cal_login=' . (int)$this->owner . ' OR phpgw_cal.is_public=1) AND (';
+			if ( !$owner_id ) $owner_id = $this->is_group ? $this->g_owner : $this->owner;
 
-			$words = explode(' ',$keywords);
-			foreach($words as $i => $word)
-			{
-				$sql .= $i > 0 ? ' OR ' : '';
-				$sql .= "(UPPER(phpgw_cal.title) LIKE UPPER('%".addslashes($word)."%') OR "
-						. "UPPER(phpgw_cal.description) LIKE UPPER('%".addslashes($word)."%') OR "
-						. "UPPER(phpgw_cal.location) LIKE UPPER('%".addslashes($word)."%') OR "
-						. "UPPER(phpgw_cal_extra.cal_extra_value) LIKE UPPER('%".addslashes($word)."%'))";
-			}
-			$sql .= ') ';
+			if ( $GLOBALS['phpgw_info']['server']['calendar_type'] != 'sql' || !count( $owner_id ) ) return array();
 
-			$sql .= (strpos($this->filter,'private')?'AND phpgw_cal.is_public=0 ':'');
-			$sql .= ($this->cat_id? "AND (phpgw_cal.category='$this->cat_id' OR phpgw_cal.category like '%,".$this->cat_id.",%') ":'');
-			$sql .= 'ORDER BY phpgw_cal.datetime DESC, phpgw_cal.edatetime DESC, phpgw_cal.priority ASC';
+			$starttime = mktime( 0, 0, 0, $smonth, $sday, $syear ) - $GLOBALS['phpgw']->datetime->tz_offset;
 
-			return $this->get_event_ids(False,$sql,True);
+			return $this->get_event_ids(
+				array( 'phpgw_cal_user.cal_login' => $owner_id ),
+				array( 'repeats' => true ),
+				array(
+					'category' => $this->cat_id,
+					'private'  => ( strpos( $this->filter, 'private' ) !== false ),
+					'( phpgw_cal_repeats.recur_enddate >= '.$starttime.' OR phpgw_cal_repeats.recur_enddate = 0 )',
+				),
+				array( 'phpgw_cal.datetime ASC', 'phpgw_cal.edatetime ASC', 'phpgw_cal.priority ASC' )
+			);
+		}
+
+		function list_events_keyword( $keywords, $members = '' )
+		{
+			return $this->get_event_ids(
+				array( 'phpgw_cal_user.cal_login' => $members?: (int)$this->owner ),
+				array( 'extra' => true ),
+				array(
+					'( phpgw_cal_user.cal_login = '.(int)$this->owner.' OR phpgw_cal.is_public = 1 )',
+					'category' => $this->cat_id,
+					'keywords' => $keywords,
+					'private'  => ( strpos( $this->filter, 'private' ) !== false ),
+				),
+				array( 'phpgw_cal.datetime DESC', 'phpgw_cal.edatetime DESC', 'phpgw_cal.priority ASC' )
+			);
+		}
+
+		function find_uid( $uid )
+		{
+			if ( !( $found = $this->get_event_ids( array( 'phpgw_cal.uid ' => $uid ) ) ) )
+				$found = $this->get_event_ids( array( 'phpgw_cal.uid ' => $uid ), array( 'repeats' => true ) );
+			return is_array( $found )? $found[0] : false;
 		}
 
 		function read_from_store($startYear,$startMonth,$startDay,$endYear='',$endMonth='',$endDay='')
@@ -183,30 +163,6 @@
 				$events_cached[] = $this->read_entry($events[$i]);
 			}
 			return $events_cached;
-		}
-
-		function get_event_ids($search_repeats=False, $sql='',$search_extra=False)
-		{
-			return $this->cal->get_event_ids($search_repeats,$sql,$search_extra);
-		}
-
-		function find_uid($uid)
-		{
-			$sql = " AND (phpgw_cal.uid = '".$uid."') ";
-
-			$found = $this->cal->get_event_ids(False,$sql);
-			if(!$found)
-			{
-				$found = $this->cal->get_event_ids(True,$sql);
-			}
-			if(is_array($found))
-			{
-				return $found[0];
-			}
-			else
-			{
-				return False;
-			}
 		}
 
 		function add_entry(&$event)

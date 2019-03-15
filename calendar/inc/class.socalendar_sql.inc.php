@@ -29,9 +29,9 @@
 		var $today = Array('raw','day','month','year','full','dow','dm','bd');
 
 
-		function socalendar_()
+		public function __construct()
 		{
-			$this->socalendar__();
+			parent::__construct();
 
 			if (!is_object($GLOBALS['phpgw']->asyncservice))
 			{
@@ -728,58 +728,6 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			return $this->event;
 		}
 
-		function list_events($startYear,$startMonth,$startDay,$endYear=0,$endMonth=0,$endDay=0,$extra='',$tz_offset=0,$owner_id=0)
-		{
-			if(!isset($this->stream))
-			{
-				return False;
-			}
-
-			$user_where = ' AND (phpgw_cal_user.cal_login in (';
-			if(is_array($owner_id) && count($owner_id))
-			{
-				$user_where .= implode(',',$owner_id);
-			}
-			else
-			{
-				//$user_where .= $this->user;
-				$user_where .= $this->user . ') OR (phpgw_cal.owner=' . $this->user;
-			}
-			$member_groups = $GLOBALS['phpgw']->accounts->membership($this->user);
-			@reset($member_groups);
-			while($member_groups != False && list($key,$group_info) = each($member_groups))
-			{
-				$member[] = $group_info['account_id'];
-			}
-			@reset($member);
-			//		$user_where .= ','.implode(',',$member);
-			$user_where .= ')) ';
-
-			if($this->debug)
-			{
-				echo '<!-- '.$user_where.' -->'."\n";
-			}
-
-			$ini     = mktime( 0, 0, 0, $startMonth, $startDay, $startYear     ) - $tz_offset;
-			$ini_lim = mktime( 0, 0, 0, $startMonth, $startDay, $startYear - 1 ) - $tz_offset;
-			
-			$end     = ( $endYear != 0 && $endMonth != 0 && $endDay != 0 )? ( mktime( 23, 59, 59, (int)$endMonth, (int)$endDay, (int)$endYear ) - $tz_offset ) : false;
-			$end_lim = ( $end === false )? ( mktime( 23, 59, 59, $startMonth, $startDay, $startYear + 2 ) - $tz_offset ) : (mktime( 23, 59, 59, (int)$endMonth, (int)$endDay, (int)($endYear)+1 ) - $tz_offset );
-
-			$interval  = 'AND ( ( ( phpgw_cal.datetime  BETWEEN '.$ini.' AND '.(($end === false)? $end_lim : $end ).' ) ';
-
-			$interval .= ( $end === false )? ' ) ) ' : ' OR ( phpgw_cal.edatetime BETWEEN '.$ini.' AND '.$end.' ) ) OR '.
-				'( ( phpgw_cal.datetime  BETWEEN '.$ini_lim.' AND '.$ini    .' ) AND ( phpgw_cal.edatetime BETWEEN '.$ini    .' AND '.$end_lim.' ) ) OR '.
-				'( ( phpgw_cal.edatetime BETWEEN '.$end    .' AND '.$end_lim.' ) AND ( phpgw_cal.datetime  BETWEEN '.$ini_lim.' AND '.$end    .' ) ) )' ;
-
-			$order_by = ' ORDER BY phpgw_cal.datetime ASC, phpgw_cal.edatetime ASC, phpgw_cal.priority ASC';
-			if($this->debug)
-			{
-				echo "SQL : ".$user_where.$interval.$extra."<br>\n";
-			}
-			return $this->get_event_ids(False,$user_where.$interval.$extra.$order_by);
-		}
-
 		function append_event()
 		{
 			$this->save_event($this->event);
@@ -850,55 +798,151 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			return 1;
 		}
 
+		function list_events( $startYear, $startMonth, $startDay, $endYear = 0, $endMonth = 0, $endDay = 0, $extra = '', $tz_offset = 0, $owner_id = 0 )
+		{
+			if ( !isset( $this->stream ) ) return false;
+
+			$from = ( is_array( $owner_id ) && count( $owner_id ) )?
+			array( 'phpgw_cal_user.cal_login' => $owner_id ) :
+			array( 'phpgw_cal.owner' => $this->user, 'phpgw_cal_user.cal_login' => $this->user );
+
+			$ini = mktime( 0, 0, 0, $startMonth, $startDay, $startYear ) - $tz_offset;
+			$end = ( $endYear != 0 && $endMonth != 0 && $endDay != 0 )? ( mktime( 23, 59, 59, (int)$endMonth, (int)$endDay, (int)$endYear ) - $tz_offset ) : ( mktime( 23, 59, 59, (int)$endMonth, (int)$endDay, (int)($endYear)+1 ) - $tz_offset );
+			$eyr = ( $end + 31536000 );
+
+			$interval  = '( '.
+				'( ( phpgw_cal.datetime  BETWEEN '.$ini.' AND '.$end.' ) OR  ( phpgw_cal.edatetime BETWEEN '.$ini.' AND '.$end.' ) ) OR '.
+				'( ( phpgw_cal.datetime  BETWEEN 0        AND '.$ini.' ) AND ( phpgw_cal.edatetime BETWEEN '.$ini.' AND '.$eyr.' ) ) OR '.
+				'( ( phpgw_cal.edatetime BETWEEN '.$end.' AND '.$eyr.' ) AND ( phpgw_cal.datetime  BETWEEN 0 AND '.$end    .' ) ) )'.
+				$extra;
+
+			return $this->get_event_ids(
+				array(
+					'phpgw_cal.owner' => $this->user,
+					'phpgw_cal_user.cal_login' => $this->user,
+				),
+				false,
+				array( $interval ),
+				array( 'phpgw_cal.datetime ASC', 'phpgw_cal.edatetime ASC', 'phpgw_cal.priority ASC' )
+			);
+		}
+
+		function list_dirty_events( $lastmod = -1, $repeats = false )
+		{
+			if ( !isset( $this->stream ) ) return false;
+
+			$lastmod = (int)$lastmod;
+
+			return $this->get_event_ids(
+				array( 'phpgw_cal_user.cal_login' => $this->user ),
+				array( 'repeats' => !!$repeats ),
+				array( ( $lastmod > 0 )? 'mdatetime = '.$lastmod : false ),
+				array( 'phpgw_cal.cal_id ASC' )
+			);
+		}
 		/***************** Local functions for SQL based Calendar *****************/
 
-		function get_event_ids($search_repeats=False,$extra='',$search_extra=False)
+		function get_event_ids( $from = false, $join = false, $where = false, $order = false )
 		{
-			$from = $where = ' ';
-			if($search_repeats)
-			{
-				$from  = ', phpgw_cal_repeats ';
-				$where = 'AND (phpgw_cal_repeats.cal_id = phpgw_cal.cal_id) ';
-			}
-			if($search_extra)
-			{
-				$from  .= 'LEFT JOIN phpgw_cal_extra ON phpgw_cal_extra.cal_id = phpgw_cal.cal_id ';
-			}
+			$sql = $this->qry_implode( ' ', array(
+				'SELECT DISTINCT phpgw_cal.cal_id, phpgw_cal.datetime,phpgw_cal.edatetime,phpgw_cal.priority',
+				$this->parse_from( $from, $join, $where ),
+				$this->parse_join( $join ),
+				$this->parse_where( $where ),
+				$this->parse_order( $order ),
+			), false, ' ' );
 
-			$sql = 'SELECT DISTINCT phpgw_cal.cal_id,'
-					. 'phpgw_cal.datetime,phpgw_cal.edatetime,'
-					. 'phpgw_cal.priority '
-					. 'FROM phpgw_cal_user, phpgw_cal'
-					. $from
-					. 'WHERE (phpgw_cal_user.cal_id = phpgw_cal.cal_id) '
-					. $where . $extra;
+			if ( $this->debug ) echo 'FULL SQL : '.$sql.'<br>'.PHP_EOL;
 
-			if($this->debug)
-			{
-				echo "FULL SQL : ".$sql."<br>\n";
-			}
-
-			$this->stream->query($sql,__LINE__,__FILE__);
+			$this->stream->query( $sql, __LINE__, __FILE__ );
 
 			$retval = Array();
-			if($this->stream->num_rows() == 0)
-			{
-				if($this->debug)
-				{
-					echo "No records found!<br>\n";
-				}
+			if ( $this->stream->num_rows() == 0 ) {
+				if ( $this->debug ) echo 'No records found!<br>'.PHP_EOL;
 				return $retval;
 			}
 
-			while($this->stream->next_record())
-			{
-				$retval[] = (int)$this->stream->f('cal_id');
-			}
-			if($this->debug)
-			{
-				echo "Records found!<br>\n";
-			}
+			while ( $this->stream->next_record() ) $retval[] = (int)$this->stream->f( 'cal_id' );
+
+			if ( $this->debug ) echo 'Records found!<br>'.PHP_EOL;
+
 			return $retval;
+		}
+
+		protected function parse_from( $from, &$join, &$where )
+		{
+			$map = array_reduce( array_keys( (array)$from ), function( $c, $i ){ $c[preg_filter( '/\..*/', '', $i)] = $i; return $c; }, array() );
+			switch ( count( $map ) ) {
+				case 0: return 'FROM phpgw_cal'; break;
+				case 1:
+					$tb = key( $map );
+					$on = $map[$tb].( is_array( $from[$map[$tb]] )? ' IN ( '.$this->qry_quote( $from[$map[$tb]] ).' )' : ' = '.$this->qry_quote( $from[$map[$tb]] ) );
+					if ( $tb === 'phpgw_cal' ) {
+						if ( !is_array( $where ) ) $where = (array)$where;
+						array_unshift( $where, $on );
+						return 'FROM phpgw_cal'; 
+					}
+					if ( !is_array( $join ) ) $join = (array)$join;
+					array_unshift( $join, 'JOIN '.$tb.' ON '.$tb.'.cal_id = phpgw_cal.cal_id AND '.$on );
+					return 'FROM phpgw_cal'; 
+					break;
+				default:
+					$suq_qry = array();
+					foreach ( $map as $tb => $key ) $suq_qry[] = 'SELECT DISTINCT '.$tb.'.cal_id FROM '.$tb.' WHERE '.$map[$tb].( is_array( $from[$map[$tb]] )? ' IN ( '.$this->qry_quote( $from[$map[$tb]] ).' )' : ' = '.$this->qry_quote( $from[$map[$tb]] ) );
+					return 'FROM phpgw_cal JOIN ( SELECT DISTINCT cal_id FROM ( '.implode( ' UNION ALL ', $suq_qry ).' ) AS sub1 ) AS sub2 ON sub2.cal_id = phpgw_cal.cal_id';
+			}
+			return false;
+		}
+
+		protected function parse_join( $join )
+		{
+			$join = $this->qry_filter( $join );
+
+			if ( isset( $join['repeats'] ) ) $join['repeats'] = 'LEFT JOIN phpgw_cal_repeats ON phpgw_cal_repeats.cal_id = phpgw_cal.cal_id';
+			if ( isset( $join['extra'] ) ) $join['extra']  = 'LEFT JOIN phpgw_cal_extra ON phpgw_cal_extra.cal_id = phpgw_cal.cal_id';
+
+			return $this->qry_implode( ' ', $join );
+		}
+
+		protected function parse_where( $where )
+		{
+			$where = $this->qry_filter( $where );
+
+			if ( isset( $where['private']  ) ) $where['private']  = 'phpgw_cal.is_public = 0';
+			if ( isset( $where['category'] ) ) $where['category'] = ( ((int)$where['category']) <= 0 )? false : 'string_to_array( phpgw_cal.category, \',\' ) @> ARRAY[ '.$this->qry_quote( $where['category'] ).' ]';
+			if ( isset( $where['keywords'] ) ) $where['keywords'] = '( '.$this->qry_implode( ' OR ', array_reduce( explode( ' ', $where['keywords'] ), function( $c, $i ){ foreach ( array( 'phpgw_cal.title', 'phpgw_cal.description', 'phpgw_cal.location', 'phpgw_cal_extra.cal_extra_value' ) as $v ) $c[] = 'UPPER( '.$v.' ) LIKE UPPER( \'%'.addslashes( addcslashes( $i, '_%' ) ).'%\')'; return $c; }, array() ) ).' )';
+
+			return $this->qry_implode( false, $where, 'WHERE' );
+		}
+
+		protected function parse_order( $order )
+		{
+			return $this->qry_implode( ', ', $this->qry_filter( $order ), 'ORDER BY' );
+		}
+
+		protected function qry_filter( $param )
+		{
+			return array_filter( (array)$param, function( $v ) {
+				return !(
+					$v === false ||
+					is_null( $v ) ||
+					( is_array( $v ) && count( $v ) === 0 ) ||
+					( is_string( $v ) && $v === '' )
+				);
+			} );
+		}
+
+		protected function qry_implode( $glue, $arr, $prefix = false )
+		{
+			if ( is_null($glue) || $glue === false ) { $glue = ' '.( $arr['glue']?: 'AND' ).' '; unset( $arr['glue'] ); }
+			return ( count( $arr ) === 0 )? false : ( ($prefix !== false)? $prefix.' ': '' ).implode( $glue, $this->qry_filter( $arr ) );
+		}
+
+		protected function qry_quote( $param )
+		{
+			if ( is_string( $param ) ) return '\''.$param.'\'';
+			if ( is_int( $param    ) ) return $param;
+			return implode( ', ', array_reduce( $param, function( $c, $i ){ $c[] = $this->qry_quote( $i ); return $c; }, array() ) );
 		}
 
 		function save_event( $event )
@@ -1159,45 +1203,6 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 		function date_to_epoch($d)
 		{
 			return $this->localdates(mktime(0,0,0,(int)(substr($d,4,2)),(int)(substr($d,6,2)),(int)(substr($d,0,4))));
-		}
-
-		function list_dirty_events($lastmod=-1,$repeats=false)
-		{
-			if(!isset($this->stream))
-			{
-				return False;
-			}
-			$lastmod = (int)  $lastmod;
-			$repeats = (bool) $repeats;
-
-			$user_where = " AND phpgw_cal_user.cal_login = $this->user";
-
-			$member_groups = $GLOBALS['phpgw']->accounts->membership($this->user);
-			@reset($member_groups);
-			while($member_groups != False && list($key,$group_info) = each($member_groups))
-			{
-				$member[] = $group_info['account_id'];
-			}
-			@reset($member);
-	//		$user_where .= ','.implode(',',$member);
-			//$user_where .= ')) ';
-
-			if($this->debug)
-			{
-				echo '<!-- '.$user_where.' -->'."\n";
-			}
-
-			if($lastmod > 0)
-			{
-				$wheremod = "AND mdatetime = $lastmod";
-			}
-
-			$order_by = ' ORDER BY phpgw_cal.cal_id ASC';
-			if($this->debug)
-			{
-				echo "SQL : ".$user_where.$wheremod.$extra."<br>\n";
-			}
-			return $this->get_event_ids($repeats,$user_where.$wheremod.$extra.$order_by);
 		}
 
 	/* OLD-ALARM

@@ -3328,10 +3328,13 @@
 			$accounts = CreateObject('phpgwapi.accounts');
 			$accountId = $accounts->name2id($account_name);
 
-			$prefs = CreateObject('phpgwapi.preferences', $accountId);
-			$account_prefs = $prefs->read();
+			if ( !isset( $_SESSION['phpgw_info']['user']['preferences']['calendar'] ) ) {
+				$prefs = CreateObject('phpgwapi.preferences', $accountId);
+				$account_prefs = $prefs->read();
+				$_SESSION['phpgw_info']['user']['preferences']['calendar'] = $account_prefs['calendar'];
+			}
 
-			$titleView = $account_prefs['calendar']['title_view'];
+			$titleView = $_SESSION['phpgw_info']['user']['preferences']['calendar']['title_view'];
 			if($titleView == "1"){
 				$textdesc = '';
 			}else{
