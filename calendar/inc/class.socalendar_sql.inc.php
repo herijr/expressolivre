@@ -945,7 +945,7 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			return implode( ', ', array_reduce( $param, function( $c, $i ){ $c[] = $this->qry_quote( $i ); return $c; }, array() ) );
 		}
 
-		function save_event( $event )
+		function save_event( &$event )
 		{
 			$locks = Array(
 				'phpgw_cal',
