@@ -3083,18 +3083,21 @@ class imap_functions
 			}
 		}
 
-
-		// This block has the purpose of transforming the CPF of shared folders into common name
+		// This block has the purpose of transforming the uid(login) of shared folders into common name
 		if(isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'])){
  			if (substr($new_folder_name,0, 4)  == 'user'){
-				 
+
 				$this->ldap = new ldap_functions();
 				
-				$tmp_folder_name = explode($this->imap_delimiter, $new_folder_name);
+				$tmpFolderName = explode( $this->imap_delimiter, $new_folder_name );
 				
-				$return['new_folder_name'] = array_pop($tmp_folder_name);
-				
-				if( $cn = $this->ldap->uid2cn($return['new_folder_name'])) { $return['new_folder_name'] = $cn; }
+				if( count($tmpFolderName) > 1 && isset($tmpFolderName[1]) ){
+					$tmpFolderName[1] = $this->ldap->uid2cn( $tmpFolderName[1] );
+				}
+
+				$return['new_folder_name'] = ( count($tmpFolderName) > 1  ) ?
+												 implode( " / " , array_slice( $tmpFolderName, 1 ) ) : 
+												 	$return['new_folder_name'];
 			}
 		}
 		
