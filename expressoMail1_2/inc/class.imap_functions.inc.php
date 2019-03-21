@@ -1730,15 +1730,28 @@ class imap_functions
     	return $thumbs_array;
 	}
 
-	// Novo
 	function delete_msgs($params)
 	{
-
 		$folder = $params['folder'];
 		$folder =  mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
 		$msgs_number = explode(",",$params['msgs_number']);
 		$border_ID = (isset($params['border_ID']) ? $params['border_ID'] : false );
 		$return = array();
+
+		// This block is intended to check permissions for shared folders
+		// Action DELETE ( permissions = xte )
+		if( substr($folder,0,4) == 'user' ){
+			
+			$acl = $this->getacltouser($folder);
+			$acl = strtolower($acl);
+			$acl = trim($acl);
+
+			$aclDelete = preg_match("/e/i", $acl ) && preg_match("/t/i", $acl ) && preg_match("/x/i", $acl );
+			
+			if( $aclDelete == false ) {
+				return array( "status" => false, "error" => "You don't have permission for this operation in this shared folder!" );
+			}
+		}
 
 		if( isset($params['get_previous_msg'])){
 			$return['previous_msg'] = $this->get_info_previous_msg($params);
@@ -1748,20 +1761,21 @@ class imap_functions
 			}
 		}
 
-		//$mbox_stream = $this->open_mbox($folder);
-	 	$mbox_stream = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder, $this->username, $this->password) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
+		$mbox_stream = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder, $this->username, $this->password) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
 
 		foreach ($msgs_number as $msg_number)
 		{
-			if (imap_delete($mbox_stream, $msg_number, FT_UID));
+			if (imap_delete($mbox_stream, $msg_number, FT_UID)){
 				$return['msgs_number'][] = $msg_number;
+			}
 		}
 
 		$return['folder'] = $folder;
 		$return['border_ID'] = $border_ID;
 
-		if($mbox_stream)
+		if($mbox_stream){
 			$this->close_mbox($mbox_stream, CL_EXPUNGE);
+		}
 		return $return;
 	}
 
@@ -1966,8 +1980,19 @@ class imap_functions
 
 		$mbox_stream = $this->open_mbox();
 
-		if ($params && isset($params['onload']) && $params['onload'] && isset($_SESSION['phpgw_info']['expressomail']['server']['certificado'])) {
-			$this->delete_mailbox(array("del_past" => "INBOX" . $this->imap_delimiter . "decifradas"));
+		if ( isset($params['onload']) && $params['onload'] ) {
+
+			if(isset($_SESSION['phpgw_info']['expressomail']['server']['certificado']) )
+			{
+				if( $_SESSION['phpgw_info']['expressomail']['server']['certificado'] == 1 )
+				{
+					$namebox = "INBOX".$this->imap_delimiter."decifradas";
+					$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
+					$namebox = mb_convert_encoding($namebox,"UTF7-IMAP","UTF-8");
+
+					imap_deletemailbox($mbox_stream,"{".$imap_server."}$namebox");
+				}
+			}
 		}
 
 		$inbox = 'INBOX';
@@ -2154,22 +2179,58 @@ class imap_functions
 
 	function create_mailbox($arr)
 	{
-		$namebox	= $arr['newp'];
+		$namebox = $arr['newp'];
+
+		// This block is intended to check permissions for shared folders
+		// Action WRITE ( permissions = kwi )
+		if(preg_match("/^user\/.*/i", $namebox)){
+ 
+			if(preg_match("/^user\/.*?\//i", $namebox, $matches)) {
+
+				$userSharedFolder = $matches[0];
+				$userSharedFolder = trim($userSharedFolder);
+				$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
+
+				$foldersDefault = array(
+					$userSharedFolder,
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'],
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'],
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
+				);
+
+				if( array_search($namebox, $foldersDefault)){ 
+					return array("status" => false, "error" => "Operation aborted because it is a system folder");
+				}
+
+				$acl = $this->getacltouser($userSharedFolder);
+
+				$aclWrite = preg_match("/i/i", $acl) && preg_match("/k/i", $acl) && preg_match("/w/i", $acl);
+
+				if( !$aclWrite){
+					return array( "status" => false, "error" => "You don't have permission for this operation in this shared folder!" );
+				}
+			}
+		}
+
 		$mbox_stream = $this->open_mbox();
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 		$namebox =  mb_convert_encoding($namebox, "UTF7-IMAP", "UTF-8");
 
-		$result = "Ok";
-		if(!imap_createmailbox($mbox_stream,"{".$imap_server."}$namebox"))
-		{
-			$result = implode("<br />\n", imap_errors());
+		$result['status'] = true;
+
+		if(!imap_createmailbox($mbox_stream,"{".$imap_server."}$namebox")){
+			$result = array(
+				"status" => false,
+				"error" => implode("<br />\n", imap_errors())
+			);
 		}
 
-		if($mbox_stream)
-			$this->close_mbox($mbox_stream);
+		if($mbox_stream){
+ 			$this->close_mbox($mbox_stream);
+		}
 
 		return $result;
-
 	}
 
 	function create_extra_mailbox($arr)
@@ -2206,43 +2267,113 @@ class imap_functions
 	function delete_mailbox($arr)
 	{
 		$namebox = $arr['del_past'];
+
+		// This block is intended to check permissions for shared folders
+		// Action DELETE ( permissions = etx )
+		if(preg_match("/^user\/.*/i", $namebox)){
+
+			if(preg_match("/^user\/.*?\//i", $namebox, $matches)) {
+
+			   $userSharedFolder = $matches[0];
+			   $userSharedFolder = trim($userSharedFolder);
+			   $userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
+
+				$foldersDefault = array(
+					$userSharedFolder,
+					$userSharedFolder.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'], 
+					$userSharedFolder.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'], 
+					$userSharedFolder.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'],
+					$userSharedFolder.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
+				);
+
+				if( array_search( $namebox, $foldersDefault ) ){
+					return array( "status" => false, "error" => "Operation aborted because it is a system folder" );
+				}
+
+				$acl = $this->getacltouser( $userSharedFolder );
+
+				$aclDelete = preg_match("/e/i", $acl) && preg_match("/t/i", $acl) && preg_match("/x/i", $acl);
+
+				if( !$aclDelete ){
+					return array( "status" => false, "error" => "You don't have permission for this operation in this shared folder!" );
+				}
+		    }
+		}		
+
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 		$mbox_stream = $this->mbox ? $this->mbox : $this->open_mbox();
-		//$del_folder = imap_deletemailbox($mbox_stream,"{".$imap_server."}INBOX.$namebox");
 
-		$result = "Ok";
+		$result['status'] = true;
 		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP","UTF-8");
-		if(!imap_deletemailbox($mbox_stream,"{".$imap_server."}$namebox"))
-		{
-			$result = implode("<br />\n", imap_errors());
+		
+		if(!imap_deletemailbox($mbox_stream,"{".$imap_server."}$namebox")) {
+			$result = array(
+				"status" => false,
+				"error" => implode("<br />\n", imap_errors())
+			);
 		}
-		/*
-		if($mbox_stream)
-			$this->close_mbox($mbox_stream);
-		*/
+		
+		if($mbox_stream){ $this->close_mbox($mbox_stream); }
+		
 		return $result;
 	}
 
 	function ren_mailbox($arr)
 	{
 		$namebox = $arr['current'];
+
+                // This block is intended to check permissions for shared folders
+		// Action WRITE ( permissions = kwi )
+		if(preg_match("/^user\/.*/i", $namebox)){
+
+			if(preg_match("/^user\/.*?\//i", $namebox, $matches)) {
+
+				$userSharedFolder = $matches[0];
+				$userSharedFolder = trim($userSharedFolder);
+				$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
+
+				$foldersDefault = array(
+					$userSharedFolder,
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'],
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'],
+					$userSharedFolder. $this->imap_delimiter. $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
+				);
+
+				if( array_search($namebox, $foldersDefault)){ 
+					return array("status" => false, "error" => "Operation aborted because it is a system folder");
+				}
+
+				$acl = $this->getacltouser($userSharedFolder);
+
+				$aclWrite = preg_match("/i/i", $acl) && preg_match("/k/i", $acl) && preg_match("/w/i", $acl);
+
+				if( !$aclWrite){ 
+					return array("status" => false, "error" => "You don't have permission for this operation in this shared folder!");
+				}
+		   }
+		}				
+
 		$new_box = $arr['rename'];
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 		$mbox_stream = $this->open_mbox();
-		//$ren_folder = imap_renamemailbox($mbox_stream,"{".$imap_server."}INBOX.$namebox","{".$imap_server."}INBOX.$new_box");
 
-		$result = "Ok";
-		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP","UTF-8");
-		$new_box = mb_convert_encoding($new_box, "UTF7-IMAP","UTF-8");
+		$result['status'] = true;
+		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP","U TF-8");
+		$new_box = mb_convert_encoding($new_box, "UTF7-IMAP","U TF-8");
 
-		if(!imap_renamemailbox($mbox_stream,"{".$imap_server."}$namebox","{".$imap_server."}$new_box"))
-		{
-			$result = imap_errors();
+		if(!imap_renamemailbox($mbox_stream,"{".$imap_server."}$namebox","{".$imap_server."}$new_box")){
+			$result = array(
+				"status" => false,
+				"error" => imap_errors()
+			); 
 		}
-		if($mbox_stream)
-			$this->close_mbox($mbox_stream);
-		return $result;
 
+		if($mbox_stream){
+ 			$this->close_mbox($mbox_stream);
+		}
+
+		return $result;
 	}
 
 	function get_num_msgs($params)
@@ -2903,113 +3034,139 @@ class imap_functions
 	function move_messages($params)
 	{
 		$folder = $params['folder'];
-		$folder = mb_convert_encoding( $folder, "ISO-8859-1", mb_detect_encoding( $folder, "UTF-8, ISO-8859-1" ) );
+		$folder = mb_convert_encoding($folder, "ISO-8859-1", mb_detect_encoding($folder, "UTF-8, ISO-8859-1"));
 		$mbox_stream = $this->open_mbox($folder);
 		$newmailbox = ($params['new_folder']);
-		$newmailbox = mb_convert_encoding( $newmailbox, "ISO-8859-1", mb_detect_encoding( $newmailbox, "UTF-8, ISO-8859-1" ) );
-		$newmailbox = mb_convert_encoding( $newmailbox, "UTF7-IMAP","ISO-8859-1");
+		$newmailbox = mb_convert_encoding($newmailbox, "ISO-8859-1", mb_detect_encoding($newmailbox, "UTF-8, ISO-8859-1"));
+		$newmailbox = mb_convert_encoding($newmailbox, "UTF7-IMAP","ISO-8859-1");
 		$new_folder_name = $params['new_folder_name'];
-		$new_folder_name = mb_convert_encoding( $new_folder_name, "ISO-8859-1", mb_detect_encoding( $new_folder_name, "UTF-8, ISO-8859-1" ) );
+		$new_folder_name = mb_convert_encoding($new_folder_name, "ISO-8859-1", mb_detect_encoding($new_folder_name, "UTF-8, ISO-8859-1"));
 		$msgs_number = $params['msgs_number'];
-		$return = array('msgs_number' 		=> $msgs_number,
-						'folder' 			=> $folder,
-						'new_folder_name' 	=> $new_folder_name,
-						'border_ID' 		=> $params['border_ID'],
-						'status' 			=> true ); //Status foi adicionado para validar as permissoes ACL
+		
+		// Status has been added to validate ACL permissions
+		$return = array(
+			'msgs_number' 		=> $msgs_number,
+			'folder' 			=> $folder,
+			'new_folder_name' 	=> $new_folder_name,
+			'border_ID' 		=> $params['border_ID'],
+			'status' 			=> true
+		); 
 
-		//Este bloco tem a finalidade de averiguar as permissoes para pastas compartilhadas
-        if (substr($folder,0,4) == 'user'){
-        	$acl = $this->getacltouser($folder);
-        	/*
-        	 *   l - lookup (mailbox is visible to LIST/LSUB commands)
-        	 *   r - read (SELECT the mailbox, perform CHECK, FETCH, PARTIAL, SEARCH, COPY from mailbox)
-        	 *   s - keep seen/unseen information across sessions (STORE SEEN flag)
-        	 *   w - write (STORE flags other than SEEN and DELETED)
-        	 *   i - insert (perform APPEND, COPY into mailbox)
-        	 *   p - post (send mail to submission address for mailbox, not enforced by IMAP4 itself)
-        	 *   c - create (CREATE new sub-mailboxes in any implementation-defined hierarchy)
-        	 *   d - delete (STORE DELETED flag, perform EXPUNGE)
-        	 *   a - administer (perform SETACL)
-			*/
-			if (strpos($acl, "d") === false){
+		// This block is intended to check permissions for shared folders
+		// Action DELETE ( permissions = xte )
+		if( substr($folder,0, 4)  == 'user'){
+ 
+			$acl = $this->getacltouser($folder);
+			$acl = strtolower($acl);
+			$acl = trim($acl);
+
+			$aclDelete = preg_match("/e/i", $acl) && preg_match("/t/i", $acl) && preg_match("/x/i", $acl);
+
+			if( $aclDelete == false) {
 				$return['status'] = false;
 				return $return;
 			}
-        }
-        //Este bloco tem a finalidade de transformar o CPF das pastas compartilhadas em common name
-        if(isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'])){
-            if (substr($new_folder_name,0,4) == 'user'){
-                $this->ldap = new ldap_functions();
-                $tmp_folder_name = explode($this->imap_delimiter, $new_folder_name);
-                $return['new_folder_name'] = array_pop($tmp_folder_name);
-                if( $cn = $this->ldap->uid2cn($return['new_folder_name']))
-                {
-                    $return['new_folder_name'] = $cn;
-                }
-            }
-        }
+		}
 
-		// Caso estejamos no box principal, nao eh necessario pegar a informacao da mensagem anterior.
-		if (($params['get_previous_msg']) && ($params['border_ID'] != 'null') && ($params['border_ID'] != ''))
-		{
+		// Action WRITE ( permissions = kwi )
+		if( substr($newmailbox,0, 4)  == 'user'){
+ 
+			$acl = $this->getacltouser($newmailbox);
+			$acl = strtolower($acl);
+			$acl = trim($acl);
+
+			$aclWrite = preg_match("/i/i", $acl) && preg_match("/k/i", $acl) && preg_match("/w/i", $acl);
+
+			if( $aclWrite == false) {
+				$return['status'] = false;
+				return $return;
+			}
+		}
+
+
+		// This block has the purpose of transforming the CPF of shared folders into common name
+		if(isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'])){
+ 			if (substr($new_folder_name,0, 4)  == 'user'){
+				 
+				$this->ldap = new ldap_functions();
+				
+				$tmp_folder_name = explode($this->imap_delimiter, $new_folder_name);
+				
+				$return['new_folder_name'] = array_pop($tmp_folder_name);
+				
+				if( $cn = $this->ldap->uid2cn($return['new_folder_name'])) { $return['new_folder_name'] = $cn; }
+			}
+		}
+		
+		// If we are in the main box, it is not necessary to get the information of the previous message.
+		if (($params['get_previous_msg']) && ($params['border_ID'] != 'null') && ($params['border_ID'] != '')) {
 			$return['previous_msg'] = $this->get_info_previous_msg($params);
 			// Fix problem in unserialize function JS.
-			if( isset($return['previous_msg']['body']) ){
-				$return['previous_msg']['body'] = str_replace(array('{','}'), array('&#123;','&#125;'), $return['previous_msg']['body']);
+			if(isset($return['previous_msg']['body'])){
+ 				$return['previous_msg']['body'] = str_replace(array('{','} '), array('&#123;','& # 125;'), $return['previous_msg']['body']);
 			}
 		}
 
 		$mbox_stream = $this->open_mbox($folder);
 		if(imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
 			imap_expunge($mbox_stream);
-			if($mbox_stream)
-				$this->close_mbox($mbox_stream);
+			
+			if( $mbox_stream){ $this->close_mbox($mbox_stream); }
+			
 			return $return;
-		}else {
-			if(strstr(imap_last_error(),'Over quota')) {
+		} else {
+			if(strstr(imap_last_error(),'O ver quota')) {
 				$accountID	= $_SESSION['phpgw_info']['expressomail']['email_server']['imapAdminUsername'];
 				$pass		= $_SESSION['phpgw_info']['expressomail']['email_server']['imapAdminPW'];
 				$userID 	= $_SESSION['phpgw_info']['expressomail']['user']['userid'];
 				$server 	= $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
-				$mbox		= @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}INBOX", $accountID, $pass) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
-				if(!$mbox)
-					return imap_last_error();
+				$mbox		= @imap_open("{".  $this->imap_server.  " :".  $this->imap_port.  $this->imap_options.  " }INBOX", $accountID, $pass) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
+
+				if( !$mbox){ return imap_last_error(); }
+
 				$quota 	= @imap_get_quotaroot($mbox_stream, "INBOX");
-				if(! imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, 2.1 * $quota['usage'])) {
-					if($mbox_stream)
-						$this->close_mbox($mbox_stream);
-					if($mbox)
-						$this->close_mbox($mbox);
-					return "move_messages(): Error setting quota for MOVE or DELETE!! ". "user".$this->imap_delimiter.$userID." line ".__LINE__."\n";
+
+				if( !imap_set_quota($mbox, "user".  $this->imap_delimiter.  $userID, 2.1 * $quota['usage'])) {
+
+					if( $mbox_stream){ $this->close_mbox($mbox_stream); }
+
+					if( $mbox){ $this->close_mbox($mbox); }
+
+					return "move_messages(): Error setting quota for MOVE or DELETE!! ".   "user".  $this->imap_delimiter.  $userID.  "  line ".__LINE__." \n";
 				}
-				if(imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
+
+				if( imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
+
 					imap_expunge($mbox_stream);
-					if($mbox_stream)
-						$this->close_mbox($mbox_stream);
+
+					if( $mbox_stream){ $this->close_mbox($mbox_stream); }
+
 					// return to original quota limit.
-					if(!imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, $quota['limit'])) {
-						if($mbox)
-							$this->close_mbox($mbox);
+					if( !imap_set_quota($mbox, "user".  $this->imap_delimiter.  $userID, $quota['limit'])) {
+
+						if( $mbox){ $this->close_mbox($mbox); }
+
 						return "move_messages(): Error setting quota for MOVE or DELETE!! line ".__LINE__."\n";
 					}
 					return $return;
-				}
-				else {
-					if($mbox_stream)
-						$this->close_mbox($mbox_stream);
-					if(!imap_set_quota($mbox, "user".$this->imap_delimiter.$userID, $quota['limit'])) {
-						if($mbox)
-							$this->close_mbox($mbox);
+				} else {
+					
+					if( $mbox_stream){ $this->close_mbox($mbox_stream); }
+
+					if( !imap_set_quota($mbox, "user".  $this->imap_delimiter.  $userID, $quota['limit'])) {
+
+						if( $mbox){ $this->close_mbox($mbox); }
+
 						return "move_messages(): Error setting quota for MOVE or DELETE!! line ".__LINE__."\n";
 					}
+
 					return imap_last_error();
 				}
+			} else {
 
-			}
-			else {
-				if($mbox_stream)
-					$this->close_mbox($mbox_stream);
-				return array( 'error' => imap_last_error(), 'folder' => $newmailbox );
+				if($mbox_stream){ $this->close_mbox($mbox_stream); }
+
+				return array('error' => imap_last_error(), 'folder' => $newmailbox);
 			}
 		}
 	}

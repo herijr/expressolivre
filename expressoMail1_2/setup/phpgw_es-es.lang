@@ -215,7 +215,6 @@ hlp_msg_addcreate_acl	expressoMail1_2	es-es	Otros usuarios podrán CREAR/AÑADIR n
 hlp_msg_delmov_acl	expressoMail1_2	es-es	Otros usuarios podrán ELIMINAR/MOVER sus mensajes
 hlp_msg_read_acl	expressoMail1_2	es-es	Otros usuarios podrán LEER sus mensajes
 hlp_msg_sendlike_acl	expressoMail1_2	es-es	Otros usuarios podrán ENVIAR mensajes como siendo usted
-hlp_msg_savelike_acl	expressoMail1_2	es-es	Otros usuarios podrán GUARDAR los mensajes enviados como siendo usted en esta bandeja 
 hours ago	expressoMail1_2	es-es	horas atrás
 Image	expressoMail1_2	es-es	Imagen
 Imap Folders Properties	admin	es-es	Características de las Carpetas del Imap

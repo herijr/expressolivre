@@ -680,6 +680,11 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 
 	var handler_delete_msgs = function(data){
 
+		if (data.status == false) {
+			alert(get_lang(data.error));
+			return false;
+		}
+
 		Element('chk_box_select_all_messages').checked = false;
 		if (currentTab)
 			mail_msg = Element("tbody_box_"+currentTab);

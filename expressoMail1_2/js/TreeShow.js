@@ -177,10 +177,10 @@ var ttreeBox = new function()
 		}
 		
 		if ( newp != '' ) {
-			var handler_return = function( data )
-			{
-				if ( data != 'Ok' ) alert( get_lang( data ) );
-				else {
+			var handler_return = function(data){
+				if (data.status == false) {
+					alert(get_lang(data.error));
+				} else {
 					ttreeBox.name_folder = 'root'; //or use var newpast
 					this.name_func = 'newpast';
 					connector.purgeCache();
@@ -233,9 +233,13 @@ var ttreeBox = new function()
 		if ( rename != '' ) {
 			var handler_return = function( data )
 			{
-				connector.purgeCache();
-				ttreeBox.name_folder = 'root';
-				ttreeBox.update_folder();
+				if( data.status == false ){
+					alert( get_lang(data.error) );
+				} else {
+					connector.purgeCache();
+					ttreeBox.name_folder = 'root';
+					ttreeBox.update_folder();
+				}
 			}
 			var args = '$this.imap_functions.ren_mailbox';
 			var params = 'rename='+rename_new+'&current='+old_box;
@@ -292,14 +296,14 @@ var ttreeBox = new function()
 		}
 		
 		if ( confirm( get_lang( 'Do you wish to exclude the folder ')+aux1+'?' ) ) {
-			var handler_return = function( data )
-			{
-				if ( data != 'Ok' ) alert( data );
-				else {
+			var handler_return = function (data) {
+				if (data.status != true) {
+					alert( get_lang( data.error ) );
+				} else {
 					connector.purgeCache();
 					ttreeBox.name_folder = 'root';
 					ttreeBox.update_folder();
-					write_msg( get_lang( 'The folder %1 was successfully removed', aux1 ) );
+					write_msg(get_lang('The folder %1 was successfully removed', aux1));
 				}
 			}
 			var args = '$this.imap_functions.delete_mailbox';

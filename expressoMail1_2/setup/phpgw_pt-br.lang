@@ -245,11 +245,10 @@ Criteria	expressoMail1_2	pt-br	Critério
 Find items	expressoMail1_2	pt-br	Processar mensagens
 if any criterion is met	expressoMail1_2	pt-br	Se algum critério for atendido
 if all criteria is met	expressoMail1_2	pt-br	Se todos os critérios forem atendidos
-hlp_msg_addcreate_acl	expressoMail1_2	pt-br	Outros usuários poderão CRIAR/ADICIONAR novas mensagens
-hlp_msg_delmov_acl	expressoMail1_2	pt-br	Outros usuários poderão APAGAR/MOVER suas mensagens
-hlp_msg_read_acl	expressoMail1_2	pt-br	Outros usuários poderão LER suas mensagens
-hlp_msg_sendlike_acl	expressoMail1_2	pt-br	Outros usuários poderão ENVIAR mensagens como sendo você
-hlp_msg_savelike_acl	expressoMail1_2	pt-br	Outros usuários irão SALVAR as mensagens enviadas como sendo você nesta caixa 
+hlp_msg_addcreate_acl	expressoMail1_2	pt-br	Outros usuários poderão salvar mensagens na sua caixa postal, em qualquer pasta. Permite também renomear ou criar pastas
+hlp_msg_delmov_acl	expressoMail1_2	pt-br	Outros usuários poderão apagar mensagens da sua caixa postal. Permite também a exclusão de pastas
+hlp_msg_read_acl	expressoMail1_2	pt-br	Outros usuários poderão acessar sua caixa postal e ler mensagens de qualquer pasta
+hlp_msg_sendlike_acl	expressoMail1_2	pt-br	Outros usuários poderão enviar mensagens como sendo você
 hours ago	expressoMail1_2	pt-br	horas atrás
 Image	expressoMail1_2	pt-br	Imagem
 Imap Folders Properties	admin	pt-br	Propriedades das pastas IMAP
@@ -747,3 +746,8 @@ end time	expressoMail1_2	pt-br	Hora Fim
 attendees	expressoMail1_2	pt-br	Participantes
 calendar event	expressoMail1_2	pt-br	Evento de Calendário
 organizer	expressoMail1_2	pt-br	Organizado por
+select a user	expressoMail1_2	pt-br	Selecione um usuário
+reading	expressoMail1_2	pt-br	Leitura
+creation	expressoMail1_2	pt-br	Criação
+sending	expressoMail1_2	pt-br	Envio
+Operation aborted because it is a system folder	expressoMail1_2	pt-br	Operaçao cancelada pois é uma pasta de sistema
