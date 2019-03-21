@@ -75,3 +75,5 @@ else $result = $obj->$method();
 
 if ( $cExecuteFormReturn ) $_SESSION['response'] = $result;
 else set_response( $result, isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'json' ), false );
+
+session_write_close();

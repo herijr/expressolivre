@@ -11,11 +11,10 @@
 	*  option) any later version.                                              *
 	\**************************************************************************/
 
-if ( isset( $_COOKIE[ 'sessionid' ] ) )
-{ 
-	session_id( $_COOKIE[ 'sessionid' ] );
+if (isset($_COOKIE['sessionid'])) {
+	session_write_close();
+	session_id($_COOKIE['sessionid']);
 }
-
 session_start();
 
 $invalidSession = false;
