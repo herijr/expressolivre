@@ -938,11 +938,20 @@ de repeticao escolhido pelo usuario (diario, semanal, mensal, anual) e insere al
 			return ( count( $arr ) === 0 )? false : ( ($prefix !== false)? $prefix.' ': '' ).implode( $glue, $this->qry_filter( $arr ) );
 		}
 
-		protected function qry_quote( $param )
+		// This method is public for PHP 5.3 compatibility
+		// Should be protected for PHP >= 5.6
+		public function qry_quote( $param )
 		{
+			$classParent = $this;
+
+			$functionArrayReduce = function( $c, $i ) use( $classParent ) { 
+				$c[] = $classParent->qry_quote( $i ); 
+				return $c; 
+			};
+
 			if ( is_string( $param ) ) return '\''.$param.'\'';
 			if ( is_int( $param    ) ) return $param;
-			return implode( ', ', array_reduce( $param, function( $c, $i ){ $c[] = $this->qry_quote( $i ); return $c; }, array() ) );
+			return implode( ', ', array_reduce( $param, $functionArrayReduce , array() ) );
 		}
 
 		function save_event( &$event )
