@@ -30,6 +30,17 @@ class UserApiResource extends ExpressoAdapter {
 			$result = ldap_search($ldapConn, $ldapDN, "(uid={$user_id})") or die( Errors::runException(2202) );
 			$data = ldap_get_entries($ldapConn, $result);
 
+			// Verify use slash
+			$useSlash = false;
+
+			if( isset($profiles['misc.config']['USE_SLASH']) ){
+				$_slash = strtolower($profiles['misc.config']['USE_SLASH']);
+				$_slash = trim($_slash);
+				$_slash = intval($_slash);
+
+				$useSlash = ( is_int($_slash) && $_slash == 1 ? true : false );
+			}
+
 			$this->setResult( $data );
 
 			$api['userAPI'] = false;
@@ -41,8 +52,15 @@ class UserApiResource extends ExpressoAdapter {
 					$api['userAPI'] = $profiles['home.server']['DEFAULT'];
 
 					foreach( $profiles['home.server'] as $key => $value ) {
-						if( preg_match('/ou='.$key.',dc/i', $data[0]['dn'], $matches ) ){
-							$api['userAPI'] = $value;
+						if( preg_match('/ou='.$key.',dc/i', $data[0]['dn'] ) ){
+							
+							$value = trim($value);
+							
+							if( preg_match('/\/$/', $value) ){
+								$value = preg_replace('/\/$/','', $value );	
+							}
+							
+							$api['userAPI'] = ( $useSlash ? $value . "/" : $value );
 						}
 					}
 				}
