@@ -872,15 +872,15 @@ class ldap_functions
 				$acl = $this->imap->getacltouser($uid);
 				$acl = trim( strtolower($acl) );
 				if ( preg_match("/a/i",$acl )){				
-					$filter .= "(uid=$uid)";					
 					if ( preg_match("/p/i",$acl )){				
+						$filter .= "(uid=$uid)";					
 						$acl_save_sent_in_shared[ $i ] =$uid;
 						$i++;
 					}					
 				}							
 			}			
 		}
-		
+
 		$this->ldapConnect();
 
 		if ($this->ds && count($acl_save_sent_in_shared) > 0 ) {
