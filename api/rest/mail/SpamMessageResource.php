@@ -4,7 +4,7 @@ class SpamMessageResource extends MailAdapter {
 
 	public function setDocumentation() {
 
-		$this->setResource("Mail","Mail/SpamMessages","Marca uma mensagem como spam ou não spam.",array("POST"));
+		$this->setResource("Mail","Mail/SpamMessage","Marca uma mensagem como spam ou não spam.",array("POST"));
 		$this->setIsMobile(true);
 		$this->addResourceParam("auth","string",true,"Chave de autenticação do Usuário.",false);
 		$this->addResourceParam("folderID","string",true,"Pasta base retornar as mensagens.",true,"INBOX");
