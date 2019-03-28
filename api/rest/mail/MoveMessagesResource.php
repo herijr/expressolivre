@@ -6,6 +6,7 @@ class MoveMessagesResource extends MailAdapter {
 
 		$this->setIsMobile(true);
 		$this->setResource("Mail","Mail/MoveMessages", "Move uma mensagem para uma pasta.", array("POST") );
+		$this->addResourceParam("auth","string",true,"Chave de autenticação do Usuário.",false);
 		$this->addResourceParam("folderID","string",true,"ID pasta de origem", false );
 		$this->addResourceParam("msgID","string",true,"Msg(s) ID(s),se for mais de um separados por vírgula",true);
 		$this->addResourceParam("toFolderID","string",true,"ID pasta de destino");
