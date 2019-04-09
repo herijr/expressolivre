@@ -18,7 +18,10 @@ class FoldersResource extends MailAdapter {
  		parent::post($request);	 		
 
 		if ($this->isLoggedIn()) {
-			$folders = $this->getImap()->get_folders_list(array("onload" => true));
+			
+			$search = $this->getParam('search') ? mb_convert_encoding($this->getParam('search'),"ISO-8859-1", "UTF-8") : null;
+
+			$folders = $this->getImap()->get_folders_list( array( 'onload' => true ) );
 
 			$result = array();
 
@@ -52,11 +55,24 @@ class FoldersResource extends MailAdapter {
 				}
 			}
 
+			$matches = array();
+
+			if( $search != null ){
+				foreach( $result['folders'] as $key => $value ){
+					if( preg_match('/'.$search.'/i', $value['folderName'] ) ){
+						$matches['folders'][] = $value;
+					}
+				}
+
+				unset( $result['folders'] );
+				$result = ( count($matches) > 0 ) ? $matches : array( "folders"=> array() );
+			}
+
 			$result["diskSizeUsed"] = intval($folders['quota_used']) > 0 ? $folders['quota_used'] * 1024 : 0;
 			$result["diskSizeLimit"] = intval($folders['quota_limit']) > 0 ? $folders['quota_limit'] * 1024 : 0;
 			$result["diskSizePercent"] = intval($folders['quota_percent']) > 0 ? $folders['quota_percent'] / 100 : 0;
 
-			$this->setResult($result);
+			$this->setResult( $result );
 		}
 		
 		//to Send Response (JSON RPC format)
