@@ -41,8 +41,10 @@ class AddFolderResource extends MailAdapter {
 			$params['newp'] = $new_id;
 
 			$result = $this->getImap()->create_mailbox($params);
-			if($result != 'Ok')
+
+			if( !$result['status'] ){
 				Errors::runException("MAIL_FOLDER_NOT_ADDED");
+			}
 		}
 
 		$this->setResult(array('folderID' => $new_id));

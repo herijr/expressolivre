@@ -20,9 +20,9 @@ class DelMessageResource extends MailAdapter {
 
 		if($this-> isLoggedIn())
 		{
-			$_result	= array();
-			$msgID		= $this->getParam('msgID');
-			$folderID 	= $this->getParam('folderID');
+			$result	= array();
+			$msgID = $this->getParam('msgID');
+			$folderID = $this->getParam('folderID');
 
 			if(!$this->getImap()->folder_exists($folderID))
 				Errors::runException("MAIL_INVALID_FOLDER");
@@ -42,18 +42,22 @@ class DelMessageResource extends MailAdapter {
 			
 			if (($folderID != $trash_folder) && ($this->getImap()->prefs['save_deleted_msg'])) {
 				
-				if ($trash_folder == "") 
+				if ($trash_folder == ""){ 
 					Errors::runException("MAIL_TRASH_FOLDER_NOT_EXISTS");
+				}
 				
 				$params['new_folder'] = $trash_folder;
-				$this->getImap()->move_messages($params);
+				
+				$result = $this->getImap()->move_messages($params);
+			} else {
+				$result = $this->getImap()->delete_msgs( $params );
 			}
-			else
-			{
-				$this->getImap()->delete_msgs( $params ); 
+
+			if( isset($result['error']) && trim($result['error']) !== "" ){
+				$this->setResult( false );	
+			} else {
+				$this->setResult( true );
 			}
-			
-			$this->setResult( true );
 		}
 
 		return $this->getResponse();

@@ -59,7 +59,7 @@ class MessagesResource extends MailAdapter {
 						);
 
 					$this->getImap()->prefs['preview_msg_subject'] = "1";
-					error_log(serialize($params));
+
 					$imap_msgs = $this->getImap()->search_msg($params);
 
 					if($imap_msgs['num_msgs'] > 0) {

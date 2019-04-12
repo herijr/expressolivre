@@ -16,8 +16,10 @@ class DelFolderResource extends MailAdapter {
 		// to Receive POST Params (use $this->params)
  		parent::post($request);
 
-		if($this-> isLoggedIn())
+		if($this->isLoggedIn())
 		{
+			$params = array();
+			
 			$params['del_past'] = $folder_id = mb_convert_encoding($this->getParam('folderID'), "UTF-8","ISO-8859-1");
 
 			if(!$this->getImap()->folder_exists(mb_convert_encoding($folder_id, "UTF7-IMAP","UTF-8")))
@@ -43,8 +45,10 @@ class DelFolderResource extends MailAdapter {
 			$this->imap = null;
 
 			$result = $this->getImap()->delete_mailbox($params);
-			if($result != 'Ok')
+
+			if( !$result['status'] ) {
 				Errors::runException("MAIL_FOLDER_NOT_DELETED");
+			}
 		}
 
 		$this->setResult(true);

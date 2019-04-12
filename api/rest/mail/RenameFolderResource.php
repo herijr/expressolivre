@@ -40,8 +40,10 @@ class RenameFolderResource extends MailAdapter {
 			$params['rename']  = $new_id;
 
 			$result = $this->getImap()->ren_mailbox($params);
-			if($result != 'Ok')
+
+			if( !$result['status'] ){
 				Errors::runException("MAIL_FOLDER_NOT_RENAMED");
+			}
 		}
 
 		$this->setResult(array('folderID' => $new_id));

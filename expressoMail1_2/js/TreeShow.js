@@ -176,10 +176,18 @@ var ttreeBox = new function()
 			newp = ( (aux[0] == 'root')? 'INBOX' : ttree.FOLDER )+cyrus_delimiter+newp;
 		}
 		
-		if ( newp != '' ) {
-			var handler_return = function(data){
-				if (data.status == false) {
-					alert(get_lang(data.error));
+		if ( $.trim(newp) !== '' ){
+			
+			var handler_return = function( data )
+			{
+				if( eval(data.status) == false && data.error ){
+					if( data.error ) {
+						if( ( new RegExp("Permission denied") ).test( $.trim(data.error) ) ){ 
+							alert( get_lang("You don't have permission for this operation!") ); 
+						} else {
+							alert( get_lang( data.error ) );
+						}
+					} 
 				} else {
 					ttreeBox.name_folder = 'root'; //or use var newpast
 					this.name_func = 'newpast';
@@ -296,9 +304,16 @@ var ttreeBox = new function()
 		}
 		
 		if ( confirm( get_lang( 'Do you wish to exclude the folder ')+aux1+'?' ) ) {
-			var handler_return = function (data) {
-				if (data.status != true) {
-					alert( get_lang( data.error ) );
+			var handler_return = function( data )
+			{
+				if( eval(data.status) == false && data.error ){
+					if( data.error ) {
+						if( ( new RegExp("Permission denied") ).test( $.trim(data.error) ) ){ 
+							alert( get_lang("You don't have permission for this operation!") ); 
+						} else {
+							alert( get_lang( data.error ) );
+						}
+					} 
 				} else {
 					connector.purgeCache();
 					ttreeBox.name_folder = 'root';

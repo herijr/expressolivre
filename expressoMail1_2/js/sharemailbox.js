@@ -1,4 +1,5 @@
-function cShareMailbox() {
+function cShareMailbox(){
+
 	this.arrayWin = new Array();
 	this.el;
 	this.alert = false;
@@ -12,7 +13,7 @@ cShareMailbox.prototype.get_available_users = function (context) {
 	}
 }
 
-cShareMailbox.prototype.get_available_users2 = function () {
+cShareMailbox.prototype.get_available_users2 = function(){
 	var context = "";
 	var cn = "";
 
@@ -36,150 +37,173 @@ cShareMailbox.prototype.get_available_users2 = function () {
 		}
 	}
 
-	if (arguments.length > 1) {
+	if( arguments.length > 1 ) {
 		context = arguments[0];
 		cn = arguments[1];
 		cExecute("$this.ldap_functions.get_available_users2&context=" + context + "&cn=" + cn, handler_get_available_users);
-	}
-	else {
+	} else {
 		context = arguments[0];
 		cExecute("$this.ldap_functions.get_available_users2&context=" + context, handler_get_available_users);
 	}
 
 }
 
-cShareMailbox.prototype.getaclfromuser = function (user) {
-	var handler_getaclfromuser = function (data) {
+cShareMailbox.prototype.setCheckBox = function( attribute, value ){
+	$("input[type='checkbox'][id*='em_input_']").each(function(i) {
+		if( attribute === 'disabled' ){ 
+			if( i > 0 ){ $(this).prop( attribute , value ); }
+		} else {
+			$(this).prop( attribute , value ); 
+		}
+		if( i == 3 ){ $(this).prop( 'disabled' , true ); } 
+		if( i == 4 ){ $(this).prop( 'disabled' , true ); }
+	});
+}
 
-		$("input[type='checkbox'][id*='em_input_']").each(function (i) {
-			if (i > 0) {
-				$(this).prop({ disabled: true, checked: false });
-			} else {
-				$(this).prop({ checked: false });
+cShareMailbox.prototype.getaclfromuser = function(user){
+	
+	var getAclFromUser = function(data){
+
+		var aclUser = ($.trim(data[user]) == "false" ? false : $.trim(data[user]));
+
+		sharemailbox.setCheckBox( 'disabled' , true );
+		
+		sharemailbox.setCheckBox( 'checked' , false );
+
+		if (aclUser) {
+
+			// Acl read
+			var _l = new RegExp("l");
+			var _r = new RegExp("r");
+			var _s = new RegExp("s");
+			var readAcl = _l.test(aclUser) && _r.test(aclUser) && _s.test(aclUser);
+			$("#em_input_readAcl").prop({ checked: readAcl });
+
+			var _disabled = ( $("#em_input_readAcl").is(":checked") ? false : true );
+			
+			sharemailbox.setCheckBox( 'disabled' , _disabled );
+
+			// Acl delete
+			var _d = new RegExp("d");
+			var deleteAcl = _d.test(aclUser);
+			
+			if( !deleteAcl ){
+				var _x = new RegExp("x");
+				var _t = new RegExp("t");
+				var _e = new RegExp("e");
+
+				var deleteAcl = _x.test(aclUser) && _t.test(aclUser) && _e.test(aclUser);
 			}
-		});
 
-		var aclUser = $.trim(data[user]);
+			$("#em_input_deleteAcl").prop({ checked: deleteAcl });
 
-		// Acl read
-		var _l = new RegExp("l");
-		var _r = new RegExp("r");
-		var _s = new RegExp("s");
-		var readAcl = _l.test(aclUser) && _r.test(aclUser) && _s.test(aclUser);
+			// Acl write
+			var _w = new RegExp("w");
+			var _i = new RegExp("i");
 
-		// Acl delete
-		var _x = new RegExp("x");
-		var _t = new RegExp("t");
-		var _e = new RegExp("e");
-		var deleteAcl = _x.test(aclUser) && _t.test(aclUser) && _e.test(aclUser);
+			var _k = new RegExp("k");
+			var writeAcl = ( ( _w.test(aclUser) && _i.test(aclUser) ) || _k.test(aclUser) );
+			$("#em_input_writeAcl").prop({ checked: writeAcl });
 
-		// Acl write
-		var _k = new RegExp("k");
-		var _w = new RegExp("w");
-		var _i = new RegExp("i");
-		var writeAcl = _k.test(aclUser) && _w.test(aclUser) && _i.test(aclUser);
+			// Acl send
+			var _a = new RegExp("a");
+			var sendAcl = _a.test(aclUser);
+			$("#em_input_sendAcl").prop({ checked: sendAcl });
 
-		// Acl send
-		var _p = new RegExp("p");
-		var sendAcl = _p.test(aclUser);
+			// Acl save
+			var _p = new RegExp("p");
+			var saveAcl = _p.test(aclUser);
+			$("#em_input_saveAcl").prop({ checked: saveAcl });
 
-		if (readAcl) {
+			if ($("#em_input_writeAcl").is(":checked")) {
+				$("#em_input_sendAcl").prop('disabled', false);
+			}
 
-			$("input[type='checkbox'][id*='em_input_']").each(function (i) {
-
-				if (i < 4) { $(this).prop({ disabled: false, checked: false }); }
-
-				if (i == 0) { $(this).prop({ checked: true }); }
-
-				if (deleteAcl) { if (i == 1) { $(this).prop({ checked: true }); } }
-
-				if (writeAcl) { if (i == 2) { $(this).prop({ checked: true }); } }
-
-				if (sendAcl) {
-					if (i == 3) { $(this).prop({ checked: true }); }
-				}
-			});
+			if ($("#em_input_sendAcl").is(":checked")) {
+				$("#em_input_sendAcl").prop('disabled', false);
+				$("#em_input_saveAcl").prop('disabled', false);
+			}
 		}
 	}
 
-	cExecute("$this.imap_functions.getaclfromuser&user=" + user, handler_getaclfromuser);
+	cExecute("$this.imap_functions.getaclfromuser&user=" + user, getAclFromUser );
 }
 
 cShareMailbox.prototype.setaclfromuser = function () {
+	
+	if( $('#em_select_sharefolders_users').val() != null ){
 
-	var select = $('#em_select_sharefolders_users')[0];
+		var user = $('#em_select_sharefolders_users').val();
+	
+		if( $("#em_input_readAcl").is(":checked") ){
+			this.setCheckBox( 'disabled' , false );
+		} else {
+			this.setCheckBox( 'checked' , false );
+			this.setCheckBox( 'disabled' , true );
+		}
 
-	if (select.selectedIndex == "-1") {
-		alert(get_lang('select a user'));
-		return false;
-	}
+		// Set acl
+		var acl = "";
 
-	var user = select.options[select.selectedIndex].value;
+		acl += $("#em_input_readAcl").is(":checked") ? 'lrs' : '';
+		acl += $("#em_input_deleteAcl").is(":checked") ? 'xte' : '';
+		acl += $("#em_input_writeAcl").is(":checked") ? 'kwi' : '';
+		acl += $("#em_input_sendAcl").is(":checked") ? 'a' : '';
 
-	// Set acl
-	var acl = "";
+		if ($("#em_input_writeAcl").is(":checked")) {
 
-	if ($("#em_input_readAcl").is(":checked")) {
+			$("#em_input_sendAcl").prop('disabled', false);
 
-		$("#em_input_readAcl").prop("disabled", false);
-		$("#em_input_deleteAcl").prop("disabled", false);
-		$("#em_input_writeAcl").prop("disabled", false);
-		$("#em_input_sendAcl").prop("disabled", false);
+			if ($("#em_input_writeAcl").is(":checked") && $("#em_input_sendAcl").is(":checked")) {
+				$("#em_input_saveAcl").prop('disabled', false);
+			} else {
+				$("#em_input_saveAcl").prop({ 'disabled': true, 'checked': false });
 
-		acl += "lrs";
-		acl += $("#em_input_deleteAcl").is(":checked") ? "xte" : "";
-		acl += $("#em_input_writeAcl").is(":checked") ? "kwi" : "";
-		acl += $("#em_input_sendAcl").is(":checked") ? "p" : "";
+				acl = acl.replace(/p/,'');
+			}
+		} else {
+			$("#em_input_sendAcl").prop({ 'disabled': true, 'checked': false });
+			$("#em_input_saveAcl").prop({ 'disabled': true, 'checked': false });
+			
+			acl = acl.replace(/p/,'');
+			acl = acl.replace(/a/,'');
+		}
+
+		acl += $("#em_input_saveAcl").is(":checked") ? 'p' : '';
+
+		var setAclFromUser = function(data){ return true; };
+
+		cExecute("$this.imap_functions.setaclfromuser&user=" + user + "&acl=" + acl, setAclFromUser);
 
 	} else {
-
-		$("input[type='checkbox'][id*='em_input_']").each(function (i) {
-			if (i > 0) {
-				$(this).prop({ disabled: true, checked: false });
-			} else {
-				$(this).prop({ checked: false });
-			}
-		});
-
-		acl = "";
+		
+		alert("Selecione antes um usuário!"); 
+		
+		return false;
 	}
-
-	// Set ACL/listrights
-	acl += "a";
-
-	var handler_setaclfromuser = function (data) {
-		if (!data) { alert(data); }
-		return true;
-	}
-
-	cExecute("$this.imap_functions.setaclfromuser&user=" + user + "&acl=" + acl, handler_setaclfromuser);
 }
 
 cShareMailbox.prototype.makeWindow = function (options) {
 	_this = this;
 
-	var el = document.createElement("DIV");
-	el.style.visibility = "hidden";
-	el.style.position = "absolute";
-	el.style.left = "0px";
-	el.style.top = "0px";
-	el.style.width = "0px";
-	el.style.height = "0px";
-	el.id = 'dJSWin_sharefolders';
+	var el = $("<div>").css({
+		'visibility': 'hidden',
+		'position': 'absolute',
+		'lef': '0px',
+		'top': '0px',
+		'width': '0px',
+		'height': '0px',
+	}).attr('id', 'dJSWin_sharefolders')[0];
 
 	document.body.appendChild(el);
 
-	if (Element('em_select_sharefolders_users')) {
-		var select_users = $('#em_select_sharefolders_users')[0];
+	if ($('#em_select_sharefolders_users').length > 0) {
+		var select_users = Element('em_select_sharefolders_users');
 		select_users.innerHTML = '#' + options;
 		select_users.outerHTML = select_users.outerHTML;
 
-		$("#em_input_readAcl").prop("checked", false);
-		$("#em_input_deleteAcl").prop("checked", false);
-		$("#em_input_writeAcl").prop("checked", false);
-		$("#em_input_sendAcl").prop("checked", false);
-	}
-	else {
+	} else {
+
 		el.innerHTML = '<div style="width:645px; height:340px; margin: 2px !important; ">' +
 			'<fieldset style="height:300px;">' +
 			'<div style="width:500px; height:15px; font-size:8pt; color:red;">' +
@@ -194,10 +218,10 @@ cShareMailbox.prototype.makeWindow = function (options) {
 			'<label>' + get_lang('Search user') + '<span style="margin-left:10px; color:red;" id="em_span_searching">&nbsp;</span><br></label>' +
 			'<input id="em_input_searchUser" size="30" autocomplete="off"  onkeyup="javascript:sharemailbox.optionFinderTimeout(this, event)">' +
 			'<div style="margin-top:17px;"><label>' + get_lang('Users') + ':</label></div>' +
-			'<select id="em_select_available_users" style="width:250px; height:150px" multiple></select></td>' +
+			'<select id="em_select_available_users" style="width:230px; height:150px" multiple></select></td>' +
 			'</div>' +
 			'<div style="width:20px; height: 300px; position:relative; float:left;">' +
-			'<div style="margin-top:120px;margin-left:3px;">' +
+			'<div style="margin-top:120px;margin-left:-3px;">' +
 			'<img onClick="javascript:sharemailbox.add_user();" src="../phpgwapi/templates/azul/images/tabs-r0.gif" style="vertical-align:middle;cursor:pointer;">' +
 			'<br/><br/>' +
 			'<img onClick="javascript:sharemailbox.remove_user();" src="../phpgwapi/templates/azul/images/tabs-l0.gif" style="vertical-align:middle;cursor:pointer;">' +
@@ -206,15 +230,16 @@ cShareMailbox.prototype.makeWindow = function (options) {
 			'<div style="width:348px; height:300px; position:relative; float:right;">' +
 			'<div style="margin-top:90px;"><label>' + get_lang('Your mailbox is shared with') + ' :</label></div>' +
 			'<div style="position:absolute; float:left;">' +
-			'<select onchange=sharemailbox.getaclfromuser(this.value); id="em_select_sharefolders_users" size="13" style="width:245px;height:150px">' + options + '</select>' +
+			'<select onchange=sharemailbox.getaclfromuser(this.value); id="em_select_sharefolders_users" size="13" style="width:230px;height:150px">' + options + '</select>' +
 			'</div>' +
-			'<div style="position:relative; float:right; width:98px;">' +
+			'<div style="position:relative; float:right; width:auto;">' +
 			'<fieldset>' +
 			'<legend>' + get_lang('Permission') + '</legend>' +
-			'<div title="' + get_lang("hlp_msg_read_acl") + '" alt="' + get_lang("hlp_msg_read_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_readAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('reading') + '</label><div/>' +
-			'<div title="' + get_lang("hlp_msg_delmov_acl") + '" alt="' + get_lang("hlp_msg_delmov_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_deleteAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('exclusion') + '</label></div>' +
-			'<div title="' + get_lang("hlp_msg_addcreate_acl") + '" alt="' + get_lang("hlp_msg_addcreate_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_writeAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('creation') + '</label></div>' +
-			'<div title="' + get_lang("hlp_msg_sendlike_acl") + '" alt="' + get_lang("hlp_msg_sendlike_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_sendAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('sending') + '</label></div>' +
+			'<div title="' + get_lang("hlp_msg_read_acl") + '" alt="' + get_lang("hlp_msg_read_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_readAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('Read') + '</label><div/>' +
+			'<div title="' + get_lang("hlp_msg_delmov_acl") + '" alt="' + get_lang("hlp_msg_delmov_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_deleteAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('Exclusion') + '</label></div>' +
+			'<div title="' + get_lang("hlp_msg_addcreate_acl") + '" alt="' + get_lang("hlp_msg_addcreate_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_writeAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('Write') + '</label></div>' +
+			'<div title="' + get_lang("hlp_msg_sendlike_acl") + '" alt="' + get_lang("hlp_msg_sendlike_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_sendAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('Send') + '</label></div>' +
+			'<div title="' + get_lang("hlp_msg_savelike_acl") + '" alt="' + get_lang("hlp_msg_savelike_acl") + '"><label style="padding-left:10px ;text-indent:-15px;"><input style="height:13px; padding:0; margin:0; vertical-align: bottom; position: relative;" id="em_input_saveAcl" onClick="return sharemailbox.setaclfromuser();" type="checkbox">' + get_lang('Save') + '</label></div>' +
 			'</fieldset>' +
 			'</div>' +
 			'</div>' +
@@ -240,35 +265,6 @@ cShareMailbox.prototype.makeWindow = function (options) {
 	cExecute("$this.ldap_functions.get_organizations&referral=false", handler_organizations);
 
 	var butt = Element('dJSWin_wfolders_bok')
-
-	if (!butt) {
-		butt = document.createElement('INPUT');
-		butt.style.marginLeft = "5px";
-		butt.id = 'dJSWin_wfolders_bok';
-		butt.type = 'button';
-		butt.value = get_lang('Save');
-		el.appendChild(butt);
-	}
-	butt.onclick = function () {
-		// Needed select all options from select
-		var users_setacl = new Array();
-		select_users = Element('em_select_sharefolders_users');
-		for (var i = 0; i < select_users.options.length; i++) {
-			users_setacl[i] = select_users.options[i].value;
-		}
-		attributes = connector.serialize(users_setacl);
-
-		var handler_save = function (data) {
-			if (data) {
-				alert(get_lang('Shared options saved with success'));
-				sharemailbox.arrayWin[el.id].close();
-			}
-		}
-
-		cExecute("$this.imap_functions.setacl", handler_save, 'users=' + attributes);
-
-	}
-
 	var space = document.createElement('SPAN');
 	space.innerHTML = "&nbsp;&nbsp;";
 	el.appendChild(space);
@@ -276,13 +272,19 @@ cShareMailbox.prototype.makeWindow = function (options) {
 	var butt = document.createElement('BUTTON');
 	var buttext = document.createTextNode(get_lang('Close'));
 	butt.appendChild(buttext);
-	butt.onclick = function () { sharemailbox.arrayWin[el.id].close(); };
+	butt.onclick = function(){ 
+		sharemailbox.setCheckBox( 'disabled', true );
+		sharemailbox.setCheckBox( 'checked', false );
+		sharemailbox.arrayWin[el.id].close(); 
+	};
+
 	el.appendChild(butt);
 
 	_this.showWindow(el);
 }
 
-cShareMailbox.prototype.showWindow = function (div) {
+cShareMailbox.prototype.showWindow = function(div){
+	
 	if (!div) {
 		alert(get_lang('This list has no participants'));
 		return;
@@ -311,12 +313,16 @@ cShareMailbox.prototype.showWindow = function (div) {
 
 		this.arrayWin[div.id] = win;
 		win.draw();
-	}
-	else {
+	} else {
+
 		win = this.arrayWin[div.id];
 	}
-	Element('em_input_sendAcl').disabled = true;
+
 	win.open();
+
+	this.setCheckBox( 'checked', false );
+
+	this.setCheckBox( 'disabled', true );
 }
 
 cShareMailbox.prototype.optionFinderTimeout = function (Obj, Event) {
@@ -353,8 +359,7 @@ cShareMailbox.prototype.optionFinderTimeout = function (Obj, Event) {
 		if (_inputSearch.value.length < parseInt(minNumChar)) {
 			oWait.innerHTML = " ( Digite mais " + (parseInt(minNumChar) - _inputSearch.value.length) + " )";
 			setTimeout(function () { cleanLabel(oWait); }, 2000);
-		}
-		else {
+		} else {
 			oWait.innerHTML = get_lang('Searching') + "...";
 
 			if (this.finderTimeout)
@@ -362,8 +367,7 @@ cShareMailbox.prototype.optionFinderTimeout = function (Obj, Event) {
 
 			this.finderTimeout = setTimeout(function () { getUsers(_inputSearch, oWait); }, 1000);
 		}
-	}
-	else {
+	} else {
 		if (this.finderTimeout)
 			clearTimeout(this.finderTimeout);
 
@@ -437,24 +441,20 @@ cShareMailbox.prototype.add_user = function () {
 }
 
 cShareMailbox.prototype.remove_user = function () {
+	
+	var user = $("#em_select_sharefolders_users option:selected").val();
+	
+	$("#em_select_sharefolders_users option:selected").remove();
 
-	select_users = document.getElementById('em_select_sharefolders_users');
+	this.setCheckBox( 'checked' , false );
 
-	for (var i = 0; i < select_users.options.length; i++) {
-		if (select_users.options[i].selected) {
-			select_users.options[i--] = null;
-		}
-	}
+	this.setCheckBox( 'disabled' , true );
 
-	$("input[type='checkbox'][id*='em_input_']").each(function (i) {
+	var removeUser = function( data ){ return true; };
 
-		if (i > 0) {
-			$(this).prop({ disabled: true, checked: false });
-		} else {
-			$(this).prop({ checked: false });
-		}
-	});
+	cExecute("$this.imap_functions.setaclfromuser&user=" + user + "&acl=none", removeUser );
 }
+
 
 /* Build the Object */
 var sharemailbox;

@@ -680,28 +680,35 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 
 	var handler_delete_msgs = function(data){
 
-		if (data.status == false) {
-			alert(get_lang(data.error));
+		if( data.error && $.trim(data.error) !== "" ) {
+			if( ( new RegExp("Permission denied") ).test( data.error ) ){ 
+				alert( get_lang("You don't have permission for this operation!") ); 
+			} else {
+				alert( get_lang('Error moving message.') + " :\n " + data.error );
+			}
+			
 			return false;
 		}
 
 		Element('chk_box_select_all_messages').checked = false;
-		if (currentTab)
+
+		if (currentTab){
 			mail_msg = Element("tbody_box_"+currentTab);
-		else
+		}else{
 			mail_msg = Element("tbody_box");
+		}
 
 		if ( preferences.use_shortcuts == '1') {
-				//Last msg is selected
-				if (mail_msg && exist_className(mail_msg.childNodes[mail_msg.childNodes.length-1], 'selected_shortcut_msg') ) {
+			//Last msg is selected
+			if (mail_msg && exist_className(mail_msg.childNodes[mail_msg.childNodes.length-1], 'selected_shortcut_msg') ) {
+				select_msg('null', 'up', true);
+			}
+			else {
+				if (!select_msg('null', 'down', true)) {
 					select_msg('null', 'up', true);
 				}
-				else {
-					if (!select_msg('null', 'down', true)) {
-						select_msg('null', 'up', true);
-					}
-				}
 			}
+		}
 
 		if (show_success_msg) {
 			if (data.msgs_number.length == 1)
@@ -732,12 +739,15 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 		refresh();
 	}
 
-	if (msgs_number == 'selected')
+	if(msgs_number === 'selected'){
 		msgs_number = get_selected_messages();
-	if (msgs_number.length > 0 || parseInt(msgs_number) > 0)
+	}
+	
+	if( msgs_number.length > 0 || parseInt(msgs_number) > 0 ){
 		cExecute ("$this.imap_functions.delete_msgs&folder="+folder+"&msgs_number="+msgs_number+"&border_ID="+border_ID+"&sort_box_type="+sort_box_type+"&search_box_type="+search_box_type+"&sort_box_reverse="+sort_box_reverse, handler_delete_msgs);
-	else
+	}else{
 		write_msg(get_lang('No selected message.'));
+	}
 }
 
 
@@ -838,35 +848,18 @@ function move_msgs2(folder, msgs_number, border_ID, new_folder, new_folder_name,
 		return move_search_msgs('content_id_' + currentTab, new_folder, new_folder_name);
 	}
 
-	var handler_move_msgs = function (data) {
+	var handler_move_msgs = function(data) {
 
-		if( data && eval(data.error) == false ){
-			alert(get_lang("You don't have permission for this operation in this shared folder!"));
-			return false;
-		}
+		if (data && eval(data.status) == false ) {
 
-		if (typeof (data) == 'string') {
-			alert(get_lang('Error moving message.') + ":\n" + data);
-			return false;
-		}
-
-		if (data && data.error) {
-			if (!data.error.match(/^(.*)TRYCREATE(.*)$/)) {
-				alert(get_lang('Error moving message.') + ":\n" + data.error);
-			} else {
-				var move_to_folder = data.folder.split(cyrus_delimiter).pop();
-				connector.loadScript('TreeS');
-				alert(get_lang('There is not %1 folder, Expresso is creating it for you... Please, repeat your request later.', move_to_folder));
-				connector.loadScript('TreeShow');
-				ttree.FOLDER = 'root';
-				ttreeBox.new_past(move_to_folder);
-			}
-			return false;
-		}
-
-		//Este bloco verifica as permissoes ACL sobre pastas compartilhadas
-		if (data.status == false) {
-			alert(get_lang("You don't have permission for this operation in this shared folder!"));
+			if( data.error ) {
+				if( ( new RegExp("Permission denied") ).test( data.error ) ){ 
+					alert( get_lang("You don't have permission for this operation!") ); 
+				} else {
+					alert( get_lang('Error moving message.') + " :\n " + data.error );
+				}
+			} 
+			
 			return false;
 		}
 

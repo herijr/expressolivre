@@ -857,9 +857,11 @@ class ldap_functions
 		return false;
 	}
 
-	function getSharedUsersFrom($params){
-		$filter = '';
+	function getSharedUsersFrom($params)
+	{
+		$filter = false;
 		$i = 0;		
+
 		//Added to save if must save sent messages in shared folder
 		$acl_save_sent_in_shared = array();
 		
@@ -871,9 +873,9 @@ class ldap_functions
 				//Added to save if user has create permission 
 				$acl = $this->imap->getacltouser($uid);
 				$acl = trim( strtolower($acl) );
-				if ( preg_match("/a/i",$acl )){				
-					if ( preg_match("/p/i",$acl )){				
-						$filter .= "(uid=$uid)";					
+				if ( preg_match("/a/i",$acl )){
+					$filter .= "(uid=$uid)";				
+					if ( preg_match("/p/i",$acl )){
 						$acl_save_sent_in_shared[ $i ] =$uid;
 						$i++;
 					}					
@@ -883,20 +885,18 @@ class ldap_functions
 
 		$this->ldapConnect();
 
-		if ($this->ds && count($acl_save_sent_in_shared) > 0 ) {
+		if ($this->ds) {
 			$justthese = array("cn","mail","uid");
 			if($filter) {
 				$filter="(&(|(phpgwAccountType=u)(phpgwAccountType=s))(|$filter))";
 				$sr = ldap_search($this->ds, $this->ldap_context, $filter, $justthese);
 				ldap_sort($this->ds,$sr,"cn");
-				$info 	= 	ldap_get_entries($this->ds, $sr);
-				$var = print_r($acl_save_sent_in_shared, true);				
+				$info = ldap_get_entries($this->ds, $sr);
+				//$var = print_r($acl_save_sent_in_shared, true);				
 				for ($i = 0;$i < $info["count"]; $i++){
 					$info[$i]['cn'][0] = utf8_decode($info[$i]['cn'][0]);
 					//verify if user has permission to save sent messages in a shared folder
-					if ( in_array( $info[$i]['uid'][0],$acl_save_sent_in_shared) ){						
-						$info[$i]['save_shared'][0] = 'y';
-					} else $info[$i]['save_shared'][0] = 'n';
+					$info[$i]['save_shared'][0] = ( in_array( $info[$i]['uid'][0],$acl_save_sent_in_shared) ? 'y' : 'n' );
 				}
 			}
 			
