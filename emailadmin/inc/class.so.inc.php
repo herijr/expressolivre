@@ -120,10 +120,8 @@ class so
 		$signature = $this->getExtras( $domain, 'defaultUserSignature' );
 		if ( !$signature ) return false;
 
-		if ( !isset( $_SESSION['phpgw_info']['workflow']['server_root'] ) ) {
-			require_once PHPGW_SERVER_ROOT.'/workflow/inc/common.inc.php';
-			Factory::getInstance('WorkflowMacro')->prepareEnvironment();
-		}
+		require_once PHPGW_SERVER_ROOT.'/workflow/inc/common.inc.php';
+		Factory::getInstance('WorkflowMacro')->prepareEnvironment();
 
 		require_once PHPGW_SERVER_ROOT.'/workflow/inc/class.so_adminaccess.inc.php';
 		require_once PHPGW_SERVER_ROOT.'/workflow/inc/local/classes/class.wf_orgchart.php';
