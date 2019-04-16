@@ -249,6 +249,7 @@ hlp_msg_addcreate_acl	expressoMail1_2	pt-br	Outros usuários poderão salvar mensa
 hlp_msg_delmov_acl	expressoMail1_2	pt-br	Outros usuários poderão apagar mensagens da sua caixa postal. Permite também a exclusão de pastas
 hlp_msg_read_acl	expressoMail1_2	pt-br	Outros usuários poderão acessar sua caixa postal e ler mensagens de qualquer pasta
 hlp_msg_sendlike_acl	expressoMail1_2	pt-br	Outros usuários poderão enviar mensagens como sendo você
+hlp_msg_savelike_acl	expressoMail1_2	pt-br	Outros usuários poderão salvar mensagens enviadas como sendo você nesta caixa
 hours ago	expressoMail1_2	pt-br	horas atrás
 Image	expressoMail1_2	pt-br	Imagem
 Imap Folders Properties	admin	pt-br	Propriedades das pastas IMAP
