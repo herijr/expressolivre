@@ -2986,18 +2986,22 @@ class imap_functions
 			'status' 			=> true
 		); 
 
-		//Este bloco tem a finalidade de transformar o CPF das pastas compartilhadas em common name
-        if(isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'])){
-            if (substr($new_folder_name,0,4) == 'user'){
-                $this->ldap = new ldap_functions();
-                $tmp_folder_name = explode($this->imap_delimiter, $new_folder_name);
-                $return['new_folder_name'] = array_pop($tmp_folder_name);
-                if( $cn = $this->ldap->uid2cn($return['new_folder_name']))
-                {
-                    $return['new_folder_name'] = $cn;
-                }
-            }
-        }
+		// This block has the purpose of transforming the uid(login) of shared folders into common name
+		if(isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'])){
+			if (substr($new_folder_name,0, 4)  == 'user'){
+				$this->ldap = new ldap_functions();
+
+				$tmpFolderName = explode( $this->imap_delimiter, $new_folder_name );
+
+				if( count($tmpFolderName) > 1 && isset($tmpFolderName[1]) ){
+					$tmpFolderName[1] = $this->ldap->uid2cn( $tmpFolderName[1] );
+				}
+
+				$return['new_folder_name'] = ( count($tmpFolderName) > 1  ) ?
+					implode( " / " , array_slice( $tmpFolderName, 1 ) ) :
+					$return['new_folder_name'];
+				}
+		}
 
 		// Caso estejamos no box principal, nao eh necessario pegar a informacao da mensagem anterior.
 		if (($params['get_previous_msg']) && ($params['border_ID'] != 'null') && ($params['border_ID'] != ''))
