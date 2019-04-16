@@ -20,7 +20,7 @@ class UserApiResource extends ExpressoAdapter {
 		} else {
 
 			$user_id = $this->getParam('user');
-			
+
 			$profiles = parse_ini_file( dirname( __FILE__ ) . '/../../config/profileHomeServer.ini', true);
 			$ldapHost = $profiles['ldap.server']['LDAP'];
 			$ldapDN = $profiles['ldap.server']['BASE_DN'];
@@ -49,22 +49,23 @@ class UserApiResource extends ExpressoAdapter {
 
 				if( isset($data[0]['dn']) ){
 
-					$api['userAPI'] = $profiles['home.server']['DEFAULT'];
+					$tmpValue = $profiles['home.server']['DEFAULT'];
 
 					foreach( $profiles['home.server'] as $key => $value ) {
 						if( preg_match('/ou='.$key.',dc/i', $data[0]['dn'] ) ){
-							
-							$value = trim($value);
-							
-							if( preg_match('/\/$/', $value) ){
-								$value = preg_replace('/\/$/','', $value );	
-							}
-							
-							$api['userAPI'] = ( $useSlash ? $value . "/" : $value );
+
+							$tmpValue = trim($value);
+
 						}
 					}
+
+					if( preg_match('/\/$/', $tmpValue) ){
+						$tmpValue = preg_replace('/\/$/','', $tmpValue );
+					}
+
+					$api['userAPI'] = ( $useSlash ? $tmpValue . "/" : $tmpValue );
 				}
-			} 
+			}
 
 			if( $api['userAPI'] ){
 				$this->setResult( $api );
