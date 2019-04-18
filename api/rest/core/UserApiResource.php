@@ -68,7 +68,14 @@ class UserApiResource extends ExpressoAdapter {
 			}
 
 			if( $api['userAPI'] ){
+
+				$api['apis'][] = array(
+					"api" => $api['userAPI'],
+					"apps" => array( "calendar", "catalog", "mail" )
+				);
+
 				$this->setResult( $api );
+
 			} else {
 				Errors::runException(2200);
 			}
