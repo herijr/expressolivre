@@ -74,6 +74,16 @@ class PreferencesAdapter extends ExpressoAdapter
 		
 		return $config['Preferences.mapping'];
 	}
+
+	protected function getDefaultSignature()
+	{
+		$profile = CreateObject('emailadmin.bo');
+		$itens = $profile->getProfileList();
+		$config = $profile->getProfile($itens[0]['profileid']);
+
+		return ( isset( $config['defaultUserSignature'] ) && $config['defaultUserSignature'] ) ? 
+					$config['defaultUserSignature'] : false;
+	}
 }
 
 ?>

@@ -36,6 +36,19 @@ class UserPreferencesResource extends PreferencesAdapter
 
 				$prefs = array_merge( $prefs_default, $prefs_user);
 
+				if( strtolower($appName) === "expressomail" )
+				{
+					$defaultSignature = $this->getDefaultSignature();
+
+					if( $defaultSignature ){
+						$prefs['auto_signature'] = 1;
+						$prefs['signature']      = $defaultSignature;
+						$prefs['type_signature'] = 'html';
+					} else  {
+						$prefs['auto_signature'] = 0;
+					}
+				}
+
 				foreach( $prefs as $k => $pref) {
 					$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF8","ISO_8859-1") : $pref;
 				}
