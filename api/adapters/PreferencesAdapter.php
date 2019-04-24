@@ -59,7 +59,7 @@ class PreferencesAdapter extends ExpressoAdapter
 		}
 		else
 		{
-			if( $auth->change_password($currentpasswd, $newPassword) )
+			if( $auth->change_password($currentPassword, $newPassword) )
 			{
 				$_return = "true";
 			}
