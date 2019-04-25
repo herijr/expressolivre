@@ -34,50 +34,62 @@ cRichTextEditor.prototype.loadEditor = function(ID) {
 	document.getElementById('fontsize').selectedIndex = 0;
 }
 
-cRichTextEditor.prototype.createElementEditor = function(pObj)
-{
-		iframe = document.createElement("IFRAME");
-		iframe.id = pObj;
-		iframe.name = pObj;
-		iframe.width = "100%";
-		iframe.height = 300;
-		iframe.setAttribute("unselectable","on");
-		iframe.setAttribute("tabIndex","1");
-		iframe.setAttribute( 'frameborder', '0' );
+cRichTextEditor.prototype.createElementEditor = function (pObj) {
 
-		config_events( iframe, 'onload', function( )
-		{
-			if ( iframe.contentWindow.document.body && iframe.contentWindow.document.body.contentEditable ) {
-				
-				if(mobile_device)
-					iframe.contentWindow.document.body.contentEditable = true;
-				else
-					iframe.contentWindow.document.designMode = "on";
+	var IDEditor = this.id;
+
+	var iframe = $("<iframe/>")
+	iframe.attr('id', pObj);
+	iframe.attr('name', pObj);
+	iframe.attr('width', "100%");
+	iframe.attr('unselectable', 'on');
+	iframe.attr('tabIndex', '1');
+	iframe.attr('frameborder', '0');
+
+	var resizeIframe = function(){
+		var idTag = 'div_message_scroll_' + IDEditor;
+		var heightIframe = parseFloat( $("div[id=" + idTag + "]").height() * ( preferences.auto_signature ? 0.55 : 0.69 ) );
+		iframe.attr('height', heightIframe);
+	};
+
+	config_events($(iframe)[0], 'onload', function () {
+		if ($(iframe)[0].contentWindow.document.body && $(iframe)[0].contentWindow.document.body.contentEditable) {
+			if (mobile_device) {
+				$(iframe)[0].contentWindow.document.body.contentEditable = true;
+			} else {
+				$(iframe)[0].contentWindow.document.designMode = "on";
 			}
-			
-			if ( iframe.contentWindow.document.documentElement ){
-				iframe.contentWindow.document.documentElement.style.background = '#fff';
-				iframe.contentWindow.document.documentElement.style.fontSize = '16px';
-			}
-		});
+		}
 
-		var div_iframe = $('<div style="border: 2px solid; border-color: #111 #b2b2c1 #b2b2c1 #111;">').append( iframe );
-		if ( preferences.auto_signature ) div_iframe.append( $('<iframe id="signature_ro_'+this.id+'" width="100%" frameborder="0">') );
-		parentDiv.appendChild( div_iframe[0] );
+		if ($(iframe)[0].contentWindow.document.documentElement) {
+			$(iframe)[0].contentWindow.document.documentElement.style.background = '#fff';
+			$(iframe)[0].contentWindow.document.documentElement.style.fontSize = '16px';
+		}
 
-		var source = document.createElement( 'input' );
-		source.id = 'viewsource_rt_checkbox_' + this.id;
-		source.type = "checkbox";
-		source.setAttribute("tabIndex","-1");
-		source.onclick = function( )
-		{
-			RichTextEditor.viewsource(this.checked);
-		};
-		source = parentDiv.appendChild(
-			document.createElement( 'span' ).appendChild( source ).parentNode
-		).appendChild(
-			document.createTextNode( get_lang( 'View HTML source' ) + '.' )
-		).parentNode;
+		resizeIframe();
+
+	});
+
+	var div_iframe = $('<div style="border: 2px solid; border-color: #111 #b2b2c1 #b2b2c1 #111;">').append($(iframe)[0]);
+
+	if (preferences.auto_signature) { div_iframe.append($('<iframe id="signature_ro_' + this.id + '" width="100%" frameborder="0">')) };
+
+	parentDiv.appendChild(div_iframe[0]);
+
+	$(window).on("resize", function () { resizeIframe(); });
+
+	var source = document.createElement('input');
+	source.id = 'viewsource_rt_checkbox_' + this.id;
+	source.type = "checkbox";
+	source.setAttribute("tabIndex", "-1");
+	source.onclick = function () {
+		RichTextEditor.viewsource(this.checked);
+	};
+	source = parentDiv.appendChild(
+		document.createElement('span').appendChild(source).parentNode
+	).appendChild(
+		document.createTextNode(get_lang('View HTML source') + '.')
+	).parentNode;
 }
 
 cRichTextEditor.prototype.loadStyle = function(tag, css_file) {
