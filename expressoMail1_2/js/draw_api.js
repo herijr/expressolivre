@@ -2441,6 +2441,7 @@ function draw_new_message(border_ID){
 	if (!expresso_offline) {
 		var img_search = document.createElement("IMG");
 		img_search.src = "./templates/"+template+"/images/search.gif";
+		img_search.style.margin = '4px';
 		img_search.title = get_lang('Search') + " | " + get_lang('Use F9 Key as shortcut.');
 		img_search.onclick = function () {emQuickSearch(document.getElementById('to_'+ID).value, 'to', ID);};
 	}

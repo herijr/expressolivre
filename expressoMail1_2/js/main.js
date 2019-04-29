@@ -1569,7 +1569,7 @@ function new_message(type, border_ID){
 		doc.open();
 		doc.write( '<body style="margin: 0;">'+signature+'</body>' );
 		doc.close();
-		iframe.style.height = doc.body.scrollHeight+'px';
+		iframe.style.height = '165px';
 	}
 
 	// IM Module Enabled
