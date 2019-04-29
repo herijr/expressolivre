@@ -48,7 +48,7 @@ cRichTextEditor.prototype.createElementEditor = function (pObj) {
 
 	var resizeIframe = function(){
 		var idTag = 'div_message_scroll_' + IDEditor;
-		var heightIframe = parseFloat( $("div[id=" + idTag + "]").height() * ( preferences.auto_signature ? 0.37 : 0.69 ) );
+		var heightIframe = parseFloat( $("div[id=" + idTag + "]").height() * ( preferences.auto_signature ? 0.40 : 0.69 ) );
 		iframe.attr('height', heightIframe);
 	};
 

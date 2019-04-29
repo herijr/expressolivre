@@ -1567,9 +1567,9 @@ function new_message(type, border_ID){
 		var iframe = document.getElementById('signature_ro_'+new_border_ID);
 		var doc    = iframe.contentWindow.document;
 		doc.open();
-		doc.write( '<body style="margin: 0;">'+signature+'</body>' );
+		doc.write( '<body style="margin: 0; overflow: hidden;">'+signature+'</body>' );
 		doc.close();
-		iframe.style.height = '165px';
+		iframe.style.height = '160px';
 	}
 
 	// IM Module Enabled
