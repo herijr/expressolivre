@@ -41,6 +41,7 @@ class UserPreferencesResource extends PreferencesAdapter
 					$defaultSignature = $this->getDefaultSignature();
 
 					if( $defaultSignature ){
+						$defaultSignature = preg_replace('/&#65279;/','', $defaultSignature );
 						$prefs['auto_signature'] = 1;
 						$prefs['signature']      = $defaultSignature;
 						$prefs['type_signature'] = 'html';
@@ -50,7 +51,7 @@ class UserPreferencesResource extends PreferencesAdapter
 				}
 
 				foreach( $prefs as $k => $pref) {
-					$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF8","ISO_8859-1") : $pref;
+					$prefs[$k] = is_string( $pref )? mb_convert_encoding($pref, "UTF-8","ISO-8859-1") : $pref;
 				}
 
 				if ($preference == "") {
