@@ -1176,6 +1176,8 @@ function new_message(type, border_ID){
 		preferences.signature = "";
 
 	var signature = preferences.type_signature == 'html' ? preferences.signature : preferences.signature.replace(/\n/g, "<br>");
+	var default_signature = preferences.default_signature? signature : false;
+	signature = default_signature? '' : '<div id="use_signature_anchor">'+signature+'</div>';
 
 	if(type!="new" && type!="edit")
 		data.is_local_message = (document.getElementById("is_local_"+border_ID).value=="1")?true:false;
@@ -1188,7 +1190,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1"){
+			if ( preferences.use_signature == "1"){
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
 			}
 			else{
@@ -1225,7 +1227,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
+			if ( preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + block_quoted_body + "</body></html>");
 			}
 			else {
@@ -1278,7 +1280,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
+			if ( preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
 			}
 			else {
@@ -1334,7 +1336,7 @@ function new_message(type, border_ID){
 			var body = document.getElementById("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
+			if ( preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + block_quoted_body + "</body></html>");
 			}
 			else {
@@ -1420,7 +1422,7 @@ function new_message(type, border_ID){
 			var body = Element("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
+			if ( preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + make_forward_body(data.body, data.to, data.date, data.subject, data.to_all, data.cc) + "</body></html>");
 			}
 			else {
@@ -1466,7 +1468,7 @@ function new_message(type, border_ID){
 			var body = document.getElementById("body_" + new_border_ID);
 			body.contentWindow.document.open();
 			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( ( !preferences.auto_signature ) && preferences.use_signature == "1") {
+			if ( preferences.use_signature == "1") {
 				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
 			}
 			else {
@@ -1562,14 +1564,14 @@ function new_message(type, border_ID){
 		default:
 	}
 
-	$('img#signature').toggle( !preferences.auto_signature );
-	if ( preferences.auto_signature ) {
+	$('img#signature').toggle( ( !default_signature ) && ( !!signature ) );
+	if ( default_signature ) {
 		var iframe = document.getElementById('signature_ro_'+new_border_ID);
 		var doc    = iframe.contentWindow.document;
 		doc.open();
-		doc.write( '<body style="margin: 0; overflow: hidden;">'+signature+'</body>' );
+		doc.write( '<body style="margin: 0; overflow: hidden;">'+default_signature+'</body>' );
 		doc.close();
-		iframe.style.height = '160px';
+		iframe.style.height = doc.body.scrollHeight+'px';
 	}
 
 	// IM Module Enabled
@@ -1884,14 +1886,34 @@ function send_message(ID, folder, folder_name){
 
 	var mail_as_plain = document.getElementById( 'textplain_rt_checkbox_' + ID );
 	mail_as_plain = ( mail_as_plain ) ? mail_as_plain.checked : false;
+	
+	var from_data = $('select#from_'+ID).find(':selected').data();
+	var cur_from = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
+	var cur_signature = {
+		'signature':      cur_from.signature,
+		'default_signature': cur_from.default_signature
+	};
 
 	var textArea = document.createElement("TEXTAREA");
 	textArea.style.display='none';
 	textArea.name = "body";
 	body = document.getElementById("body_"+ID);
+	
+	var mail_text = '';
+	if ( mail_as_plain ) {
+		mail_text = is_ie ? body.contentWindow.document.body.innerHTML : body.previousSibling.value
+	} else {
+		// Remove div#use_signature_anchor before send
+		var obj = $('<div>');
+		$(obj).html( $('iframe#body_'+ID).contents().find('body').html() );
+		var sig_anchor = $(obj).find('div#use_signature_anchor')
+		$(sig_anchor).after( $(sig_anchor).html() );
+		$(sig_anchor).remove();
+		mail_text = $(obj).html();
+	}
 	textArea.value = ( mail_as_plain?
-		( ( is_ie ? body.contentWindow.document.body.innerHTML : body.previousSibling.value )+( preferences.auto_signature? '\n\n'+RichTextEditor.stripHTML( preferences.signature ) : '' ) ) :
-		( '<body>\r\n'+body.contentWindow.document.body.innerHTML+( preferences.auto_signature? '<br>'+preferences.signature : '' )+'\r\n</body>' )
+		( mail_text+( cur_signature.default_signature? '\n\n'+RichTextEditor.stripHTML( cur_signature.signature ) : '' ) ) :
+		( '<body>\r\n'+mail_text+( cur_signature.default_signature? '<br>'+cur_signature.signature : '' )+'\r\n</body>' )
 	);
 	var input_folder = document.createElement("INPUT");
 	input_folder.style.display='none';

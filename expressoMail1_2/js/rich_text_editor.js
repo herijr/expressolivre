@@ -48,7 +48,7 @@ cRichTextEditor.prototype.createElementEditor = function (pObj) {
 
 	var resizeIframe = function(){
 		var idTag = 'div_message_scroll_' + IDEditor;
-		var heightIframe = parseFloat( $("div[id=" + idTag + "]").height() * ( preferences.auto_signature ? 0.40 : 0.65 ) );
+		var heightIframe = parseFloat( $("div[id=" + idTag + "]").height() * ( preferences.default_signature ? 0.40 : 0.65 ) );
 		iframe.attr('height', heightIframe);
 	};
 
@@ -71,8 +71,7 @@ cRichTextEditor.prototype.createElementEditor = function (pObj) {
 	});
 
 	var div_iframe = $('<div style="border: 2px solid; border-color: #111 #b2b2c1 #b2b2c1 #111;">').append($(iframe)[0]);
-
-	if (preferences.auto_signature) { div_iframe.append($('<iframe id="signature_ro_' + this.id + '" width="100%" frameborder="0">')) };
+	div_iframe.append($('<iframe id="signature_ro_' + this.id + '" width="100%" frameborder="0">'));
 
 	parentDiv.appendChild(div_iframe[0]);
 
@@ -376,8 +375,11 @@ cRichTextEditor.prototype.editorCommand = function(command, option) {
 	try {
 		var mainField = document.getElementById(this.editor).contentWindow;
 		mainField.focus();
-		var signature = preferences.type_signature == 'html' ? preferences.signature : preferences.signature.replace(/\n/g, "<br>");
 		if (command == 'signature'){
+			var ID = this.editor.replace( 'body_', '' );
+			var from_data = $('select#from_'+ID).find(':selected').data();
+			var cur_from = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
+			var signature = ( typeof cur_from.type_signature != 'undefined' && cur_from.type_signature != 'html' )? cur_from.signature.replace(/\n/g, "<br>") : cur_from.signature;
 			if (is_ie){
 				var sel = document.selection;
 				if (sel!=null)

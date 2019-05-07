@@ -2280,6 +2280,7 @@ function draw_new_message(border_ID){
 	sel_from.name = "input_from";
 	sel_from.style.width = "70%";
 	sel_from.setAttribute("wrap","soft");
+	$(sel_from).on( 'change', update_signature_frame );
 	td_from.appendChild(sel_from);
 	tr1_1.appendChild(td1_1);
 	tr1_1.appendChild(td_from);
@@ -2888,67 +2889,70 @@ function draw_new_message(border_ID){
 
 //	Verify if any user is sharing his name/email address
 //	for use in the new messages's "From " field.
-function draw_from_field(sel_from,tr1_1){
+function draw_from_field( sel_from, tr1_1 ) {
 
-	var el_shared_users = Element("el_shared_users");
-	// The element was loaded and populated...so return.
-	if(el_shared_users){
-		// Nothing to work...so return.
-		if(el_shared_users.options.length == 0)
-			return;
-		tr1_1.style.display = '';
-		for (var x = 0; x < el_shared_users.options.length; x++) {
-			var _option = document.createElement("OPTION");
-			_option.text = el_shared_users.options[x].text;
-			_option.value = el_shared_users.options[x].value;
-			sel_from.options[sel_from.options.length] = _option	;
+	// Handler function for cExecute
+	var h_user = function( data ) {
+		if ( data.length > 0 ) {
+			tr1_1.style.display = '';
+
+			$(sel_from).append( $('<option>')
+				.val( data.myname+";"+$('#user_email').val() )
+				.data( {
+					'mail': $('#user_email').val(),
+					'signature': preferences.signature,
+					'use_signature': preferences.use_signature,
+					'type_signature': preferences.type_signature,
+					'default_signature': preferences.default_signature
+				} )
+				.text( '"'+data.myname+'" <'+$('#user_email').val()+'>' ) );
+
+			for ( var i = 0; i < data.length; i++ )
+				$(sel_from).append( $('<option>')
+					.data( data[i] )
+					.val( data[i].cn + ';'+data[i].mail+';'+data[i].save_shared+';'+data[i].uid )
+					.text( '"'+data[i].cn+'" <'+data[i].mail+'>' ) );
+
 		}
-		return;
+		SharedUsersData = data;
 	}
+
+	if ( typeof SharedUsersData !== 'undefined' ) return h_user( SharedUsersData );
+
 	// Get the shared folders.....
- 	var sharedFolders = new Array();
+	var sharedFolders = new Array();
 	for(var i = 0; i < folders.length; i++) {
 		var x = folders[i].folder_id;
-	  	if (folders[i].folder_parent == 'user'){
-	  		sharedFolders[sharedFolders.length] = x;
-	  	}
+		if (folders[i].folder_parent == 'user'){
+			sharedFolders[sharedFolders.length] = x;
+		}
 	}
 
 	var matchUser = '#';
 	var sharedUsers = new Array();
-  	// Filter the shared folders (only root folders) .....
-   	for(var i = 0; i < sharedFolders.length; i++) {
+	// Filter the shared folders (only root folders) .....
+	for(var i = 0; i < sharedFolders.length; i++) {
 		matchUser = sharedFolders[i];
 		sharedUsers[sharedUsers.length] = matchUser.substring(("user"+cyrus_delimiter).length,matchUser.length);
 	}
 
-	// Handler function for cExecute
-	var h_user = function(data) {
-		if(data.length > 0) {
-			tr1_1.style.display = '';
-			var _option = document.createElement("OPTION");
-			_option.text =  '"'+data.myname+'" <'+Element("user_email").value+'>';
-			_option.value  = data.myname+";"+Element("user_email").value;
-			sel_from.options[sel_from.options.length] = _option;
-
-			var options = '';
-			for (var x = 0; x < data.length; x++)	{
-				var _option = document.createElement("OPTION");
-				_option.text = '"'+data[x].cn[0] + '" <'+data[x].mail[0]+'>';
-				_option.value = data[x].cn[0] + ';'+data[x].mail[0]+';'+data[x].save_shared[0]+';'+data[x].uid[0];
-				sel_from.options[sel_from.options.length] = _option	;
-			}
-		}
-		var shared_users_from = Element("el_shared_users");
-		if(!shared_users_from) {
-			shared_users_from = sel_from.cloneNode(true);
-			shared_users_from.id = "el_shared_users";
-			shared_users_from.style.display = 'none';
-			document.body.appendChild(shared_users_from);
-		}
-	}
 	// First time, so execute.....
 	cExecute ("$this.ldap_functions.getSharedUsersFrom&uids="+sharedUsers.join(';'), h_user);
+}
+
+function update_signature_frame( e ) {
+	var data = $(e.currentTarget).find(':selected').data();
+	var ID = $(e.currentTarget)[0].id.replace( 'from_', '' );
+	$('img#signature').toggle( ( !data.default_signature ) && ( !!data.signature ) );
+	$('iframe#signature_ro_'+ID).toggle( !!data.default_signature );
+	var usig = $('#body_'+ID).contents().find('div#use_signature_anchor');
+	$(usig).html('');
+	if ( data.default_signature ) {
+		var doc = document.getElementById('signature_ro_'+ID).contentWindow.document;
+		doc.open();
+		doc.write( data.signature );
+		doc.close();
+	} if ( data.use_signature == '1' ) $(usig).html( data.signature );
 }
 
 function changeBgColorToON(all_messages, begin, end){

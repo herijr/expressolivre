@@ -1,4 +1,5 @@
 <?php
+require_once( '../header.inc.php' );
 include_once("class.imap_functions.inc.php");
 include_once("class.functions.inc.php");
 
@@ -886,52 +887,61 @@ class ldap_functions
 		$this->ldapConnect();
 
 		if ($this->ds) {
-			$justthese = array("cn","mail","uid");
-			if($filter) {
-				$filter="(&(|(phpgwAccountType=u)(phpgwAccountType=s))(|$filter))";
-				$sr = ldap_search($this->ds, $this->ldap_context, $filter, $justthese);
-				ldap_sort($this->ds,$sr,"cn");
-				$info = ldap_get_entries($this->ds, $sr);
-				//$var = print_r($acl_save_sent_in_shared, true);				
-				for ($i = 0;$i < $info["count"]; $i++){
-					$info[$i]['cn'][0] = utf8_decode($info[$i]['cn'][0]);
-					//verify if user has permission to save sent messages in a shared folder
-					$info[$i]['save_shared'][0] = ( in_array( $info[$i]['uid'][0],$acl_save_sent_in_shared) ? 'y' : 'n' );
+			$soemailadmin = CreateObject( 'emailadmin.so' );
+			$result       = array();
+
+			// Conf full name for display on sending email
+			$fullNameUser = ( trim( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['display_user_email'] ) != '' )?
+				$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['display_user_email'] :
+				$_SESSION['phpgw_info']['expressomail']['user']['fullname'];
+
+			$justthese    = array( 'cn', 'mail', 'uid', 'uidnumber' );
+			if ( $filter ) {
+				$filter = '(&(|(phpgwAccountType=u)(phpgwAccountType=s))(|'.$filter.'))';
+				foreach ( ldap_get_entries( $this->ds,  ldap_search( $this->ds, $this->ldap_context, $filter, $justthese ) ) as $entry ) {
+					if ( !isset( $entry['cn'][0] ) ) continue;
+					$shared_user = array(
+						'cn'                => utf8_decode( $entry['cn'][0] ),
+						'mail'              => $entry['mail'][0],
+						'uid'               => $entry['uid'][0],
+						'save_shared'       => ( in_array( $entry['uid'][0], $acl_save_sent_in_shared )? 'y' : 'n' ),
+						'default_signature' => true,
+					);
+					if ( ( $shared_user['signature'] = $soemailadmin->getDefaultSignature( $entry['mail'][0], $entry['uidnumber'][0] ) ) === false ) {
+						$pref = CreateObject( 'phpgwapi.preferences', $entry['uidnumber'][0] );
+						$usrpref= $pref->read();
+						$shared_user['default_signature'] = false;
+						$shared_user['signature']         = $usrpref['expressoMail']['signature'];
+						$shared_user['use_signature']     = $usrpref['expressoMail']['use_signature'];
+						$shared_user['type_signature']    = $usrpref['expressoMail']['type_signature'];
+					}
+					$result[] = $shared_user;
 				}
 			}
-			
-			// Conf full name for display on sending email
-			$fullNameUser = $_SESSION['phpgw_info']['expressomail']['user']['fullname'];
-			if( trim($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['display_user_email']) != "" )
-			{
-				$fullNameUser = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['display_user_email'];
-			}
-
-			$info['myname'] = $fullNameUser;
 
 			//Find institucional_account.
-			$filter="(&(phpgwAccountType=i)(mailForwardingAddress=".$_SESSION['phpgw_info']['expressomail']['user']['email']."))";
-			$sr	= ldap_search($this->ds, $this->ldap_context, $filter, $justthese);
 			##
 			# @AUTHOR Rodrigo Souza dos Santos
 			# @DATE 2008/09/17
 			# @BRIEF Changing to ensure that the variable session is always with due value.
 			##
-			if(ldap_count_entries($this->ds,$sr))
-			{
-				ldap_sort($this->ds,$sr,"cn");
-				$result = ldap_get_entries($this->ds, $sr);
-				for ($j = 0;$j < $result["count"]; $j++){
-					$info[$i]['cn'][0] = utf8_decode($result[$j]['cn'][0]);
-					$info[$i]['mail'][0] = $result[$j]['mail'][0];
-					$info[$i]['save_shared'][0] = 'n';
-					$info[$i++]['uid'][0] = $result[$j]['uid'][0];					
-				}
+			$filter = '(&(phpgwAccountType=i)(mailForwardingAddress='.$_SESSION['phpgw_info']['expressomail']['user']['email'].'))';
+			foreach ( ldap_get_entries( $this->ds,  ldap_search( $this->ds, $this->ldap_context, $filter, $justthese ) ) as $entry ) {
+				if ( !isset( $entry['cn'][0] ) ) continue;
+				$shared_user = array(
+					'cn'            => utf8_decode( $entry['cn'][0] ),
+					'mail'          => $entry['mail'][0],
+					'uid'           => $entry['uid'][0],
+					'save_shared'   => 'n',
+					'signature'     => $soemailadmin->getDefaultSignature( $entry['mail'][0], $entry['mail'][0], 'ldap', 'defaultInstitucionalSignature' ),
+				);
+				$shared_user['default_signature'] = ( $shared_user['signature'] !== false );
+				$result[] = $shared_user;
 			}
 
-			$_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes'] = $info;
-			
-			return $info;
+			usort( $result, function( $a, $b ) { return strcmp( $a['cn'], $b['cn'] ); } );
+			$result['myname'] = $fullNameUser;
+			return ( $_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes'] = $result );
 		}
 
 		return false;

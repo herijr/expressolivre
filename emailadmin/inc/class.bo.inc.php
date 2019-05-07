@@ -26,7 +26,7 @@ class bo
 	function bo()
 	{
 		$this->soemailadmin = CreateObject('emailadmin.so');
-		$this->ldap = CreateObject('phpgwapi.common')->ldapConnect();
+		$this->ldap = $this->soemailadmin->ldap;
 
 		//Limit Ldap
 		$this->ldapLimit = 50000;

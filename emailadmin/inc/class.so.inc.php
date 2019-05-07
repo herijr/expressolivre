@@ -13,12 +13,14 @@
 class so
 {
 	var $db;
+	var $ldap;
 	var $tables;
 	var $current_account = false;
 
 	public function __construct()
 	{
 		$this->db = $GLOBALS['phpgw']->db;
+		$this->ldap = CreateObject('phpgwapi.common')->ldapConnect();
 		
 		include(PHPGW_INCLUDE_ROOT.'/emailadmin/setup/tables_current.inc.php');
 		
@@ -115,11 +117,42 @@ class so
 		(int)$_SESSION['phpgw_info']['expresso']['expressoAdmin']['expressoAdmin_defaultUserQuota'] : 20;
 	}
 
-	function getDefaultSignature( $domain = '' )
+	public function getDefaultSignature( $domain = '', $account = false, $type = 'orgchart', $extra = 'defaultUserSignature' )
 	{
-		$signature = $this->getExtras( $domain, 'defaultUserSignature' );
+		$account = $account?: $this->getCurrentAccount();
+
+		$signature = $this->getExtras( $domain, $extra );
 		if ( !$signature ) return false;
 
+		return ( $type == 'orgchart' )? $this->renderSignatureOrgChart( $signature, $account ) : (
+			( $type == 'ldap' )? $this->renderSignatureLDAP( $signature, $account, $extra ) : false
+		);
+	}
+	
+	protected function renderSignatureLDAP( $signature, $account, $extra )
+	{
+		$filter = '(&'.
+			'('.( ( $extra == 'defaultInstitucionalSignature' )? 'mail' : 'uidnumber' ).'='.$account.')'.
+			'(phpgwAccountType='.( ( $extra == 'defaultInstitucionalSignature' )? 'i' : 'u' ).')'.
+		')';
+
+		preg_match_all( '/#([\w ]+)#/', $signature, $matchesA );
+		preg_match_all( '/%([\w ]+)%/', $signature, $matchesB );
+		$attrs = array_merge( $matchesA[1], $matchesB[1] );
+		
+		if ( !( is_array( $attrs ) && count( $attrs ) ) ) return $signature;
+
+		$entry = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
+		$data  = array_reduce( $attrs, function( $carry, $item ) use ( $entry ) {
+			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item) )] = htmlentities( is_array( $entry[0][$item] )? $entry[0][$item][0] : $entry[0][$item] );
+			return $carry;
+		}, array() );
+
+		return $this->drawSignature( $signature, $data );
+	}
+
+	protected function renderSignatureOrgChart( $signature, $account )
+	{
 		require_once PHPGW_SERVER_ROOT.'/workflow/inc/common.inc.php';
 		Factory::getInstance('WorkflowMacro')->prepareEnvironment();
 
@@ -129,10 +162,10 @@ class so
 
 		$GLOBALS['ajax']->acl = &Factory::getInstance( 'so_adminaccess', Factory::getInstance('WorkflowObjects')->getDBGalaxia()->Link_ID );
 		$orgchart = new wf_orgchart();
-		if ( ( $employeeInfo = $orgchart->getEmployee( $this->getCurrentAccount() ) ) === false ) return false;
+		if ( ( $employeeInfo = $orgchart->getEmployee( $account ) ) === false ) return false;
 
 		$orgchart = new so_orgchart();
-		$data     = $orgchart->getEmployeeInfo( $this->getCurrentAccount() , $employeeInfo['organizacao_id'] );
+		$data     = $orgchart->getEmployeeInfo( $account, $employeeInfo['organizacao_id'] );
 		if ( isset( $data['error'] ) ) return false;
 
 		$data = array_reduce( $data['info'], function( $carry, $item ) {
@@ -140,11 +173,15 @@ class so
 			return $carry;
 		}, array() );
 
+		return $this->drawSignature( $signature, $data );
+	}
+
+	protected function drawSignature( $signature, $data )
+	{
 		foreach ( $data as $key => $value ) {
 			$signature = preg_replace( '/%'.preg_quote( $key ).'%/i', $value, $signature );
 			$signature = preg_replace( '/#'.preg_quote( $key ).'#/i', preg_replace( '/([\.:])/','&#65279;$1', $value ), $signature );
 		}
-
 		return $signature;
 	}
 

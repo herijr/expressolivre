@@ -2374,7 +2374,7 @@ class imap_functions
 			}
 			
 			foreach ( $shared_mailboxes as $key => $val ) {
-				if ( isset( $val['mail'][0] ) && $val['mail'][0] == $fromaddress[1] ) {
+				if ( isset( $val['mail'] ) && $val['mail'] == $fromaddress[1] ) {
 					$deny = false;
 					break;
 				}
@@ -2691,22 +2691,40 @@ class imap_functions
    			return array("success" => true, 'refresh_folders' => $mail->RefreshFolders );
 		}
 	}
+	function decodeForwardingAttachments( $forwarding_attachments )
+	{
+		$frwd_attchs = array();
+		foreach ( $forwarding_attachments as $k => $str )
+			$frwd_attchs[$k] = preg_replace( '/\'*\'/i', '', array_values( unserialize( rawurldecode( $str ) ) ) );
+		return $frwd_attchs;
+	}
+	function getForwardingAttachmentsIndex( $frwd_attchs, $msg_folder, $msg_num, $msg_part )
+	{
+		foreach ( $frwd_attchs as $k => $obj )
+			if ( $obj[0] == $msg_folder && $obj[1] == $msg_num && $obj[3] == $msg_part ) return $k;
+		return false;
+	}
 	function buildEmbeddedImages(&$mail,$msg_uid,&$forwarding_attachments) 
 	{ 
 		//      Build CID for embedded Images!!! 
+
+		// Decode forwarding attachments
+		$frwd_attchs = $this->decodeForwardingAttachments( $forwarding_attachments );
+
 		$return_forward = array();
 		$pattern = '/src="([^"]*?show_embedded_attach.php\?msg_folder=(.+)?&(amp;)?msg_num=(.+)?&(amp;)?msg_part=(.+)?)"/isU'; 
 		$cid_imgs = ''; 
 		preg_match_all($pattern,$mail->Body,$cid_imgs,PREG_PATTERN_ORDER); 
 		$cid_array = array(); 
 		foreach($cid_imgs[6] as $j => $val){
-			
 			if ( !array_key_exists($cid_imgs[4][$j].$val, $cid_array) ) 
 			{ 
 				$cid_array[$cid_imgs[4][$j].$val] = base_convert(microtime(), 10, 36); 
 			} 
 			$cid = $cid_array[$cid_imgs[4][$j].$val];  
 			$mail->Body = str_replace($cid_imgs[1][$j], "cid:".$cid, $mail->Body);
+			
+			$key = $this->getForwardingAttachmentsIndex( $frwd_attchs, $cid_imgs[2][$j], $cid_imgs[4][$j], $cid_imgs[6][$j] );
 			
 			if ($msg_uid != $cid_imgs[4][$j]) // The image is not in the same mail? 
 			{ 
@@ -2723,13 +2741,13 @@ class imap_functions
 				$file_attached[5] = strlen($fileContent); //Size of file 
 				$return_forward[] = $file_attached; 
 
-				$attachment_ = unserialize(rawurldecode($forwarding_attachments[$cid_imgs[6][$j]-2])); 
+				$attachment_ = unserialize(rawurldecode($forwarding_attachments[$key])); 
 				if ($file_attached[3] == $attachment_[3]) 
-					unset($forwarding_attachments[$cid_imgs[6][$j]-2]); 	
+					unset($forwarding_attachments[$key]); 	
 			} 
 			else 
 			{ 
-				$attach_img = $forwarding_attachments[$cid_imgs[6][$j]-2]; 
+				$attach_img = $forwarding_attachments[$key]; 
 				$file_description = unserialize(rawurldecode($attach_img)); 
 				if (is_array($file_description)) {
 					foreach($file_description as $i => $descriptor) {
@@ -2740,7 +2758,7 @@ class imap_functions
 				$fileName = $file_description[2]; 
 				$fileCode = $file_description[4]; 
 				$fileType = $this->get_file_type($file_description[2]); 
-				unset($forwarding_attachments[$cid_imgs[6][$j]-2]); 
+				unset($forwarding_attachments[$key]); 
 				if (!empty($file_description)) 
 				{ 
 					$file_description[5] = strlen($fileContent); //Size of file 
@@ -2822,6 +2840,9 @@ class imap_functions
 	{
 		$mbox_stream = $this->open_mbox(utf8_decode(urldecode($msg_folder)));
 		$fileContent = imap_fetchbody($mbox_stream, $msg_number, $msg_part, FT_UID);
+		error_log(html_entity_decode(Zend_Debug::dump(imap_fetchstructure($mbox_stream, $msg_number, FT_UID),'imap_fetchstructure',false)).PHP_EOL,3,'/tmp/log');
+		error_log(html_entity_decode(Zend_Debug::dump(imap_errors(),'imap_errors',false)).PHP_EOL,3,'/tmp/log');
+		error_log(html_entity_decode(Zend_Debug::dump(imap_alerts(),'imap_alerts',false)).PHP_EOL,3,'/tmp/log');
 		if($encoding == 'base64')
 			# The function imap_base64 adds a new line
 			# at ASCII text, with CRLF line terminators.
@@ -3115,7 +3136,8 @@ class imap_functions
 
 	function save_msg($params)
 	{
-
+		$params['frwd_attchs'] = $this->decodeForwardingAttachments( $params['forwarding_attachments'] );
+		error_log(html_entity_decode(Zend_Debug::dump($params,'params',false)).PHP_EOL,3,'/tmp/log');
 		include_once("class.phpmailer.php");
 		$mail = new PHPMailer();
 		include_once("class.db_functions.inc.php");
@@ -3193,7 +3215,8 @@ class imap_functions
 
 				$file_description[5] = strlen($fileContent); //Size of file
 				$return_forward[] = $file_description;
-
+				error_log(html_entity_decode(Zend_Debug::dump($file_description,'$file_description',false)).PHP_EOL,3,'/tmp/log');
+				error_log(html_entity_decode(Zend_Debug::dump(base64_encode($fileContent),$fileName,false)).PHP_EOL,3,'/tmp/log');
 				$mail->AddStringAttachment($fileContent, $fileName, $file_description[4], $this->get_file_type($file_description[2]));
 			}
 		}
@@ -3267,6 +3290,7 @@ class imap_functions
 		$mbox_stream = $this->open_mbox($folder);
 		$new_header = str_replace("\n", "\r\n", $header);
 		$new_body = str_replace("\n", "\r\n", $body);
+		error_log(html_entity_decode(Zend_Debug::dump($new_header . $new_body,'RAW',false)).PHP_EOL,3,'/tmp/log');
 		$return['save_draft'] = imap_append($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, $new_header . $new_body, "\\Seen \\Draft");
 		$status = imap_status($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, SA_UIDNEXT);
 		$return['msg_no'] = $status->uidnext - 1;
@@ -3294,6 +3318,8 @@ class imap_functions
 			$return['has_error'] = true;
 		}
 		
+		//error_log(html_entity_decode(Zend_Debug::dump($mail,'mail',false)).PHP_EOL,3,'/tmp/log');
+		error_log(html_entity_decode(Zend_Debug::dump($return,'$return',false)).PHP_EOL,3,'/tmp/log');
 		return $return;
 	}
 

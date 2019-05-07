@@ -435,8 +435,9 @@ class ui
 			"link_back_page" 		=> $GLOBALS['phpgw']->link('/index.php','menuaction=emailadmin.ui.listConfigurations'),
 			"rowsTable"				=> $rowsTable,
 			'extras_vars_keys_json' => preg_replace( '/^{/', '{ ', json_encode( array(
-				'defaultUserQuota'     => utf8_encode( lang( 'defaultUserQuota' ) ),
-				'defaultUserSignature' => utf8_encode( lang( 'defaultUserSignature' ) ),
+				'defaultUserQuota'              => utf8_encode( lang( 'defaultUserQuota' ) ),
+				'defaultUserSignature'          => utf8_encode( lang( 'defaultUserSignature' ) ),
+				'defaultInstitucionalSignature' => utf8_encode( lang( 'defaultInstitucionalSignature' ) ),
 			) ) ),
 		));	
 
