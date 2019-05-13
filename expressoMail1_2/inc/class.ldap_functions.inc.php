@@ -1,5 +1,5 @@
 <?php
-require_once( '../header.inc.php' );
+include_once(dirname(__FILE__) . '/../../header.inc.php');
 include_once("class.imap_functions.inc.php");
 include_once("class.functions.inc.php");
 
