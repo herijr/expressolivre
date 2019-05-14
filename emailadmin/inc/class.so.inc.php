@@ -21,34 +21,34 @@ class so
 	{
 		$this->db = $GLOBALS['phpgw']->db;
 		$this->ldap = CreateObject('phpgwapi.common')->ldapConnect();
-		
+
 		include(PHPGW_INCLUDE_ROOT.'/emailadmin/setup/tables_current.inc.php');
-		
+
 		$this->tables = &$phpgw_baseline;
-		
+
 		unset($phpgw_baseline);
-		
+
 		$this->table = &$this->tables['phpgw_emailadmin'];
 	}
-	
+
 	function addMBoxMigrate($mailBoxes)
 	{
 		$query = "INSERT INTO phpgw_emailadmin_mbox_migrate(uid, profileid_orig, profileid_dest, data) VALUES ";
-		
+
 		foreach( $mailBoxes as $value )
-		{	
+		{
 			$query .= "('".$this->db->db_addslashes($value['uid'])."',";
 			$query .= "'".$this->db->db_addslashes($value['profileid_orig'])."',";
 			$query .= "'".$this->db->db_addslashes($value['profileid_dest'])."',";
 			$query .= "'".$this->db->db_addslashes($value['data'])."'),";
 		}
-		
+
 		$query = substr($query, 0, strlen($query) -1 ) . " RETURNING mboxmigrateid;";
-		
+
 		if (!$this->db->query($query)) return false;
-		
+
 		$async = CreateObject('phpgwapi.asyncservice');
-		
+
 		foreach ($this->db->Query_ID->GetArray() as $row) {
 			$async->add(
 				'mbox:'.$row['mboxmigrateid'],
@@ -66,7 +66,7 @@ class so
 	{
 		$query = 'DELETE FROM phpgw_emailadmin_domains WHERE profileid='.intval( $profileID ).';';
 
-		$this->db->query($query,__LINE__ , __FILE__);	
+		$this->db->query($query,__LINE__ , __FILE__);
 	}
 
 	function deleteProfile( $profileID )
@@ -128,7 +128,7 @@ class so
 			( $type == 'ldap' )? $this->renderSignatureLDAP( $signature, $account, $extra ) : false
 		);
 	}
-	
+
 	protected function renderSignatureLDAP( $signature, $account, $extra )
 	{
 		$filter = '(&'.
@@ -139,7 +139,7 @@ class so
 		preg_match_all( '/#([\w ]+)#/', $signature, $matchesA );
 		preg_match_all( '/%([\w ]+)%/', $signature, $matchesB );
 		$attrs = array_merge( $matchesA[1], $matchesB[1] );
-		
+
 		if ( !( is_array( $attrs ) && count( $attrs ) ) ) return $signature;
 
 		$entry = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
@@ -160,7 +160,19 @@ class so
 		require_once PHPGW_SERVER_ROOT.'/workflow/inc/local/classes/class.wf_orgchart.php';
 		require_once PHPGW_SERVER_ROOT.'/workflow/inc/class.so_orgchart.inc.php';
 
-		$GLOBALS['ajax']->acl = &Factory::getInstance( 'so_adminaccess', Factory::getInstance('WorkflowObjects')->getDBGalaxia()->Link_ID );
+		$GLOBALS['ajax']->db = &Factory::getInstance('WorkflowObjects')->getDBExpresso();
+		$GLOBALS['ajax']->db->Halt_On_Error = 'no';
+
+		$GLOBALS['ajax']->db_workflow = &Factory::getInstance('WorkflowObjects')->getDBWorkflow();
+		$GLOBALS['ajax']->db_workflow->Halt_On_Error = 'no';
+
+		$GLOBALS['ajax']->db_galaxia = &Factory::getInstance('WorkflowObjects')->getDBGalaxia();
+		$GLOBALS['ajax']->db_galaxia->Halt_On_Error = 'no';
+
+		$GLOBALS['phpgw']->ADOdb = &$GLOBALS['ajax']->db->Link_ID;
+
+		$GLOBALS['ajax']->acl = &Factory::getInstance( 'so_adminaccess', $GLOBALS['ajax']->db_galaxia->Link_ID );
+
 		$orgchart = new wf_orgchart();
 		if ( ( $employeeInfo = $orgchart->getEmployee( $account ) ) === false ) return false;
 
@@ -311,8 +323,8 @@ class so
 		foreach( $serverConfig as $key => $value )
 		{
 			if( $key == 'profileid' )
-				continue;				
-			
+				continue;
+
 			if( $fields != '' )
 			{
 				$fields .= ',';
@@ -322,19 +334,19 @@ class so
 
 			switch($tableCurrent[$key]['type'])
 			{
-				case 'int': 
+				case 'int':
 					$value = ( trim($value) != "") ? intval($value) : 0 ;
 					break;
-				
+
 				case 'auto':
 					$value = intval($value);
 					break;
-				
+
 				default :
 					$value = $this->db->db_addslashes($value);
 					break;
 			}
-			
+
 			$fields .= "$key";
 			$values .= "'$value'";
 			$query  .= "$key='$value'";
