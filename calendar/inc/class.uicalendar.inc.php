@@ -1444,14 +1444,15 @@
 			{
 				$participant = substr($participant,0,strlen($participant)-1);
 				$acct_type = $GLOBALS['phpgw']->accounts->get_type((int)$participant);
-				if($acct_type=='g')
+				if( strtolower($acct_type) === 'g')
 				{
 					$bo_groups = CreateObject('expressoAdmin1_2.group');
 					$users = $bo_groups->get_info($participant,true);
 					foreach($users['memberuid_info'] as $user)
 					{
-						if($user['type']==u)
+						if( strtolower($user['type']) === 'u'){
 							$participants[$user['uidnumber']] = 'U';
+						}
 					}
 				}
 				else
@@ -1464,14 +1465,16 @@
 			
 			$freetime = $GLOBALS['phpgw']->datetime->localdates(mktime(0,0,0,$date[1],$date[0],$date[2]) - $GLOBALS['phpgw']->datetime->tz_offset);
 
-			echo json_encode( $this->print_disponibility(
+			$result = $this->print_disponibility(
 			 	array(
 			 		'date'			=> $freetime,
 			 		'starttime'		=> $this->bo->splittime('000000',False),
 			 		'endtime'		=> 0,
 			 		'participants'	=> $participants
 			 	)
-			));
+			);
+
+			printf( '%s', $result );
 		}
 
 		function print_disponibility($param)
@@ -1596,7 +1599,7 @@
 			$this->bo->so->owner = $owner;
 			$this->bo->so->open_box($owner);
 			
-			return array( "map_users" => $mapUsers );			
+			return $mapUsers;
 		}
 
 		function day()

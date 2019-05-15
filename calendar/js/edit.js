@@ -66,7 +66,7 @@
 				url			: "./index.php?menuaction=calendar.uicalendar.disponibility",
 				type		: "POST",
 				data		: {"participants" : participants , "date" : $("input[id^=start]").eq(0).val() },
-				dataType	: "json",
+				dataType	: "html",
 				success: function(data)
 				{
 					var winAvailability = $("#availability");
@@ -100,7 +100,7 @@
 						// Span Title:
 						winAvailability.parent().find("span.ui-dialog-title").css("text-align","left");
 						
-						winAvailability.html( new EJS( {url: './calendar/templates/default/availabilityMap.ejs'} ).render( { 'obj' : data } ) );
+						winAvailability.html( data );
 					}
 					else
 					{
@@ -117,11 +117,16 @@
 							"border"			: 	"1px solid #cecece"
 						});
 
+						var _win = '<div style="width:630px; overflow-y:auto;">' + data + '</div>';
+						_win +=	'<div style="text-align:left;margin-top:10px;width:580px;">';
+						_win +=	'<button style="padding:5px;"></button>';
+						_win += '</div>';
+
 						winAvailability.show("fast");
-						winAvailability.html( new EJS( {url: './calendar/templates/default/availabilityMapIE.ejs'} ).render( { 'obj' : data } ) );
+						winAvailability.html( _win );
 						winAvailability.find("button").button();
 						winAvailability.find("button").html("Fechar");
-						winAvailability.find("button").click(function(){ winAvailability.hide( 1000 ); });						
+						winAvailability.find("button").click(function(){ winAvailability.hide( 1000 ); });												
 					}
 				}
 			});
