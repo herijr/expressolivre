@@ -1777,6 +1777,10 @@ class imap_functions
 		fgets( $socket );
 		fputs( $socket, 'c0 AUTHENTICATE PLAIN '.base64_encode( $this->username.chr(0).$this->username.chr(0).$this->password ).PHP_EOL );
 		fgets( $socket );
+		$rem_array = function( $arr, $folder ) {
+			if ( !isset( $_SESSION['phpgw_info']['expressomail']['email_server'][$folder] ) ) return $arr;
+			return array_diff( $arr, array( 'INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server'][$folder] ) );
+		};
 		$folders = array();
 		switch ( $alert_pref ) {
 			case 1: $folders[] = imap_utf7_encode( $cur_folder ); break;
@@ -1785,10 +1789,8 @@ class imap_functions
 				fputs( $socket, 'c1 LIST INBOX *'.PHP_EOL );
 				while ( ( $line = fgets( $socket ) ) && ord( $line[0] ) === 42 )
 					$folders[] = rtrim( array_pop( explode( ' ', $line, 5 ) ) );
-				$folders = array_diff( $folders, array(
-					'INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
-					'INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpam'],
-				) );
+				$folders = $rem_array( $folders, 'imapDefaultTrashFolder' );
+				$folders = $rem_array( $folders, 'imapDefaultSpam' );
 				break;
 		}
 		foreach ( $folders as $folder ) {
