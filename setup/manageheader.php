@@ -652,9 +652,6 @@
 				case '1':
 					$setup_tpl->set_var('captcha_1',' checked');
 					break;
-				default:
-					$setup_tpl->set_var('captcha_0',' checked');
-					$setup_tpl->set_var('div_badlogin',' style="display:none" ');
 			}
 
 			if($GLOBALS['phpgw_info']['server']['num_badlogin'])
