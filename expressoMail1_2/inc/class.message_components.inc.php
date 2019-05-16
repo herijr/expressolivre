@@ -107,10 +107,7 @@
 
                     $ftype        = (empty($parts[$p]->type))?           $this->data_types[0].'/'.strtolower($parts[$p]->subtype) : $this->data_types[$parts[$p]->type].'/'.strtolower($parts[$p]->subtype);
                     $encoding     = (empty($parts[$p]->encoding))?       $this->encoding_types[0] : $this->encoding_types[$parts[$p]->encoding];
-                    if(!preg_match("/5./",phpversion()))
-	                    $charset      = $parts[$p]->parameters[0]->value;
-                    else
-						$charset      = ( isset( $parts->p->parameters[0]->value ) ) ? $parts->p->parameters[0]->value : NULL;
+                    $charset      = ( $parts[$p]->ifparameters && isset( $parts[$p]->parameters[0]->value ) ) ? $parts[$p]->parameters[0]->value : NULL;
                     $skip_next    = ($ftype == 'message/rfc822')?        true : false;
 
 					if (
