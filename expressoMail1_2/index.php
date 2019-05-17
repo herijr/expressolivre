@@ -8,7 +8,7 @@
 	);
 	
 	require_once('../header.inc.php');
-	$update_version = $GLOBALS['phpgw_info']['apps']['expressoMail1_2']['version'];
+	$update_version = $GLOBALS['phpgw_info']['apps']['expressoMail1_2']['version'] . '.' . '0001';
 	$_SESSION['phpgw_info']['expressomail']['user'] = $GLOBALS['phpgw_info']['user'];
 	$GLOBALS['phpgw']->css->validate_file('expressoMail1_2/templates/' . $GLOBALS['phpgw_info']['server']['template_set'] . '/main.css');
 	$GLOBALS['phpgw']->css->validate_file('phpgwapi/js/dftree/dftree.css');
@@ -259,7 +259,7 @@
 		echo "<script src='js/gears_init.js?".$update_version."'></script>";
 	
 	echo '<script src="../phpgwapi/js/dftree/dftree.js?'.$update_version.'"></script>';
-	echo '<script src="js/drag_area.js?'.$GLOBALS['phpgw_info']['apps']['expressoMail1_2']['version'].'"></script>';
+	echo '<script src="js/drag_area.js?'.$update_version.'"></script>';
 
 	$scripts = "js/abas.js," .
 				"js/main.js," .
