@@ -1306,7 +1306,7 @@ class wf_orgchart
 			return false;
 
 		$query  = "SELECT funcionario_id, area_id, localidade_id, centro_custo_id, organizacao_id,
-							funcionario_status_id, cargo_id, nivel, funcionario_categoria_id, titulo, apelido" .
+							funcionario_status_id, cargo_id, nivel, funcao, funcionario_categoria_id, titulo, apelido" .
 				  "  FROM funcionario" .
 				  " WHERE (funcionario_id = ?)";
 

@@ -1264,6 +1264,18 @@ class so_orgchart
 			'value' => ( $titulo ? $titulo : '' )
 		);
 
+		$funcao = NULL;
+		if ( !empty( $employeeInfo['funcao'] ) )
+		{
+			$funcao = $employeeInfo['funcao'];
+		}
+
+		$outputInfo[] = array(
+			'name' => 'funcao',
+			'field' => 'jobfunction',
+			'value' => ( $funcao ? $funcao : '' )
+		);
+
 		$cargo = NULL;
 		$authorized_cargo = $this->acl->checkUserGroupAccessToResource('ORG', $account_id, (int) $organizationID, 4);
 		if (($account_id == $employeeID) || ($authorized_cargo))
