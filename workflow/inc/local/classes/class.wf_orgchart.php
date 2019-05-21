@@ -1296,6 +1296,7 @@ class wf_orgchart
 	 * - funcionario_status_id
 	 * - cargo_id
 	 * - nivel: o nível numérico dentro do cargo
+	 * - funcao: posto do funcionario na organizacao
 	 * - funcionario_categoria_id
 	 * - titulo: nome pelo qual o funcionário e reconhecido na organização, por exemplo: gerente comercial
 	 * @access public
