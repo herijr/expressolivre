@@ -13,14 +13,12 @@
 class so
 {
 	var $db;
-	var $ldap;
 	var $tables;
 	var $current_account = false;
 
 	public function __construct()
 	{
 		$this->db = $GLOBALS['phpgw']->db;
-		$this->ldap = CreateObject('phpgwapi.common')->ldapConnect();
 
 		include(PHPGW_INCLUDE_ROOT.'/emailadmin/setup/tables_current.inc.php');
 
@@ -142,7 +140,8 @@ class so
 
 		if ( !( is_array( $attrs ) && count( $attrs ) ) ) return $signature;
 
-		$entry = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
+		$ldapConn = CreateObject('phpgwapi.common')->ldapConnect();
+		$entry = ldap_get_entries( $ldapConn, ldap_search( $ldapConn, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
 		$data  = array_reduce( $attrs, function( $carry, $item ) use ( $entry ) {
 			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item) )] = htmlentities( is_array( $entry[0][$item] )? $entry[0][$item][0] : $entry[0][$item] );
 			return $carry;
@@ -153,32 +152,114 @@ class so
 
 	protected function renderSignatureOrgChart( $signature, $account )
 	{
-		require_once PHPGW_SERVER_ROOT.'/workflow/inc/common.inc.php';
-		Factory::getInstance('WorkflowMacro')->prepareEnvironment();
+		// DB Config
+		$query = "SELECT * FROM phpgw_config where config_app = 'workflow'";
 
-		require_once PHPGW_SERVER_ROOT.'/workflow/inc/class.so_adminaccess.inc.php';
-		require_once PHPGW_SERVER_ROOT.'/workflow/inc/local/classes/class.wf_orgchart.php';
-		require_once PHPGW_SERVER_ROOT.'/workflow/inc/class.so_orgchart.inc.php';
+		$this->db->query( $query, __LINE__, __FILE__ );
 
-		$GLOBALS['ajax']->db = &Factory::getInstance('WorkflowObjects')->getDBExpresso();
-		$GLOBALS['ajax']->db->Halt_On_Error = 'no';
+		$dtSetWrk = array();
 
-		$GLOBALS['ajax']->db_workflow = &Factory::getInstance('WorkflowObjects')->getDBWorkflow();
-		$GLOBALS['ajax']->db_workflow->Halt_On_Error = 'no';
+		while( $this->db->next_record() ){
 
-		$GLOBALS['ajax']->db_galaxia = &Factory::getInstance('WorkflowObjects')->getDBGalaxia();
-		$GLOBALS['ajax']->db_galaxia->Halt_On_Error = 'no';
+			if( $this->db->f('config_name') === 'database_host' ){
+				$dtSetWrk['host'] = $this->db->f('config_value');
+			}
 
-		$GLOBALS['phpgw']->ADOdb = &$GLOBALS['ajax']->db->Link_ID;
+			if( $this->db->f('config_name') === 'database_port' ){
+				$dtSetWrk['port'] = $this->db->f('config_value');
+			}
 
-		$GLOBALS['ajax']->acl = &Factory::getInstance( 'so_adminaccess', $GLOBALS['ajax']->db_galaxia->Link_ID );
+            if( $this->db->f('config_name') === 'database_name' ){
+                $dtSetWrk['dbname'] = $this->db->f('config_value');
+			}
 
-		$orgchart = new wf_orgchart();
-		if ( ( $employeeInfo = $orgchart->getEmployee( $account ) ) === false ) return false;
+            if( $this->db->f('config_name') === 'database_admin_user' ){
+                $dtSetWrk['username'] = $this->db->f('config_value');
+			}
 
-		$orgchart = new so_orgchart();
-		$data     = $orgchart->getEmployeeInfo( $account, $employeeInfo['organizacao_id'] );
-		if ( isset( $data['error'] ) ) return false;
+            if( $this->db->f('config_name') === 'database_admin_password' ){
+                $dtSetWrk['password'] = $this->db->f('config_value');
+			}
+		}
+
+		//DB WORKFLOW
+		$dbWrkConn = pg_connect("host='".$dtSetWrk['host']."' port='".$dtSetWrk['port']."' dbname='".$dtSetWrk['dbname']."' user='".$dtSetWrk['username']."' password='".$dtSetWrk['password']."'");
+
+		$query = 'SELECT func.funcionario_id, '.
+			'area.sigla, area.descricao, func.funcao, '.
+			'func.apelido, org.sitio FROM funcionario AS func '.
+			'INNER JOIN area AS area ON func.area_id = area.area_id '.
+			'INNER JOIN organizacao as org on func.organizacao_id = org.organizacao_id '.
+			'WHERE func.funcionario_id =\''.$account.'\'';
+
+		$result = pg_fetch_array( pg_query( $dbWrkConn, $query ), NULL, PGSQL_ASSOC );
+
+		pg_close( $dbWrkConn );
+
+		if( !is_array($result) ){ return false; }
+
+		// LDAP
+		$ldapConn = CreateObject('phpgwapi.common')->ldapConnect();
+		$filter = '(&(uidnumber='.$account.')(phpgwAccountType=u))';
+		$attrs = array('cn','mail','telephonenumber','mobile','homephone','employeenumber');
+		$entry = ldap_get_entries( $ldapConn, ldap_search( $ldapConn, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
+
+		$data['info'] = array();
+
+		$data['info'][] = array(
+			'field' => 'mobilephone',
+			'value' => ( isset($entry[0]['mobile'][0]) ? $entry[0]['mobile'][0] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'homephone',
+			'value' => ( isset($entry[0]['homephone'][0]) ? $entry[0]['homephone'][0] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'fullname',
+			'value' => ( isset($entry[0]['cn'][0]) ? $entry[0]['cn'][0] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'nickname',
+			'value' => ( !empty($result['apelido']) ? $result['apelido'] : $entry[0]['cn'][0] )
+		);
+
+		$data['info'][] = array(
+			'field' => 'presentationname',
+			'value' => ( !empty($result['apelido']) ? $result['apelido'] : $entry[0]['cn'][0] )
+		);
+
+		$data['info'][] = array(
+			'field' => 'jobphone',
+			'value' => ( isset( $entry[0]['telephonenumber'][0] ) ? $entry[0]['telephonenumber'][0] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'area',
+			'value' => ( !empty($result['sigla']) ? $result['sigla'] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'areadescription',
+			'value' => ( !empty($result['descricao']) ? $result['descricao'] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'jobfunction',
+			'value' => ( !empty($result['funcao']) ? " / ". $result['funcao'] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'mail',
+			'value' => ( isset($entry[0]['mail'][0]) ? $entry[0]['mail'][0] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'site',
+			'value' => ( !empty($result['sitio']) ? $result['sitio'] : '' )
+		);
 
 		$data = array_reduce( $data['info'], function( $carry, $item ) {
 			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item['field']) )] = htmlentities( is_array( $item['value'] )? $item['value'][0] : $item['value'] );
