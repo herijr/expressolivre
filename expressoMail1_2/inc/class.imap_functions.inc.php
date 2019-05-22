@@ -1777,9 +1777,10 @@ class imap_functions
 		fgets( $socket );
 		fputs( $socket, 'c0 AUTHENTICATE PLAIN '.base64_encode( $this->username.chr(0).$this->username.chr(0).$this->password ).PHP_EOL );
 		fgets( $socket );
-		$rem_array = function( $arr, $folder ) {
+		$imapDelimiter = $this->imap_delimiter;
+		$rem_array = function( $arr, $folder ) use( $imapDelimiter ) {
 			if ( !isset( $_SESSION['phpgw_info']['expressomail']['email_server'][$folder] ) ) return $arr;
-			return array_diff( $arr, array( 'INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server'][$folder] ) );
+			return array_diff( $arr, array( 'INBOX'.$imapDelimiter.$_SESSION['phpgw_info']['expressomail']['email_server'][$folder] ) );
 		};
 		$folders = array();
 		switch ( $alert_pref ) {
