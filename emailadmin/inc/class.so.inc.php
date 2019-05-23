@@ -13,12 +13,14 @@
 class so
 {
 	var $db;
+	var $ldap;
 	var $tables;
 	var $current_account = false;
 
 	public function __construct()
 	{
 		$this->db = $GLOBALS['phpgw']->db;
+		$this->ldap = CreateObject('phpgwapi.common')->ldapConnect();
 
 		include(PHPGW_INCLUDE_ROOT.'/emailadmin/setup/tables_current.inc.php');
 
@@ -140,8 +142,7 @@ class so
 
 		if ( !( is_array( $attrs ) && count( $attrs ) ) ) return $signature;
 
-		$ldapConn = CreateObject('phpgwapi.common')->ldapConnect();
-		$entry = ldap_get_entries( $ldapConn, ldap_search( $ldapConn, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
+		$entry = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
 		$data  = array_reduce( $attrs, function( $carry, $item ) use ( $entry ) {
 			$carry[strtolower( iconv( 'ISO-8859-1', 'ASCII//TRANSLIT', $item) )] = htmlentities( is_array( $entry[0][$item] )? $entry[0][$item][0] : $entry[0][$item] );
 			return $carry;
@@ -199,10 +200,9 @@ class so
 		if( !is_array($result) ){ return false; }
 
 		// LDAP
-		$ldapConn = CreateObject('phpgwapi.common')->ldapConnect();
 		$filter = '(&(uidnumber='.$account.')(phpgwAccountType=u))';
 		$attrs = array('cn','mail','telephonenumber','mobile','homephone','employeenumber');
-		$entry = ldap_get_entries( $ldapConn, ldap_search( $ldapConn, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
+		$entry = ldap_get_entries( $this->ldap, ldap_search( $this->ldap, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $attrs ) );
 
 		$data['info'] = array();
 
