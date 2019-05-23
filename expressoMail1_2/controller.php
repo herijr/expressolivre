@@ -51,12 +51,6 @@ else if ( isset( $_POST['action'] ) && $_POST['action'] ) list( $app, $class, $m
 // NO ACTION
 else return $_SESSION['response'] = 'Post-Content-Length';
 
-// Load dinamically class file.
-include_once( ( ($app == '$this')? '' : '../'.$app.'/' ).'inc/class.'.$class.'.inc.php' );
-
-// Create new Object  (class loaded).
-$obj = new $class;
-
 // Prepare parameters for execution.
 $params = array();
 
@@ -67,6 +61,12 @@ else if ( count( $_GET ) > 1) {
 	array_shift( $_GET );
 	$params = $_GET;
 }
+
+// Load dinamically class file.
+include_once( ( ($app == '$this')? '' : '../'.$app.'/' ).'inc/class.'.$class.'.inc.php' );
+
+// Create new Object  (class loaded).
+$obj = new $class;
 
 // if params is not empty, then class method with parameters.
 $result = array();
