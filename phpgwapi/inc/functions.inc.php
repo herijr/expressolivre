@@ -35,33 +35,37 @@
 	 @function lang
 	 @abstract function to handle multilanguage support
 	*/
-	function lang($key,$m1='',$m2='',$m3='',$m4='',$m5='',$m6='',$m7='',$m8='',$m9='',$m10='')
-	{
-		if(is_array($m1))
+	if (!function_exists('lang')) {	
+		function lang($key,$m1='',$m2='',$m3='',$m4='',$m5='',$m6='',$m7='',$m8='',$m9='',$m10='')
 		{
-			$vars = $m1;
-		}
-		else
-		{
-			$vars = array($m1,$m2,$m3,$m4,$m5,$m6,$m7,$m8,$m9,$m10);
-		}
-		// Get the translation from Lang File, if the database is down.
-		if(!$GLOBALS['phpgw']->translation){
-			$fn = PHPGW_SERVER_ROOT.'/phpgwapi/setup/phpgw_'.$GLOBALS['_SERVER']['HTTP_ACCEPT_LANGUAGE'].'.lang';
-			if (file_exists($fn)){
-				$fp = fopen($fn,'r');
-				while ($data = fgets($fp,16000)){
-					list($message_id,$app_name,$null,$content) = explode("\t",substr($data,0,-1));
-					$GLOBALS['phpgw_info']['phpgwapi']['lang'][$message_id] =  $content;
-				}
-				fclose($fp);
+			if(is_array($m1))
+			{
+				$vars = $m1;
 			}
-			$return = str_replace('%1',$vars[0],$GLOBALS['phpgw_info']['phpgwapi']['lang'][$key]);
-			return $return;
+			else
+			{
+				$vars = array($m1,$m2,$m3,$m4,$m5,$m6,$m7,$m8,$m9,$m10);
+			}
+			// Get the translation from Lang File, if the database is down.
+			if(!$GLOBALS['phpgw']->translation){
+				$fn = PHPGW_SERVER_ROOT.'/phpgwapi/setup/phpgw_'.$GLOBALS['_SERVER']['HTTP_ACCEPT_LANGUAGE'].'.lang';
+				if (file_exists($fn)){
+					$fp = fopen($fn,'r');
+					while ($data = fgets($fp,16000)){
+						list($message_id,$app_name,$null,$content) = explode("\t",substr($data,0,-1));
+						$GLOBALS['phpgw_info']['phpgwapi']['lang'][$message_id] =  $content;
+					}
+					fclose($fp);
+				}
+				$return = str_replace('%1',$vars[0],$GLOBALS['phpgw_info']['phpgwapi']['lang'][$key]);
+				return $return;
+			}
+			$value = $GLOBALS['phpgw']->translation->translate("$key",$vars);
+			return $value;
 		}
-		$value = $GLOBALS['phpgw']->translation->translate("$key",$vars);
-		return $value;
 	}
+
+	if (!function_exists('get_theme')) {
 
 		function get_theme()
 		{
@@ -82,6 +86,7 @@
 			// senão retorna o tema definido na sessão
 			return $_SESSION['THEME'];
 		}
+	}
 
 	/* Make sure the header.inc.php is current. */
 	if ($GLOBALS['phpgw_info']['server']['versions']['header'] < $GLOBALS['phpgw_info']['server']['versions']['current_header'])
