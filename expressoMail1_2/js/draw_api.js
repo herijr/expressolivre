@@ -1937,7 +1937,7 @@ function draw_message(info_msg, ID){
 		typeof(preferences.notification_domains) != 'undefined'
 	) {
 		var domains = preferences.notification_domains.split(',');
-		jQuery.each( domains, function( i, v ) { domains[i] = new RegExp( jQuery.ui.autocomplete.escapeRegex( v.trim() )+'$' ); } );
+		jQuery.each( domains, function( i, v ) { domains[i] = new RegExp( jQuery.ui.autocomplete.escapeRegex( $.trim(v) )+'$' ); } );
 
 		var quoteprt = function( str ) { return '"'+str.replace( /"/g,'\\\"' )+'"'; };
 
@@ -2014,21 +2014,22 @@ function draw_message(info_msg, ID){
 	var tr = document.createElement("TR");
 	tr.className = "tr_message_body";
 	var td = document.createElement("TD");
-	//td.setAttribute("colSpan","2");
-	newBody = newBody.replace("<body","<span");
-	newBody = newBody.replace("<BODY","<span");
-	while ( ( /<span[^>]*><span[^>]*>/ig ).test( newBody ) )
-		newBody = newBody.replace( /(<span[^>]*>)<span[^>]*>/ig, '$1' );
+
 
 	var _body = document.createElement( 'div' );
 	_body.id = 'body_' + ID;
-	_body.innerHTML = newBody;
 	_body.style.fontSize = '16px';
+	_body.innerHTML = newBody.replace(/<\/?body[^>]*>/ig,'');
 
-	var _elements = _body.getElementsByTagName( '*' );
-	for( var i = 0; i < _elements.length; i++ )
-		if ( _elements[ i ].attributes && _elements[ i ].attributes.getNamedItem( 'id' ) )
-			_elements[ i ].attributes.removeNamedItem( 'id' );
+	$(_body).data({'type':info_msg.type});
+	if ( info_msg.type == 'plain' ) {
+		if ( !( $(_body).children().length == 1 && $(_body).children().get(0).tagName == 'PRE' ) )
+			$(_body).html( '<pre>'+newBody.replace(/<\/?body[^>]*>/ig,'')+'</pre>' );
+		$(_body).find('*').not('div#use_signature_anchor,pre').remove();
+	}
+
+	// Remove all ids attributes, preserve signature anchor
+	$(_body).find('*').not('div#use_signature_anchor').attr('id',null);
 
 	div.appendChild( _body );
 
@@ -2204,6 +2205,7 @@ function draw_new_message(border_ID){
 	form.name = "form_message_"+ID;
 	form.method = "POST";
 	form.onsubmit = function(){return false;}
+	$(form).css('height', '100%');
 	if(!is_ie)
 		form.enctype="multipart/form-data";
 	else
@@ -2214,6 +2216,7 @@ function draw_new_message(border_ID){
 	var content = Element('content_id_' + ID);
 	var table_message = document.createElement("TABLE");
 	table_message.width = "100%";
+	$(table_message).css('height', '100%');
 	var tbody_message = document.createElement("TBODY");
 	var tr0 = document.createElement("TR");
 	tr0.className = "tr_message_header";
@@ -2280,7 +2283,7 @@ function draw_new_message(border_ID){
 	sel_from.name = "input_from";
 	sel_from.style.width = "70%";
 	sel_from.setAttribute("wrap","soft");
-	$(sel_from).on( 'change', update_signature_frame );
+	$(sel_from).on('change',function(e){ update_signature_frame( ID ); });
 	td_from.appendChild(sel_from);
 	tr1_1.appendChild(td1_1);
 	tr1_1.appendChild(td_from);
@@ -2788,20 +2791,12 @@ function draw_new_message(border_ID){
 		).parentNode.appendChild(
 			document.createTextNode( get_lang('Send this mail as text plain') + ':')
 		);
-		// changed to work in ie
-		input_checkbox = document.createElement('input');
-		input_checkbox.setAttribute('class', 'checkbox');
-		input_checkbox.setAttribute('type', 'checkbox');
-		input_checkbox.setAttribute('tabIndex', '-1');
-		input_checkbox.setAttribute('id', 'textplain_rt_checkbox_' + ID);
-
-		input_checkbox.onclick = function ()
-		{
-			RichTextEditor.plain( this.checked );
-			document.getElementById( 'viewsource_rt_checkbox_' + ID ).parentNode.style.display = ( this.checked ) ? 'none' : '';
-		};
-
-		text_plain.parentNode.appendChild(input_checkbox);
+		$(text_plain).after( $('<input>')
+			.attr({ 'id': 'textplain_rt_checkbox_'+ID, 'type': 'checkbox', 'tabIndex': '-1', 'class': 'checkbox' })
+			.on('change',function(e){
+				RichTextEditor.plain( this.checked );
+			})
+		);
 	}
 
 	tbody_message.appendChild(tr5);
@@ -2851,12 +2846,14 @@ function draw_new_message(border_ID){
 	tbody_message.appendChild(tr6);
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 	var tr5 = document.createElement("TR");
+	$(tr5).css('height', '100%');
 	var td5 = document.createElement("TD");
 	td5.innerHTML = "&nbsp;";
 	var td_body = document.createElement("TD");
 	td_body.setAttribute("colSpan","2");
 	var div_body_position = document.createElement("DIV");
 	div_body_position.id = "body_position_" + ID;
+	$(div_body_position).css('height', '100%');
 	td_body.appendChild(div_body_position);
 	tr5.appendChild(td5);
 	tr5.appendChild(td_body);
@@ -2940,19 +2937,87 @@ function draw_from_field( sel_from, tr1_1 ) {
 	cExecute ("$this.ldap_functions.getSharedUsersFrom&uids="+sharedUsers.join(';'), h_user);
 }
 
-function update_signature_frame( e ) {
-	var data = $(e.currentTarget).find(':selected').data();
-	var ID = $(e.currentTarget)[0].id.replace( 'from_', '' );
-	$('img#signature').toggle( ( !data.default_signature ) && ( !!data.signature ) );
-	$('iframe#signature_ro_'+ID).toggle( !!data.default_signature );
-	var usig = $('#body_'+ID).contents().find('div#use_signature_anchor');
-	$(usig).html('');
-	if ( data.default_signature ) {
-		var doc = document.getElementById('signature_ro_'+ID).contentWindow.document;
+function update_signature_frame( ID, location, funct, extra )
+{
+	funct    = ( typeof funct != 'undefined' )? funct : 'append';
+	extra    = ( typeof extra != 'undefined' )? extra : $('<br>');
+	var from_data = $('select#from_'+ID).find(':selected').data();
+	var data      = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
+	$('img#signature').toggle( !!data.signature );
+
+	$('iframe#body_'+ID).contents().find('iframe#use_signature_anchor:not(:first)').remove();
+	var ifrm = $('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').get(0);
+	if ( typeof ifrm == 'undefined' ) {
+		ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contenteditable': 'false' }).css({ 'width': '100%' }).on('load',function(e){
+			if ( $(e.currentTarget).data('writed') !=  $(e.currentTarget).find('body').html() ) {
+				write_signature_frame( ifrm, $(e.currentTarget).data('writed'), true );
+			}
+			$(e.currentTarget).height($(e.currentTarget.contentWindow.document).height());
+		}).get(0);
+		var has_div = $('iframe#body_'+ID).contents().find('div#use_signature_anchor');
+		if ( $(has_div).length > 0 ) {
+			$(has_div[0]).after( ifrm );
+			$(has_div).remove();
+		} else {
+			location = ( typeof location == 'undefined' )? $('iframe#body_'+ID).contents().find('body').get(0) : location;
+			if ( location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
+			$(location)[funct]( extra, ifrm );
+		}
+	}
+	if ( !( data.default_signature || data.use_signature == '1' ) ) $(ifrm).hide();
+	else {
+		var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( typeof data.type_signature != 'undefined' && data.type_signature != 'html' ) )?
+			'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>': data.signature;
+		write_signature_frame( ifrm, signature, false )
+	}
+}
+function write_signature_frame( ifrm, signature, force ) {
+	try {
+		var doc = ifrm.document || ifrm.contentDocument || ifrm.contentWindow;
+		if ( !doc ) return;
+		if ( ( !force ) && $(ifrm).data( 'writed' ) == signature ) return;
+		$(ifrm).data( 'writed', signature );
 		doc.open();
-		doc.write( data.signature );
+		doc.write( signature );
 		doc.close();
-	} if ( data.use_signature == '1' ) $(usig).html( data.signature );
+		$(doc).find('head').append(
+			$('<style>').attr({'type':'text/css'}).text(
+				'body{margin:0;}'+
+				'pre{margin:0;white-space: pre-wrap !important;overflow-wrap: break-word !important;font-family: !monospace important;font-size: 11px !important;}'
+			)
+		);
+		$(ifrm).height($(doc).find('body').height());
+	} catch (e) {}
+}
+
+function persist_signature_frame( e, ID )
+{
+	window.clearTimeout( $(e.currentTarget).data('timer') );
+	if ( $('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').length ) {
+		$(e.currentTarget).data( 'timer', window.setTimeout(function(){
+			update_signature_frame( ID, get_caret_position( e.currentTarget ), 'after' );
+		},1000));
+	} else {
+		update_signature_frame( ID, get_caret_position( e.currentTarget ), 'after', false );
+	}
+}
+
+function get_caret_position( ifrm )
+{
+	try {
+		ifrm = ( ifrm.selector && ifrm.length )? ifrm.get(0) : ifrm;
+		var win = ifrm.contentWindow || ifrm.document.parentWindow;
+		if (win.getSelection) {
+			// except IE
+			var sel = ifrm.contentDocument.getSelection();
+			return ( sel.focusNode.nodeType == 1 )? sel.focusNode.childNodes[sel.focusOffset] : sel.focusNode;
+		} else if (ifrm.document.selection) {
+			// for IE
+			ifrm.focus();
+			var range = ifrm.document.selection.createRange();
+			return range.parentElement();
+		}
+	} catch (e) {}
 }
 
 function changeBgColorToON(all_messages, begin, end){

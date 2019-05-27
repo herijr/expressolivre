@@ -646,6 +646,8 @@ class imap_functions
 		$return_get_body = $this->get_body_msg( $msg_number, $msg_folder );
 		$body = $return_get_body['body'];
 		
+		$return['type'] = isset( $return_get_body['type'] )? $return_get_body['type'] : false;
+		
 		if( isset($return_get_body['hash_vcalendar']))
 		{
 			$return['hash_vcalendar'] = $return_get_body['hash_vcalendar'];
@@ -900,19 +902,18 @@ class imap_functions
 		$return['timestamp'] = $header->udate;
 		$return['login'] = $_SESSION['phpgw_info']['expressomail']['user']['account_id'];//$GLOBALS['phpgw_info']['user']['account_id'];
 		$return['reply_toaddress'] = $header->reply_toaddress;
-                
-                if($return_get_body['body']=='isSigned'){
-                    $this->close_mbox($this->mbox);
-                    $new_mail = $this->show_decript($return_get_body,$dec = 1);
-                    //$new_mail['signature'] =  $return_get_body['signature'];
-                    $return['body'] 		= $new_mail['body'];
-                    $return['attachments'] 	= $new_mail['attachments'];
-                    $return['thumbs'] 		= $new_mail['thumbs'];
-                    $return['folder'] = $return['msg_folder'];
-                    $return['original_ID'] =  $return['msg_number'];
-                    $return['msg_folder']	= 'INBOX'.$this->imap_delimiter.'decifradas';
-                    $return['msg_number']	= $new_mail['msg_no'];
-                    //$return['signature']	= $return_get_body['signature'];
+
+		if($return_get_body['body']=='isSigned'){
+			$this->close_mbox($this->mbox);
+			$new_mail              = $this->show_decript($return_get_body,$dec = 1);
+			$return['body']        = $new_mail['body'];
+			$return['attachments'] = $new_mail['attachments'];
+			$return['thumbs']      = $new_mail['thumbs'];
+			$return['folder']      = $return['msg_folder'];
+			$return['original_ID'] = $return['msg_number'];
+			$return['msg_folder']  = 'INBOX'.$this->imap_delimiter.'decifradas';
+			$return['msg_number']  = $new_mail['msg_no'];
+			$return['type']        = isset( $new_mail['type'] )? $new_mail['type'] : $return['type'];
 		}
 		return $return;
 	}
@@ -1105,6 +1106,7 @@ class imap_functions
 			}
 
 			$content = ''; 
+			$return['type'] = strtolower($msg->structure[$msg_number]->subtype);
 			
 			// If simple message is subtype 'html' or 'plain' or 'calendar', then get content body. 
 			switch (strtolower($msg->structure[$msg_number]->subtype)) {
@@ -1117,17 +1119,6 @@ class imap_functions
 						$msg->charset[$msg_number][0]
 					);
 					break;
-			}
-
-			if (strtolower($msg->structure[$msg_number]->subtype) == 'plain') {
-				$content = str_replace(array('<', '>'), array(' #$<$# ', ' #$>$# '), $content);
-				$content = htmlentities($content);
-				$content = $this->replace_links($content);
-				$content = str_replace(array(' #$&lt;$# ', ' #$&gt;$# '), array('&lt;', '&gt;'), $content);
-				$content = '<pre>' . $content . '</pre>';
-				$content = str_replace("\x00", '', $content);
-				$return['body'] = $content;
-				return $return;
 			}
 
 			if( strtolower($msg->structure[$msg_number]->subtype) == 'calendar' )
@@ -1307,6 +1298,7 @@ class imap_functions
 				else if(!strtolower($msg->structure[$msg_number]->subtype) == "mixed")
 					$content .= nl2br(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID));
 			}
+			$return['type'] = strtolower($file_type);
 		}
 		// Force message with flag Seen (imap_fetchbody not works correctly)
 		$params = array('folder' => $msg_folder, "msgs_to_set" => $msg_number, "flag" => "seen");
@@ -1534,7 +1526,7 @@ class imap_functions
 		$body = mb_ereg_replace('&lt;!\[endif\]--&gt;', '<![endif]-->', $body);
 		$body = str_replace("\x00", '', $body);
 		
-		return  "<span>".$body;	
+		return $body;
 	}
 
 	function replace_links( $body )
@@ -2498,6 +2490,7 @@ class imap_functions
 		$mail->Subject = $subject;
 		$mail->IsHTML( ( array_key_exists( 'type', $params ) && in_array( strtolower( $params[ 'type' ] ), array( 'html', 'plain' ) ) ) ? strtolower( $params[ 'type' ] ) != 'plain' : true );
 		$mail->Body = $body;
+		$mail->CharSet = mb_detect_encoding( $body, 'UTF-8, ISO-8859-1' );
 
         if (($encrypt && $signed && $params['smime']) || ($encrypt && !$signed))	// a msg deve ser enviada cifrada...
 		{
@@ -3130,10 +3123,6 @@ class imap_functions
 		$is_important = ( isset($params['input_important_message']) ? $params['input_important_message'] : "" );
 		$subject = $params['input_subject'];
 		$msg_uid = $params['msg_id'];
-		$body = $params['body'];
-		$body = str_replace("%nbsp;","&nbsp;",$params['body']);
-		$body = preg_replace("/\n/"," ",$body);
-		$body = preg_replace("/\r/","",$body);
 		$forwarding_attachments = ( isset($params['forwarding_attachments']) ? $params['forwarding_attachments'] : false );
 		$attachments = ( isset($params['FILES']) ? $params['FILES'] : array() );
 		$return_files = ( isset($params['FILES'])? $params['FILES'] :  array() );
@@ -3166,8 +3155,9 @@ class imap_functions
 		$this->add_recipients("cco", $ccoaddress, $mail);
 		$mail->AddReplyTo($replytoaddress);
 		$mail->Subject = $subject;
-		$mail->IsHTML(true);
-		$mail->Body = $body;
+		$mail->Body    = $params['body'];
+		$mail->CharSet = mb_detect_encoding( $params['body'], 'UTF-8, ISO-8859-1' );
+		$mail->IsHTML( !( isset( $params['type'] ) && strtolower( $params['type'] ) == 'plain' ) );
 		
 		// Important message
 		if( trim($is_important) !== "" ){ $mail->isImportant(); }

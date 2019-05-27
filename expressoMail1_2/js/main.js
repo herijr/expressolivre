@@ -1121,8 +1121,7 @@ function new_message(type, border_ID){
 		input_current_folder.value = folder_message.value;
 		Element("content_id_" + new_border_ID).appendChild(input_current_folder);
 	}//Fim.
-	var title = '';
-	data = [];
+	var data = [];
 	if (Element("from_" + border_ID)){
 			if (document.getElementById("reply_to_" + border_ID)){
 				data.to = document.getElementById("reply_to_values_" + border_ID).value;
@@ -1159,8 +1158,11 @@ function new_message(type, border_ID){
 	}
 	if (document.getElementById("subject_" + border_ID))
 		data.subject = document.getElementById("subject_" + border_ID).innerHTML;
-	if (document.getElementById("body_" + border_ID))
+
+	if (document.getElementById("body_" + border_ID)) {
 		data.body = document.getElementById("body_" + border_ID).innerHTML;
+		data.type = $('#body_'+border_ID).data('type');
+	}
 
 	if (Element('date_' + border_ID)){
 		data.date = Element('date_' + border_ID).innerHTML;
@@ -1175,86 +1177,30 @@ function new_message(type, border_ID){
 	if(typeof(preferences.signature) == 'undefined')
 		preferences.signature = "";
 
-	var signature = preferences.type_signature == 'html' ? preferences.signature : preferences.signature.replace(/\n/g, "<br>");
-	var default_signature = preferences.default_signature? signature : false;
-	signature = default_signature? '' : '<div id="use_signature_anchor">'+signature+'</div>';
-
 	if(type!="new" && type!="edit")
 		data.is_local_message = (document.getElementById("is_local_"+border_ID).value=="1")?true:false;
-	switch(type){
-		case "reply_without_history":
-			Element("to_" + new_border_ID).value = data.to;
-			title = "Re: " + data.subject;
-			Element("subject_" + new_border_ID).value = "Re: " + data.subject;			
-			useOriginalAttachments(new_border_ID,border_ID,data.is_local_message);
-			var body = Element("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( preferences.use_signature == "1"){
-				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
-			}
-			else{
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'></body></html>");
-			}
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			//Focus
-			if (is_ie)
-				window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();', 300);
-			else
-				body.contentWindow.focus();
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			msg_reply_from = document.createElement('input');
-			msg_reply_from.id = "msg_reply_from_" + new_border_ID;
-			msg_reply_from.type = "hidden";
-			msg_reply_from.value = Element("msg_number_" + border_ID).value;
-			Element("content_id_" + new_border_ID).appendChild(msg_reply_from);
-			break;
+
+	var title        = '';
+	var mail_content = '';
+	var target_signature = 'append';
+	switch ( type ) {
+	
 		case "reply_with_history":
-			title = "Re: " + data.subject;
-			Element("subject_" + new_border_ID).value = "Re: " + data.subject;
-			Element("to_" + new_border_ID).value = data.to;
-			useOriginalAttachments(new_border_ID,border_ID,data.is_local_message);
-			block_quoted_body = make_body_reply(data.body, data.to, data.date_day, data.date_hour);
-			var body = Element("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( preferences.use_signature == "1") {
-				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + block_quoted_body + "</body></html>");
-			}
-			else {
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>"+block_quoted_body+"</body></html>");
-			}
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			//Focus
-			if (is_ie)
-				window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();', 300);
-			else
-				body.contentWindow.focus();
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			msg_reply_from = document.createElement('input');
-			msg_reply_from.id = "msg_reply_from_" + new_border_ID;
-			msg_reply_from.type = "hidden";
-			msg_reply_from.value = Element("msg_number_" + border_ID).value;
-			Element("content_id_" + new_border_ID).appendChild(msg_reply_from);
+			target_signature = 'prepend';
+			mail_content = make_body_reply( data.body, data.to, data.date_day, data.date_hour );
+		case "reply_without_history":
+			title = 'Re: '+data.subject;
+			$('input#subject_'+new_border_ID).val(title);
+			$('input#to_'+new_border_ID).val(data.to);
+			$('div#content_id_'+new_border_ID).append(
+				$('<input>').attr({'id':'msg_reply_from_'+new_border_ID,'type':'hidden'}).val($('input#msg_number_'+border_ID).val())
+			);
+			useOriginalAttachments( new_border_ID, border_ID, data.is_local_message );
 			break;
+
+		case "reply_to_all_with_history":
+			target_signature = 'prepend';
+			mail_content = make_body_reply( data.body, data.to, data.date_day, data.date_hour );
 		case "reply_to_all_without_history":
 			// delete user email from to_all array.
 			data.to_all = new Array();
@@ -1264,108 +1210,25 @@ function new_message(type, border_ID){
 					data.to_all[j++] = _array_to_all[i];
 				}
 			}
-			data.to_all = data.to_all.join(",");
+			if ( data.to_all != get_lang("undisclosed-recipient") ) data.to_all = data.to_all.join(",");
+			else data.to_all = '';
 
-			title = "Re: " + data.subject;
-			Element("subject_" + new_border_ID).value = "Re: " + data.subject;
-			Element("to_" + new_border_ID).value = data.to;
-			Element("to_" + new_border_ID).value += ', ' + data.to_all;
-			if (data.cc){
-				Element("cc_" + new_border_ID).value = data.cc;
-				Element("a_cc_link_" + new_border_ID).style.display='none';
+			title = 'Re: '+data.subject;
+			$('input#subject_'+new_border_ID).val(title);
+			$('input#to_'+new_border_ID).val(data.to+', '+data.to_all);
+			if ( data.cc ) {
+				$('input#cc_'+new_border_ID).val(data.cc);
 				Element("tr_cc_" + new_border_ID).style.display='';
+				Element("a_cc_link_" + new_border_ID).style.display='none';
 				Element('space_link_' + new_border_ID).style.display='none';
 			}
-			useOriginalAttachments(new_border_ID,border_ID,data.is_local_message);
-			var body = Element("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( preferences.use_signature == "1") {
-				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
-			}
-			else {
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'></body></html>");
-			}
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			//Focus
-			if (is_ie)
-				window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();', 300);
-			else
-				body.contentWindow.focus();
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			msg_reply_from = document.createElement('input');
-			msg_reply_from.id = "msg_reply_from_" + new_border_ID;
-			msg_reply_from.type = "hidden";
-			msg_reply_from.value = Element("msg_number_" + border_ID).value;
-			Element("content_id_" + new_border_ID).appendChild(msg_reply_from);
+			$('div#content_id_'+new_border_ID).append(
+				$('<input>').attr({ 'id': 'msg_reply_from_'+new_border_ID, 'type': 'hidden' }).val($('input#msg_number_'+border_ID).val())
+			);
+			useOriginalAttachments( new_border_ID, border_ID, data.is_local_message );
 			break;
-		case "reply_to_all_with_history":
-			// delete user email from to_all array.
-			data.to_all = new Array();
-			var j = 0;
-				for(i = 0; i < _array_to_all.length; i++) {
-				if(_array_to_all[i].lastIndexOf(Element("user_email").value) == "-1"){
-					data.to_all[j++] = _array_to_all[i];
-				}
-		}
-			if (data.to_all != get_lang("undisclosed-recipient"))
-				data.to_all = data.to_all.join(",");
-			else
-				data.to_all = "";
-			title = "Re: " + data.subject;
-			Element("to_" + new_border_ID).value = data.to;
-			Element("to_" + new_border_ID).value += ', ' + data.to_all;
-			if (data.cc){
-				document.getElementById("cc_" + new_border_ID).value = data.cc;
-				document.getElementById("a_cc_link_" + new_border_ID).style.display='none';
-				document.getElementById("tr_cc_" + new_border_ID).style.display='';
-				document.getElementById('space_link_' + new_border_ID).style.display='none';
-			}
-			document.getElementById("subject_" + new_border_ID).value = "Re: " + data.subject;
-			useOriginalAttachments(new_border_ID,border_ID,data.is_local_message);
-			block_quoted_body = make_body_reply(data.body, data.to, data.date_day, data.date_hour);
-			var body = document.getElementById("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( preferences.use_signature == "1") {
-				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + block_quoted_body + "</body></html>");
-			}
-			else {
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>"+block_quoted_body+"</body></html>");
-			}
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			//Focus
-			if (is_ie)
-				window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();', 300);
-			else
-				body.contentWindow.focus();
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			msg_reply_from = document.createElement('input');
-			msg_reply_from.id = "msg_reply_from_" + new_border_ID;
-			msg_reply_from.type = "hidden";
-			msg_reply_from.value = Element("msg_number_" + border_ID).value;
-			Element("content_id_" + new_border_ID).appendChild(msg_reply_from);
-			break;
+
 		case "forward":
-			data.is_local_message = (document.getElementById("is_local_"+border_ID).value=="1")?true:false;
 			msg_forward_from = document.createElement('input');
 			msg_forward_from.id = "msg_forward_from_" + new_border_ID;
 			msg_forward_from.type = "hidden";
@@ -1419,29 +1282,11 @@ function new_message(type, border_ID){
 					}
 				}
 			}
-			var body = Element("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( preferences.use_signature == "1") {
-				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>" + make_forward_body(data.body, data.to, data.date, data.subject, data.to_all, data.cc) + "</body></html>");
-			}
-			else {
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>"+make_forward_body(data.body, data.to, data.date, data.subject, data.to_all, data.cc)+"</body></html>");
-			}
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			Element("to_" + new_border_ID).focus();
+			target_signature = 'prepend';
+			mail_content = make_forward_body( data.body, data.to, data.date, data.subject, data.to_all, data.cc );
 			break;
 		case "new":
+			mail_content = '<br>';
 			title = get_lang("New Message");
 			if(Element('msg_number').value) {
 				var _to = Element('msg_number').value;
@@ -1465,27 +1310,6 @@ function new_message(type, border_ID){
 				Element("to_" + new_border_ID).value = _to +',';
 				Element('msg_number').value = '';
 			}
-			var body = document.getElementById("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			// Insert the signature automaticaly at message body if use_signature preference is set
-			if ( preferences.use_signature == "1") {
-				body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>" + "<br>" + signature + "</body></html>");
-			}
-			else {
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'></body></html>");
-			}
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			Element("to_" + new_border_ID).focus();
 			break;
 		case "edit":
 			openTab.imapBox[new_border_ID] = folder_message.value;
@@ -1541,53 +1365,36 @@ function new_message(type, border_ID){
 					divFiles.appendChild(link_attachment);
 				}
 			}
-			var body = Element("body_" + new_border_ID);
-			body.contentWindow.document.open();
-			body.contentWindow.document.write("<html><body bgcolor='#FFFFFF'>"+data.body+"</body></html>");
-			body.contentWindow.document.close();
-			body.contentWindow.document.designMode = "on";
-			//Focus
-			if (is_ie)
-				window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();', 300);
-			else
-				body.contentWindow.focus();
-			config_events( body.contentWindow.document, 'onkeyup', function( e )
-			{
-				if ( e.keyCode == 13 )
-				{
-					var paragraphs = body.contentWindow.document.getElementsByTagName( 'p' );
-					for ( p = 0; p < paragraphs.length; p++ )
-						paragraphs.item( p ).style.margin = '0px';
-				}
-			});
-			break;
+			mail_content = data.body;
+			$('#textplain_rt_checkbox_'+new_border_ID).get(0).checked = ( data.type == 'plain' );
 		default:
 	}
 
-	$('img#signature').toggle( ( !default_signature ) && ( !!signature ) );
-	if ( default_signature ) {
-		var iframe = document.getElementById('signature_ro_'+new_border_ID);
-		var doc    = iframe.contentWindow.document;
-		doc.open();
-		doc.write( '<body style="margin: 0; overflow: hidden;">'+default_signature+'</body>' );
-		doc.close();
-		iframe.style.height = doc.body.scrollHeight+'px';
-	}
+	// Write main editor frame
+	var body = $('iframe#body_'+new_border_ID)[0];
+	var doc = body.contentWindow.document;
+	doc.open();
+	doc.write('<html><body bgcolor="#FFFFFF">'+mail_content+'</body></html>');
+	doc.close();
+	doc.designMode = 'on';
+
+	// Set signature frame
+	update_signature_frame( new_border_ID, $(body).contents().find('body'), target_signature );
+	$(doc).on( 'selectionchange.edit,mouseup.edit,mousedown.edit,keyup.edit', function(e){ persist_signature_frame(e, new_border_ID); } );
+
+	// Set paragraphs margin
+	$(body).on('onkeyup',function(e){
+		if ( e.keyCode == 13 ) $(e.currentTarget.contentWindow.document).find('p').css('margin','0px');
+	});
+
+	// Set focus on main editor frame
+	if ( is_ie ) window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();',300);
+	else body.contentWindow.focus();
 
 	// IM Module Enabled
 	if( window.parent.loadscript && loadscript.autoStatusIM )
 	{
 		config_events( body.contentWindow.document, "onkeypress", loadscript.autoStatusIM );
-	}
-
-	if ( ! expresso_offline )
-	{
-		if ( mobile_device )
-		{
-			var text_plain = document.getElementById( 'textplain_rt_checkbox_' + new_border_ID );
-			text_plain.click( );
-			text_plain.parentNode.style.display = 'none';
-		}
 	}
 
 	if (preferences.auto_save_draft == 1)
@@ -1620,7 +1427,7 @@ function new_message(type, border_ID){
 	// END Tab event
 
 	// Load default style for <PRE> tag, inside RichTextEditor.
-	RichTextEditor.loadStyle("pre","main.css");
+	RichTextEditor.loadStyle( 'pre', 'main.css' );
 
 	Element("border_id_" + new_border_ID).title = title;
 	set_border_caption("border_id_" + new_border_ID, title);
@@ -1677,6 +1484,173 @@ function useOriginalAttachments(new_id_border,old_id_border,is_local)
 				}
 			}
 	}
+}
+
+/**
+ * Método chamado pela applet para retornar o resultado da assinatura/decifragem do e-mail.
+ * para posterior envio ao servidor.
+ * @author Mário César Kolling <mario.kolling@serpro.gov.br>, Bruno Vieira da Costa <bruno.vieira-costa@serpro.gov.br>
+ * @param smime O e-mail decifrado/assinado
+ * @param ID O ID do e-mail, para saber em que aba esse e-mail será mostrado.
+ * @param operation A operação que foi realizada pela applet (assinatura ou decifragem)
+ */
+function appletReturn(smime, ID, operation, folder){
+
+	if (!smime){ // Erro aconteceu ao assinar ou decifrar e-mail
+		connector = new  cConnector();
+		connector.hideProgressBar();
+		return;
+	}
+
+	if(operation=='decript')
+	{
+		var handler = function(data){
+
+			if(data.msg_day == '')
+			{
+				header=expresso_local_messages.get_msg_date(data.original_ID, proxy_mensagens.is_local_folder(get_current_folder()));
+
+				data.fulldate=header.fulldate;
+				data.smalldate=header.smalldate;
+				data.msg_day = header.msg_day;
+				data.msg_hour = header.msg_hour;
+
+			}
+			this.show_msg(data);
+		}
+		para="&source="+smime+"&ID="+ID+"&folder="+folder;
+		cExecute ("$this.imap_functions.show_decript&", handler, para);
+	}else
+	{
+		ID_tmp = ID;
+		// Lê a variável e chama a nova função cExecuteForm
+		// Processa e envia para o servidor web
+		// Faz o request do connector novamente. Talvez implementar no connector
+		// para manter coerência.
+
+		var handler_send_smime = function(data){
+			send_message_return(data, this.ID_tmp); // this is a hack to escape quotation form connector bug
+		};
+
+		var textArea = document.createElement("TEXTAREA");
+		textArea.style.display='none';
+		textArea.id = 'smime';
+		textArea.name = "smime";
+		textArea.value += smime;
+
+		// Lê a variável e chama a nova função cExecuteForm
+		// Processa e envia para o servidor web
+		// Faz o request do connector novamente. Talvez implementar no connector
+		// para manter coerência.
+		if (is_ie){
+			var i = 0;
+			while (document.forms(i).name != "form_message_"+ID){i++}
+			form = document.forms(i);
+		}
+		else
+			form = document.forms["form_message_"+ID];
+
+		form.appendChild(textArea);
+
+		cExecuteForm ("$this.imap_functions.send_mail", form, handler_send_smime, ID);
+	}
+}
+
+function send_message( ID, folder, folder_name )
+{
+	//limpa autosave_timer[ID]; havia conflito quando uma mensagem ia ser enviada e nesse exato momento o autosave
+	//entrava em execucao (a aba de edicao da mensagem continuava aberta e a mensagem exibida era a de que a mensagem foi
+	//salva na pasta Rascunhos e nao que tinha sido enviada, como deveria);
+	if ( preferences.auto_save_draft == 1 && openTab.autosave_timer[ID] ) clearTimeout( openTab.autosave_timer[ID] );
+
+	if ( $('#user_is_blocked_to_send_email').val() == 1 ) {
+		write_msg( $('#user_is_blocked_to_send_email_message').val() );
+		return;
+	}
+
+	if ( trim( $('#subject_'+ID).val() ).length == 0 && !confirm( get_lang( 'Send this message without a subject?' ) ) ) {
+		$('#subject_'+ID).focus()
+		return;
+	}
+
+	var body = $('iframe#body_'+ID).contents().find('body');
+	if ( !body ) return;
+
+	$('#save_message_options_'+ID).addClass('message_options_inactive').off('click');
+
+	// Remove #use_signature_anchor before send
+	update_signature_frame( ID, body );
+	var body_buffer = $('<div>');
+	$(body_buffer).html( $(body).html() );
+	$(body_buffer).find('iframe#use_signature_anchor').after(
+		$(body).find('iframe#use_signature_anchor').contents().find('body').html()
+	).remove();
+
+	var form = $('form[name=form_message_'+ID+']');
+
+	$(form).find('textarea[name=body]').remove();
+	$(form).append( $('<textarea>')
+		.attr('name','body')
+		.css('display','none')
+		.val( $('#textplain_rt_checkbox_'+ID).is(':checked')? $(body_buffer).text() : $(body_buffer).html() )
+	);
+
+	$(form).find('input[name=folder]').remove();
+	$(form).append( $('<input>')
+		.attr('name','folder')
+		.attr('type','hidden')
+		.val(folder)
+	);
+
+	$(form).find('input[name=msg_id]').remove();
+	$(form).append( $('<input>')
+		.attr('name','msg_id')
+		.attr('type','hidden')
+		.val(openTab.imapUid[ID])
+	);
+
+	$(form).find('input[name=type]').remove();
+	$(form).append( $('<input>')
+		.attr('name','type')
+		.attr('type','hidden')
+		.val($('#textplain_rt_checkbox_'+ID).is(':checked')? 'plain' : 'html')
+	);
+
+	// Evita que e-mails assinados sejam enviados quando o usuário tenta enviar um e-mail
+	// não assinado (desmarcou a opção) após tentar enviar um e-mail assinado que não passou
+	// no teste de validação.
+	var checkSign = document.getElementById('return_digital_'+ID);
+	if ( checkSign && !checkSign.checked ) {
+		var smime = Element('smime');
+		if ( smime ) {
+			var parent = smime.parentNode;
+			parent.removeChild(smime);
+		}
+	}
+
+	if (expresso_offline) {
+		stringEmail = Element("to_"+ID).value;
+		stringEmail += Element("cco_"+ID).value =='' ? "":", "+Element("cco_"+ID).value;
+		stringEmail += Element("cc_"+ID).value =='' ? "":", "+Element("cc_"+ID).value;
+		var invalidEmail = searchEmail(stringEmail);
+		if(Element("to_"+ID).value=="" && Element("cco_"+ID).value=="" && Element("cc_"+ID).value=="") {
+			write_msg(get_lang("message without receiver."));
+			return;
+		}else if(invalidEmail[0] == true){
+			write_msg("Os endereços de destinatário a seguir estão incorretos: "+invalidEmail[1]);
+			return;
+		}
+
+		sucess = expresso_local_messages.send_to_queue(form);
+		var data_return = new Array();
+		data_return.success = sucess;
+		send_message_return( data, ID );
+		return;
+	}
+
+	send_post_request( '$this.imap_functions.send_mail', form, function( data ){
+		return send_message_return( data, ID );
+	} );
 }
 
 function send_message_return(data, ID){
@@ -1776,227 +1750,74 @@ function send_message_return(data, ID){
 		connector.hideProgressBar();
 }
 
-/**
- * Método chamado pela applet para retornar o resultado da assinatura/decifragem do e-mail.
- * para posterior envio ao servidor.
- * @author Mário César Kolling <mario.kolling@serpro.gov.br>, Bruno Vieira da Costa <bruno.vieira-costa@serpro.gov.br>
- * @param smime O e-mail decifrado/assinado
- * @param ID O ID do e-mail, para saber em que aba esse e-mail será mostrado.
- * @param operation A operação que foi realizada pela applet (assinatura ou decifragem)
- */
-function appletReturn(smime, ID, operation, folder){
+function save_msg( ID, withImage )
+{
+	var body = $('iframe#body_'+ID).contents().find('body');
+	if ( !body ) return;
 
-	if (!smime){ // Erro aconteceu ao assinar ou decifrar e-mail
-		connector = new  cConnector();
-		connector.hideProgressBar();
-		return;
-	}
+	if ( typeof withImage == 'undefined' ) withImage = false;
 
-	if(operation=='decript')
-	{
-		var handler = function(data){
+	$('#send_button_'+ID).hide();
 
-			if(data.msg_day == '')
-			{
-				header=expresso_local_messages.get_msg_date(data.original_ID, proxy_mensagens.is_local_folder(get_current_folder()));
+	// Remove #use_signature_anchor before send
+	update_signature_frame( ID, body );
+	var body_buffer = $('<div>');
+	$(body_buffer).html( $(body).html() );
+	$(body_buffer).find('iframe#use_signature_anchor').after(
+		$('<div>').attr('id','use_signature_anchor').html(
+			$(body).find('iframe#use_signature_anchor').contents().find('body').html()
+		)
+	).remove();
 
-				data.fulldate=header.fulldate;
-				data.smalldate=header.smalldate;
-				data.msg_day = header.msg_day;
-				data.msg_hour = header.msg_hour;
+	var form = $('form[name=form_message_'+ID+']');
 
-			}
-			this.show_msg(data);
-		}
-		para="&source="+smime+"&ID="+ID+"&folder="+folder;
-		cExecute ("$this.imap_functions.show_decript&", handler, para);
-	}else
-	{
-		ID_tmp = ID;
-		// Lê a variável e chama a nova função cExecuteForm
-		// Processa e envia para o servidor web
-		// Faz o request do connector novamente. Talvez implementar no connector
-		// para manter coerência.
-
-		var handler_send_smime = function(data){
-			send_message_return(data, this.ID_tmp); // this is a hack to escape quotation form connector bug
-		};
-
-		var textArea = document.createElement("TEXTAREA");
-		textArea.style.display='none';
-		textArea.id = 'smime';
-		textArea.name = "smime";
-		textArea.value += smime;
-
-		// Lê a variável e chama a nova função cExecuteForm
-		// Processa e envia para o servidor web
-		// Faz o request do connector novamente. Talvez implementar no connector
-		// para manter coerência.
-		if (is_ie){
-			var i = 0;
-			while (document.forms(i).name != "form_message_"+ID){i++}
-			form = document.forms(i);
-		}
-		else
-			form = document.forms["form_message_"+ID];
-
-		form.appendChild(textArea);
-
-		cExecuteForm ("$this.imap_functions.send_mail", form, handler_send_smime, ID);
-	}
-}
-
-function send_message(ID, folder, folder_name){
-
-	//limpa autosave_timer[ID]; havia conflito quando uma mensagem ia ser enviada e nesse exato momento o autosave
-		//entrava em execucao (a aba de edicao da mensagem continuava aberta e a mensagem exibida era a de que a mensagem foi
-		//salva na pasta Rascunhos e nao que tinha sido enviada, como deveria);
-		if (preferences.auto_save_draft == 1)
-	{
-		if (openTab.autosave_timer[ID])
-		{
-			clearTimeout(openTab.autosave_timer[ID]);
-		}
-	}
-
-	var isBlocked = document.getElementById('user_is_blocked_to_send_email').value;
-
-	if (isBlocked == 1) {
-		write_msg(document.getElementById('user_is_blocked_to_send_email_message').value);
-		return;
-	}
-	var _subject = trim(Element("subject_"+ID).value);
-	if((_subject.length == 0) && !confirm(get_lang("Send this message without a subject?"))) {
-		Element("subject_"+ID).focus();
-		return;
-	}
-
-	if ( document.getElementById('viewsource_rt_checkbox_' + ID).checked == true )
-		document.getElementById('viewsource_rt_checkbox_' + ID).click();
-
-	var save_link = Element("save_message_options_"+ID);
-	save_link.onclick = '';
-	save_link.className = 'message_options_inactive';
-
-	ID_tmp = ID;
-
-	var handler_send_message = function(data){
-		send_message_return(data, this.ID_tmp); // this is a hack to escape quotation form connector bug
-	};
-
-	var mail_as_plain = document.getElementById( 'textplain_rt_checkbox_' + ID );
-	mail_as_plain = ( mail_as_plain ) ? mail_as_plain.checked : false;
-	
-	var from_data = $('select#from_'+ID).find(':selected').data();
-	var cur_from = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
-	var cur_signature = {
-		'signature':      cur_from.signature,
-		'default_signature': cur_from.default_signature
-	};
-
-	var textArea = document.createElement("TEXTAREA");
-	textArea.style.display='none';
-	textArea.name = "body";
-	body = document.getElementById("body_"+ID);
-	
-	var mail_text = '';
-	if ( mail_as_plain ) {
-		mail_text = is_ie ? body.contentWindow.document.body.innerHTML : body.previousSibling.value
-	} else {
-		// Remove div#use_signature_anchor before send
-		var obj = $('<div>');
-		$(obj).html( $('iframe#body_'+ID).contents().find('body').html() );
-		var sig_anchor = $(obj).find('div#use_signature_anchor')
-		$(sig_anchor).after( $(sig_anchor).html() );
-		$(sig_anchor).remove();
-		mail_text = $(obj).html();
-	}
-	textArea.value = ( mail_as_plain?
-		( mail_text+( cur_signature.default_signature? '\n\n'+RichTextEditor.stripHTML( cur_signature.signature ) : '' ) ) :
-		( '<body>\r\n'+mail_text+( cur_signature.default_signature? '<br>'+cur_signature.signature : '' )+'\r\n</body>' )
+	$(form).find('textarea[name=body]').remove();
+	$(form).append( $('<textarea>')
+		.attr('name','body')
+		.css('display','none')
+		.val($(body_buffer).html())
 	);
-	var input_folder = document.createElement("INPUT");
-	input_folder.style.display='none';
-	input_folder.name = "folder";
-	input_folder.value = folder;
-	var msg_id = document.createElement("INPUT");
-	msg_id.style.display='none';
-	msg_id.name = "msg_id";
-	msg_id.value = openTab.imapUid[ID];
 
-	if (is_ie){
-		var i = 0;
-		while (document.forms(i).name != "form_message_"+ID){i++}
-		form = document.forms(i);
-	}
-	else
-		form = document.forms["form_message_"+ID];
+	// Gets the imap folder
+	var folder_id = ( openTab.imapBox[ID] && openTab.type[ID] < 6 )? openTab.imapBox[ID] : 'INBOX'+cyrus_delimiter+draftsfolder;
+	var folder_name = ( folder_id == 'INBOX' )? get_lang( folder_id ) : folder_id.substr( 6 );
 
-		// Evita que e-mails assinados sejam enviados quando o usuário tenta enviar um e-mail
-		// não assinado (desmarcou a opção) após tentar enviar um e-mail assinado que não passou
-		// no teste de validação.
-		var checkSign = document.getElementById('return_digital_'+ID);
-		if (checkSign && !checkSign.checked){
-			var smime = Element('smime');
-			if (smime)
-			{
-				var parent = smime.parentNode;
-				parent.removeChild(smime);
-			}
-		 }
+	$(form).find('input[name=folder]').remove();
+	$(form).append( $('<input>')
+		.attr('name','folder')
+		.attr('type','hidden')
+		.val(folder_id)
+	);
 
-	form.appendChild(textArea);
-	form.appendChild(input_folder);
-	form.appendChild(msg_id);
+	$(form).find('input[name=msg_id]').remove();
+	$(form).append( $('<input>')
+		.attr('name','msg_id')
+		.attr('type','hidden')
+		.val(openTab.imapUid[ID])
+	);
 
-	var mail_type = document.createElement('input');
-	mail_type.setAttribute('type', 'hidden');
-	mail_type.name = 'type';
-	mail_type.value = ( mail_as_plain ) ? 'plain' : 'html';
-	form.appendChild(mail_type);
+	$(form).find('input[name=type]').remove();
+	$(form).append( $('<input>')
+		.attr('name','type')
+		.attr('type','hidden')
+		.val($('#textplain_rt_checkbox_'+ID).is(':checked')? 'plain' : 'html')
+	);
 
-	if (expresso_offline) {
-		stringEmail = Element("to_"+ID).value;
-		stringEmail += Element("cco_"+ID).value =='' ? "":", "+Element("cco_"+ID).value;
-		stringEmail += Element("cc_"+ID).value =='' ? "":", "+Element("cc_"+ID).value;
-		var invalidEmail = searchEmail(stringEmail);
-		if(Element("to_"+ID).value=="" && Element("cco_"+ID).value=="" && Element("cc_"+ID).value=="") {
-			write_msg(get_lang("message without receiver."));
-			return;
-		}else if(invalidEmail[0] == true){
-			write_msg("Os endereços de destinatário a seguir estão incorretos: "+invalidEmail[1]);
-			return;
-		}
+	$(form).find('input[name=insertImg]').remove();
+	$(form).append( $('<input>')
+		.attr('name','insertImg')
+		.attr('type','hidden')
+		.val(withImage)
+	);
 
-		sucess = expresso_local_messages.send_to_queue(form);
-		var data_return = new Array();
-		data_return.success = sucess;
-		handler_send_message(data_return,ID);
-	}
-	else
-		cExecuteForm("$this.imap_functions.send_mail", form, handler_send_message, ID);
-}
-function change_tr_properties(tr_element, newUid, newSubject){
-	message_id=tr_element.id;
-	var td_who = document.getElementById('td_who_'+message_id);
-	if (typeof(newSubject) != 'undefined')
-		td_who.nextSibling.innerHTML = newSubject;
-	tr_element.id = newUid;
-
-	var openNewMessage = function () {
-		cExecute("$this.imap_functions.get_info_msg&msg_number="+newUid
-				+"&msg_folder="+url_encode(current_folder),show_msg);
-	};
-	for (var i=2; i < 10; i++){
-		if (typeof(tr_element.childNodes[i].id) != "undefined")
-			tr_element.childNodes[i].id = tr_element.childNodes[i].id.replace(message_id,newUid);
-		tr_element.childNodes[i].onclick = openNewMessage;
-	}
+	send_post_request( '$this.imap_functions.save_msg', form, function( data ){
+		return return_save( data, ID, folder_name, folder_id, openTab.imapUid[ID] );
+	} );
 }
 
 function return_save(data,border_id,folder_name,folder_id,message_id)
 {
-	Element("send_button_"+border_id).style.visibility="visible";
+	$('#send_button_'+border_id).show();
 	var handler_delete_msg = function(data){ refresh(preferences.alert_new_msg); };
 	
 	if (data.save_draft != true || !data)
@@ -2151,96 +1972,23 @@ function return_save(data,border_id,folder_name,folder_id,message_id)
 	}
 }
 
-function save_msg(border_id,withImage){
-	if (typeof(withImage) == 'undefined')
-		withImage = false;
+function change_tr_properties(tr_element, newUid, newSubject){
+	message_id=tr_element.id;
+	var td_who = document.getElementById('td_who_'+message_id);
+	if (typeof(newSubject) != 'undefined')
+		td_who.nextSibling.innerHTML = newSubject;
+	tr_element.id = newUid;
 
-	var rt_checkbox = Element('viewsource_rt_checkbox_' + border_id);
-	if (rt_checkbox == null)
-		return false;
-	if (rt_checkbox.checked == true)
-		rt_checkbox.click();
-
-	var sendButton = Element("send_button_"+border_id);
-	if (sendButton)
-		sendButton.style.visibility="hidden";
-
-	if (openTab.imapBox[border_id] && openTab.type[border_id] < 6) //Gets the imap folder
-		var folder_id = openTab.imapBox[border_id];
-	else
-		var folder_id = "INBOX" + cyrus_delimiter + draftsfolder;
-
-	if (folder_id == 'INBOX') // and folder name from border
-		var folder_name = get_lang(folder_id);
-	else
-		var folder_name = folder_id.substr(6);
-
-	// hack to avoid form connector bug,  escapes quotation. Please see #179
-	tmp_border_id=border_id;
-	tmp_folder_name=folder_name;
-	tmp_folder_id=folder_id;
-	message_id = openTab.imapUid[border_id];
- 	var handler_save_msg = function(data){ return_save(data,this.tmp_border_id,this.tmp_folder_name,this.tmp_folder_id,this.message_id); }
-
-	var mail_as_plain = document.getElementById( 'textplain_rt_checkbox_' + border_id );
-	mail_as_plain = ( mail_as_plain ) ? mail_as_plain.checked : false;
-
-	var textArea = document.createElement("TEXTAREA");
-	textArea.style.display='none';
-	textArea.name = "body";
-	body = document.getElementById("body_"+border_id);
-	if (! body)
-		return;
-	textArea.value = ( ( mail_as_plain ) ? body.previousSibling.value : ( '<body>\r\n' + body.contentWindow.document.body.innerHTML + '\r\n</body>' ) );
-	var input_folder = document.createElement("INPUT");
-	input_folder.style.display='none';
-	input_folder.name = "folder";
-	input_folder.value = folder_id;
-	var input_msgid = document.createElement("INPUT");
-	input_msgid.style.display='none';
-	input_msgid.name = "msg_id";
-	input_msgid.value = message_id;
-	var input_insertImg = document.createElement("INPUT");
-	input_insertImg.style.display='none';
-	input_insertImg.name = "insertImg";
-	input_insertImg.value = withImage;
-
-	if( is_ie )
-	{
-		var i = 0;
-		while (document.forms(i).name != "form_message_"+border_id){i++}
-		form = document.forms(i);
-	} else {
-		form = document.forms["form_message_"+border_id];
+	var openNewMessage = function () {
+		cExecute("$this.imap_functions.get_info_msg&msg_number="+newUid
+				+"&msg_folder="+url_encode(current_folder),show_msg);
+	};
+	for (var i=2; i < 10; i++){
+		if (typeof(tr_element.childNodes[i].id) != "undefined")
+			tr_element.childNodes[i].id = tr_element.childNodes[i].id.replace(message_id,newUid);
+		tr_element.childNodes[i].onclick = openNewMessage;
 	}
-
-	form.appendChild(textArea);
-	form.appendChild(input_folder);
-	form.appendChild(input_msgid);
-	form.appendChild(input_insertImg);
-
-	var mail_type = document.createElement('input');
-	mail_type.name = 'type';
-	mail_type.setAttribute('type', 'hidden');
-	mail_type.value = ( mail_as_plain ) ? 'plain' : 'html';
-	form.appendChild(mail_type);
-
-	cExecuteForm ("$this.imap_functions.save_msg", form, handler_save_msg,border_id);
 }
-
-function return_saveas(data,border_id,folder_name)
-{
-	if(!verify_session(data))
-		return;
-	if (data.save_draft)
-	{
-		delete_border(border_id,null);
-		write_msg(get_lang('Your message was save as draft in folder %1.', folder_name));
-	}
-	else
-		write_msg('ERROR saving your message.');
-}
-
 
 function save_as_msg(border_id, folder_id, folder_name){
 	// hack to avoid form connector bug,  escapes quotation. Please see #179
@@ -2273,6 +2021,18 @@ function save_as_msg(border_id, folder_id, folder_name){
 	cExecuteForm ("$this.imap_functions.save_msg", form, handler_save_msg,border_id);
 }
 
+function return_saveas(data,border_id,folder_name)
+{
+	if(!verify_session(data))
+		return;
+	if (data.save_draft)
+	{
+		delete_border(border_id,null);
+		write_msg(get_lang('Your message was save as draft in folder %1.', folder_name));
+	}
+	else
+		write_msg('ERROR saving your message.');
+}
 
 // Get checked messages
 function set_messages_flag(flag, msgs_to_set){
@@ -3049,3 +2809,30 @@ function open_alert_new_msg( params ) {
 function open_alert_new_msg_resize() {
 	$('#recent').parent().position({ my : 'center', at : 'center', of : window });
 }
+
+function send_post_request( action, data, handler )
+{
+	return $.ajax({
+		'type'       : 'POST',
+		'method'     : 'POST',
+		'url'        :'./controller.php?action='+action,
+		'data'       : $(data).serializeForm(),
+		'cache'      : false,
+		'dataType'   : 'json',
+		'processData': false,
+		'contentType': false
+	})
+	.done( handler )
+	.fail(function() { write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) ); });
+}
+
+(function($) {
+	$.fn.serializeForm = function() {
+		var obj = $(this);
+		var formData = new FormData();
+		$.each($(obj).find('input[type=file]'), function(i, tag) { $.each($(tag)[0].files, function(i, file) { formData.append(tag.name, file); }); });
+		var params = $(obj).serializeArray();
+		$.each(params, function (i, val) { formData.append(val.name, val.value); });
+		return formData;
+	};
+})(jQuery);

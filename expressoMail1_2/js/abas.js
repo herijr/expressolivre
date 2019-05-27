@@ -75,17 +75,6 @@ function alternate_border(ID) {
 			c.style.display = 'none';
 			if (Element("font_border_id_" + BordersArray[i].sequence))
 				Element("font_border_id_" + BordersArray[i].sequence).className = 'font-menu';
-			var body = Element('body_' + BordersArray[i].sequence);
-			if (body) {
-				try {
-					if (Element('viewsource_rt_checkbox_' + ID).checked) {
-						connector.loadScript("rich_text_editor");
-						RichTextEditor.viewsource(false);
-					}
-				} catch (e) {
-					//alert(e.message)
-				}
-			}
 		}
 	}
 
@@ -97,7 +86,7 @@ function alternate_border(ID) {
 	var c = Element("content_id_" + ID)
 	if (c) { c.style.display = ''; }
 
-	body = document.getElementById('body_' + ID);
+	var body = document.getElementById('body_' + ID);
 	if (body) {
 		try {
 			if (ID) {

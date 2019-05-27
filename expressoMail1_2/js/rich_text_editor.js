@@ -18,77 +18,32 @@ cRichTextEditor.prototype.loadEditor = function(ID) {
 
 	$(parentDiv).prepend( this.table );
 
-	var mail_as_plain = document.getElementById( 'textplain_rt_checkbox_' + this.id );
-	this.table.style.visibility = ( mail_as_plain && mail_as_plain.checked ) ? 'hidden' : 'visible';
+	$(this.table).toggle( !$('#textplain_rt_checkbox_'+this.id).is(':checked') );
 
 	if(!Element(this.editor))
 	{
 		this.createElementEditor(this.editor);
-	}
-	else
-	{
-		Element( 'viewsource_rt_checkbox_' + this.id ).checked=false;
 	}
 
 	document.getElementById('fontname').selectedIndex = 0;
 	document.getElementById('fontsize').selectedIndex = 0;
 }
 
-cRichTextEditor.prototype.createElementEditor = function (pObj) {
+cRichTextEditor.prototype.createElementEditor = function ( iframe_id  ) {
 
-	var IDEditor = this.id;
-
-	var iframe = $("<iframe/>")
-	iframe.attr('id', pObj);
-	iframe.attr('name', pObj);
-	iframe.attr('width', "100%");
-	iframe.attr('unselectable', 'on');
-	iframe.attr('tabIndex', '1');
-	iframe.attr('frameborder', '0');
-
-	var resizeIframe = function(){
-		var idTag = 'div_message_scroll_' + IDEditor;
-		var heightIframe = parseFloat( $("div[id=" + idTag + "]").height() * ( preferences.default_signature ? 0.40 : 0.65 ) );
-		iframe.attr('height', heightIframe);
-	};
-
-	config_events($(iframe)[0], 'onload', function () {
-		if ($(iframe)[0].contentWindow.document.body && $(iframe)[0].contentWindow.document.body.contentEditable) {
-			if (mobile_device) {
-				$(iframe)[0].contentWindow.document.body.contentEditable = true;
-			} else {
-				$(iframe)[0].contentWindow.document.designMode = "on";
+	$('#body_position_'+this.id).append(
+		$('<iframe>')
+		.attr({ 'id': iframe_id, 'name': iframe_id, 'unselectable': 'on', 'tabIndex': '1', 'frameborder': '1' })
+		.css({ 'width': 'calc( 100% - 4px )', 'height': 'calc( 100% - 32px )' })
+		.on('load',function(e){
+			var doc = e.currentTarget.contentWindow.document;
+			if ( doc.body && doc.body.contentEditable ) {
+				if ( mobile_device ) doc.body.contentEditable = true;
+				else doc.designMode = 'on';
 			}
-		}
-
-		if ($(iframe)[0].contentWindow.document.documentElement) {
-			$(iframe)[0].contentWindow.document.documentElement.style.background = '#fff';
-			$(iframe)[0].contentWindow.document.documentElement.style.fontSize = '16px';
-		}
-
-		resizeIframe();
-
-	});
-
-	var div_iframe = $('<div style="border: 2px solid; border-color: #111 #b2b2c1 #b2b2c1 #111;">').append($(iframe)[0]);
-	div_iframe.append($('<iframe id="signature_ro_' + this.id + '" width="100%" frameborder="0">'));
-
-	parentDiv.appendChild(div_iframe[0]);
-
-	$(window).on("resize", function () { resizeIframe(); });
-
-	var source = document.createElement('input');
-	source.id = 'viewsource_rt_checkbox_' + this.id;
-	source.type = "checkbox";
-	source.setAttribute("tabIndex", "-1");
-	source.onclick = function () {
-		RichTextEditor.viewsource(this.checked);
-	};
-	source = parentDiv.appendChild(
-		document.createElement('span').appendChild(source).parentNode
-	).appendChild(
-		document.createTextNode(get_lang('View HTML source') + '.')
-	).parentNode;
+			$(doc).css({ 'background': '#fff', 'fontSize': '16px' });
+		})
+	);
 }
 
 cRichTextEditor.prototype.loadStyle = function(tag, css_file) {
@@ -130,104 +85,38 @@ cRichTextEditor.prototype.loadStyle = function(tag, css_file) {
 	hh1.appendChild(ss1);
 }
 
-cRichTextEditor.prototype.viewsource = function(source) {
-	var html;
-	var mainField = document.getElementById(this.editor).contentWindow;
-	if (source) {
-		if (is_ie){
-			connector.loadScript('html2xhtml');
-			html = frames[this.editor].document.body;
-			var xhtml = get_xhtml(html, 'en', 'iso-8859-1');
-			frames[this.editor].document.body.innerText = xhtml;
-			document.getElementById("table_richtext_toolbar").style.visibility="hidden";
-		}
-		else{
-			html = document.createTextNode(document.getElementById(this.editor).contentWindow.document.body.innerHTML);
-			document.getElementById(this.editor).contentWindow.document.body.innerHTML = "";
-			html = document.getElementById(this.editor).contentWindow.document.importNode(html,false);
-			document.getElementById(this.editor).contentWindow.document.body.appendChild(html);
-			document.getElementById("table_richtext_toolbar").style.visibility="hidden";
-		}		
-	} else {
-		if (is_ie){
-			var output = escape(frames[this.editor].document.body.innerText);
-			output = output.replace("%3CP%3E%0D%0A%3CHR%3E", "%3CHR%3E");
-			output = output.replace("%3CHR%3E%0D%0A%3C/P%3E", "%3CHR%3E");
-			frames[this.editor].document.body.innerHTML = unescape(output);
-			document.getElementById("table_richtext_toolbar").style.visibility="visible";  
-		}
-		else{
-			html = document.getElementById(this.editor).contentWindow.document.body.ownerDocument.createRange();
-			html.selectNodeContents(document.getElementById(this.editor).contentWindow.document.body);
-			document.getElementById(this.editor).contentWindow.document.body.innerHTML = html.toString();
-			document.getElementById("table_richtext_toolbar").style.visibility="visible";  
-		}
-	}
+cRichTextEditor.prototype.stripHTML = function( string ) {
+	return string
+		.replace(/<style([\s\S]*?)<\/style>/gi, '')
+		.replace(/<script([\s\S]*?)<\/script>/gi, '')
+		.replace(/<\/div>/ig, '\n')
+		.replace(/<\/li>/ig, '\n')
+		.replace(/<li>/ig, '  *  ')
+		.replace(/<\/ul>/ig, '\n')
+		.replace(/<\/p>/ig, '\n')
+		.replace(/<br\s*[\/]?>/gi, "\n")
+		.replace(/<iframe([\s\S]*?)use_signature_anchor([\s\S]*?)<\/iframe>/gi, '€@€')
+		.replace(/<[^>]+>/ig, '')
+		.replace(/\ufeff/g, '')
+		.split('€@€');
 }
 
-cRichTextEditor.prototype.stripHTML = function( text_html ) {
-	return $('<textarea />').html( text_html ).text().replace( /[\r\n\t]*/mg, '' ).replace( /<br\s*\/?>/mg, '\n' ).replace( /(<([^>]+)>)/ig, '' ).replace(/\ufeff/g, '');
-}
-
-cRichTextEditor.prototype.plain = function(source) {
-	var html;
-	var editor = document.getElementById( this.editor );
-
-	if (source) {
-		var mail_as_plain = document.getElementById( 'textplain_rt_checkbox_' + this.id );
-		if (is_ie){
-			connector.loadScript('html2xhtml');
-			html = frames[this.editor].document.body;
-			var xhtml = get_xhtml(html, 'en', 'iso-8859-1');
-			xhtml = xhtml.replace( /<br\s*\/?>/mg, "\n" ).replace( /(<([^>]+)>)/ig, '' ).replace( /^[\n ]+|[\n ]+$/g, '' );
-			if ( ! mobile_device && xhtml != '' && ! ( mail_as_plain.checked = confirm( get_lang( 'The text format will be lost' ) + '.' ) ) )
-				return false;
-			frames[this.editor].document.body.innerText = xhtml;
-			document.getElementById("table_richtext_toolbar").style.visibility="hidden";
-		}
-		else{
-			html = document.createTextNode( editor.contentWindow.document.body.innerHTML );
-			html = html.nodeValue.replace( /<br\s*\/?>/mg, "\n" ).replace( /(<([^>]+)>)/ig, '' ).replace( /^[\n ]+|[\n ]+$/g, '' );
-
-			if ( ! mobile_device && html != '' && ! ( mail_as_plain.checked = confirm( get_lang( 'The text format will be lost' ) + '.' ) ) )
-				return false;
-
-			this.table.style.visibility="hidden";
-			editor.contentWindow.document.body.innerHTML = '';
-
-			var textarea = document.createElement( 'textarea' );
-			textarea.style.width = '99%';
-			textarea.style.height = '300px';
-			textarea.style.fontSize = '12pt';
-			textarea.innerHTML = html;
-
-			editor.style.width = '0px';
-			editor.style.height = '0px';
-			editor.style.visibility = 'hidden';
-
-			editor.parentNode.insertBefore( textarea, editor );
-			textarea.focus( );
-		}
+cRichTextEditor.prototype.plain = function( to_plain, silent ) {
+	silent = ( typeof silent != 'undefined' )? silent : false;
+	if ( to_plain ) {
+		if ( ( !silent ) &&( !mobile_device ) && !( $('#textplain_rt_checkbox_'+this.id)[0].checked = confirm( get_lang( 'The text format will be lost' ) + '.' ) ) )
+			return false;
+		$(this.table).hide();
+		var arr = this.stripHTML( $('iframe#body_'+this.id).contents().find('body').get(0).innerHTML );
+		var pre = $('<pre>')
+			.append(arr.shift())
+			.append($('iframe#body_'+this.id).contents().find('iframe#use_signature_anchor').detach())
+			.append(arr.join(''));
+		$('iframe#body_'+this.id).contents().find('body').empty().append(pre);
 	} else {
-		if (is_ie){
-			var output = escape(frames[this.editor].document.body.innerText);
-			output = output.replace("%3CP%3E%0D%0A%3CHR%3E", "%3CHR%3E");
-			output = output.replace("%3CHR%3E%0D%0A%3C/P%3E", "%3CHR%3E");
-			frames[this.editor].document.body.innerHTML = unescape(output);
-			document.getElementById("table_richtext_toolbar").style.visibility="visible";  
-		}
-		else{
-			editor.contentWindow.document.body.innerHTML = editor.previousSibling.value.replace( /\n/g, '<br/>' );
-			editor.parentNode.removeChild( editor.previousSibling );
-
-			editor.style.width = '99%';
-			editor.style.height = '300px';
-			editor.style.visibility = 'visible';
-
-			this.loadEditor( this.id );
-
-			setTimeout( function( ) { editor.contentWindow.focus( ); }, 100 );
-		}
+		$(this.table).show();
+		var html = $('iframe#body_'+this.id).contents().find('pre').html().replace(/\r?\n/gi,'</br>');
+		$('iframe#body_'+this.id).contents().find('body').empty().html( html );
 	}
 }
 
@@ -375,23 +264,11 @@ cRichTextEditor.prototype.editorCommand = function(command, option) {
 	try {
 		var mainField = document.getElementById(this.editor).contentWindow;
 		mainField.focus();
-		if (command == 'signature'){
+		if ( command == 'signature' ) {
 			var ID = this.editor.replace( 'body_', '' );
-			var from_data = $('select#from_'+ID).find(':selected').data();
-			var cur_from = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
-			var signature = ( typeof cur_from.type_signature != 'undefined' && cur_from.type_signature != 'html' )? cur_from.signature.replace(/\n/g, "<br>") : cur_from.signature;
-			if (is_ie){
-				var sel = document.selection;
-				if (sel!=null)
-				{
-				    var rng = sel.createRange();
-				    if (rng!=null)
-			        	rng.pasteHTML(signature);
-				}
-			}
-			else{
-				mainField.document.execCommand('inserthtml', false, signature);
-			}
+			$('select#from_'+ID).find(':selected').data( 'use_signature', '1' );
+			$('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').remove();
+			update_signature_frame( ID, get_caret_position( $('iframe#body_'+ID) ), 'after', false );
 		}
 		else if (command == 'CreateLink')
 			mainField.document.execCommand('CreateLink', false, option);

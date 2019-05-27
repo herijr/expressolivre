@@ -143,7 +143,6 @@ function setupSpellChecker(){
         currObj.controlPanelDiv.style.display = "none";
 	currObj.controlPanelDiv.appendChild(currObj.statusSpan);
 
-        //currObj.controlPanelDiv.parentNode.insertBefore(currObj.controlPanelDiv, document.getElementById("viewsource_rt_checkbox"));
    
       
 
@@ -462,18 +461,6 @@ function spellCheck() {
             var query;
 
             currObj.controlPanelDiv.style.display = "block";
-
-            //disable the view source HTMl during the corretion
-            var position = "body_position_" + currentTab;
-            var posicao = document.getElementById(position);
-            var nodeArray = posicao.getElementsByTagName("input");
-            var totArray = nodeArray.length;            
-            for (var i = 0 ; i < totArray ; i++) {
-                var node = nodeArray[i];
-                if (node.id == "viewsource_rt_checkbox") {
-                    node.disabled = true;
-                }
-            }              
 
             if(currObj.spellingResultsDiv)
             {
@@ -1118,22 +1105,6 @@ function resumeEditing()
         
         }
 
-
-        //enable the view source HTMl after the corretion
-        var position = "body_position_" + currentTab;
-        var posicao = document.getElementById(position);
-        var nodeArray = posicao.getElementsByTagName("input");
-        var totArray = nodeArray.length;
-        for (var i = 0 ; i < totArray ; i++) {
-            var node = nodeArray[i];
-            if (node.id == "viewsource_rt_checkbox") {
-                node.disabled = false;
-
-            }
-        }
-
-
-	
 	currObj.switchText();
 }; // end resumeEditing
 

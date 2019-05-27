@@ -273,7 +273,7 @@ class so
 	{
 		foreach ( $data as $key => $value ) {
 			$signature = preg_replace( '/%'.preg_quote( $key ).'%/i', $value, $signature );
-			$signature = preg_replace( '/#'.preg_quote( $key ).'#/i', preg_replace( '/([\.:])/','&#65279;$1', $value ), $signature );
+			$signature = preg_replace( '/#'.preg_quote( $key ).'#/i', $value, $signature );
 		}
 		return $signature;
 	}
