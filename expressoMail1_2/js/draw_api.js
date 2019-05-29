@@ -2893,8 +2893,7 @@ function draw_new_message(border_ID){
 //	for use in the new messages's "From " field.
 function draw_from_field( sel_from, tr1_1 )
 {
-	var data = SharedUsersData;
-	var myname = (data && data.myname)? data.myname : '';
+	var myname = SharedUsersData.myname? SharedUsersData.myname : '';
 
 	$(sel_from).append( $('<option>')
 		.val( myname+";"+$('#user_email').val() )
@@ -2907,13 +2906,13 @@ function draw_from_field( sel_from, tr1_1 )
 		} )
 		.text( '"'+myname+'" <'+$('#user_email').val()+'>' ) );
 
-	if ( data.length > 0 ) {
+	for ( var i in SharedUsersData ) {
+		if ( isNaN( parseInt( i ) ) ) continue;
 		tr1_1.style.display = '';
-		for ( var i = 0; i < data.length; i++ )
-			$(sel_from).append( $('<option>')
-				.data( data[i] )
-				.val( data[i].cn + ';'+data[i].mail+';'+data[i].save_shared+';'+data[i].uid )
-				.text( '"'+data[i].cn+'" <'+data[i].mail+'>' ) );
+		$(sel_from).append( $('<option>')
+			.data( SharedUsersData[i] )
+			.val( SharedUsersData[i].cn + ';'+SharedUsersData[i].mail+';'+SharedUsersData[i].save_shared+';'+SharedUsersData[i].uid )
+			.text( '"'+SharedUsersData[i].cn+'" <'+SharedUsersData[i].mail+'>' ) );
 	}
 }
 
