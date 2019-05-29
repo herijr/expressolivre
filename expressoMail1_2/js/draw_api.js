@@ -2188,8 +2188,13 @@ function draw_new_message(border_ID){
 	connector.loadScript("color_palette");
 	connector.loadScript("rich_text_editor");
 	connector.loadScript('wfolders');
-	if(typeof(RichTextEditor) == 'undefined' || typeof(ColorPalette) == 'undefined' || typeof(wfolders) == 'undefined')
-		return false;
+	load_from_field();
+	if (
+		typeof RichTextEditor  == 'undefined' ||
+		typeof ColorPalette    == 'undefined' ||
+		typeof wfolders        == 'undefined' ||
+		typeof SharedUsersData == 'undefined'
+	) return false;
 
 	var ID = create_border("",border_ID);
 	if (ID == 0)
@@ -2886,35 +2891,35 @@ function draw_new_message(border_ID){
 
 //	Verify if any user is sharing his name/email address
 //	for use in the new messages's "From " field.
-function draw_from_field( sel_from, tr1_1 ) {
+function draw_from_field( sel_from, tr1_1 )
+{
+	var data = SharedUsersData;
+	var myname = (data && data.myname)? data.myname : '';
 
-	// Handler function for cExecute
-	var h_user = function( data ) {
-		if ( data.length > 0 ) {
-			tr1_1.style.display = '';
+	$(sel_from).append( $('<option>')
+		.val( myname+";"+$('#user_email').val() )
+		.data( {
+			'mail': $('#user_email').val(),
+			'signature': preferences.signature,
+			'use_signature': preferences.use_signature,
+			'type_signature': preferences.type_signature,
+			'default_signature': preferences.default_signature
+		} )
+		.text( '"'+myname+'" <'+$('#user_email').val()+'>' ) );
 
+	if ( data.length > 0 ) {
+		tr1_1.style.display = '';
+		for ( var i = 0; i < data.length; i++ )
 			$(sel_from).append( $('<option>')
-				.val( data.myname+";"+$('#user_email').val() )
-				.data( {
-					'mail': $('#user_email').val(),
-					'signature': preferences.signature,
-					'use_signature': preferences.use_signature,
-					'type_signature': preferences.type_signature,
-					'default_signature': preferences.default_signature
-				} )
-				.text( '"'+data.myname+'" <'+$('#user_email').val()+'>' ) );
-
-			for ( var i = 0; i < data.length; i++ )
-				$(sel_from).append( $('<option>')
-					.data( data[i] )
-					.val( data[i].cn + ';'+data[i].mail+';'+data[i].save_shared+';'+data[i].uid )
-					.text( '"'+data[i].cn+'" <'+data[i].mail+'>' ) );
-
-		}
-		SharedUsersData = data;
+				.data( data[i] )
+				.val( data[i].cn + ';'+data[i].mail+';'+data[i].save_shared+';'+data[i].uid )
+				.text( '"'+data[i].cn+'" <'+data[i].mail+'>' ) );
 	}
+}
 
-	if ( typeof SharedUsersData !== 'undefined' ) return h_user( SharedUsersData );
+function load_from_field()
+{
+	if ( typeof SharedUsersData !== 'undefined' ) return;
 
 	// Get the shared folders.....
 	var sharedFolders = new Array();
@@ -2933,8 +2938,10 @@ function draw_from_field( sel_from, tr1_1 ) {
 		sharedUsers[sharedUsers.length] = matchUser.substring(("user"+cyrus_delimiter).length,matchUser.length);
 	}
 
-	// First time, so execute.....
-	cExecute ("$this.ldap_functions.getSharedUsersFrom&uids="+sharedUsers.join(';'), h_user);
+	var form = $('<form>').append($('<input>').attr({'name':'uids'}).val(sharedUsers.join(';')));
+	send_post_request( '$this.ldap_functions.getSharedUsersFrom', form, function( data ) {
+		SharedUsersData = data;
+	} );
 }
 
 function changeBgColorToON(all_messages, begin, end){

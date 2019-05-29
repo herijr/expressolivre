@@ -62,15 +62,14 @@ var SignatureFrame = new function() {
 
 	this.redraw = function( $bdy_ifrm, location, funct, extra )
 	{
-
 		$bdy_ifrm = $bdy_ifrm.jquery? $bdy_ifrm : $($bdy_ifrm);
 		funct     = ( typeof funct != 'undefined' )? funct : 'append';
 		extra     = ( typeof extra != 'undefined' )? extra : $('<br>');
 
 		var ID = $bdy_ifrm.attr('id').replace( 'body_', '' )
 
-		var from_data = $('select#from_'+ID).find(':selected').data();
-		var data      = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
+		var data = $('select#from_'+ID).find(':selected').data();
+		if ( !data ) return;
 
 		$('img#signature').toggle( !!data.signature );
 
