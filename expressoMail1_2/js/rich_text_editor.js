@@ -89,6 +89,7 @@ cRichTextEditor.prototype.stripHTML = function( string ) {
 	return string
 		.replace(/<style([\s\S]*?)<\/style>/gi, '')
 		.replace(/<script([\s\S]*?)<\/script>/gi, '')
+		.replace(/([^>])<div/ig,'$1\n<div')
 		.replace(/<\/div>/ig, '\n')
 		.replace(/<\/li>/ig, '\n')
 		.replace(/<li>/ig, '  *  ')
@@ -102,22 +103,27 @@ cRichTextEditor.prototype.stripHTML = function( string ) {
 }
 
 cRichTextEditor.prototype.plain = function( to_plain, silent ) {
+
 	silent = ( typeof silent != 'undefined' )? silent : false;
+
+	var $bdy_doc = $('iframe#body_'+this.id).contents();
+
 	if ( to_plain ) {
 		if ( ( !silent ) &&( !mobile_device ) && !( $('#textplain_rt_checkbox_'+this.id)[0].checked = confirm( get_lang( 'The text format will be lost' ) + '.' ) ) )
 			return false;
-		$(this.table).hide();
-		var arr = this.stripHTML( $('iframe#body_'+this.id).contents().find('body').get(0).innerHTML );
+		$(this.table).find('img#signature').siblings().hide()
+		var arr = this.stripHTML( $bdy_doc.find('body').get(0).innerHTML );
 		var pre = $('<pre>')
 			.append(arr.shift())
-			.append($('iframe#body_'+this.id).contents().find('iframe#use_signature_anchor').detach())
+			.append($bdy_doc.find('iframe#use_signature_anchor').detach())
 			.append(arr.join(''));
-		$('iframe#body_'+this.id).contents().find('body').empty().append(pre);
+		$bdy_doc.find('body').empty().append(pre);
 	} else {
-		$(this.table).show();
-		var html = $('iframe#body_'+this.id).contents().find('pre').html().replace(/\r?\n/gi,'</br>');
-		$('iframe#body_'+this.id).contents().find('body').empty().html( html );
+		$(this.table).find('img#signature').siblings().show();
+		var html = $bdy_doc.find('pre').html().replace(/\r?\n/gi,'</br>');
+		$bdy_doc.find('body').empty().html( html );
 	}
+	SignatureFrame.redrawOnCaret( $('iframe#body_'+this.id) );
 }
 
 cRichTextEditor.prototype.buildEditor = function() {
@@ -268,7 +274,7 @@ cRichTextEditor.prototype.editorCommand = function(command, option) {
 			var ID = this.editor.replace( 'body_', '' );
 			$('select#from_'+ID).find(':selected').data( 'use_signature', '1' );
 			$('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').remove();
-			update_signature_frame( ID, get_caret_position( $('iframe#body_'+ID) ), 'after', false );
+			SignatureFrame.redrawOnCaret( $('iframe#body_'+ID) );
 		}
 		else if (command == 'CreateLink')
 			mainField.document.execCommand('CreateLink', false, option);

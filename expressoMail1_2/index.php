@@ -263,7 +263,8 @@
 
 	$scripts = "js/abas.js," .
 				"js/main.js," .
-				"js/draw_api.js,";
+				"js/draw_api.js,".
+				"js/signature_frame.js,";
 	if($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_local_messages'])
 		$scripts .= "js/local_messages.js,";
 	

@@ -1190,10 +1190,10 @@ function new_message(type, border_ID){
 			mail_content = make_body_reply( data.body, data.to, data.date_day, data.date_hour );
 		case "reply_without_history":
 			title = 'Re: '+data.subject;
-			$('input#subject_'+new_border_ID).val(title);
-			$('input#to_'+new_border_ID).val(data.to);
-			$('div#content_id_'+new_border_ID).append(
-				$('<input>').attr({'id':'msg_reply_from_'+new_border_ID,'type':'hidden'}).val($('input#msg_number_'+border_ID).val())
+			$('#subject_'+new_border_ID).val(title);
+			$('#to_'+new_border_ID).val(data.to);
+			$('#content_id_'+new_border_ID).append(
+				$('<input>').attr({'id':'msg_reply_from_'+new_border_ID,'type':'hidden'}).val($('#msg_number_'+border_ID).val())
 			);
 			useOriginalAttachments( new_border_ID, border_ID, data.is_local_message );
 			break;
@@ -1214,16 +1214,16 @@ function new_message(type, border_ID){
 			else data.to_all = '';
 
 			title = 'Re: '+data.subject;
-			$('input#subject_'+new_border_ID).val(title);
-			$('input#to_'+new_border_ID).val(data.to+', '+data.to_all);
+			$('#subject_'+new_border_ID).val(title);
+			$('#to_'+new_border_ID).val(data.to+', '+data.to_all);
 			if ( data.cc ) {
-				$('input#cc_'+new_border_ID).val(data.cc);
+				$('#cc_'+new_border_ID).val(data.cc);
 				Element("tr_cc_" + new_border_ID).style.display='';
 				Element("a_cc_link_" + new_border_ID).style.display='none';
 				Element('space_link_' + new_border_ID).style.display='none';
 			}
-			$('div#content_id_'+new_border_ID).append(
-				$('<input>').attr({ 'id': 'msg_reply_from_'+new_border_ID, 'type': 'hidden' }).val($('input#msg_number_'+border_ID).val())
+			$('#content_id_'+new_border_ID).append(
+				$('<input>').attr({ 'id': 'msg_reply_from_'+new_border_ID, 'type': 'hidden' }).val($('#msg_number_'+border_ID).val())
 			);
 			useOriginalAttachments( new_border_ID, border_ID, data.is_local_message );
 			break;
@@ -1379,8 +1379,7 @@ function new_message(type, border_ID){
 	doc.designMode = 'on';
 
 	// Set signature frame
-	update_signature_frame( new_border_ID, $(body).contents().find('body'), target_signature );
-	$(doc).on( 'selectionchange.edit,mouseup.edit,mousedown.edit,keyup.edit', function(e){ persist_signature_frame(e, new_border_ID); } );
+	SignatureFrame.init( body, target_signature );
 
 	// Set paragraphs margin
 	$(body).on('onkeyup',function(e){
@@ -1579,7 +1578,7 @@ function send_message( ID, folder, folder_name )
 	$('#save_message_options_'+ID).addClass('message_options_inactive').off('click');
 
 	// Remove #use_signature_anchor before send
-	update_signature_frame( ID, body );
+	SignatureFrame.redraw( $('iframe#body_'+ID), body );
 	var body_buffer = $('<div>');
 	$(body_buffer).html( $(body).html() );
 	$(body_buffer).find('iframe#use_signature_anchor').after(
@@ -1760,7 +1759,7 @@ function save_msg( ID, withImage )
 	$('#send_button_'+ID).hide();
 
 	// Remove #use_signature_anchor before send
-	update_signature_frame( ID, body );
+	SignatureFrame.redraw( $('iframe#body_'+ID), body );
 	var body_buffer = $('<div>');
 	$(body_buffer).html( $(body).html() );
 	$(body_buffer).find('iframe#use_signature_anchor').after(

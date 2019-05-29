@@ -2283,7 +2283,7 @@ function draw_new_message(border_ID){
 	sel_from.name = "input_from";
 	sel_from.style.width = "70%";
 	sel_from.setAttribute("wrap","soft");
-	$(sel_from).on('change',function(e){ update_signature_frame( ID ); });
+	$(sel_from).on('change',function(e){ SignatureFrame.redraw( $('iframe#body_'+ID) ); });
 	td_from.appendChild(sel_from);
 	tr1_1.appendChild(td1_1);
 	tr1_1.appendChild(td_from);
@@ -2935,89 +2935,6 @@ function draw_from_field( sel_from, tr1_1 ) {
 
 	// First time, so execute.....
 	cExecute ("$this.ldap_functions.getSharedUsersFrom&uids="+sharedUsers.join(';'), h_user);
-}
-
-function update_signature_frame( ID, location, funct, extra )
-{
-	funct    = ( typeof funct != 'undefined' )? funct : 'append';
-	extra    = ( typeof extra != 'undefined' )? extra : $('<br>');
-	var from_data = $('select#from_'+ID).find(':selected').data();
-	var data      = ( from_data && from_data.mail != $('#user_email').val() )? from_data : preferences;
-	$('img#signature').toggle( !!data.signature );
-
-	$('iframe#body_'+ID).contents().find('iframe#use_signature_anchor:not(:first)').remove();
-	var ifrm = $('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').get(0);
-	if ( typeof ifrm == 'undefined' ) {
-		ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contenteditable': 'false' }).css({ 'width': '100%' }).on('load',function(e){
-			if ( $(e.currentTarget).data('writed') !=  $(e.currentTarget).find('body').html() ) {
-				write_signature_frame( ifrm, $(e.currentTarget).data('writed'), true );
-			}
-			$(e.currentTarget).height($(e.currentTarget.contentWindow.document).height());
-		}).get(0);
-		var has_div = $('iframe#body_'+ID).contents().find('div#use_signature_anchor');
-		if ( $(has_div).length > 0 ) {
-			$(has_div[0]).after( ifrm );
-			$(has_div).remove();
-		} else {
-			location = ( typeof location == 'undefined' )? $('iframe#body_'+ID).contents().find('body').get(0) : location;
-			if ( location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
-			$(location)[funct]( extra, ifrm );
-		}
-	}
-	if ( !( data.default_signature || data.use_signature == '1' ) ) $(ifrm).hide();
-	else {
-		var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( typeof data.type_signature != 'undefined' && data.type_signature != 'html' ) )?
-			'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>': data.signature;
-		write_signature_frame( ifrm, signature, false )
-	}
-}
-function write_signature_frame( ifrm, signature, force ) {
-	try {
-		var doc = ifrm.document || ifrm.contentDocument || ifrm.contentWindow;
-		if ( !doc ) return;
-		if ( ( !force ) && $(ifrm).data( 'writed' ) == signature ) return;
-		$(ifrm).data( 'writed', signature );
-		doc.open();
-		doc.write( signature );
-		doc.close();
-		$(doc).find('head').append(
-			$('<style>').attr({'type':'text/css'}).text(
-				'body{margin:0;}'+
-				'pre{margin:0;white-space: pre-wrap !important;overflow-wrap: break-word !important;font-family: !monospace important;font-size: 11px !important;}'
-			)
-		);
-		$(ifrm).height($(doc).find('body').height());
-	} catch (e) {}
-}
-
-function persist_signature_frame( e, ID )
-{
-	window.clearTimeout( $(e.currentTarget).data('timer') );
-	if ( $('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').length ) {
-		$(e.currentTarget).data( 'timer', window.setTimeout(function(){
-			update_signature_frame( ID, get_caret_position( e.currentTarget ), 'after' );
-		},1000));
-	} else {
-		update_signature_frame( ID, get_caret_position( e.currentTarget ), 'after', false );
-	}
-}
-
-function get_caret_position( ifrm )
-{
-	try {
-		ifrm = ( ifrm.selector && ifrm.length )? ifrm.get(0) : ifrm;
-		var win = ifrm.contentWindow || ifrm.document.parentWindow;
-		if (win.getSelection) {
-			// except IE
-			var sel = ifrm.contentDocument.getSelection();
-			return ( sel.focusNode.nodeType == 1 )? sel.focusNode.childNodes[sel.focusOffset] : sel.focusNode;
-		} else if (ifrm.document.selection) {
-			// for IE
-			ifrm.focus();
-			var range = ifrm.document.selection.createRange();
-			return range.parentElement();
-		}
-	} catch (e) {}
 }
 
 function changeBgColorToON(all_messages, begin, end){

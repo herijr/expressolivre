@@ -363,7 +363,7 @@
 				select[select.length] = opt;
 			}
 		}
-		content.splice(0,(content.lenght));
+		content.splice(0,(content.length));
 	}
 
 	emQuickCatalogSearch.prototype.update_organizations = function(){
