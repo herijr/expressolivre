@@ -63,8 +63,8 @@ var SignatureFrame = new function() {
 	this.redraw = function( $bdy_ifrm, location, funct, extra )
 	{
 		$bdy_ifrm = $bdy_ifrm.jquery? $bdy_ifrm : $($bdy_ifrm);
-		funct     = ( typeof funct != 'undefined' )? funct : 'append';
-		extra     = ( typeof extra != 'undefined' )? extra : $('<br>');
+		funct     = funct !== undefined? funct : 'append';
+		extra     = extra !== undefined? extra : $('<br>');
 
 		var ID = $bdy_ifrm.attr('id').replace( 'body_', '' )
 
@@ -79,9 +79,7 @@ var SignatureFrame = new function() {
 
 		if ( !$ifrm.length ) {
 			$ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contenteditable': 'false' }).css({ 'width': '100%' }).on('load',function(){
-				if ( $ifrm.data('writed') != $ifrm.contents().find('body').html() ) {
-					SignatureFrame.write( $ifrm, $ifrm.data('writed'), true );
-				}
+				if ( $ifrm.data('writed') != $ifrm.contents().find('body').html() ) SignatureFrame.write( $ifrm, $ifrm.data('writed'), true );
 				SignatureFrame.setHeight( $ifrm );
 			});
 
@@ -90,14 +88,14 @@ var SignatureFrame = new function() {
 				$has_div.after( $ifrm );
 				$has_div.remove();
 			} else {
-				location = ( typeof location == 'undefined' )? SignatureFrame.caretPosition( $bdy_ifrm ) : location;
+				location = location !== undefined? location : SignatureFrame.caretPosition( $bdy_ifrm );
 				if ( location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
 				$(location)[funct]( extra, $ifrm );
 			}
 		}
 		if ( !( data.default_signature || data.use_signature == '1' ) ) $ifrm.hide();
 		else {
-			var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( typeof data.type_signature != 'undefined' && data.type_signature != 'html' ) )?
+			var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
 				'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>': data.signature;
 			$ifrm.show();
 			SignatureFrame.write( $ifrm, signature, false )
@@ -109,6 +107,9 @@ var SignatureFrame = new function() {
 		try {
 
 			if ( !$ifrm.contents() ) return;
+
+			signature = signature !== undefined? signature : '';
+			force     = force     !== undefined? force : false;
 
 			if ( ( !force ) && $ifrm.data( 'writed' ) == signature ) return;
 
