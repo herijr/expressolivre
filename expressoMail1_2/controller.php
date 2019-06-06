@@ -1,8 +1,8 @@
 <?php
 
-function set_response( $data, $isJSON = true, $isUTF8 = true ){
-	header( 'Content-Type: '.( $isJSON? 'application/json' : 'text/html' ).'; charset='.( $isUTF8? 'utf-8' : 'iso-8859-1' ).';' );
-	$datachr = ( $isUTF8? utf8enc( $data ) : $data );
+function set_response( $data, $isJSON = true ){
+	header( 'Content-Type: '.( $isJSON? 'application/json' : 'text/html' ).'; charset='.( $isJSON? 'utf-8' : 'iso-8859-1' ).';' );
+	$datachr = ( $isJSON? utf8enc( $data ) : $data );
 	echo $isJSON? json_encode( $datachr ) : serialize( $datachr );
 }
 
@@ -14,8 +14,13 @@ function utf8enc( $data ) {
 }
 
 function sconv( $obj ) {
-	return is_string( $obj )? utf8_encode($obj) : $obj;
+	return ( is_string( $obj ) && ( !isUTF8( $obj ) ) )? ( utf8_encode($obj) ) : $obj;
 }
+
+function isUTF8( $str ) {
+    return ( iconv( 'utf-8', 'utf-8//IGNORE', $str ) == $str );
+}
+
 
 if ( !isset( $GLOBALS['phpgw_info'] ) ) {
 	$GLOBALS['phpgw_info']['flags'] = array(
@@ -74,6 +79,6 @@ if ( $params ) $result = $obj->$method( $params );
 else $result = $obj->$method();
 
 if ( $cExecuteFormReturn ) $_SESSION['response'] = $result;
-else set_response( $result, isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'json' ), true );
+else set_response( $result, isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'json' ) );
 
 session_write_close();
