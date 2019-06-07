@@ -399,4 +399,22 @@
 		return $GLOBALS['setup_info']['workflow']['currentver'];
 	}
 
+	$test[] = '2.5.2';
+	function workflow_upgrade2_5_2()
+	{
+		$workflowHostInfo = extractDatabaseParameters();
+
+		/* connect to Workflow database */
+		$workflowDB = $GLOBALS['phpgw']->ADOdb;
+		if ($workflowDB->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], 'workflow'))
+		{
+			$workflowDB->query('ALTER TABLE public.funcionario ALTER COLUMN apelido CHARACTER VARYING(200)');
+		}
+
+		/* reconnect to the previous database */
+		$GLOBALS['phpgw']->ADOdb->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], $workflowHostInfo['dbname']);
+		$GLOBALS['setup_info']['workflow']['currentver'] = '2.5.3';
+		return $GLOBALS['setup_info']['workflow']['currentver'];
+	}
+
 ?>

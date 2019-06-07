@@ -758,16 +758,16 @@ function loadAddEmployeeUI(organizationID, callback)
 	content += "<table>";
 	content += '<tr><td><label for="funcionario_id_desc">Funcionário</label></td><td>';
 	content += '<input type="hidden" name="funcionario_id" id="funcionario_id" value="" />';
-	content += '<input type="input" name="funcionario_id_desc" id="funcionario_id_desc" value="" readonly="true" size="40" />';
+	content += '<input type="input" name="funcionario_id_desc" id="funcionario_id_desc" value="" readonly="true" size="50" />';
 	content += '<a href="javascript:void(0)" onclick="openParticipantsWindow(\'funcionario_id\', \'uid=1&hidegroups=1\');" id="addEmployeeLink"><img border="0" width="16" height="16" src="workflow/templateFile.php?file=images/add_user.png" /></a>';
 	content += '</td></tr>';
 	content += '<tr><td><label for="funcionario_status_id">Status</label></td><td id="comboStatus"><i>carregando</i></td></tr>';
-	content += '<tr><td><label for="apelido">Apelido</label></td><td><input type="text" size="20" maxlength="20" name="apelido" id="apelido" value=""/></td></tr>';
+	content += '<tr><td><label for="apelido">Nome de apresenta&ccedil;&atilde;o</label></td><td><input type="text" size="50" maxlength="200" name="apelido" id="apelido" value=""/></td></tr>';
 	content += '<tr><td><label for="funcionario_categoria_id">Categoria</label></td><td id="comboFuncionarioCategoria"><i>carregando</i></td></tr>';
 	content += '<tr><td><label for="cargo_id">Cargo</label></td><td id="comboCargo"><i>carregando</i></td></tr>';
 	content += '<tr><td><label for="funcao">Função</label></td><td><input type="text" size="50" maxlength="200" name="funcao" id="funcao" value=""/></td></tr>';
 	content += '<tr><td><label for="data_admissao">Data de admissão</label></td><td><input type="text" name="data_admissao" id="data_admissao" value="" size="15" onkeypress="return formatDateField(event, this);" /></td></tr>';
-	content += '<tr><td><label for="titulo">T&iacute;tulo</label></td><td><input type="text" size="30" name="titulo" id="titulo" value=""/></td></tr>';
+	content += '<tr><td><label for="titulo">T&iacute;tulo</label></td><td><input type="text" size="30" maxlength="30" name="titulo" id="titulo" value=""/></td></tr>';
 	content += '<tr><td><label for="nivel">Nível</label></td><td><input type="text" size="3" name="nivel" id="nivel"/></td></tr>';
 	content += '<tr><td><label for="area_id">Área</label></td><td id="comboArea"><i>carregando</i></td></tr>';
 	content += '<tr><td><label for="centro_custo_id">Centro de Custo</label></td><td id="comboCentroCusto"><i>carregando</i></td></tr>';
@@ -776,7 +776,7 @@ function loadAddEmployeeUI(organizationID, callback)
 	content += '</form>';
 	content += '<button id="inserir" onclick="objEmployee.add(); return false;">Inserir</button>';
 	content += '<button onclick="valid.deactivate(); return false;">Cancelar</button>';
-	
+
 	var divLB = $('lbContent');
     divLB.innerHTML = content;
 
