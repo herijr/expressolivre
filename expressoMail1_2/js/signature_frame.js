@@ -96,7 +96,7 @@ var SignatureFrame = new function() {
 		if ( !( data.default_signature || data.use_signature == '1' ) ) $ifrm.hide();
 		else {
 			var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
-				'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>': data.signature;
+				'<pre>'+RichTextEditor.stripHTML( ( data.signature ? data.signature : '' ) ).join('')+'</pre>': ( data.signature ? data.signature : '' );
 			$ifrm.show();
 			SignatureFrame.write( $ifrm, signature, false )
 		}
