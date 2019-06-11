@@ -1768,6 +1768,13 @@ function save_msg( ID, withImage )
 		)
 	).remove();
 
+	// Remove tag pre, if checkbox plain is checked
+	if( $('#textplain_rt_checkbox_'+ID).is(':checked') ){
+		if( $(body_buffer).find('pre:first-child').length > 0 ){
+			$(body_buffer).html( $(body_buffer).find('pre:first-child').html() );
+		}
+	}
+
 	var form = $('form[name=form_message_'+ID+']');
 
 	$(form).find('textarea[name=body]').remove();

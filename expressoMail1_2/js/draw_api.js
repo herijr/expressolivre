@@ -2007,7 +2007,6 @@ function draw_message(info_msg, ID){
 	tr.appendChild(td)
 	tbody_message.appendChild(tr);
 
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Make the body message.
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2015,23 +2014,39 @@ function draw_message(info_msg, ID){
 	tr.className = "tr_message_body";
 	var td = document.createElement("TD");
 
-
 	var _body = document.createElement( 'div' );
 	_body.id = 'body_' + ID;
 	_body.style.fontSize = '16px';
-	_body.innerHTML = newBody.replace(/<\/?body[^>]*>/ig,'');
 
 	$(_body).data({'type':info_msg.type});
+
 	if ( info_msg.type == 'plain' ) {
-		if ( !( $(_body).children().length == 1 && $(_body).children().get(0).tagName == 'PRE' ) )
-			$(_body).html( '<pre>'+newBody.replace(/<\/?body[^>]*>/ig,'')+'</pre>' );
-		$(_body).find('*').not('div#use_signature_anchor,pre').remove();
+		
+		var pre_plain = $('<pre>').text( newBody );
+		
+		$(_body).append( pre_plain );
+
+		if( info_msg.Draft && $.trim(info_msg.Draft) === 'X' ){
+
+			var regexSignature = /<div id\="use_signature_anchor">.*<\/div>/g;
+
+			if( newBody.search(regexSignature) >= 0 ){
+
+				var signatureUser = newBody.match( regexSignature );
+
+				$(pre_plain).append( signatureUser[0] ).append( ' ' );
+				$(pre_plain)[0].childNodes[2].data = newBody.substring( newBody.search(regexSignature) + signatureUser[0].length )
+				$(pre_plain)[0].childNodes[0].data = newBody.substring(0, newBody.search(regexSignature));
+			}
+		}			
+	} else {
+		$(_body).html( newBody.replace(/<\/?body[^>]*>/ig,''));
 	}
 
 	// Remove all ids attributes, preserve signature anchor
 	$(_body).find('*').not('div#use_signature_anchor').attr('id',null);
 
-	div.appendChild( _body );
+	$(div).append( $(_body) );
 
 	function mailto( link )
 	{
@@ -2042,7 +2057,9 @@ function draw_message(info_msg, ID){
 			return false;
 		};
 	}
+	
 	var links = div.getElementsByTagName( 'a' );
+	
 	for ( var i = 0; i < links.length; i++ ){
 		try{
 			if ( links.item( i ).href.indexOf( 'mailto:' ) === 0 ){
