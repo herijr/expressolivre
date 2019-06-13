@@ -1304,7 +1304,7 @@ class imap_functions
 		$params = array('folder' => $msg_folder, "msgs_to_set" => $msg_number, "flag" => "seen");
 		$this->set_messages_flag($params);
 		$content = $this->process_embedded_images($msg,$msg_number,$content, $msg_folder);
-		$content = $this->replace_special_characters($content);
+		$content = ( $return['type'] !== "plain") ? $this->replace_special_characters($content) : $content;
 
 		if (preg_match('/charset=(\'|\")?(utf8|utf-8)/i', $content)) {
 
