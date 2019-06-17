@@ -16,9 +16,10 @@ function buildLayout()
 	content += '<br/><button onclick="clearApplicationData();">Novo</button>';
 	content += '&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="removeExternalApplication($F(\'externalApplications\'));">Excluir</button></td>';
 	content += '<td valign="top"><div id="externalApplicationData" style="display: none;"><table>';
-	content += '<tr><td><label for="name">Nome</label></td><td><input type="text" id="name" size="30" /></td></tr>';
-	content += '<tr><td><label for="address">Endereço</label></td><td><input type="text" id="address" size="50" /></td></tr>';
+	content += '<tr><td><label for="name">Nome</label></td><td><input type="text" id="name" size="30" maxlength="50" /></td></tr>';
+	content += '<tr><td><label for="address">Endereço</label></td><td><input type="text" id="address" size="50" maxlength="120" /></td></tr>';
 	content += '<tr><td><label for="description">Descrição</label></td><td><textarea id="description" cols="40" rows="3"></textarea></td></tr>';
+	content += '<tr><td><label for="category">Categoria</label></td><td><input type="text" id="category" size="50" maxlength="100" /></td></tr>';
 	content += '<tr><td valign="top" colspan="2"><label><input type="checkbox" id="intranet_only");"/>Acessível somente na Intranet?</label></td></tr>';
 	content += '<tr><td valign="top"><label><input type="checkbox" id="authentication" onclick="if (this.checked) Effect.BlindDown(\'post_div\'); else Effect.BlindUp(\'post_div\');"/>Autentica?</label></td><td><div id="post_div""><label for="post">Post</label><br/><textarea id="post" cols="40" rows="3"></textarea></div></td></tr>';
 	content += '<tr><td><label for="image">Imagem</label></td>';
@@ -44,6 +45,7 @@ function clearApplicationData()
 	$('name').value = '';
 	$('description').value = '';
 	$('address').value = '';
+	$('category').value = '';
 	$('authentication').checked = false;
 	$('post').value = '';
 	$('external_application_id').value = '';
@@ -72,6 +74,7 @@ function getExternalApplication(externalApplicationID)
 		$('name').value = data['name'];
 		$('description').value = data['description'];
 		$('address').value = data['address'];
+		$('category').value = data['category'];
 		$('intranet_only').checked = (data['intranet_only'] == '1')? true : false;
 		$('authentication').checked = (data['authentication'] == '1')? true : false;
 		if ($('authentication').checked)
@@ -150,6 +153,7 @@ function sendContents()
 		var params = 'name=' + escape($F('name'));
 		params += '&description=' + escape($F('description'));
 		params += '&address=' + escape($F('address'));
+		params += '&category=' + escape($F('category'));
 		params += '&intranet_only=' + (($F('intranet_only') == 'on') ? '1' : '0');
 		params += '&authentication=' + (($F('authentication') == 'on') ? '1' : '0');
 		params += '&post=' + escape($F('post'));

@@ -118,7 +118,7 @@ class so_userinterface
 		$externalApplicationsID = $GLOBALS['ajax']->acl->getUserGroupPermissions('APX', $_SESSION['phpgw_info']['workflow']['account_id']);
 		if (!empty($externalApplicationsID))
 		{
-			$result = Factory::getInstance('WorkflowObjects')->getDBGalaxia()->Link_ID->query("SELECT DISTINCT external_application_id, name, address, image, authentication, intranet_only FROM egw_wf_external_application WHERE (external_application_id IN (" . implode(', ', $externalApplicationsID)  . ")) ORDER BY name");
+			$result = Factory::getInstance('WorkflowObjects')->getDBGalaxia()->Link_ID->query("SELECT DISTINCT external_application_id, name, address, category, image, authentication, intranet_only FROM egw_wf_external_application WHERE (external_application_id IN (" . implode(', ', $externalApplicationsID)  . ")) ORDER BY category, name");
 			$preOutput = $result->GetArray(-1);
 
 			/* keep only associative elments and check if the user can access an intranet application */

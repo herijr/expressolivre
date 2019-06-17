@@ -417,4 +417,18 @@
 		return $GLOBALS['setup_info']['workflow']['currentver'];
 	}
 
+	$test[] = '2.5.3';
+	function workflow_upgrade2_5_3()
+	{
+		$workflowHostInfo = extractDatabaseParameters();
+
+		if ($GLOBALS['phpgw']->ADOdb->connect($workflowHostInfo['host'], $workflowHostInfo['user'], $workflowHostInfo['password'], $workflowHostInfo['dbname']))
+		{
+			$GLOBALS['phpgw']->ADOdb->query('ALTER TABLE public.egw_wf_external_application ADD COLUMN category CHARACTER VARYING(100)');
+		}
+
+		$GLOBALS['setup_info']['workflow']['currentver'] = '2.5.4';
+		return $GLOBALS['setup_info']['workflow']['currentver'];
+	}
+
 ?>

@@ -70,7 +70,7 @@ class bo_external_applications extends bo_ajaxinterface
 	 */
 	function addExternalApplication($params)
 	{
-		$result = $this->so->addExternalApplication($params['name'], $params['description'], $params['address'], $params['image'], $params['authentication'], $params['post'], $params['intranet_only']);
+		$result = $this->so->addExternalApplication($params['name'], $params['description'], $params['address'], $params['category'], $params['image'], $params['authentication'], $params['post'], $params['intranet_only']);
 		$this->disconnect_all();
 
 		return $result;
@@ -84,7 +84,7 @@ class bo_external_applications extends bo_ajaxinterface
 	 */
 	function updateExternalApplication($params)
 	{
-		$result = $this->so->updateExternalApplication($params['external_application_id'], $params['name'], $params['description'], $params['address'], $params['image'], $params['authentication'], $params['post'], $params['remove_current_image'], $params['intranet_only']);
+		$result = $this->so->updateExternalApplication($params['external_application_id'], $params['name'], $params['description'], $params['address'], $params['category'], $params['image'], $params['authentication'], $params['post'], $params['remove_current_image'], $params['intranet_only']);
 		$this->disconnect_all();
 
 		return $result;

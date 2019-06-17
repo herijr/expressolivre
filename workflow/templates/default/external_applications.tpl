@@ -3,7 +3,7 @@
 {$css}
 {$javaScripts}
 <div id="main_body" style="width:99.5%;">
-	<h2>Applicações Externas</h2>
+	<h2>Aplicações Externas</h2>
 	<div id="conteudo"></div>
 </div>
 {$footer}

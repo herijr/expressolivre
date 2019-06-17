@@ -217,6 +217,7 @@
 					'image' => array('type' => 'varchar', 'precision' => '100', 'nullable' => True),
 					'image_path' => array('type' => 'varchar', 'precision' => '250', 'nullable' => True),
 					'address' => array('type' => 'varchar', 'precision' => '120', 'nullable' => False),
+					'category' => array('type' => 'varchar', 'precision' => '100', 'nullable' => True),
 					'authentication' => array('type' => 'bit', 'precision' => '1', 'nullable' => True),
 					'post' => array('type' => 'text', 'nullable' => True),
 					'intranet_only' => array('type' => 'bit', 'precision' => '1', 'nullable' => True)
