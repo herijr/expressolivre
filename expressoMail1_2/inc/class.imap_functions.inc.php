@@ -1453,8 +1453,12 @@ class imap_functions
 		}
 
 		// All other encodings are returned raw.
-		if (strtolower($charset) === "utf-8") {
-			$body = utf8_decode($body);
+		$charset = trim($charset);
+		$charset = strtoupper($charset);
+		if ($charset === "UTF-8") {
+			if (mb_detect_encoding($body, 'UTF-8', true) === 'UTF-8') {
+				$body = utf8_decode($body);
+			}
 		}
 
 		return $body;
