@@ -371,10 +371,10 @@ class so
 
 		if( $params['action'] == 'add' )
 		{
-			$query = 'INSERT INTO phpgw_emailadmin_domains( profileid, domain, organization_units ) VALUES('.
+			$query = 'INSERT INTO phpgw_emailadmin_domains( profileid, domain, organization_units, extras ) VALUES('.
 				(int)$params['profileid'].",".
 				"'".$this->db->db_addslashes( $params['domain'] )."',".
-				( count( (array)$params['ous'] )? "'".$this->db->db_addslashes( serialize( (array)$params['ous'] ) )."'" : 'null' )."',".
+				( count( (array)$params['ous'] )? "'".$this->db->db_addslashes( serialize( (array)$params['ous'] ) )."'" : 'null' ).",".
 				( count( (array)$params['extras'] )? "'".$this->db->db_addslashes( serialize( (array)$params['extras'] ) )."'" : 'null' ).
 				')';
 		}
