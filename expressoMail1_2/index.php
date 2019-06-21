@@ -8,7 +8,7 @@
 	);
 	
 	require_once('../header.inc.php');
-	$update_version = $GLOBALS['phpgw_info']['apps']['expressoMail1_2']['version'] . '.' . '0003';
+	$update_version = $GLOBALS['phpgw_info']['apps']['expressoMail1_2']['version'] . '.' . '0004';
 	$_SESSION['phpgw_info']['expressomail']['user'] = $GLOBALS['phpgw_info']['user'];
 	$GLOBALS['phpgw']->css->validate_file('expressoMail1_2/templates/' . $GLOBALS['phpgw_info']['server']['template_set'] . '/main.css');
 	$GLOBALS['phpgw']->css->validate_file('phpgwapi/js/dftree/dftree.css');

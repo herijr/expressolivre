@@ -78,8 +78,9 @@ var SignatureFrame = new function() {
 		var $ifrm = $bdy_ifrm.contents().find('iframe#use_signature_anchor');
 
 		if ( !$ifrm.length ) {
-			$ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contenteditable': 'false' }).css({ 'width': '100%' }).on('load',function(){
-				if ( $ifrm.data('writed') != $ifrm.contents().find('body').html() ) SignatureFrame.write( $ifrm, $ifrm.data('writed'), true );
+			$ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contentEditable': 'true' }).css({ 'width': '100%' }).on('load',function(){
+				var data = $('select#from_'+ID).find(':selected').data();
+				if ( $ifrm.data('writed') != $ifrm.contents().find('body').html() ) SignatureFrame.write( $ifrm, data.mail, $ifrm.data('writed'), true, data.default_signature );
 				SignatureFrame.setHeight( $ifrm );
 			});
 
@@ -92,17 +93,19 @@ var SignatureFrame = new function() {
 				if ( location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
 				$(location)[funct]( extra, $ifrm );
 			}
+		} else {
+			if ( data.mail == $ifrm.data('mail') ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
 		}
 		if ( !( data.default_signature || data.use_signature == '1' ) ) $ifrm.hide();
 		else {
 			var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
 				'<pre>'+RichTextEditor.stripHTML( ( data.signature ? data.signature : '' ) ).join('')+'</pre>': ( data.signature ? data.signature : '' );
 			$ifrm.show();
-			SignatureFrame.write( $ifrm, signature, false )
+			SignatureFrame.write( $ifrm, data.mail, signature, false, data.default_signature )
 		}
 	}
 
-	this.write = function( $ifrm, signature, force )
+	this.write = function( $ifrm, mail, signature, force, isDefault )
 	{
 		try {
 
@@ -115,10 +118,11 @@ var SignatureFrame = new function() {
 
 			$ifrm.data( 'writed', signature );
 
+			$ifrm.data( 'mail', mail );
+
 			var doc = $ifrm.contents().get(0);
-			doc.open();
-			doc.write( signature );
-			doc.close();
+
+			$(doc).find('body').html( signature ).attr( 'contentEditable', !isDefault );
 
 			$(doc).find('head').append(
 				$('<style>').attr({'type':'text/css'}).text(
