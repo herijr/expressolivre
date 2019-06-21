@@ -2039,6 +2039,9 @@ function draw_message(info_msg, ID){
 				$(pre_plain)[0].childNodes[0].data = newBody.substring(0, newBody.search(regexSignature));
 			}
 		}			
+
+		pre_plain.html( pre_plain.text() );
+
 	} else {
 		$(_body).html( newBody.replace(/<\/?body[^>]*>/ig,''));
 	}
