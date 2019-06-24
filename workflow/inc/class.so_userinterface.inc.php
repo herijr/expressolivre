@@ -505,7 +505,7 @@ class so_userinterface
 		if (count($ldapResult) == 0)
 			return array();
 
-		$uids = implode( ',', array_keys( $ldapResult ) );
+		$uids = implode( ',', array_filter( array_keys( $ldapResult ) ) );	// using array_filter to remove empty items
 
 		/* searching for aditional employee information */
 		$query  = "SELECT ";
