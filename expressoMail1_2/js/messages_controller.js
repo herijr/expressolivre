@@ -290,8 +290,9 @@
 		for (var i=0; i<msgs_number.length; i++){
 			msg_to_delete = Element(msgs_number[i]);
 			if (msg_to_delete){
-				if ( (msg_to_delete.style.backgroundColor != '') && (preferences.use_shortcuts == '1') )
-					select_msg('null', 'down');
+				if ( (msg_to_delete.style.backgroundColor != '') && (preferences.use_shortcuts == '1') ){
+					shortcutExpresso.selectMsg( false, 'down' );
+				}
 				mail_msg.removeChild(msg_to_delete);
 			}
 		}

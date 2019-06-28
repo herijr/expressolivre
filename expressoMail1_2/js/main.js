@@ -450,8 +450,9 @@ function show_msg(msg_info){
 		var ID = msg_info.original_ID ? msg_info.original_ID : msg_info.msg_number;
 		var id_msg_read = ID+"_r";
 
-		if (preferences.use_shortcuts == '1')
-			select_msg(ID, 'null');
+		if (preferences.use_shortcuts == '1'){
+			shortcutExpresso.selectMsg( ID , false );
+		}
 		// Call function to draw message
 		// If needed, delete old border
 		if (openTab.type[currentTab] == 2 || openTab.type[currentTab] == 3)
@@ -627,7 +628,9 @@ function refresh(alert_new_msg){
 			{
 				// Get last index of focus and select message
 				var idx = Math.min(Shortcut.focus_index(),$('#tbody_box').children().length);
-				if ( idx > 0 ) select_msg( $('#tbody_box tr:nth-child('+idx+')').attr('id') );
+				if ( idx > 0 ){ 
+					shortcutExpresso.selectMsg( $('#tbody_box tr:nth-child('+idx+')').attr('id'), false );
+				};
 			}
 		}
 		connector.purgeCache();
@@ -701,12 +704,10 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 		if ( preferences.use_shortcuts == '1') {
 			//Last msg is selected
 			if (mail_msg && exist_className(mail_msg.childNodes[mail_msg.childNodes.length-1], 'selected_shortcut_msg') ) {
-				select_msg('null', 'up', true);
+				shortcutExpresso.selectMsg( false, 'up' );	
 			}
 			else {
-				if (!select_msg('null', 'down', true)) {
-					select_msg('null', 'up', true);
-				}
+				shortcutExpresso.selectMsg( false, 'up' );
 			}
 		}
 

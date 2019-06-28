@@ -780,8 +780,9 @@ function draw_box(headers_msgs, msg_folder, alternate){
 		});
 	}
 
-	if ((preferences.use_shortcuts == '1') && (headers_msgs[0]))
-		select_msg(headers_msgs[0].msg_number, 'null', true);
+	if ((preferences.use_shortcuts == '1') && (headers_msgs[0])){
+		shortcutExpresso.selectMsg( headers_msgs[0].msg_number, false, true );
+	}
 
 	var tdFolders  =  Element("folderscol");
 	tdFolders.style.display = preferences.hide_folders == '1'  ? "none" : "";

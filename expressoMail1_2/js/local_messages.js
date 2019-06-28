@@ -605,7 +605,7 @@ local_messages.prototype.delete_msgs = function(msgs_number,border_ID) {
 	msg_to_delete = Element(msgs_exploded[i]);
 	if (msg_to_delete){
 	    if ( (msg_to_delete.style.backgroundColor != '') && (preferences.use_shortcuts == '1') )
-		select_msg('null', 'down');
+		shortcutExpresso.selectMsg( false , 'down' );
 	    mail_msg.removeChild(msg_to_delete);
 	    decrement_folder_unseen();
 	}

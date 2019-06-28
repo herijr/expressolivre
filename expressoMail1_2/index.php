@@ -278,7 +278,7 @@
 
 	if ($GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['use_shortcuts'])
 	{
-		echo $obj -> getFilesJs("js/shortcut.js", $update_version);
+		echo $obj->getFilesJs("js/shortcutExpresso.js", $update_version);
 	}
 
 	// Get Preferences or redirect to preferences page.
