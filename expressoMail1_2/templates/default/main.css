@@ -517,6 +517,10 @@ input.em_button_like_span {
 	height:15px !important;
 	font-weight: bold;
 }
+input.em_button_like_span:disabled {
+	color: #999 !important;
+	cursor: default;
+}
 
 .l {
 	background-image: url(../../../phpgwapi/templates/default/images/foldertree_folder.png);

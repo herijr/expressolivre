@@ -808,7 +808,7 @@ function draw_box(headers_msgs, msg_folder, alternate){
 		new_message('new','null');
 	}
 	else if(msg_folder && msg_number){
-		cExecute("$this.imap_functions.get_info_msg&msg_number="+ msg_number + "&msg_folder=" + url_encode(msg_folder), show_msg);
+		Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': msg_number, 'msg_folder': msg_folder }, show_msg );
 		Element('msg_folder').value = '';
 		Element('msg_number').value = '';
 	}
@@ -1876,46 +1876,16 @@ function draw_message(info_msg, ID){
 	tr5.appendChild(td5);
 	tr5.appendChild(subject);
 	tbody_message_others_options.appendChild(tr5);
-	if ( info_msg.attachments && info_msg.attachments.length > 0 ){
-		var tr6 = document.createElement("TR");
-		tr6.className = "tr_message_header";
-		var td6 = document.createElement("TD");
-		td6.innerHTML = get_lang("Attachments: ");
 
-		var attachments = document.createElement("TD");
-		td6.vAlign = "top";
-		attachments.align='left';
-		if(info_msg.attachments.length >= 1) {
-			if(info_msg.attachments.length > 1) {
-				var link_attachment	 = document.createElement("A");
-				link_attachment.setAttribute("href", "javascript:export_attachments('"+info_msg.msg_folder+"','"+parseInt( info_msg.msg_number )+"')");
-				link_attachment.innerHTML = " "+info_msg.attachments.length+' '+get_lang('files')+' :: '+get_lang('Download all atachments');
-				attachments.appendChild(link_attachment);
-			}
-			if(parseInt(preferences.remove_attachments_function))
-			{
-                                attachments.appendChild(document.createTextNode('  '));
-				var del_attachments = document.createElement("A");
-				del_attachments.setAttribute("href", "javascript:remove_all_attachments('"+info_msg.msg_folder+"','"+parseInt( info_msg.msg_number )+"')");
-				del_attachments.innerHTML = get_lang('remove all attachments');
-				attachments.appendChild(del_attachments);
-			}
-			attachments.appendChild(document.createElement('BR'));
-		}
-
-		attachments.id = "attachments_" + ID;
-		for (var i=0; i<info_msg.attachments.length; i++){
-			var link_attachment = document.createElement("A");
-			link_attachment.setAttribute("href", "javascript:export_attachments('"+info_msg.msg_folder+"','"+parseInt( info_msg.msg_number )+"','"+info_msg.attachments[i].pid+"')");
-			$(link_attachment).data([ info_msg.msg_folder, info_msg.msg_number, info_msg.attachments[i].name, info_msg.attachments[i].pid, info_msg.attachments[i].encoding ]);
-			link_attachment.innerHTML = url_decode(info_msg.attachments[i].name);
-			link_attachment.innerHTML += " ("+borkb(info_msg.attachments[i].fsize)+")";
-			link_attachment.innerHTML += '<br/>';
-			attachments.appendChild(link_attachment);
-		}
-		tr6.appendChild(td6);
-		tr6.appendChild(attachments);
-		tbody_message_others_options.appendChild(tr6);
+	if ( info_msg.attachs && info_msg.attachs.length > 0 ) {
+		$(tbody_message_others_options).append(
+			$('<tr>').addClass('tr_message_header').append(
+				$('<td>').attr({ 'valign': 'top' }).html( get_lang( 'Attachments: ' ) )
+			).append(
+				$('<td>').attr({ 'id': 'attachments_'+ID, 'align': 'left' })
+			)
+		);
+		buildAttachments( $(tbody_message_others_options).find('#attachments_'+ID).data( info_msg ) );
 	}
 
 	var div = document.createElement("DIV");
@@ -2255,36 +2225,35 @@ function draw_new_message(border_ID){
 	table_menu_new_message.className = 'table_message';
 	var tbody_menu_new_message = document.createElement("TBODY");
 	var tr_menu_new_message = document.createElement("TR");
-	var td_menu_new_message = document.createElement("TD");
-	td_menu_new_message.setAttribute("noWrap","true");
+	var td_menu_new_message = $('<td>').attr({'noWrap': 'true'});
 
-	if ((preferences.save_in_folder == '-1') || (preferences.save_in_folder == '')){
-		//var option_send = '<span class="message_options" onclick=send_message("'+ID+'","null","null");>'+get_lang("Send")+'</span> | ';
-		var option_send   = '<input type="button" id="send_button_'+ID+'" class="em_button_like_span" tabindex="1" value="'+get_lang("Send and not file")+'" onclick=send_message("'+ID+'","null","null");>' + ' | ';
+	if ( preferences.save_in_folder == '-1' || preferences.save_in_folder == '' ) {
+		td_menu_new_message.append(
+			$('<input>').attr({'id':'send_button_'+ID,'type':'button','tabindex':'1'}).addClass('em_button_like_span').val(get_lang('Send and not file')).on('click',function(){ send_message( ID, null, null ); })
+		);
+		if ( !expresso_offline )
+			td_menu_new_message.append(' | ').append(
+				$('<input>').attr({'type':'button','tabindex':'2'}).addClass('em_button_like_span').val(get_lang('Send and file')).on('click',function(){ wfolders.makeWindow( ID, 'send_and_file' ); })
+			);
+	} else {
+		td_menu_new_message.append(
+			$('<input>').attr({'id':'send_button_'+ID,'type':'button','tabindex':'1'}).addClass('em_button_like_span').val(get_lang('Send')).on('click',function(){ send_message( ID, preferences.save_in_folder, null ); })
+		);
+		wfolders.setAlertMsg( true );
+	}
+	if ( !expresso_offline ) {
+		td_menu_new_message.append(' | ').append(
+			$('<input>').attr({'id':'save_message_options_'+ID,'type':'button','tabindex':'3'}).addClass('em_button_like_span').val(get_lang('Save')).on('click',function(){ openTab.toPreserve[ID] = true; save_msg( ID ); })
+		).append(' | ').append(
+			$('<input>').attr({'type':'button','tabindex':'4'}).addClass('em_button_like_span').val(get_lang('Search')).on('click',function(){ openListUsers( ID ); })
+		);
+	} else {
+		td_menu_new_message.append(
+			$('<input>').attr({'id':'save_message_options_'+ID,'type':'hidden'})
+		);
+	}
 
-		if(!expresso_offline)
-			var option_send_and_file= '<span class="message_options" onclick=wfolders.makeWindow("'+ID+'","send_and_file");>'+get_lang("Send and file")+'</span> | ';
-		else
-			var option_send_and_file='';
-	}
-	else{
-		//var option_send = '<span class="message_options" onclick="send_message(\''+ID+'\',\''+preferences.save_in_folder+'\',\'null\');">'+get_lang("Send")+'</span> | ';
-		var option_send   = '<input type="button" id="send_button_'+ID+'" class="em_button_like_span" tabindex="1" value="'+get_lang("Send")+'" onclick="send_message(\''+ID+'\',\''+preferences.save_in_folder+'\',\'null\');">' + ' | ';
-		var option_send_and_file='';
-		wfolders.setAlertMsg(true);
-	}
-//	var option_save_as		= '<span class="message_options" onclick=wfolders.makeWindow("'+ID+'","save");>'+get_lang("Save as")+'</span> | ';
-	if (!expresso_offline) {
-		var option_save = '<span id="save_message_options_'+ID+'" class="message_options" onclick="openTab.toPreserve['+ID+'] = true; save_msg('+ID+');">'+get_lang("Save")+'</span> | ';
-		var option_search = '<span class="message_options" onclick=openListUsers("'+ID+'");>'+get_lang("Search")+'</span>';
-	}
-	else {
-		var option_save = '<input type="hidden" id="save_message_options_'+ID+'">';
-		var option_search = '';
-	}
-	td_menu_new_message.innerHTML = option_send + option_send_and_file + option_save + option_search;
-
-	tr_menu_new_message.appendChild(td_menu_new_message);
+	$(tr_menu_new_message).append(td_menu_new_message);
 
 	tbody_menu_new_message.appendChild(tr_menu_new_message);
 	table_menu_new_message.appendChild(tbody_menu_new_message);
@@ -2853,6 +2822,7 @@ function draw_new_message(border_ID){
 	add_files.setAttribute("tabIndex","-1");
 	var divfiles = document.createElement("DIV");
 	divfiles.id = "divFiles_"+ID;
+	$(divfiles).addClass('msg_attachs');
 	var tr5 = document.createElement("TR");
 	var td5_link = document.createElement("TD");
 	var td5_input = document.createElement("TD");
@@ -2959,7 +2929,7 @@ function load_from_field()
 	}
 
 	var form = $('<form>').append($('<input>').attr({'name':'uids'}).val(sharedUsers.join(';')));
-	send_post_request( '$this.ldap_functions.getSharedUsersFrom', form, function( data ) {
+	Ajax( '$this.ldap_functions.getSharedUsersFrom', form, function( data ) {
 		SharedUsersData = data;
 	} );
 }

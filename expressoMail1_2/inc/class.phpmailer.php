@@ -307,6 +307,11 @@ class PHPMailer
     // RECIPIENT METHODS
     /////////////////////////////////////////////////
 
+	public function GetAddresses( $type = 'to' )
+	{
+		return array_map( array( $this, 'AddrFormat'), $this->$type );
+	}
+
     /**
      * Adds a "To" address.  
      * @param string $address
@@ -1502,12 +1507,12 @@ class PHPMailer
      * @return void
      */
     function AddStringAttachment($string, $filename, $encoding = "base64", 
-                                 $type = "application/octet-stream") {
+                                 $type = "application/octet-stream", $name = false ) {
         // Append to $attachment array
         $cur = count($this->attachment);
         $this->attachment[$cur][0] = $string;
         $this->attachment[$cur][1] = $filename;
-        $this->attachment[$cur][2] = $filename;
+        $this->attachment[$cur][2] = $name?: $filename;
         $this->attachment[$cur][3] = $encoding;
         $this->attachment[$cur][4] = $type;
         $this->attachment[$cur][5] = true; // isString
@@ -1555,12 +1560,12 @@ class PHPMailer
         return true;
     }
     
-    function AddStringEmbeddedImage( $string, $cid, $name = "", $encoding = "base64", $type = "application/octet-stream" )
+    function AddStringEmbeddedImage( $string, $cid, $name = "", $encoding = "base64", $type = "application/octet-stream", $filename = false )
     {
         // Append to $attachment array
         $cur = count($this->attachment);
         $this->attachment[$cur][0] = $string;
-        $this->attachment[$cur][1] = $name;
+        $this->attachment[$cur][1] = $filename?: $name;
         $this->attachment[$cur][2] = $name;
         $this->attachment[$cur][3] = $encoding;
         $this->attachment[$cur][4] = $type;

@@ -86,6 +86,7 @@ class ExportEml
 		//exec( 'nice '.escapeshellarg(PHPGW_SERVER_ROOT.'/prototype/bin/zip/zip').' '.escapeshellarg($dir_exp) );
 		exec( 'cd '.escapeshellarg($dir_exp).' && find -type f ! -name messages.zip | nice zip -9 messages.zip -@' );
 		
+		if ( !file_exists( $dir_exp.'/messages.zip' ) ) exit;
 		header( 'Content-Type: application/zip' );
 		header( 'Content-Disposition: attachment; filename='.lang( 'messages' ).'.zip;' );
 		header( 'Content-Length: '.filesize( $dir_exp.'/messages.zip' ) );

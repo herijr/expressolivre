@@ -33,6 +33,86 @@ function HeaderFlags()
     this.Recent = 0;
 }
 
+//ADD forwarded files
+function addForwardedFile(id_border,file_name,link,divFiles){
+	if(!divFiles)
+		divFiles = document.getElementById("divFiles_"+id_border);
+
+	if (! divFiles)
+		return false;
+
+	if (divFiles.lastChild)
+		var countDivFiles = parseInt(divFiles.lastChild.id.split('_')[2]) + 1;
+
+	if (! countDivFiles)
+		var countDivFiles = 1;
+
+	divFile = document.createElement('DIV');
+
+
+	if (!expresso_offline) {
+		if (!is_ie) {
+			var inputFile = document.createElement("INPUT");
+
+			var tmp_id_border = document.createAttribute('id_border');
+			tmp_id_border.value = id_border;
+
+			inputFile.setAttributeNode(tmp_id_border);
+			inputFile.id = "inputFile_" + id_border + "_" + countDivFiles;
+			inputFile.type = 'file';
+			inputFile.size = 50;
+			inputFile.maxLength = 255;
+			inputFile.name = 'file_' + countDivFiles;
+			inputFile.style.display = "none";
+		}
+		else {
+			var inputFile = document.createElement("link");
+
+			var tmp_id_border = document.createAttribute('id_border');
+			tmp_id_border.value = id_border;
+
+			inputFile.setAttributeNode(tmp_id_border);
+			inputFile.id = "inputFile_" + id_border + "_" + countDivFiles;
+			inputFile.name = 'file_' + countDivFiles;
+
+
+		}
+
+	}
+	else {
+		var inputFile = document.createElement("input");
+		inputFile.type = 'hidden';
+		inputFile.name = 'offline_forward_' + countDivFiles;
+	}
+	divFile.appendChild(inputFile);
+
+	var a_tmp = new Array();
+	a_tmp[0] = "local_";
+	a_tmp[1] = 'file_' + countDivFiles;
+	a_tmp[2] = file_name;
+	s_tmp = escape(connector.serialize(a_tmp));
+	var checkbox = document.createElement("INPUT");
+	checkbox.type = "checkbox";
+	checkbox.id = "checkbox_"+id_border+"_"+countDivFiles;
+	checkbox.name = "local_attachments[]";
+
+	checkbox.value = s_tmp;
+	divFile.appendChild(checkbox);
+
+	var link_attachment = document.createElement("A");
+	link_attachment.setAttribute("href", link);
+
+	link_attachment.innerHTML = file_name;
+	divFile.appendChild(link_attachment);
+
+	countDivFiles++;
+	divFile.id = "divFile_"+id_border+"_"+countDivFiles;
+	divFiles.appendChild(divFile);
+
+	checkbox.checked = true; //Incri­vel, mas no Internet Explorer o checked so funciona efetivamente se o elemente ja estiver renderizado... por isso so aqui eu seleciono ele...
+	return inputFile;
+}
+
 HeaderFlags.prototype.getAnswered = function()
 {
     return this.Answered;

@@ -19,9 +19,9 @@
 		}
 	}
 
-	messages_proxy.prototype.get_msg = function(msg_number,msg_folder,set_flag,call_back)
+	messages_proxy.prototype.get_msg = function( msg_number, msg_folder, set_flag, callback )
 	{
-		cExecute("$this.imap_functions.get_info_msg&msg_number="+ msg_number + "&msg_folder=" + url_encode(msg_folder), call_back );
+		Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': msg_number, 'msg_folder': msg_folder }, callback );
 	}
 	
 	messages_proxy.prototype.delete_msgs = function(folder, msgs_number, border_ID) {
@@ -310,13 +310,13 @@
 		
 	}
 
-   	messages_proxy.prototype.msg_img = function(msgs_number,folder_name,call_back) {
-     if(this.is_local_folder(folder_name)){
+   	messages_proxy.prototype.msg_img = function(msgs_number,msg_folder,callback) {
+     if(this.is_local_folder(msg_folder)){
          var msg = expresso_local_messages.get_local_mail(msgs_number);
 		 eval('call_back(msg)');
      }
      else
-        cExecute('$this.imap_functions.get_info_msg&msg_number='+msgs_number+'&msg_folder='+url_encode(folder_name),call_back);
+		Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': msg_number, 'msg_folder': msg_folder }, callback );
     }
 
 	messages_proxy.prototype.export_all_messages = function( folder )

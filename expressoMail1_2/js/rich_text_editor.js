@@ -270,37 +270,45 @@ cRichTextEditor.prototype.editorCommand = function(command, option) {
 	try {
 		var mainField = document.getElementById(this.editor).contentWindow;
 		mainField.focus();
-		if ( command == 'signature' ) {
-			var ID = this.editor.replace( 'body_', '' );
-			$('select#from_'+ID).find(':selected').data( 'use_signature', '1' );
-			$('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').remove();
-			SignatureFrame.redrawOnCaret( $('iframe#body_'+ID) );
-		}
-		else if (command == 'CreateLink')
-			mainField.document.execCommand('CreateLink', false, option);
-		else if (command == 'Table'){
-			if (is_ie){
-				var sel = document.selection;
-				if (sel!=null)
-				{
-				    var rng = sel.createRange();
-				    if (rng!=null)
-			        rng.pasteHTML(option);
+		switch ( command ) {
+
+			case 'signature':
+				var ID = this.editor.replace( 'body_', '' );
+				$('select#from_'+ID).find(':selected').data( 'use_signature', '1' );
+				$('iframe#body_'+ID).contents().find('iframe#use_signature_anchor').remove();
+				SignatureFrame.redrawOnCaret( $('iframe#body_'+ID) );
+				break;
+
+			case 'CreateLink':
+				mainField.document.execCommand('CreateLink', false, option);
+				break;
+
+			case 'Table':
+				if ( is_ie ) {
+					var sel = document.selection;
+					if ( sel != null ) {
+						var rng = sel.createRange();
+						if ( rng != null ) rng.pasteHTML(option);
+					}
+				} else mainField.document.execCommand('inserthtml', false, option);
+				break;
+
+			case 'Image':
+				mainField.document.execCommand('InsertImage', false, option);
+				break;
+
+			case 'spellCheck':
+				if ( preferences.use_SpellChecker != '0' ) {
+					beginSpellCheck(); // configure
+					spellCheck(); // run spellChecker
 				}
-			}
-			else 
-				mainField.document.execCommand('inserthtml', false, option);
-			}
-		else if (command == 'Image')
-			mainField.document.execCommand('InsertImage', false, option);
-                else if (command == 'spellCheck' && preferences.use_SpellChecker != '0'){
-                        beginSpellCheck(); // configure
-                        spellCheck(); // run spellChecker
-                }
-		else
-			mainField.document.execCommand(command, false, option);
+				break;
+
+			default:
+				mainField.document.execCommand(command, false, option);
+		}
 		//mainField.focus();
-    } catch (e) {/* alert(e);*/ }
+	} catch (e) {/* alert(e);*/ }
 }
 
 cRichTextEditor.prototype.createLink = function(){
@@ -323,65 +331,37 @@ cRichTextEditor.prototype.createLink = function(){
 	}
 }
 
+cRichTextEditor.prototype.insertImageHTML = function( img_id )
+{
+	var doc = document.getElementById( this.editor );
+	doc = doc.document ? doc.document : doc.contentWindow.document;
+	var img_html = '<img cid="'+img_id+'">';
+	if ( document.all ) {
+		var range = doc.selection.createRange();
+		range.pasteHTML( img_html );
+		range.collapse( false );
+		range.select();
+	} else doc.execCommand( 'insertHTML', false, img_html );
+};
+
 // It include the image file in emails body
 // It saves and attach in drafts folder and open it
 cRichTextEditor.prototype.addInputFile = function()
 {
 	//Begin: Verify if the image extension is allowed.
-	var imgExtensions = new Array("jpeg", "jpg", "gif", "png", "bmp", "xbm", "tiff", "pcx");
-	var inputFile = document.getElementById('inputFile_img');	
-	if(!inputFile.value) return false;
-	var fileExtension = inputFile.value.split(".");
-	fileExtension = fileExtension[(fileExtension.length-1)];
-	var deniedExtension = true;
-	for(var i=0; i<imgExtensions.length; i++) {
-		if(imgExtensions[i].toUpperCase() == fileExtension.toUpperCase()) {
-			deniedExtension = false;
-			break;
-		}
-	}
-	if(deniedExtension) {
-		alert(get_lang('File extension forbidden or invalid file') + '.');
+	var $inpt = $('#inputFile_img');
+	if ( !$inpt.val() ) return false;
+	if ( ![ 'jpeg', 'jpg', 'gif', 'png', 'bmp', 'xbm', 'tiff', 'pcx' ].includes( $inpt.val().split('.').pop().toLowerCase() ) ) {
+		alert( get_lang( 'File extension forbidden or invalid file' )+'.' );
 		return false;
 	}
 	// End: Verify image extension.
-	var id = this.editor.substr(5); // border_id
-	divFiles = document.getElementById("divFiles_"+id);
-	var countDivFiles = divFiles.childNodes.length + 1;
 
-	var divFiles = document.getElementById('divFiles_'+id);
-	inputFile.id = 'inputFile_'+id +"_"+countDivFiles;
-	inputFile.name = 'file_'+countDivFiles;
-	divFile = document.createElement('DIV');
-	divFile.appendChild(inputFile);
-	divFiles.appendChild(divFile);
-
-	var form_upload = document.getElementById('form_upload');
-	form_upload.parentNode.removeChild(form_upload);
+	var cid = parseInt(Date.now(),10).toString(32);
+	$('#content_id_'+this.id+' div.msg_attachs').append( $inpt.attr({ 'name': 'cid:'+cid }).detach() );
 	win.close();
-
-	RichTextEditor.saveFlag = 0; // See if save function finished
-	var save_link = document.getElementById("save_message_options_"+id);
-	save_msg(id,true);
-	RichTextEditor.insertImgHtml(id);
-}
-
-cRichTextEditor.prototype.insertImgHtml = function (id)
-{
-	if ( RichTextEditor.saveFlag == 0 )
-        {
-            setTimeout( function(){ RichTextEditor.insertImgHtml(id); },1000 );
-        }
-	else
-        {
-            if ( RichTextEditor.saveFlag == 1 )
-            {
-                var folderNameDraft = "INBOX" + cyrus_delimiter + draftsfolder;
-                this.editorCommand('Image', './inc/show_embedded_attach.php?msg_folder=' + folderNameDraft + '&msg_num='+openTab.imapUid[id]+'&msg_part='+(openTab.countFile[id]+1));
-                openTab.toPreserve[id] = true;
-                save_msg(id,true);
-            }
-        }
+	this.insertImageHTML( cid );
+	save_msg( this.id );
 }
 
 cRichTextEditor.prototype.insertTableHtml = function (){
@@ -448,10 +428,7 @@ cRichTextEditor.prototype.decrementField = function(id_val){
 }
 
 cRichTextEditor.prototype.createImage = function(){
-	if (preferences.auto_save_draft == 1){
-			autosave_time = 200000;
-			clearTimeout(openTab.autosave_timer[currentTab]);
-		}
+	if ( preferences.auto_save_draft == 1 ) clearTimeout( openTab.autosave_timer[currentTab] );
 	var form = document.getElementById("attachment_window");
 	if (form == null){
 		form = document.createElement("DIV");

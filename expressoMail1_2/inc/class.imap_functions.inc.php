@@ -32,7 +32,7 @@ class imap_functions
 	var $imap_sentfolder;
 	var $fullNameUser;
 
-	function __construct(){
+	public function __construct(){
 		$this->foldersLimit     = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['imap_max_folders'] ?  $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['imap_max_folders'] : 20000; //Limit of folders (mailboxes) user can see
 		$this->username         = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
 		$this->password         = $_SESSION['phpgw_info']['expressomail']['user']['passwd'];
@@ -57,15 +57,10 @@ class imap_functions
 		}	
 	}
 
-	function __destruct()
-	{
-		$this->close_mbox( $this->mbox );
-	}
-
 	// BEGIN of functions.
 	function open_mbox($folder = false , $force_die = true)
 	{
-		$folder = mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
+		$folder = mb_convert_encoding($folder, "UTF7-IMAP","UTF8, ISO-8859-1");
 		if (is_resource($this->mbox))
         	{
 			if ($force_die)
@@ -622,6 +617,9 @@ class imap_functions
 
 	function get_info_msg($params)
 	{
+		include_once( 'class.message_reader.inc.php' );
+		$mail_reader = new MessageReader();
+
 		$return = array();
 		$msg_number = $params['msg_number'];
 		if(preg_match('/(.+)(_[a-zA-Z0-9]+)/',$msg_number,$matches)) { //Verifies if it comes from a tab diferent of the main one.
@@ -633,8 +631,8 @@ class imap_functions
 		}
 		$msg_folder = urldecode($params['msg_folder']);
 
-		if(!$this->mbox || !is_resource($this->mbox))
-			$this->mbox = $this->open_mbox($msg_folder);
+		if ( !$this->mbox || !is_resource( $this->mbox ) ) $this->mbox = $this->open_mbox( $msg_folder );
+
 		$header = $this->get_header($msg_number);
 		if (!$header) {
 			$return['status_get_msg_info'] = "false";
@@ -642,10 +640,13 @@ class imap_functions
 		}
 
 		$header_src = imap_fetchheader( $this->mbox, $msg_number, FT_UID );
+		$attachments = $mail_reader->setMessage( $this->mbox, $msg_folder, $msg_number )->getAttachInfo();
 
 		$return_get_body = $this->get_body_msg( $msg_number, $msg_folder );
+		$return_get_body['attachments'] = $attachments;
+
 		$body = $return_get_body['body'];
-		
+
 		$return['type'] = isset( $return_get_body['type'] )? $return_get_body['type'] : false;
 		
 		if( isset($return_get_body['hash_vcalendar']))
@@ -915,6 +916,11 @@ class imap_functions
 			$return['msg_number']  = $new_mail['msg_no'];
 			$return['type']        = isset( $new_mail['type'] )? $new_mail['type'] : $return['type'];
 		}
+
+		// compatibility of names
+		$return['uid']     = $return['msg_number'];
+		$return['folder']  = $return['msg_folder'];
+		$return['attachs'] = $return['attachments'];
 		return $return;
 	}
 
@@ -2332,429 +2338,7 @@ class imap_functions
 		$this->close_mbox($mbox);
 		return $return;
 	}
-	
-	function send_mail($params)
-	{
-		include_once("class.phpmailer.php");
-		$mail = new PHPMailer();
-		include_once("class.db_functions.inc.php");
-		$db = new db_functions();
-		$fromaddress = ( isset($params['input_from']) ? explode(';',$params['input_from']) : "" );
-		##
-		# @AUTHOR Rodrigo Souza dos Santos
-		# @DATE 2008/09/17$fileName
-		# @BRIEF Checks if the user has permission to send an email with the email address used.
-		##
-		if ( is_array($fromaddress) && ($fromaddress[1] != $_SESSION['phpgw_info']['expressomail']['user']['email']) )
-		{
-			$deny = true;
-			$shared_mailboxes = array();
-			
-			if ( isset($_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes']) ) {
-				
-				$shared_mailboxes = $_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes'];
-				
-			} else {
-				
-				$this->ldap = new ldap_functions();
-				$mbox_stream = $this->open_mbox();
-				
-				$folders_list = imap_getmailboxes(
-					$mbox_stream,
-					'{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}',
-					'user'.$this->imap_delimiter.'%'
-				);
-				
-				$uids = array_map( function( $val ) {
-					return substr( $val->name, strrpos( $val->name, $val->delimiter ) + 1 );
-				}, $folders_list );
-				
-				$shared_mailboxes = $this->ldap->getSharedUsersFrom( array( 'uids' => implode( ';', $uids ) ) );
-			}
-			
-			foreach ( $shared_mailboxes as $key => $val ) {
-				if ( isset( $val['mail'] ) && $val['mail'] == $fromaddress[1] ) {
-					$deny = false;
-					break;
-				}
-			}
-			
-			if ( $deny )
-				return "The server denied your request to send a mail, you cannot use this mail address.";
-		}
 
-		$toaddress = implode(',',$db->getAddrs(explode(',',$params['input_to'])));
-		$ccaddress = implode(',',$db->getAddrs(explode(',',$params['input_cc'])));
-		$ccoaddress = implode(',',$db->getAddrs(explode(',',$params['input_cco'])));
-		$replytoaddress = $params['input_replyto'];
-		$subject = $params['input_subject'];
-		$msg_uid = $params['msg_id'];
-		
-		$return_receipt = isset( $params['input_return_receipt']    )? $params['input_return_receipt']    : false;
-		$is_important   = isset( $params['input_important_message'] )? $params['input_important_message'] : false;
-		$encrypt        = isset( $params['input_return_cripto']     )? $params['input_return_cripto']     : false;
-		$signed         = isset( $params['input_return_digital']    )? $params['input_return_digital']    : false;
-		
-		if ( isset($params['smime']) && $params['smime'] )
-        {
-            $body = $params['smime'];
-            $mail->SMIME = true;
-            // A MSG assinada deve ser testada neste ponto.
-            // Testar o certificado e a integridade da msg....
-            include_once(dirname( __FILE__ ) ."/../../security/classes/CertificadoB.php");
-            $erros_acumulados = '';
-            $certificado = new certificadoB();
-            $validade = $certificado->verificar($body);
-            if(!$validade)
-            {
-                foreach($certificado->erros_ssl as $linha_erro)
-                {
-                    $erros_acumulados .= $linha_erro;
-                }
-            }
-            else
-            {
-                // Testa o CERTIFICADO: se o CPF  he o do usuario logado, se  pode assinar msgs e se  nao esta expirado...
-                if ($certificado->apresentado)
-                {
-                    if($certificado->dados['EXPIRADO']) $erros_acumulados .='Certificado expirado.';
-                    if($certificado->dados['CPF'] != $this->username) $erros_acumulados .=' CPF no certificado diferente do logado no expresso.';
-                    if(!($certificado->dados['KEYUSAGE']['digitalSignature'] && $certificado->dados['EXTKEYUSAGE']['emailProtection'])) $erros_acumulados .=' Certificado nao permite assinar mensagens.';
-                }
-                else
-                {
-                    $$erros_acumulados .= 'Nao foi possivel usar o certificado para assinar a msg';
-                }
-            }
-            if(!$erros_acumulados =='')
-            {
-                return $erros_acumulados;
-            }
-        }
-        else
-        {
-            $body = $params['body'];
-	    //Compatibilização com Outlook, ao encaminhar a mensagem
-	    $body = mb_ereg_replace('<!--\[','<!-- [',$body);
-        }
-		//echo "<script language=\"javascript\">javascript:alert('".$body."');</script>";
-		$attachments = $_FILES;
-		$forwarding_attachments = isset( $params['forwarding_attachments'] )? $params['forwarding_attachments'] : array();
-		$local_attachments      = isset( $params['local_attachments'] )?      $params['local_attachments']      : array();
-
-		//Test if must be saved in shared folder and change if necessary
-		if( isset($fromaddress[2]) && $fromaddress[2] == 'y' ){
-			//build shared folder path
-			$newfolder = "user".$this->imap_delimiter.$fromaddress[3].$this->imap_delimiter.$this->imap_sentfolder;
-			if( $this->folder_exists($newfolder) ) $folder = $newfolder;
-			else $folder =  $params['folder'];  			
-		} else	{
-			$folder = $params['folder'];			
-		}
-		
-		$folder = mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
-		$folder_name = isset( $params['folder_name'] )? $params['folder_name'] : false;
-		// Fix problem with cyrus delimiter changes.
-		// Dots in names: enabled/disabled.
-		$folder = @preg_replace("#INBOX/#i", "INBOX".$this->imap_delimiter, $folder);
-		$folder = @preg_replace("#INBOX.#i", "INBOX".$this->imap_delimiter, $folder);
-		// End Fix.
-		if ($folder != 'null'){
-			$mail->SaveMessageInFolder = $folder;
-		}
-////////////////////////////////////////////////////////////////////////////////////////////////////
-		$mail->SMTPDebug = false;
-
-		if($signed && !$params['smime'])
-		{
-            $mail->Mailer = "smime";
-			$mail->SignedBody = true;
-		}
-		else
-            $mail->IsSMTP();
-
-		$mail->Host = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpServer'];
-		$mail->Port = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpPort'];
-		$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];
-		$mail->FromName = $this->fullNameUser;
-		if($fromaddress){
-			$mail->Sender = $mail->From;
-			$mail->SenderName = $mail->FromName;
-			$mail->FromName = $fromaddress[0];
-			$mail->From = $fromaddress[1];
-		}
-
-		$this->add_recipients("to", $toaddress, $mail);
-		$this->add_recipients("cc", $ccaddress, $mail);
-		$this->add_recipients("cco", $ccoaddress, $mail);
-		if ($replytoaddress !="") 
-		{
-		$mail->AddReplyTo($replytoaddress);
-		}
-		$mail->Subject = $subject;
-		$mail->IsHTML( ( array_key_exists( 'type', $params ) && in_array( strtolower( $params[ 'type' ] ), array( 'html', 'plain' ) ) ) ? strtolower( $params[ 'type' ] ) != 'plain' : true );
-		$mail->Body = $body;
-		$mail->CharSet = mb_detect_encoding( $body, 'UTF-8, ISO-8859-1' );
-
-        if (($encrypt && $signed && $params['smime']) || ($encrypt && !$signed))	// a msg deve ser enviada cifrada...
-		{
-			$email = $this->add_recipients_cert($toaddress . ',' . $ccaddress. ',' .$ccoaddress);
-            $email = explode(",",$email);
-            // Deve ser testado se foram obtidos os certificados de todos os destinatarios.
-            // Deve ser verificado um numero limite de destinatarios.
-            // Deve ser verificado se os certificados sao validos.
-            // Se uma das verificacoes falhar, nao enviar o e-mail e avisar o usuario.
-            // O array $mail->Certs_crypt soh deve ser preenchido se os certificados passarem nas verificacoes.
-            $numero_maximo = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['num_max_certs_to_cipher'];  // Este valor dever ser configurado pelo administrador do site ....
-            $erros_acumulados = "";
-            $aux_mails = array();
-            $mail_list = array();
-            if(count($email) > $numero_maximo)
-            {
-                $erros_acumulados .= "Excedido o numero maximo (" . $numero_maximo . ") de destinatarios para uma msg cifrada...." . chr(0x0A);
-                return $erros_acumulados;
-            }
-            // adiciona o email do remetente. eh para cifrar a msg para ele tambem. Assim vai poder visualizar a msg na pasta enviados..
-            $email[] = $_SESSION['phpgw_info']['expressomail']['user']['email'];
-            foreach($email as $item)
-            {
-                $certificate = $db->get_certificate(strtolower($item));
-                if(!$certificate)
-                {
-                    $erros_acumulados .= "Chamada com parametro invalido.  e-Mail nao pode ser vazio." . chr(0x0A);
-                    return $erros_acumulados;
-                }
-
-                if (array_key_exists("dberr1", $certificate))
-                {
-
-                    $erros_acumulados .= "Ocorreu um erro quando pesquisava certificados dos destinatarios para cifrar a msg." . chr(0x0A);
-                    return $erros_acumulados;
-				}
-                if (array_key_exists("dberr2", $certificate))
-                {
-                    $erros_acumulados .=  $item . ' : Nao  pode cifrar a msg. Certificado nao localizado.' . chr(0x0A);
-                    //continue;
-                }
-			/*  Retirado este teste para evitar mensagem de erro duplicada.
-                if (!array_key_exists("certs", $certificate))
-              	{
-               		$erros_acumulados .=  $item . ' : Nao  pode cifrar a msg. Certificado nao localizado.' . chr(0x0A);
-                    continue;
-                }
-            */
-                include_once(dirname( __FILE__ ) ."/../../security/classes/CertificadoB.php");
-
-                foreach ($certificate['certs'] as $registro)
-                {
-                    $c1 = new certificadoB();
-                    $c1->certificado($registro['chave_publica']);
-                    if ($c1->apresentado)
-                    {
-                        $c2 = new Verifica_Certificado($c1->dados,$registro['chave_publica']);
-                        if (!$c1->dados['EXPIRADO'] && !$c2->revogado && $c2->status)
-                        {
-                            $aux_mails[] = $registro['chave_publica'];
-                            $mail_list[] = strtolower($item);
-                        }
-                        else
-                        {
-                            if ($c1->dados['EXPIRADO'] || $c2->revogado)
-                            {
-                                $db->update_certificate($c1->dados['SERIALNUMBER'],$c1->dados['EMAIL'],$c1->dados['AUTHORITYKEYIDENTIFIER'],
-                                    $c1->dados['EXPIRADO'],$c2->revogado);
-                            }
-
-                            $erros_acumulados .= $item . ':  ' . $c2->msgerro . chr(0x0A);
-                            foreach($c2->erros_ssl as $linha)
-                            {
-                                $erros_acumulados .=  $linha . chr(0x0A);
-                            }
-                            $erros_acumulados .=  'Emissor: ' . $c1->dados['EMISSOR'] . chr(0x0A);
-                            $erros_acumulados .=  $c1->dados['CRLDISTRIBUTIONPOINTS'] . chr(0x0A);
-                        }
-                    }
-                    else
-                    {
-                        $erros_acumulados .= $item . ' : Nao  pode cifrar a msg. Certificado invalido.' . chr(0x0A);
-                    }
-                }
-            	if(!(in_array(strtolower($item),$mail_list)) && !empty($erros_acumulados))
-				{
-					return $erros_acumulados;
-        		}
-            }
-
-            $mail->Certs_crypt = $aux_mails;
-        }
-                // Build CID images 
-		$this->buildEmbeddedImages($mail,$msg_uid,$forwarding_attachments); 
-
-		//	Build Uploading Attachments!!!
-		if (count($attachments)>0) //Caso seja forward normal...
-		{
-			$total_uploaded_size = 0;
-			$upload_max_filesize = str_replace("M","",$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['max_attachment_size']) * 1024 * 1024;
-			foreach ($attachments as $attach)
-			{
-                                if($attach['error'] == UPLOAD_ERR_INI_SIZE)
-                                    return $this->parse_error("message file too big");
-				if($attach['name']=='Unknown')
-					continue;
-				$mail->AddAttachment($attach['tmp_name'], $attach['name'], "base64", $this->get_file_type($attach['name']));  // optional name
-				$total_uploaded_size = $total_uploaded_size + $attach['size'];
-			}
-			if( $total_uploaded_size > $upload_max_filesize){
-				return $this->parse_error("message file too big");
-			}
-		}
-		if(count($local_attachments)>0) { //Caso seja forward de mensagens locais
-
-			$total_uploaded_size = 0;
-			$upload_max_filesize = str_replace("M","",ini_get('upload_max_filesize')) * 1024 * 1024;
-			foreach($local_attachments as $local_attachment) {
-				$file_description = unserialize(rawurldecode($local_attachment));
-				$tmp = array_values($file_description);
-				foreach($file_description as $i => $descriptor){
-					$tmp[$i]  = preg_replace('/\'*\'/i','',$descriptor);
-				}
-				$mail->AddAttachment($_FILES[$tmp[1]]['tmp_name'], $tmp[2], "base64", $this->get_file_type($tmp[2]));  // optional name
-				$total_uploaded_size = $total_uploaded_size + $_FILES[$tmp[1]]['size'];
-			}
-			if( $total_uploaded_size > $upload_max_filesize)
-				return 'false';
-		}
-////////////////////////////////////////////////////////////////////////////////////////////////////
-		//	Build Forwarding Attachments!!!
-		if (count($forwarding_attachments) > 0)
-		{
-			// Bug fixed for array_search function
-			$name_cid_files = array(); 
-			if(count($name_cid_files) > 0) {
-				$name_cid_files[count($name_cid_files)] = $name_cid_files[0];
-				$name_cid_files[0] = null;
-			}
-
-			foreach($forwarding_attachments as $forwarding_attachment)
-			{
-					$file_description = unserialize(rawurldecode($forwarding_attachment));
-					$tmp = array_values($file_description);
-					foreach($file_description as $i => $descriptor){
-						$tmp[$i]  = preg_replace('/\'*\'/i','',$descriptor);
-					}
-					$file_description = $tmp;
-					$fileContent = $this->get_forwarding_attachment($file_description[0], $file_description[1], $file_description[3],$file_description[4]);
-					$fileName = $file_description[2];
-					if(!array_search(trim($fileName),$name_cid_files)) {
-						$mail->AddStringAttachment($fileContent,html_entity_decode(rawurldecode($fileName)), $file_description[4], $this->get_file_type($file_description[2]));
-				}
-			}
-		}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Important message
-		if($is_important)
-			$mail->isImportant();
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Disposition-Notification-To
-		if ($return_receipt)
-			$mail->ConfirmReadingTo = $_SESSION['phpgw_info']['expressomail']['user']['email'];
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		$sent = $mail->Send();
-
-		if(!$sent)
-		{
-   			return $this->parse_error($mail->ErrorInfo);
-		}
-		else
-		{
-            if ($signed && !$params['smime'])
-			{
-				return $sent;
-			}
-			if($_SESSION['phpgw_info']['server']['expressomail']['expressoMail_enable_log_messages'] == "True")
-			{
-				$userid = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
-				$userip = $_SESSION['phpgw_info']['expressomail']['user']['session_ip'];
-				$now = date("d/m/y H:i:s");
-				$addrs = $toaddress.$ccaddress.$ccoaddress;
-				$sent = trim($sent);
-			}
-			if($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['number_of_contacts'] &&
-		   	   $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_dynamic_contacts']) {
-				$contacts = new dynamic_contacts();
-				$new_contacts = $contacts->add_dynamic_contacts($toaddress.",".$ccaddress.",".$ccoaddress);
-				return array("success" => true, "new_contacts" => $new_contacts, 'refresh_folders' => $mail->RefreshFolders );
-			}
-   			return array("success" => true, 'refresh_folders' => $mail->RefreshFolders );
-		}
-	}
-	function buildEmbeddedImages(&$mail,$msg_uid,&$forwarding_attachments) 
-	{ 
-		//      Build CID for embedded Images!!! 
-		$return_forward = array();
-		$pattern = '/src="([^"]*?show_embedded_attach.php\?msg_folder=(.+)?&(amp;)?msg_num=(.+)?&(amp;)?msg_part=(.+)?)"/isU'; 
-		$cid_imgs = ''; 
-		preg_match_all($pattern,$mail->Body,$cid_imgs,PREG_PATTERN_ORDER); 
-		$cid_array = array(); 
-		foreach($cid_imgs[6] as $j => $val){
-			
-			if ( !array_key_exists($cid_imgs[4][$j].$val, $cid_array) ) 
-			{ 
-				$cid_array[$cid_imgs[4][$j].$val] = base_convert(microtime(), 10, 36); 
-			} 
-			$cid = $cid_array[$cid_imgs[4][$j].$val];  
-			$mail->Body = str_replace($cid_imgs[1][$j], "cid:".$cid, $mail->Body);
-			
-			if ($msg_uid != $cid_imgs[4][$j]) // The image is not in the same mail? 
-			{ 
-				$fileContent = $this->get_forwarding_attachment($cid_imgs[2][$j], $cid_imgs[4][$j], $cid_imgs[6][$j], 'base64'); 
-				//prototype: get_forwarding_attachment ( folder, msg number, part, encoding) 
-				$fileName = "image_".($j).".jpg"; 
-				$fileCode = "base64"; 
-				$fileType = "image/jpg"; 
-				$file_attached[0] = $cid_imgs[2][$j]; 
-				$file_attached[1] = $cid_imgs[4][$j]; 
-				$file_attached[2] = $fileName; 
-				$file_attached[3] = $cid_imgs[6][$j]; 
-				$file_attached[4] = 'base64'; 
-				$file_attached[5] = strlen($fileContent); //Size of file 
-				$return_forward[] = $file_attached; 
-
-				$attachment_ = unserialize(rawurldecode($forwarding_attachments[$cid_imgs[6][$j]-2])); 
-				if ($file_attached[3] == $attachment_[3]) 
-					unset($forwarding_attachments[$cid_imgs[6][$j]-2]); 	
-			} 
-			else 
-			{ 
-				$attach_img = $forwarding_attachments[$cid_imgs[6][$j]-2]; 
-				$file_description = unserialize(rawurldecode($attach_img)); 
-				if (is_array($file_description)) {
-					foreach($file_description as $i => $descriptor) {
-						$file_description[$i]  = preg_replace('/\'*\'/i','',$descriptor); 
-					}
-				}
-				$fileContent = $this->get_forwarding_attachment($file_description[0], $msg_uid, $file_description[3], 'base64'); 
-				$fileName = $file_description[2]; 
-				$fileCode = $file_description[4]; 
-				$fileType = $this->get_file_type($file_description[2]); 
-				unset($forwarding_attachments[$cid_imgs[6][$j]-2]); 
-				if (!empty($file_description)) 
-				{ 
-					$file_description[5] = strlen($fileContent); //Size of file 
-					$return_forward[] = $file_description; 
-				} 
-			}
-			
-			if ($fileContent) {
-				$mail->AddStringEmbeddedImage( $fileContent, $cid, $fileName, $fileCode, $fileType );
-			}
-		}
-		return $return_forward; 
-	}
-	
 	function add_recipients_cert($full_address)
 	{
 		$result = "";
@@ -2832,12 +2416,6 @@ class imap_functions
 		else if($encoding == 'quoted-printable')
 			$fileContent = quoted_printable_decode($fileContent);
 		return $fileContent;
-	}
-
-	function del_last_caracter($string)
-	{
-		$string = substr($string,0,(strlen($string) - 1));
-		return $string;
 	}
 
 	function del_last_two_caracters($string)
@@ -2931,7 +2509,6 @@ class imap_functions
 		return $sort;
 
 	}
-
 
 	function move_search_messages($params){
 		$params['selected_messages'] = urldecode($params['selected_messages']);
@@ -3113,185 +2690,332 @@ class imap_functions
 		}
 	}
 
-	function save_msg($params)
+	public function send_mail( $params )
 	{
+		if ( !$this->check_from_acl( $params ) ) return "The server denied your request to send a mail, you cannot use this mail address.";
 
-		include_once("class.phpmailer.php");
-		$mail = new PHPMailer();
-		include_once("class.db_functions.inc.php");
-		$toaddress = $params['input_to'];
-		$ccaddress = $params['input_cc'];
-		$ccoaddress = $params['input_cco'];
-		$replytoaddress = ( isset($params['input_replyto']) ? $params['input_replyto'] : "" );
-		$return_receipt = ( isset($params['input_return_receipt']) ? $params['input_return_receipt'] : "" );
-		$is_important = ( isset($params['input_important_message']) ? $params['input_important_message'] : "" );
-		$subject = $params['input_subject'];
-		$msg_uid = $params['msg_id'];
-		$forwarding_attachments = ( isset($params['forwarding_attachments']) ? $params['forwarding_attachments'] : false );
-		$attachments = ( isset($params['FILES']) ? $params['FILES'] : array() );
-		$return_files = ( isset($params['FILES'])? $params['FILES'] :  array() );
-		
-		$folder = $params['folder'];
-		$folder = mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
-		// Fix problem with cyrus delimiter changes.
-		// Dots in names: enabled/disabled.
-		$folder = preg_replace("#INBOX/#i", "INBOX".$this->imap_delimiter, $folder);
-		$folder = preg_replace("#INBOX.#i", "INBOX".$this->imap_delimiter, $folder);
-		$folder = trim($folder);
-		
-		// End Fix.
-		if(strtoupper($folder) === 'INBOX'.$this->imap_delimiter.'DRAFTS'){ $mail->SaveMessageAsDraft = $folder; }
+		$mail = $this->compose_msg( $params );
 
-		$mail->SaveMessageInFolder = $folder;
-		$mail->SMTPDebug = false;
+		if ( !( $sent = $mail->Send() ) ) $this->parse_error( $mail->ErrorInfo );
 
-		$mail->IsSMTP();
-		$mail->Host = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpServer'];
-		$mail->Port = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpPort'];
-		$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];
-		$mail->FromName = $this->fullNameUser;
+		if ( $signed && !$params['smime'] ) return $sent;
 
-		$mail->Sender = $mail->From;
-		$mail->SenderName = $mail->FromName;
-
-		$this->add_recipients("to", $toaddress, $mail);
-		$this->add_recipients("cc", $ccaddress, $mail);
-		$this->add_recipients("cco", $ccoaddress, $mail);
-		$mail->AddReplyTo($replytoaddress);
-		$mail->Subject = $subject;
-		$mail->Body    = $params['body'];
-		$mail->CharSet = mb_detect_encoding( $params['body'], 'UTF-8, ISO-8859-1' );
-		$mail->IsHTML( !( isset( $params['type'] ) && strtolower( $params['type'] ) == 'plain' ) );
-		
-		// Important message
-		if( trim($is_important) !== "" ){ $mail->isImportant(); }
-
-		// Disposition-Notification-To
-		if( trim($return_receipt) !== "" ){
-			$mail->ConfirmReadingTo = $_SESSION['phpgw_info']['expressomail']['user']['email'];
+		if (
+			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['number_of_contacts'] &&
+			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_dynamic_contacts']
+		) {
+			$contacts     = new dynamic_contacts();
+			$new_contacts = $contacts->add_dynamic_contacts( implode( ',', array_merge( $mail->GetAddresses( 'to' ), $mail->GetAddresses( 'cc' ), $mail->GetAddresses( 'bcc' ) ) ) );
+			return array("success" => true, "new_contacts" => $new_contacts, 'refresh_folders' => $mail->RefreshFolders );
 		}
 
-		$return_forward = $this->buildEmbeddedImages($mail,$msg_uid,$forwarding_attachments); 
+		return array( 'success' => true, 'refresh_folders' => $mail->RefreshFolders );
+	}
 
-		// Build Forwarding Attachments!!!
-		if( $forwarding_attachments && count($forwarding_attachments) > 0 )
-		{
-			foreach($forwarding_attachments as $forwarding_attachment)
-			{
-				$file_description = unserialize(rawurldecode($forwarding_attachment));
-				$tmp = array_values($file_description);
-				foreach($file_description as $i => $descriptor){
-					$tmp[$i]  = preg_replace('/\'*\'/i','',$descriptor);
-				}
-				$file_description = $tmp;
+	public function save_msg( $params )
+	{
+		include_once 'class.message_reader.inc.php';
 
-				$fileContent = $this->get_forwarding_attachment($file_description[0], $file_description[1], $file_description[3],$file_description[4]);
-				$fileName = $file_description[2];
+		$msg_uid     = ( isset( $params['msg_id'                 ] ) && $params['msg_id'                       ] > 0      )? $params['msg_id'] : false;
 
-				$file_description[5] = strlen($fileContent); //Size of file
-				$return_forward[] = $file_description;
+		$mail        = $this->compose_msg( $params );
+		$mail_reader = new MessageReader();
 
-				$mail->AddStringAttachment($fileContent, $fileName, $file_description[4], $this->get_file_type($file_description[2]));
-			}
-		}
+		$new_header  = str_replace( "\n", "\r\n", $mail->CreateHeader() );
+		$new_body    = str_replace( "\n", "\r\n", $mail->CreateBody()   );
+		$folder      = mb_convert_encoding( $mail->SaveMessageInFolder, 'UTF-8', 'UTF7-IMAP' );
 
-		if ((count($return_forward) > 0) && (count($return_files) > 0)){
-			$return_files = array_merge_recursive($return_forward,$return_files);
-		} else {
-			if ( count($return_files) < 1 ){
-				$return_files = $return_forward;
-			}
-		}
+		$this->open_mbox( $folder );
 
-		//	Build Uploading Attachments!!!
-		$sizeof_attachments = count($attachments);
-		if ($sizeof_attachments) {
-			foreach ($attachments as $numb => $attach) {
-				if( $numb == ($sizeof_attachments-1) && ( isset($params['insertImg']) && $params['insertImg'] == 'true' ) ) { // Auto-resize image
-					list($width, $height,$image_type) = getimagesize($attach['tmp_name']);
-					switch ($image_type) {
-						// Do not corrupt animated gif
-						//case 1: $image_big = imagecreatefromgif($attach['tmp_name']);break;
-						case 2: $image_big = imagecreatefromjpeg($attach['tmp_name']);  break;
-						case 3: $image_big = imagecreatefrompng($attach['tmp_name']); break;
-						case 6:
-							require_once("gd_functions.php");
-							$image_big = imagecreatefrombmp($attach['tmp_name']); break;
-						default:
-							$mail->AddAttachment($attach['tmp_name'], $attach['name'], "base64", $this->get_file_type($attach['name']));
-							break;
-					}
-					$max_resolution = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['image_size'];
-					$max_resolution = ($max_resolution==""?'65536':$max_resolution);
-					if ($width < $max_resolution && $height < $max_resolution){
-						$new_width = $width;
-						$new_height = $height;
-					} else if ($width > $max_resolution){
-						$new_width = $max_resolution;
-						$new_height = $height*($new_width/$width);
-					} else {
-						$new_height = $max_resolution;
-						$new_width = $width*($new_height/$height);
-					}
-					$image_new = imagecreatetruecolor($new_width, $new_height);
-					imagecopyresampled($image_new, $image_big, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-					
-					ob_start();
-					imagejpeg( $image_new,null, 85 );
-					$fileContent = ob_get_contents();
-					ob_end_clean();
-					
-					$mail->AddStringAttachment( $fileContent, $attach['name'], "base64", $this->get_file_type($attach['name']) );
-				} else {
-					if( isset($attach['isbase64']) && $attach['isbase64'] ){
-						$mail->AddStringAttachment( base64_decode($attach['source']), $attach['name'], "base64", $this->get_file_type($attach['name']) );
-					} else {
-						$mail->AddAttachment($attach['tmp_name'], $attach['name'], "base64", $this->get_file_type($attach['name']));
-					}
-				}
-			}
-		}
+		if ( !imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, $new_header . $new_body, '\Seen \Draft' ) )
+			return array( 'status' => false, 'error' => imap_last_error() );
 
-		if( !empty($mail->AltBody) ){ 
-			$mail->ContentType = "multipart/alternative"; 
-		}
+		$sa_uidnext  = imap_status( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, SA_UIDNEXT );
+		$mail_reader->setMessage( $this->mbox, $folder, ( $sa_uidnext->uidnext-1 ) );
 
-		$mail->error_count = 0; // reset errors
-		$mail->SetMessageType();
-		$header = $mail->CreateHeader();
-		$body = $mail->CreateBody();
+		$return          = $mail_reader->getInfo();
+		$return->subject = $mail->Subject;
+		$return->status  = true;
 
-		$mbox_stream = $this->open_mbox($folder);
-		$new_header = str_replace("\n", "\r\n", $header);
-		$new_body = str_replace("\n", "\r\n", $body);
-		$return['save_draft'] = imap_append($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, $new_header . $new_body, "\\Seen \\Draft");
-		$status = imap_status($mbox_stream, "{".$this->imap_server.":".$this->imap_port."}".$folder, SA_UIDNEXT);
-		$return['msg_no'] = $status->uidnext - 1;
-		$return['folder_id'] = $folder;
+		if ( $msg_uid !== false ) {
+			imap_delete( $this->mbox, $msg_uid, FT_UID );
+			$this->close_mbox( $this->mbox, CL_EXPUNGE );
+		} else $this->close_mbox( $this->mbox );
 
-		if( $mbox_stream ){ $this->close_mbox($mbox_stream); }
-
-		if (is_array($return_files)){
-			foreach ($return_files as $index => $_attachment) {
-				if (array_key_exists("name",$_attachment)){
-					unset($return_files[$index]);
-					$return_files[$index] = $_attachment['name']."_SIZE_".$return_files[$index][1] = $_attachment['size'];
-				} else {
-					unset($return_files[$index]);
-					$return_files[$index] = $_attachment[2]."_SIZE_". $return_files[$index][1] = $_attachment[5];
-				}
-			}
-		}
-
-		$return['files'] = serialize($return_files);
-		$return["subject"] = $subject;
-
-		if( !$return['save_draft'] ){
-			$return['save_draft'] = imap_last_error();
-			$return['has_error'] = true;
-		}
-		
 		return $return;
+	}
+
+	protected function compose_msg( $params )
+	{
+		include_once 'class.phpmailer.php';
+		include_once 'class.message_reader.inc.php';
+		include_once 'class.db_functions.inc.php';
+
+		$mail           = new PHPMailer();
+		$mail_reader    = new MessageReader();
+		$db             = new db_functions();
+
+		$body           = isset( $params['body'] )? $params['body'] : '';
+		$folder         = ( isset( $params['folder']                  ) && trim( $params['folder']                  ) !== '' )? trim( $params['folder']        ) : false;
+		$subject        = ( isset( $params['input_subject']           ) && trim( $params['input_subject']           ) !== '' )? trim( $params['input_subject'] ) : false;
+		$fromaddress    = ( isset( $params['input_from']              ) && trim( $params['input_from']              ) !== '' )? explode( ';', trim( $params['input_from'] ) ) : false;
+		$toaddress      = ( isset( $params['input_to']                ) && trim( $params['input_to']                ) !== '' )? trim( $params['input_to']      ) : false;
+		$ccaddress      = ( isset( $params['input_cc']                ) && trim( $params['input_cc']                ) !== '' )? trim( $params['input_cc']      ) : false;
+		$ccoaddress     = ( isset( $params['input_cco']               ) && trim( $params['input_cco']               ) !== '' )? trim( $params['input_cco']     ) : false;
+		$replytoaddress = ( isset( $params['input_replyto']           ) && trim( $params['input_replyto']           ) !== '' )? trim( $params['input_replyto'] ) : false;
+		$smime          = ( isset( $params['smime']                   ) && trim( $params['smime']                   ) !== '' )? trim( $params['smime']         ) : false;
+		$encrypt        = ( isset( $params['input_return_cripto']     ) && trim( $params['input_return_cripto']     ) !== '' );
+		$signed         = ( isset( $params['input_return_digital']    ) && trim( $params['input_return_digital']    ) !== '' );
+		$return_receipt = ( isset( $params['input_return_receipt']    ) && trim( $params['input_return_receipt']    ) !== '' );
+		$is_important   = ( isset( $params['input_important_message'] ) && trim( $params['input_important_message'] ) !== '' );
+		$is_html        = !( isset( $params['type']                   ) && trim( $params['type']                    ) === 'plain' );
+		$fwrd_attachs   = isset( $params['forwarding_attachments'] )? array_map( 'json_decode', $params['forwarding_attachments'] ) : array();
+		$attachments    = isset( $_FILES )? $_FILES : array();
+
+		//Test if must be saved in shared folder and change if necessary
+		if( isset($fromaddress[2]) && $fromaddress[2] == 'y' ){
+			//build shared folder path
+			$newfolder = "user".$this->imap_delimiter.$fromaddress[3].$this->imap_delimiter.$this->imap_sentfolder;
+			if( $this->folder_exists($newfolder) ) $folder = $newfolder;
+		}
+
+		if ( $smime ) {
+			$error = $this->check_smime( $mail, $smime );
+			if( count( $error ) ) foreach ( $error as $msg ) $mail->SetError( $msg );
+		} else $body = mb_ereg_replace( '<!--\[', '<!-- [', $body ); //Compatibilização com Outlook, ao encaminhar a mensagem
+
+		if ( $signed && !$smime ) {
+			$mail->Mailer          = 'smime';
+			$mail->SignedBody      = true;
+		} else $mail->IsSMTP();
+
+		if ( $toaddress      ) $this->add_recipients( 'to',  implode( ',', $db->getAddrs( explode( ',', $toaddress  ) ) ), $mail );
+		if ( $ccaddress      ) $this->add_recipients( 'cc',  implode( ',', $db->getAddrs( explode( ',', $ccaddress  ) ) ), $mail );
+		if ( $ccoaddress     ) $this->add_recipients( 'cco', implode( ',', $db->getAddrs( explode( ',', $ccoaddress ) ) ), $mail );
+
+		if ( ( $encrypt && $signed && $smime ) || ( $encrypt && !$signed ) ) {
+			$error = $this->check_smime( $mail, $db );
+			if( count( $error ) ) foreach ( $error as $msg ) $mail->SetError( $msg );
+		}
+
+		$mail->SMTPDebug           = false;
+		$mail->Host                = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpServer'];
+		$mail->Port                = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpPort'];
+		$mail->From                = $_SESSION['phpgw_info']['expressomail']['user']['email'];
+		$mail->FromName            = $this->fullNameUser;
+		$mail->Sender              = $mail->From;
+		$mail->SenderName          = $mail->FromName;
+		$mail->Subject             = $subject;
+		$mail->Body                = $body;
+		$mail->CharSet             = mb_detect_encoding( $body, 'UTF-8, ISO-8859-1' );
+		$mail->IsHTML( $is_html );
+
+		if ( $replytoaddress ) $mail->AddReplyTo( $replytoaddress );
+		if ( $is_important   ) $mail->isImportant();
+		if ( $return_receipt ) $mail->ConfirmReadingTo = $_SESSION['phpgw_info']['expressomail']['user']['email'];
+		if ( $folder         ) {
+			// Fix problem with cyrus delimiter changes.
+			// Dots in names: enabled/disabled.
+			$folder = preg_replace( '#INBOX/#i', 'INBOX'.$this->imap_delimiter, $folder );
+			$folder = preg_replace( '#INBOX.#i', 'INBOX'.$this->imap_delimiter, $folder );
+			$mail->SaveMessageInFolder = mb_convert_encoding( $folder, 'UTF7-IMAP', 'UTF-8, ISO-8859-1' );
+			if ( strtoupper( $folder ) === 'INBOX'.$this->imap_delimiter.'DRAFTS' ) $mail->SaveMessageAsDraft = true;
+		}
+
+		$this->buildEmbeddedImages( $mail, $mail_reader, $fwrd_attachs );
+
+		// Forwarding Attachments
+		foreach( $fwrd_attachs as $msg ) {
+			$this->open_mbox( $msg->folder );
+			$info = $mail_reader->setMessage( $this->mbox, $msg->folder, $msg->msg_no )->getAttach( $msg->section );
+			$mail->AddStringAttachment( $info->data, $info->filename, $info->encoding, $info->type, ( isset( $info->params['name'] )? $info->params['name'] : false ) );
+		}
+
+		// Uploading New Attachments
+		foreach ( $attachments as $fid => $attach ) {
+			if ( preg_match( '/^cid:(.*)$/', $fid, $cid ) ) {
+				$fname = pathinfo( $attach['name'], PATHINFO_FILENAME ).'.jpg';
+				$mail->AddStringEmbeddedImage( $this->resize_upload_image( $attach ), $cid[1], $fname, 'base64', $this->get_file_type( $fname ) );
+				$mail->Body = preg_replace( '/<img[^>]*'.$cid[1].'[^>]*>/', '<img cid="'.$cid[1].'" src="cid:'.$cid[1].'">', $mail->Body );
+			} else {
+				$mail->AddAttachment( ( isset( $attach['isbase64'] ) && $attach['isbase64'] )? base64_decode( $attach['source'] ) : $attach['tmp_name'], $attach['name'], 'base64', $this->get_file_type( $attach['name'] ) );
+			}
+		}
+
+		if( !empty( $mail->AltBody ) ) $mail->ContentType = 'multipart/alternative';
+		$mail->SetMessageType();
+
+		return $mail;
+	}
+
+	protected function buildEmbeddedImages( &$mail_writer, &$mail_reader, &$attachments )
+	{
+		$transpose = function( $a ) { array_unshift( $a, null); return call_user_func_array( 'array_map', $a ); };
+		$pattern   = '/src="([^"]*?show_embedded_attach.php\?msg_folder=(.+)?&(?:amp;)?msg_num=(.+)?&(?:amp;)?msg_part=(.+)?)"/isU';
+		$cids      = array();
+		preg_match_all( $pattern, $mail_writer->Body, $cid_imgs, PREG_PATTERN_ORDER );
+		foreach ( $transpose( $cid_imgs ) as $cid_img ) {
+			list( $cid_str, $cid_src, $cid_folder, $cid_msg_no, $cid_section ) = $cid_img;
+			if ( isset( $cids[$cid_str] ) ) continue;
+
+			$this->open_mbox( $cid_folder );
+			$info = $mail_reader->setMessage( $this->mbox, $cid_folder, $cid_msg_no )->getAttach( $cid_section );
+
+			$key = current( array_keys( array_filter( $attachments, function( $b ) use ( $cid_section ) { return ( $b->section === $cid_section ); } ) ) );
+			$cid = $cids[$cid_str] = ( $key !== false && isset( $attachments[$key]->cid ) )? $attachments[$key]->cid : $info->cid;
+
+			$mail_writer->AddStringEmbeddedImage( $info->data, $cid, ( isset( $info->params['name'] )? $info->params['name'] : false ), $info->encoding, $info->type, $info->filename );
+			$mail_writer->Body = str_replace( $cid_str, 'src="cid:'.$cid.'"', $mail_writer->Body );
+
+			if ( $key !== false ) unset( $attachments[$key] );
+		}
+	}
+
+	protected function build_smime( &$mail, &$db )
+	{
+		$emails = explode( ',', $this->add_recipients_cert( implode( ',', array_merge( $mail->GetAddresses( 'to' ), $mail->GetAddresses( 'cc' ), $mail->GetAddresses( 'bcc' ) ) ) ) );
+		// Deve ser testado se foram obtidos os certificados de todos os destinatarios.
+		// Deve ser verificado um numero limite de destinatarios.
+		// Deve ser verificado se os certificados sao validos.
+		// Se uma das verificacoes falhar, nao enviar o e-mail e avisar o usuario.
+		// O array $mail->Certs_crypt soh deve ser preenchido se os certificados passarem nas verificacoes.
+
+		// Este valor dever ser configurado pelo administrador do site ....
+		if ( count( $emails ) > $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['num_max_certs_to_cipher'] )
+			return array( 'Excedido o numero maximo ('.$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['num_max_certs_to_cipher'].') de destinatarios para uma msg cifrada...' );
+
+		// adiciona o email do remetente. eh para cifrar a msg para ele tambem. Assim vai poder visualizar a msg na pasta enviados..
+		$emails[] = $_SESSION['phpgw_info']['expressomail']['user']['email'];
+		
+		$pub_keys  = array();
+		$mail_list = array();
+		$error     = array();
+		foreach( $emails as $email ) {
+
+			if ( !( $certificate = $db->get_certificate( strtolower( $email ) ) ) ) return array( 'Chamada com parametro invalido. e-Mail nao pode ser vazio.' );
+			if ( array_key_exists( 'dberr1', $certificate ) ) return array( 'Ocorreu um erro quando pesquisava certificados dos destinatarios para cifrar a msg.' );
+			if ( array_key_exists( 'dberr2', $certificate ) ) $error[] = 'Nao pode cifrar a msg. Certificado nao localizado.';
+
+			include_once dirname( __FILE__ ).'/../../security/classes/CertificadoB.php';
+
+			foreach ( $certificate['certs'] as $registro ) {
+				$c1 = new certificadoB();
+				$c1->certificado( $registro['chave_publica'] );
+				if ( $c1->apresentado ) {
+					$c2 = new Verifica_Certificado( $c1->dados, $registro['chave_publica'] );
+					if ( !$c1->dados['EXPIRADO'] && !$c2->revogado && $c2->status ) {
+						$pub_keys[] = $registro['chave_publica'];
+						$mail_list[] = strtolower( $email );
+					} else {
+						if ( $c1->dados['EXPIRADO'] || $c2->revogado )
+							$db->update_certificate( $c1->dados['SERIALNUMBER'], $c1->dados['EMAIL'], $c1->dados['AUTHORITYKEYIDENTIFIER'], $c1->dados['EXPIRADO'], $c2->revogado );
+
+						$error[] = $email.': '.$c2->msgerro;
+						$error = array_merge( $error, $c2->erros_ssl );
+						$error[] = 'Emissor: '.$c1->dados['EMISSOR'];
+						$error[] = $c1->dados['CRLDISTRIBUTIONPOINTS'];
+					}
+				} else $error[] = $email.': Nao pode cifrar a msg. Certificado invalido.';
+			}
+			if ( count( $error ) || !in_array( strtolower( $email ), $mail_list ) )  return $error;
+		}
+
+		$mail->Certs_crypt = $pub_keys;
+
+		return array();
+	}
+
+	protected function check_smime( &$mail, $smime )
+	{
+		include_once dirname( __FILE__ ).'/../../security/classes/CertificadoB.php';
+		$mail->SMIME = true;
+		// A MSG assinada deve ser testada neste ponto.
+		// Testar o certificado e a integridade da msg....
+		$cert = new certificadoB();
+		if ( !$cert->verificar( $smime ) ) return $cert->erros_ssl;
+
+		// Testa o CERTIFICADO: se o CPF  he o do usuario logado, se  pode assinar msgs e se  nao esta expirado...
+		$error = array();
+		if ( $cert->apresentado ) {
+			if ( $cert->dados['EXPIRADO'] ) $error[] = 'Certificado expirado.';
+			if ( $cert->dados['CPF'] != $this->username ) $error[] = 'CPF no certificado diferente do logado no expresso.';
+			if ( !( $cert->dados['KEYUSAGE']['digitalSignature'] && $cert->dados['EXTKEYUSAGE']['emailProtection'] ) ) $error[] = 'Certificado nao permite assinar mensagens.';
+		}
+		return $error;
+	}
+
+	protected function check_from_acl( $params )
+	{
+		##
+		# @AUTHOR Rodrigo Souza dos Santos
+		# @DATE 2008/09/17$fileName
+		# @BRIEF Checks if the user has permission to send an email with the email address used.
+		##
+		$fromaddress = ( isset($params['input_from']) ? explode(';',$params['input_from']) : "" );
+		if ( is_array($fromaddress) && ($fromaddress[1] != $_SESSION['phpgw_info']['expressomail']['user']['email']) )
+		{
+			$deny = true;
+			$shared_mailboxes = array();
+			
+			if ( isset($_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes']) ) {
+				
+				$shared_mailboxes = $_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes'];
+				
+			} else {
+				
+				$this->ldap = new ldap_functions();
+				$mbox_stream = $this->open_mbox();
+				
+				$folders_list = imap_getmailboxes(
+						$mbox_stream,
+						'{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}',
+						'user'.$this->imap_delimiter.'%'
+						);
+				
+				$uids = array_map( function( $val ) {
+					return substr( $val->name, strrpos( $val->name, $val->delimiter ) + 1 );
+				}, $folders_list );
+					
+					$shared_mailboxes = $this->ldap->getSharedUsersFrom( array( 'uids' => implode( ';', $uids ) ) );
+			}
+			
+			foreach ( $shared_mailboxes as $key => $val ) {
+				if ( isset( $val['mail'] ) && $val['mail'] == $fromaddress[1] ) {
+					$deny = false;
+					break;
+				}
+			}
+			return $deny;
+		}
+		return true;
+	}
+
+	protected function resize_upload_image( $attach )
+	{
+		list( $width, $height, $image_type ) = getimagesize( $attach['tmp_name'] );
+		$rsize      =  max( $width, $height ) / (int)( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['image_size']?: 65536 );
+		$new_width  = $width * $rsize;
+		$new_height = $height * $rsize;
+		$image_new  = imagecreatetruecolor( $new_width, $new_height );
+
+		switch ( $image_type ) {
+			// Do not corrupt animated gif
+			//case 1: $image_big = imagecreatefromgif( $attach['tmp_name'] );break;
+			case 2: $image_big = imagecreatefromjpeg( $attach['tmp_name'] );  break;
+			case 3: $image_big = imagecreatefrompng( $attach['tmp_name'] ); break;
+			case 6:
+				require_once("gd_functions.php");
+				$image_big = imagecreatefrombmp( $attach['tmp_name'] ); break;
+			default: $image_big = file_get_contents( $attach['tmp_name'] );
+		}
+
+		imagecopyresampled( $image_new, $image_big, 0, 0, 0, 0, $new_width, $new_height, $width, $height );
+		ob_start();
+		imagejpeg( $image_new, null, 85 );
+		$content = ob_get_contents();
+		ob_end_clean();
+
+		return $content;
 	}
 
 	function set_messages_flag($params)
@@ -4608,5 +4332,10 @@ class imap_functions
 	    } 
 	    $imapfp->close(); 
 	    return $data; 
-    }  
+	}
+
+	public function __destruct()
+	{
+		$this->close_mbox( $this->mbox );
+	}
 }
