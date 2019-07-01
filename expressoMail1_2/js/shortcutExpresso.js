@@ -14,11 +14,11 @@ $(document).on('keydown.shorcut', function( event ){
             if( !event.shiftKey && !event.ctrlKey ){ shortcutExpresso.selectMsg( false, 'down' ); }
             break;
         case 46: shortcutExpresso.buttonDel(); break;
-        case 69: shortcutExpresso.buttonE(); break;
-        case 73: print_all(); break;
-        case 78: new_message("new","null"); break;
+        case 69: shortcutExpresso.buttonE(event); break;
+        case 73: shortcutExpresso.buttonI(); break;
+        case 78: shortcutExpresso.buttonN(event); break;
         case 79: shortcutExpresso.buttonO(); break;
-        case 82: shortcutExpresso.buttonR(); break;
+        case 82: shortcutExpresso.buttonR(event); break;
         case 120: shortcutExpresso.buttonF9(); break;
     }
 });
@@ -100,11 +100,20 @@ var shortcutExpresso = new function(){
         }
     };
 
-    this.buttonE = function(){
+    this.buttonE = function(ev){
 
         let msgId = this.getMsgId();
 
-        if ( msgId ) { $( "#msg_opt_forward_" + msgId ).click(); }
+        if ( msgId ){
+            
+            $( "#msg_opt_forward_" + msgId ).click();
+            
+            if( !ev.shiftKey || !ev.ctrlKey ){ ev.stopPropagation(); ev.preventDefault(); }
+        }
+    };
+
+    this.buttonI = function(){
+        print_all();
     };
 
     this.buttonEsc = function(){
@@ -119,11 +128,23 @@ var shortcutExpresso = new function(){
         if ( !windowClosed ){ delete_border( this.getMsgId(), 'false'); }
     };
 
-    this.buttonR = function(){
+    this.buttonN = function(ev){
+
+        new_message("new","null");
+        
+        if( !ev.shiftKey || !ev.ctrlKey ){ ev.stopPropagation(); ev.preventDefault(); }
+    };
+
+    this.buttonR = function(ev){
 
         let msgId = this.getMsgId();
 
-        if ( msgId ) { $( "#msg_opt_reply_" + msgId ).click(); }
+        if ( msgId ){
+            
+            $( "#msg_opt_reply_" + msgId ).click();
+            
+            if( !ev.shiftKey || !ev.ctrlKey ){ ev.stopPropagation(); ev.preventDefault(); }
+        }
     }
 
     this.buttonF9 = function(){
