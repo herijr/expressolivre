@@ -631,7 +631,9 @@ function emQuickSearch(emailList, field, ID){
 	{
 		connector.loadScript("QuickCatalogSearch");
 		if (typeof(QuickCatalogSearch) == 'undefined'){
-			setTimeout('emQuickSearch("'+emailList+'", "'+field+'", "'+ID+'")',500);
+			setTimeout(() =>{
+				emQuickSearch( emailList , field , ID );
+			}, 500 );
 			return false;
 		}
 	}

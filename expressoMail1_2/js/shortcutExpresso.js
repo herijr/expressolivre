@@ -1,25 +1,29 @@
 $(document).on('keydown.shorcut', function( event ){
 
-    switch( event.keyCode ){
-        case 13: shortcutExpresso.buttonEnter(); break;
-        case 27: shortcutExpresso.buttonEsc(); break;
-        case 38: 
-            if( event.shiftKey ){ shortcutExpresso.buttonShift('up'); }
-            if( event.ctrlKey ){ shortcutExpresso.buttonCtrl('up'); }
-            if( !event.shiftKey && !event.ctrlKey ){ shortcutExpresso.selectMsg( false, 'up' ); }
-            break;
-        case 40:
-            if( event.shiftKey ){ shortcutExpresso.buttonShift('down'); }
-            if( event.ctrlKey ){ shortcutExpresso.buttonCtrl('down'); }
-            if( !event.shiftKey && !event.ctrlKey ){ shortcutExpresso.selectMsg( false, 'down' ); }
-            break;
-        case 46: shortcutExpresso.buttonDel(); break;
-        case 69: shortcutExpresso.buttonE(event); break;
-        case 73: shortcutExpresso.buttonI(); break;
-        case 78: shortcutExpresso.buttonN(event); break;
-        case 79: shortcutExpresso.buttonO(); break;
-        case 82: shortcutExpresso.buttonR(event); break;
-        case 120: shortcutExpresso.buttonF9(); break;
+    if( event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT' ){
+        return;
+    } else {
+        switch( event.keyCode ){
+            case 13: shortcutExpresso.buttonEnter(); break;
+            case 27: shortcutExpresso.buttonEsc(); break;
+            case 38: 
+                if( event.shiftKey ){ shortcutExpresso.buttonShift('up'); }
+                if( event.ctrlKey ){ shortcutExpresso.buttonCtrl('up'); }
+                if( !event.shiftKey && !event.ctrlKey ){ shortcutExpresso.selectMsg( false, 'up' ); }
+                break;
+            case 40:
+                if( event.shiftKey ){ shortcutExpresso.buttonShift('down'); }
+                if( event.ctrlKey ){ shortcutExpresso.buttonCtrl('down'); }
+                if( !event.shiftKey && !event.ctrlKey ){ shortcutExpresso.selectMsg( false, 'down' ); }
+                break;
+            case 46: shortcutExpresso.buttonDel(); break;
+            case 69: shortcutExpresso.buttonE(event); break;
+            case 73: shortcutExpresso.buttonI(); break;
+            case 78: shortcutExpresso.buttonN(event); break;
+            case 79: shortcutExpresso.buttonO(); break;
+            case 82: shortcutExpresso.buttonR(event); break;
+            case 120: shortcutExpresso.buttonF9(); break;
+        }
     }
 });
 
@@ -131,7 +135,7 @@ var shortcutExpresso = new function(){
     this.buttonN = function(ev){
 
         new_message("new","null");
-        
+
         if( !ev.shiftKey || !ev.ctrlKey ){ ev.stopPropagation(); ev.preventDefault(); }
     };
 
