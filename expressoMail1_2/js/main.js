@@ -1411,7 +1411,7 @@ function buildAttachments( $obj, edit, deflt )
 			).append(
 				$('<a>')
 				.css({ 'position': 'absolute', 'top': '50%', '-ms-transform': 'translateY(-50%)', 'transform': 'translateY(-50%)' })
-				.attr( { 'href': "'"+msg.folder+"','"+msg.uid+"','"+msg.attachs[key].section+"'" } )
+				.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");' } )
 				.html( msg.attachs[key].filename+' ('+borkb( parseInt( msg.attachs[key].size ) )+')' )
 			)
 		);
