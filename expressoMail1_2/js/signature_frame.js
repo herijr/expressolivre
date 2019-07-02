@@ -94,7 +94,7 @@ var SignatureFrame = new function() {
 				$(location)[funct]( extra, $ifrm );
 			}
 		} else {
-			if ( data.mail == $ifrm.data('mail') ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
+			if ( data.mail == $ifrm.data('mail') && data.use_signature == '1' ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
 		}
 		if ( !( data.default_signature || data.use_signature == '1' ) ) $ifrm.hide();
 		else {
