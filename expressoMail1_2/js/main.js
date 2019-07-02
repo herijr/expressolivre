@@ -1312,8 +1312,14 @@ function new_message(type, border_ID){
 	});
 
 	// Set focus on main editor frame
-	if ( is_ie ) window.setTimeout('document.getElementById("body_'+new_border_ID+'").contentWindow.focus();',300);
-	else body.contentWindow.focus();
+	// reply_to_all_with_history, reply_to_all_without_history, reply_with_history, reply_without_history
+	if( type.indexOf("reply_") > -1 ){
+		if ( is_ie ) setTimeout(()=>{ document.getElementById("body_"+ new_border_ID ).contentWindow.focus(); }, 300);
+		else body.contentWindow.focus();
+	} else {
+		// forward, new, edit
+		Element("to_" + new_border_ID ).focus();
+	}
 
 	// IM Module Enabled
 	if( window.parent.loadscript && loadscript.autoStatusIM )
