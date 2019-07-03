@@ -76,23 +76,34 @@ var shortcutExpresso = new function(){
         
         let selectedMsgs = [];
 
-        $("#tbody_box").find(".selected_shortcut_msg").each(function(){
-            selectedMsgs[selectedMsgs.length]= $(this).attr('id');
-        });
+        if( $("#tbody_box").find("tr input[type=checkbox]").is(":checked") ){
+            $("#tbody_box").find("tr input[type=checkbox]").each(function(){
+                if( $(this).is(":checked") ){ 
+                    selectedMsgs[selectedMsgs.length]= $(this).parent().parent().attr('id');
+                }
+            });
+        } else {
+            $("#tbody_box").find(".selected_shortcut_msg").each(function(){
+                selectedMsgs[selectedMsgs.length]= $(this).attr('id');
+            });
 
-        let firstElement = ( $("#"+selectedMsgs[0]).prev().length ? $("#"+selectedMsgs[0]).prev() : false );
+            let firstElement = ( $("#"+selectedMsgs[0]).prev().length ? $("#"+selectedMsgs[0]).prev() : false );
+    
+            shiftLast = firstElement ? $(firstElement) : $(shiftLast);
+        }
 
-        shiftLast = firstElement ? $(firstElement) : $(shiftLast);
+        if( selectedMsgs.length > 0 ){
 
-        //Delete Msgs
-        proxy_mensagens.delete_msgs(current_folder, selectedMsgs.join(','), 'null');
-        
-        setTimeout(() => {
-            if( !$(shiftLast).length ){ shiftLast = $("#tbody_box tr").first(); }
+            //Delete Msgs
+            proxy_mensagens.delete_msgs(current_folder, selectedMsgs.join(','), 'null');
+            
+            setTimeout(() => {
+                if( !$(shiftLast).length ){ shiftLast = $("#tbody_box tr").first(); }
 
-            add_className( shiftLast[0], "selected_shortcut_msg" );
-                
-        }, 300);
+                add_className( shiftLast[0], "selected_shortcut_msg" );
+                    
+            }, 300);
+        }
     };
 
     this.buttonEnter = function(){
