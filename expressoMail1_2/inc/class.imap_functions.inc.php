@@ -2805,7 +2805,7 @@ class imap_functions
 		$mail->FromName            = $this->fullNameUser;
 		$mail->Sender              = $mail->From;
 		$mail->SenderName          = $mail->FromName;
-		$mail->Subject             = $subject;
+		$mail->Subject             = ( $subject === false )? '' : $subject;
 		$mail->Body                = $body;
 		$mail->CharSet             = mb_detect_encoding( $body, 'UTF-8, ISO-8859-1' );
 		$mail->IsHTML( $is_html );
