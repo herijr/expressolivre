@@ -1672,7 +1672,7 @@ function draw_message(info_msg, ID){
 	from.id = "from_"+ID;
 	from.innerHTML = info_msg.from.full;
 	if (info_msg.Draft != "X"){
-		from.innerHTML += draw_plugin_cc(ID, info_msg.from);
+		from.innerHTML = draw_plugin_cc(ID, info_msg.from);
 		tbody_message_others_options.appendChild(tr1);
 	}
 	from.className = "header_message_field";
@@ -3270,6 +3270,7 @@ function draw_search_box(){
 function draw_plugin_cc(ID, addrs)
 {
 	connector.loadScript("ccQuickAdd");
+	if ( typeof addrs.full !== 'undefined' ) addrs = addrs.full;
 
 	var array_addrs = '';
 	var array_name 	= '';
