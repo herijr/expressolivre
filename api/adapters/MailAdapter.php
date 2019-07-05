@@ -236,11 +236,12 @@ class MailAdapter extends ExpressoAdapter {
 			$msg['msgAttachments'] = array();
 			foreach($info_msg['attachments'] as $i => $attachment){
 				$msg['msgAttachments'][] = array (
-					'attachmentID'			=> "".$attachment['pid'],
+					'attachmentID'			=> "".$attachment->section,
 					'attachmentIndex'		=> "".$i,
-					'attachmentName' 		=> "".mb_convert_encoding($attachment['name'],"UTF8", "ISO_8859-1"),
-					'attachmentSize'		=> "".$attachment['fsize'],
-					'attachmentEncoding'	=> $attachment['encoding']
+					'attachmentName' 		=> "".mb_convert_encoding( $attachment->filename ,"UTF8", "ISO_8859-1"),
+					'attachmentSize'		=> "".$attachment->size,
+					'attachmentEncoding'	=> $attachment->encoding,
+					'attachamentType'		=> $attachment->type
 				);
 			}
 			$msg['msgHasAttachments'] = "1";
