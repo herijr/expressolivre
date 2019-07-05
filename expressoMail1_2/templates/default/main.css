@@ -586,3 +586,7 @@ input.em_button_like_span:disabled {
 	background-image: url(../../../phpgwapi/templates/default/images/right-grey.png);
 	cursor: default;
 }
+
+.msg_attachs .ckb_center { height: 22px; position: relative; }
+.msg_attachs .ckb_center a { position: absolute; top: 50%; transform: translateY(-50%); }
+

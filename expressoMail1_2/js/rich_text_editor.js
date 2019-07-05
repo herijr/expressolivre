@@ -331,11 +331,11 @@ cRichTextEditor.prototype.createLink = function(){
 	}
 }
 
-cRichTextEditor.prototype.insertImageHTML = function( img_id )
+cRichTextEditor.prototype.insertImageHTML = function( cid )
 {
 	var doc = document.getElementById( this.editor );
 	doc = doc.document ? doc.document : doc.contentWindow.document;
-	var img_html = '<img cid="'+img_id+'">';
+	var img_html = '<img cid="'+cid+'">';
 	if ( document.all ) {
 		var range = doc.selection.createRange();
 		range.pasteHTML( img_html );

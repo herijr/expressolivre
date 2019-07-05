@@ -1377,45 +1377,52 @@ function buildAttachments( $obj, edit, deflt )
 	var msg  = $obj.data();
 	$obj.empty();
 	if ( msg.attachs == undefined || ( msg.attachs && msg.attachs.length == 0 ) ) return true;
-
-	if ( edit == 'none' ) {
-		if ( msg.attachs.length > 1 )
-			$obj.append(
-				$('<a>').attr({ 'href': 'javascript:export_attachments("'+msg.folder+'","'+parseInt( msg.uid )+'")' })
-				.html( msg.attachs.length+' '+get_lang( 'files' )+' :: '+get_lang( 'Download all atachments' ) )
-			);
-
-		if ( parseInt( preferences.remove_attachments_function ) )
-			$obj.append(
-				$('<a>').attr({ 'href': 'javascript:remove_all_attachments("'+msg.folder+'","'+parseInt( msg.uid )+'")' })
-				.html( ' '+get_lang( 'remove all attachments' ) )
-			);
-	} else if ( deflt ) $obj.append(
-		$('<a>').attr({ 'href': 'javascript:void(0)', 'tabIndex': '-1' }).addClass('add_link').html( get_lang( 'Original attachments: add' ) ).on('click',function(e){
-			var is_add = $(e.currentTarget).hasClass( 'add_link' );
-			$(e.currentTarget).parent().find('input[type=checkbox]').prop( 'checked', is_add ).parent().toggle();
-			$(e.currentTarget).toggleClass( 'add_link' ).html( get_lang( 'Original attachments: '+(is_add? 'remove' : 'add' ) ) );
-		})
-	);
+	$obj.append($('<div>').addClass('cids')).append($('<div>').addClass('common'));
 
 	for ( var key in msg.attachs ) {
 		if ( typeof msg.attachs[key].cid !== 'undefined' ) {
 			$obj.parents('.conteudo').find('iframe').contents().find('img[cid='+msg.attachs[key].cid+']')
-			.attr({ 'src': './inc/show_embedded_attach.php?msg_folder='+msg.folder+'&msg_num='+msg.uid+'&msg_part='+msg.attachs[key].section });
-		}
-		$obj.append(
-			$('<div>').css({ 'height': '22px', 'position': 'relative', 'display': deflt? 'none' : undefined }).append(
-				$('<input>').css({ 'display': edit })
-				.attr( { 'type': 'checkbox', 'name': 'forwarding_attachments[]', 'checked': deflt? undefined : 'checked' } )
-				.val( JSON.stringify( Object.assign( msg.attachs[key], { folder: msg.folder, msg_no: msg.uid } ) ) )
-			).append(
+				.attr({ 'src': './inc/show_embedded_attach.php?msg_folder='+msg.folder+'&msg_num='+msg.uid+'&msg_part='+msg.attachs[key].section });
+			$obj.find('.cids').append(
 				$('<a>')
-				.css({ 'position': 'absolute', 'top': '50%', '-ms-transform': 'translateY(-50%)', 'transform': 'translateY(-50%)' })
-				.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");' } )
-				.html( msg.attachs[key].filename+' ('+borkb( parseInt( msg.attachs[key].size ) )+')' )
-			)
-		);
+					.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");' } )
+					.html( msg.attachs[key].filename+' (cid:'+msg.attachs[key].cid+') ('+borkb( parseInt( msg.attachs[key].size ) )+')' )
+			).append( $('<br>') );
+		} else {
+			$obj.find('.common').css({ 'display': deflt? 'none' : undefined }).append(
+				$('<div>').addClass('ckb_center').append(
+					$('<input>').css({ 'display': edit })
+						.attr( { 'type': 'checkbox', 'name': 'forwarding_attachments[]', 'checked': deflt? undefined : 'checked' } )
+						.val( JSON.stringify( Object.assign( msg.attachs[key], { folder: msg.folder, msg_no: msg.uid } ) ) )
+				).append(
+					$('<a>')
+						.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");' } )
+						.html( msg.attachs[key].filename+' ('+borkb( parseInt( msg.attachs[key].size ) )+')' )
+				)
+			);
+		}
 	}
+
+	if ( edit === 'none' ) {
+		if ( msg.attachs.length > 1 ) {
+			if ( parseInt( preferences.remove_attachments_function ) )
+				$obj.prepend(
+					$('<a>').attr({ 'href': 'javascript:remove_all_attachments("'+msg.folder+'","'+parseInt( msg.uid )+'")' })
+					.html( ' '+get_lang( 'remove all attachments' ) )
+				);
+			$obj.prepend(
+				$('<a>').attr({ 'href': 'javascript:export_attachments("'+msg.folder+'","'+parseInt( msg.uid )+'")' })
+				.html( msg.attachs.length+' '+get_lang( 'files' )+' :: '+get_lang( 'Download all atachments' ) )
+			);
+		}
+	} else if ( deflt && $obj.find('.common div').length ) $obj.find('.common').before(
+		$('<a>').attr({ 'href': 'javascript:void(0)', 'tabIndex': '-1' }).addClass('add_link').html( get_lang( 'Original attachments: add' ) ).on('click',function(e){
+			var is_add = $(e.currentTarget).hasClass( 'add_link' );
+			$(e.currentTarget).siblings('.common').toggle( is_add ).find('input[type=checkbox]').prop( 'checked', is_add );
+			$(e.currentTarget).toggleClass( 'add_link' ).html( get_lang( 'Original attachments: '+(is_add? 'remove' : 'add' ) ) );
+		})
+	);
+
 	return true;
 }
 

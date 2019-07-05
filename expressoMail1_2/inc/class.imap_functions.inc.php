@@ -2822,7 +2822,7 @@ class imap_functions
 			if ( strtoupper( $folder ) === 'INBOX'.$this->imap_delimiter.'DRAFTS' ) $mail->SaveMessageAsDraft = true;
 		}
 
-		$this->buildEmbeddedImages( $mail, $mail_reader, $fwrd_attachs );
+		if ( $is_html ) $this->buildEmbeddedImages( $mail, $mail_reader );
 
 		// Forwarding Attachments
 		foreach( $fwrd_attachs as $msg ) {
@@ -2848,12 +2848,15 @@ class imap_functions
 		return $mail;
 	}
 
-	protected function buildEmbeddedImages( &$mail_writer, &$mail_reader, &$attachments )
+	protected function buildEmbeddedImages( &$mail_writer, &$mail_reader )
 	{
 		$transpose = function( $a ) { array_unshift( $a, null); return call_user_func_array( 'array_map', $a ); };
 		$pattern   = '/src="([^"]*?show_embedded_attach.php\?msg_folder=(.+)?&(?:amp;)?msg_num=(.+)?&(?:amp;)?msg_part=(.+)?)"/isU';
 		$cids      = array();
-		preg_match_all( $pattern, $mail_writer->Body, $cid_imgs, PREG_PATTERN_ORDER );
+		if ( !preg_match_all( $pattern, $mail_writer->Body, $cid_imgs, PREG_PATTERN_ORDER ) ) return true;
+
+		$mail_writer->Body = preg_replace('/ *cid="[^"]*" */', ' ', $mail_writer->Body );
+
 		foreach ( $transpose( $cid_imgs ) as $cid_img ) {
 			list( $cid_str, $cid_src, $cid_folder, $cid_msg_no, $cid_section ) = $cid_img;
 			if ( isset( $cids[$cid_str] ) ) continue;
@@ -2861,14 +2864,13 @@ class imap_functions
 			$this->open_mbox( $cid_folder );
 			$info = $mail_reader->setMessage( $this->mbox, $cid_folder, $cid_msg_no )->getAttach( $cid_section );
 
-			$key = current( array_keys( array_filter( $attachments, function( $b ) use ( $cid_section ) { return ( $b->section === $cid_section ); } ) ) );
-			$cid = $cids[$cid_str] = ( $key !== false && isset( $attachments[$key]->cid ) )? $attachments[$key]->cid : $info->cid;
+			if ( !$info->cid ) continue;
+			$cids[$cid_str] = $info->cid;
 
-			$mail_writer->AddStringEmbeddedImage( $info->data, $cid, ( isset( $info->params['name'] )? $info->params['name'] : false ), $info->encoding, $info->type, $info->filename );
-			$mail_writer->Body = str_replace( $cid_str, 'src="cid:'.$cid.'"', $mail_writer->Body );
-
-			if ( $key !== false ) unset( $attachments[$key] );
+			$mail_writer->AddStringEmbeddedImage( $info->data, $cids[$cid_str], ( isset( $info->params['name'] )? $info->params['name'] : false ), $info->encoding, $info->type, $info->filename );
+			$mail_writer->Body = str_replace( $cid_str, 'cid="'.$cids[$cid_str].'" src="cid:'.$cids[$cid_str].'"', $mail_writer->Body );
 		}
+		return true;
 	}
 
 	protected function build_smime( &$mail, &$db )
