@@ -92,14 +92,14 @@ class SendResource extends MailAdapter {
 				$params['FILES'] = $files;
 				$result = $this->getImap()->save_msg( $params );
 				
-				if( isset($result['has_error']) ){
+				if( isset($result->status) ){
 					Errors::runException("MAIL_NOT_SAVED_DRAFTS");
 				}
 				
 				$this->setResult( array(
-						'saveDraft' => $result['save_draft'],
-						'msgId' => $result['msg_no'],
-						'folderID' => $result['folder_id']
+						'saveDraft' => ( $result->status ? true : false ),
+						'msgId' => $result->uid,
+						'folderID' => $result->folder
 				));
 				
 			}
