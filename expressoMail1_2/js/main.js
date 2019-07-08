@@ -1381,7 +1381,7 @@ function buildAttachments( $obj, edit, deflt )
 
 	for ( var key in msg.attachs ) {
 		if ( typeof msg.attachs[key].cid !== 'undefined' ) {
-			$obj.parents('.conteudo').find('iframe').contents().find('img[cid='+msg.attachs[key].cid+']')
+			$obj.parents('.conteudo').find('iframe').contents().find('img[cid="'+msg.attachs[key].cid+'"]')
 				.attr({ 'src': './inc/show_embedded_attach.php?msg_folder='+msg.folder+'&msg_num='+msg.uid+'&msg_part='+msg.attachs[key].section });
 			$obj.find('.cids').append(
 				$('<a>')
