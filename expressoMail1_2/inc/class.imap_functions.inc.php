@@ -2692,9 +2692,11 @@ class imap_functions
 
 	public function send_mail( $params )
 	{
-		if ( !$this->check_from_acl( $params ) ) return "The server denied your request to send a mail, you cannot use this mail address.";
+		//if ( !$this->check_from_acl( $params ) ) return "The server denied your request to send a mail, you cannot use this mail address.";
 
 		$mail = $this->compose_msg( $params );
+		
+		$signed = isset($params['input_return_digital'])? $params['input_return_digital'] : false;
 
 		if ( !( $sent = $mail->Send() ) ) $this->parse_error( $mail->ErrorInfo );
 
@@ -2805,6 +2807,12 @@ class imap_functions
 		$mail->FromName            = $this->fullNameUser;
 		$mail->Sender              = $mail->From;
 		$mail->SenderName          = $mail->FromName;
+
+		if( $fromaddress ) {
+			$mail->FromName = $fromaddress[0];
+			$mail->From = $fromaddress[1];
+		}
+
 		$mail->Subject             = ( $subject === false )? '' : $subject;
 		$mail->Body                = $body;
 		$mail->CharSet             = mb_detect_encoding( $body, 'UTF-8, ISO-8859-1' );
