@@ -2692,7 +2692,7 @@ class imap_functions
 
 	public function send_mail( $params )
 	{
-		//if ( !$this->check_from_acl( $params ) ) return "The server denied your request to send a mail, you cannot use this mail address.";
+		if ( !$this->has_permission_to_send( $params ) ) return lang("The server denied your request to send a mail, you cannot use this mail address.");
 
 		$mail = $this->compose_msg( $params );
 		
@@ -2954,7 +2954,7 @@ class imap_functions
 		return $error;
 	}
 
-	protected function check_from_acl( $params )
+	protected function has_permission_to_send( $params )
 	{
 		##
 		# @AUTHOR Rodrigo Souza dos Santos
@@ -2962,18 +2962,19 @@ class imap_functions
 		# @BRIEF Checks if the user has permission to send an email with the email address used.
 		##
 		$fromaddress = ( isset($params['input_from']) ? explode(';',$params['input_from']) : "" );
-		if ( is_array($fromaddress) && ($fromaddress[1] != $_SESSION['phpgw_info']['expressomail']['user']['email']) )
+
+		if ( is_array($fromaddress) && ( $fromaddress[1] !== $_SESSION['phpgw_info']['expressomail']['user']['email']) )
 		{
-			$deny = true;
+			$deny = false;
+
 			$shared_mailboxes = array();
 			
 			if ( isset($_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes']) ) {
-				
 				$shared_mailboxes = $_SESSION['phpgw_info']['expressomail']['user']['shared_mailboxes'];
 				
 			} else {
-				
 				$this->ldap = new ldap_functions();
+
 				$mbox_stream = $this->open_mbox();
 				
 				$folders_list = imap_getmailboxes(
@@ -2985,18 +2986,19 @@ class imap_functions
 				$uids = array_map( function( $val ) {
 					return substr( $val->name, strrpos( $val->name, $val->delimiter ) + 1 );
 				}, $folders_list );
-					
-					$shared_mailboxes = $this->ldap->getSharedUsersFrom( array( 'uids' => implode( ';', $uids ) ) );
+
+				$shared_mailboxes = $this->ldap->getSharedUsersFrom( array( 'uids' => implode( ';', $uids ) ) );
 			}
-			
-			foreach ( $shared_mailboxes as $key => $val ) {
-				if ( isset( $val['mail'] ) && $val['mail'] == $fromaddress[1] ) {
-					$deny = false;
+
+			foreach ( $shared_mailboxes as $val ) {
+				if ( isset( $val['mail'] ) && trim($val['mail']) === trim($fromaddress[1]) ) {
+					$deny = true;
 					break;
 				}
 			}
 			return $deny;
 		}
+		
 		return true;
 	}
 
