@@ -2068,19 +2068,14 @@ function print_msg(msg_folder, msg_number, border_ID){
 	}
 	
 	//needed to get the names of the attachments... only.
-	if(attachments != null)
+	if( $(attachments).length > 0 )
 	{
-		var a = attachments.childNodes;
-		var attachs = "";
-		var show_attachs = "";
-		var ii = a.length >2?2:1;
-		for(i=ii;i<a.length;i++)
-		{
-			if(a[i].tagName && a[i].tagName == "A")
-			{
-				attachs += a[i].innerHTML;
-			}
-		}
+		let attachs = "";
+
+		$(attachments).find("a").each(function(){
+			attachs += '<div>' + $(this).html() + '</div>';
+		});
+
 		show_attachs = "<tr><td width=7%><font size='2'>" + get_lang('Attachments: ')+ " </font></td><td><font size='2'>"+attachs+"</font></td></tr>";
 	} else{
 		show_attachs = "";
