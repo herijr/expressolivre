@@ -375,10 +375,11 @@ class wf_instance
 	* @param mixed $users Um array com IDs de usuários ou perfis (no caso de perfis, deve-se prefixar seu ID com o caractere 'p'). Também pode possuir um único ID (seja de usuário ou de perfil)
 	* @param mixed $activities Um array com IDs de atividades das se quer as instâncias. Também pode ser um inteiro, representando um único ID. Caso possua valor null, o resultado não é filtrado de acordo com as atividades (parâmetro opcional)
 	* @param mixed $status Um array com os status requeridos (para filtrar as instâncias). Também pode ser uma string, representando um único status. Caso possua valor null, o resultado não é filtrado de acordo com o status. Os status podem ser: completed, active, aborted e exception (parâmetro opcional)
+	* @param string $priorityOrder String com os possíveis valores: 'hilo', 'lohi', 'none', sendo de maior para menor prioridade, de menor para maior, ou sem ordenação, respectivamente
 	* @return array As instâncias que satisfazem o critério de seleção.
 	* @access public
 	*/
-	public function getByUser($users, $activities = null, $status = null)
+	public function getByUser($users, $activities = null, $status = null, $priorityOrder = 'none')
 	{
 		/* check for the supplied users/roles */
 		if (empty($users))
@@ -434,6 +435,11 @@ class wf_instance
 			}
 			$query .= ' ))';
 		}
+
+		if ($priorityOrder == 'hilo')
+			$query .= ' ORDER BY wf_priority DESC, wf_started ASC';
+		if ($priorityOrder == 'lohi')
+			$query .= ' ORDER BY wf_priority ASC, wf_started DESC';
 
 		$resultSet = $this->db->query($query, $values);
 
