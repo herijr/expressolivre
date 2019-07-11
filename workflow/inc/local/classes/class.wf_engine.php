@@ -14,11 +14,19 @@ class wf_engine
 	* @access private
 	*/
 	var $processManager;
+
+	/**
+	* @var object $activityManager objeto da classe ActivityManager
+	* @access private
+	*/
+	var $activityManager;
+
 	/**
 	* @var object $acl objeto da classe workflow_acl
 	* @access private
 	*/
 	var $acl;
+
 	/**
 	* @var object $run_activity objeto da classe run_activity
 	* @access private
@@ -35,6 +43,7 @@ class wf_engine
 		$this->processManager = null;
 		$this->acl = null;
 		$this->run_activity = null;
+		$this->activityManager = Factory::getInstance('workflow_activitymanager');
 	}
 
 	private function getCurrentProcessID()
@@ -300,6 +309,16 @@ class wf_engine
 			$this->acl = null;
 
 		return $output;
+	}
+
+	/**
+	* Busca as atividades do processo
+	* @return mixed Array contendo as informações sobre as atividades
+	* @access public
+	*/
+	function getProcessActivities()
+	{
+		return $this->activityManager->get_process_activities($this->getCurrentProcessID());
 	}
 
 	/**
