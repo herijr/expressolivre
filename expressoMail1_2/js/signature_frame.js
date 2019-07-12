@@ -76,7 +76,6 @@ var SignatureFrame = new function() {
 		$bdy_ifrm.contents().find('iframe#use_signature_anchor:not(:first)').remove();
 
 		var $ifrm = $bdy_ifrm.contents().find('iframe#use_signature_anchor');
-
 		if ( !$ifrm.length ) {
 			$ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contentEditable': 'true' }).css({ 'width': '100%' }).on('load',function(){
 				var data = $('select#from_'+ID).find(':selected').data();
@@ -93,22 +92,21 @@ var SignatureFrame = new function() {
 				if ( location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
 				$(location)[funct]( extra, $ifrm );
 			}
-		} else {
-			if ( data.mail == $ifrm.data('mail') && data.use_signature == '1' ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
-		}
-		if ( !( data.default_signature || data.use_signature == '1' ) ) $ifrm.hide();
-		else {
-			var signature = ( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
-				'<pre>'+RichTextEditor.stripHTML( ( data.signature ? data.signature : '' ) ).join('')+'</pre>': ( data.signature ? data.signature : '' );
-			$ifrm.show();
-			SignatureFrame.write( $ifrm, data.mail, signature, false, data.default_signature )
-		}
+		} else if ( data.mail == $ifrm.data('mail') && data.use_signature == '1' ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
+
+		$ifrm.toggle( ( data.default_signature || data.use_signature == '1' ) );
+		var signature = data.signature ? (
+			( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
+			'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>' : data.signature
+		) : '';
+
+		SignatureFrame.write( $ifrm, data.mail, signature, ( data.mail != $ifrm.data('mail') ), data.default_signature );
+		
 	}
 
 	this.write = function( $ifrm, mail, signature, force, isDefault )
 	{
 		try {
-
 			if ( !$ifrm.contents() ) return;
 
 			signature = signature !== undefined? signature : '';
@@ -122,12 +120,12 @@ var SignatureFrame = new function() {
 
 			var doc = $ifrm.contents().get(0);
 
-			$(doc).find('body').html( signature ).attr( 'contentEditable', !isDefault );
-
+			$(doc).find('body').attr( 'contentEditable', !isDefault ).html( signature ).find('img').off('load').on('load',function(){ SignatureFrame.setHeight( $ifrm ); });
 			$(doc).find('head').append(
 				$('<style>').attr({'type':'text/css'}).text(
-					'body{margin:0;}'+
-					'pre{margin:0;white-space: pre-wrap !important;overflow-wrap: break-word !important;font-family: !monospace important;font-size: 11px !important;}'
+					'body{ margin:0; }'+
+					'body:hover{ background-color: aliceblue !important; }'+
+					'pre{ margin:0;white-space: pre-wrap !important;overflow-wrap: break-word !important;font-family: !monospace important;font-size: 11px !important; }'
 				)
 			);
 
@@ -142,6 +140,10 @@ var SignatureFrame = new function() {
 
 		if( !$ifrm.contents().find('body').children().length ) return;
 
-		$ifrm.height( $ifrm.contents().find('body').get(0).lastChild.getBoundingClientRect().bottom );
+		try{
+			$ifrm.height( $ifrm.contents().find('body').get(0).lastChild.getBoundingClientRect().bottom );
+		} catch(e){
+			//alert(e);
+		}
 	};
 }
