@@ -310,15 +310,6 @@
 		
 	}
 
-   	messages_proxy.prototype.msg_img = function(msg_number,msg_folder,callback) {
-     if(this.is_local_folder(msg_folder)){
-         var msg = expresso_local_messages.get_local_mail(msg_number);
-		 eval('call_back(msg)');
-     }
-     else
-		Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': msg_number, 'msg_folder': msg_folder }, callback );
-    }
-
 	messages_proxy.prototype.export_all_messages = function( folder )
 	{
 		if ( !folder ) folder = get_current_folder();

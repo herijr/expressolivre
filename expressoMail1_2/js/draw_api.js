@@ -1169,9 +1169,8 @@ function draw_header_box(){
 	document.getElementById("message_header_SORTSIZE_"+numBox).innerHTML	= get_lang("Size");
 	document.getElementById("message_header_"+(sort_box_type.lastIndexOf("SORT") != "-1" ? sort_box_type : "SORTARRIVAL")+"_"+numBox ).innerHTML = "<B>"+type_name+"</B><img src ='templates/"+template+"/images/arrow_"+(sort_box_reverse == 1 ? 'desc' : 'asc')+"endant.gif'>";
 }
-function draw_message(info_msg, ID){
-	var content = document.getElementById('content_id_' + ID);
-
+function draw_message( info_msg, ID )
+{
 	var menuHidden = Element("folderscol").style.display == 'none' ? true : false;
 	 //////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Make the next/previous buttom.
@@ -1967,7 +1966,10 @@ function draw_message(info_msg, ID){
 		if ( blocked.length > 0 ) {
 			var showImgLink = document.createElement('DIV');
 			showImgLink.id="show_img_link_"+ID;
-			showImgLink.onclick = function(){show_msg_img(info_msg.msg_number,info_msg.msg_folder)};
+			showImgLink.onclick = function(){
+				info_msg.showImg = true;
+				draw_message(info_msg, ID);
+			};
 			showImgLink.className="show_img_link";
 			showImgLink.innerHTML = get_lang("Show images from")+": "+info_msg.from.email+' ( '+jQuery.unique( blocked ).join(', ')+' )';
 			td.appendChild(showImgLink);
@@ -1988,8 +1990,6 @@ function draw_message(info_msg, ID){
 	var _body = document.createElement( 'div' );
 	_body.id = 'body_' + ID;
 	_body.style.fontSize = '16px';
-
-	$(_body).data({'type':info_msg.type});
 
 	if ( info_msg.type == 'plain' ) {
 		
@@ -2114,15 +2114,15 @@ function draw_message(info_msg, ID){
 		table_message_thumbs.appendChild(tbody_message_thumbs);
 		div.appendChild(table_message_thumbs);
 	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	table_message.appendChild(tbody_message);
-	content.appendChild(table_message);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	$('#content_id_'+ID)
+		.empty()
+		.data( info_msg )
+		.append( table_message )
+		.append( $('<input>').attr({ 'id': 'msg_number_'+ID, 'type': 'hidden' }).val( info_msg.msg_number ) );
 	resizeWindow();
-	var msg_number = document.createElement('INPUT');
-	msg_number.id = "msg_number_" + ID;
-	msg_number.type = "hidden";
-	msg_number.value = info_msg.msg_number;
-	content.appendChild(msg_number);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//Exibe o cabecalho da mensagem totalmente aberto caso esteja setado nas preferencias do usuario

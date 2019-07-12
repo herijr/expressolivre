@@ -357,21 +357,6 @@ function watch_changes_in_msg( id )
 	}
 }
 
-function show_msg_img(msg_number,folder){
-	var call_back = function(data){
-	   data.showImg = true;
-	   if (!Element(data.msg_number)){
-		   trElement = document.createElement('DIV');
-		   trElement.id = data.msg_number;
-		   Element("tbody_box").appendChild(trElement);
-	   }
-	   show_msg(data);
-	}
-
-	proxy_mensagens.msg_img(msg_number,folder,call_back);
-
-}
-
 function show_msg(msg_info){
 	
 	if ( !( msg_info instanceof Object ) && !msg_info.msg_number )
@@ -1064,11 +1049,8 @@ function new_message_to(email) {
 	document.getElementById("to_" + new_border_ID).value=email;
 }
 
-function new_message(type, border_ID){
-		if (Element('show_img_link_'+border_ID))
-		{
-			show_msg_img(border_ID.match(/^\d*/)[0], Element('input_folder_'+border_ID).value);
-		}
+function new_message(type, border_ID)
+{
 	var new_border_ID = draw_new_message(parseInt(border_ID));
 	if(typeof(openTab.type[new_border_ID]) != "undefined") {
 		if(tabTypes[type] == openTab.type[new_border_ID]) {
@@ -1146,8 +1128,8 @@ function new_message(type, border_ID){
 		data.subject = document.getElementById("subject_" + border_ID).innerHTML;
 
 	if (document.getElementById("body_" + border_ID)) {
-		data.body = document.getElementById("body_" + border_ID).innerHTML;
-		data.type = $('#body_'+border_ID).data('type');
+		data.body = $('#content_id_'+border_ID).data('body');
+		data.type = $('#content_id_'+border_ID).data('type');
 	}
 
 	if (Element('date_' + border_ID)){
