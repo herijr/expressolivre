@@ -2174,15 +2174,15 @@ function popup_print( wndw )
 
 function export_attachments( folder, msg_number, section )
 {
-	msg_number = parseInt( msg_number );
-	section = ( section == undefined || section == '*' )? '*' : section;
-	proxy_mensagens.exportEml( 'exportAttachments', {
-		'folder': folder, 'msg_number': msg_number, 'section': section
+	Download( '$this.exporteml.exportAttachments', {
+		'folder'     : folder,
+		'section'    : ( section == undefined || section == '*' )? '*' : section,
+		'msg_number' : parseInt( msg_number )
 	} );
 }
 
-function export_all_selected_msgs(){
-	
+function export_all_selected_msgs()
+{
 	var folders = get_selected_messages_by_folder();
 	if ( folders === false ) {
 		write_msg(get_lang('Error compressing messages (ZIP). Contact the administrator.'));
@@ -2193,7 +2193,7 @@ function export_all_selected_msgs(){
 		write_msg(get_lang('No selected message.'));
 		return false;
 	}
-	proxy_mensagens.exportEml( 'exportMessages', folders );
+	Download( '$this.exporteml.exportMessages', { 'folders': folders } );
 	return true;
 }
 
@@ -2231,40 +2231,6 @@ function get_selected_messages_by_folder()
 		default: return false;
 	}
 	return result;
-}
-
-function iframe_download( url, data ) {
-	
-	// Init iframe
-	var iframe_content = $('#iframe_content');
-	if ( $(iframe_content).length === 0 ) {
-		
-		iframe_content = $('<div>')
-			.attr( 'id', 'iframe_content' )
-			.css( { 'display': 'none', 'width': '0px', 'height': '0px' } )
-			.append( $('<iframe>').attr( 'name', 'iframe_target' ) )
-			.appendTo( 'body' );
-		
-	}
-	
-	// Create a post form on iframe body
-	var frm = $('<form>')
-		.attr( 'method', 'POST' )
-		.attr( 'action', url )
-		.attr( 'target', 'iframe_target' );
-	
-	// Add post data
-	for ( var key in data ) {
-		$(frm).append(
-			$('<input>')
-				.attr( 'name', key )
-				.attr( 'type', 'hidden' )
-				.val( ( data[key] instanceof Object )? encodeURIComponent( JSON.stringify( data[key] ) ) : data[key] )
-		);
-	}
-	
-	// Submit and remove form
-	$(frm).appendTo( iframe_content ).submit().remove();
 }
 
 function select_all_search_messages(select, id){
@@ -2635,6 +2601,39 @@ function open_alert_new_msg( params ) {
 
 function open_alert_new_msg_resize() {
 	$('#recent').parent().position({ my : 'center', at : 'center', of : window });
+}
+
+function Download( action, data, callback )
+{
+	if ( !( typeof action === 'string' && action.trim() !== '' ) ) return false;
+
+	// Init iframe
+	var iframe_download = $('#iframe_download');
+	if ( $(iframe_download).length === 0 ) {
+		iframe_download = $('<div>')
+			.attr( 'id', 'iframe_download' )
+			.css( { 'display': 'none', 'width': '0px', 'height': '0px' } )
+			.append( $('<iframe>').attr( 'name', 'iframe_target' ) )
+			.appendTo( 'body' );
+	}
+
+	var serializeObject = function( obj, idx ){
+		var res = {};
+		if ( !( obj instanceof Object ) ) res[idx] = obj;
+		else for ( var key in obj ) {
+			var sr = serializeObject( obj[key], ( ( idx === undefined )? key : idx+'['+key+']') );
+			for ( var k in sr ) res[k] = sr[k];
+		}
+		return res;
+	};
+	data = serializeObject( data );
+
+	// Create a post form on iframe body and post data
+	var frm = $('<form>').attr( 'method', 'POST' ).attr( 'action', './controller.php?action='+action ).attr( 'target', 'iframe_target' );
+	for ( var key in data ) $(frm).append( $('<input>').attr( 'type', 'hidden' ).attr( 'name', key ).val( data[key] ) );
+
+	// Submit and remove form
+	$(frm).appendTo( iframe_download ).submit().remove();
 }
 
 function Ajax( action, data, callback, method )

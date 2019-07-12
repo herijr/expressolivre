@@ -121,8 +121,8 @@ class MessageReader
 
 		// PARAMETERS
 		$params = array();
-		if ( $node->parameters ) foreach ( $node->parameters as $x ) $params[strtolower( $x->attribute )] = $x->value;
-		if ( $node->dparameters ) foreach ( $node->dparameters as $x ) $params[strtolower( $x->attribute )] = $x->value;
+		if ( $node->parameters  ) foreach ( $node->parameters as $x  ) $params[strtolower( $x->attribute )] = $this->_str_decode( $x->value );
+		if ( $node->dparameters ) foreach ( $node->dparameters as $x ) $params[strtolower( $x->attribute )] = $this->_str_decode( $x->value );
 		if ( count( $params ) ) $obj->params = $params;
 
 		// ATTACHMENTS
@@ -131,13 +131,19 @@ class MessageReader
 			$obj->filename = isset( $params['filename'] )? $params['filename'] : ( isset( $params['name'] )? $params['name'] : false );
 			if ( $obj->filename === false ) {
 				preg_match('/name=["\']?(.*)["\']?/', imap_fetchmime( $this->_mbox, $this->_uid , $obj->section, FT_UID ), $matchs );
-				$obj->filename = isset( $matchs[1] )? mb_convert_encoding( $matchs[1], 'UTF-8', mb_detect_encoding($matchs[1], 'UTF-8, ISO-8859-1', true ) ): 'attachment.bin';
+				$obj->filename = isset( $matchs[1] )? $this->_str_decode( $matchs[1] ) : 'attachment.bin';
 			}
 		}
 
 		$this->_sections[$obj->section] = $obj;
 
 		if ( isset( $node->parts ) ) foreach ( $node->parts as $i => $part ) $this->_readSection( $part, $prefix.($prefix?'.':'').($i+1) );
+	}
+
+	private function _str_decode( $str )
+	{
+		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		return mb_convert_encoding( $str, 'UTF-8', mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) );
 	}
 	/*
 	public function getSections() {

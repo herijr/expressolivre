@@ -264,7 +264,7 @@ var ttreeBox = new function()
 		var folders = {};
 		folders[ttree.FOLDER] = '*';
 		
-		proxy_mensagens.exportEml( 'exportMessages', folders );
+		Download( '$this.exporteml.exportMessages', { 'folders': folders } );
 		
 		return true;
 	}

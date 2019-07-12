@@ -33,19 +33,13 @@ class ExportEml
 	/**
 	 * Export messages: Create a zip file with messages.eml
 	 * If none message found, return file not found.
-	 * 
-	 * @param array $params = array(
-	 *    'json' => '{"INBOX":[1,2,3,...],"INBOX/subdir":[1,2,...],"INBOX/other":[...,100,...]}',
-	 *    'flags' => 'keep_directory',
-	 * )
 	 */
-	public function exportMessages( $params = array() )
+	public function exportMessages( $params )
 	{
 		$numFiles = 0;
-		$flags    = isset( $params['flags'] )? explode( ',', $params['flags'] ) : array();
-		$kpdir    = in_array( 'keep_directory', $flags );
-		$folders  = isset( $params['json'] )? json_decode( urldecode( $params['json'] ), true ) : array();
 		$dir_exp  = false;
+		$folders  = isset( $params['folders']        )? $params['folders'] : false;
+		$kpdir    = isset( $params['keep_directory'] );
 		
 		if ( !count( $folders ) ) return $this->_resultNotFound();
 		
@@ -60,9 +54,21 @@ class ExportEml
 			if ( $msgs === '*' ) $msgs = imap_search( $this->_getImapStream(), 'ALL', SE_UID );
 			
 			// One select on folder
-			if ( is_int( $msgs ) ) $msgs = (array)$msgs;
+			if ( is_numeric( $msgs ) ) $msgs = (array)$msgs;
 			
 			if ( is_array( $msgs ) ) {
+				if ( count( $folders) === 1 && count( $msgs ) === 1 ) {
+					$id    = current( $msgs );
+					$fname = $this->_squeeze( '_', $this->_subjectToFilename( $id ) ).'.eml';
+					$data  = $this->_getSourceMessage( $id );
+					header( 'Content-Type: message/rfc822' );
+					$this->_setContentDisposition( $fname );
+					header( 'Content-Length: '.strlen( $data ) );
+					echo $data;
+					ob_flush();
+					flush();
+					exit;
+				}
 				
 				foreach ( $msgs as $key => $id ) {
 					
@@ -70,8 +76,8 @@ class ExportEml
 					if ( $dir_exp === false ) $dir_exp = $this->_makeTmpDir();
 					
 					// Add message to zip
-					$num = ( $kpdir? $key : $numFiles ) + 1;
-					$fname = $dir_exp.'/'.$this->_utf8Encode($ifolder.$this->_squeeze( '_', $this->_subjectToFilename( $id ) . '_' . $num . '.eml' ));
+					$num   = ( $kpdir? $key : $numFiles ) + 1;
+					$fname = $dir_exp.'/'.$ifolder.$this->_squeeze( '_', $this->_subjectToFilename( $id ).'_'.$num.'.eml' );
 					
 					if ( !file_exists( dirname( $fname ) ) ) mkdir( dirname( $fname ), 0770, true );
 					
@@ -88,11 +94,10 @@ class ExportEml
 		
 		if ( !file_exists( $dir_exp.'/messages.zip' ) ) exit;
 		header( 'Content-Type: application/zip' );
-		header( 'Content-Disposition: attachment; filename='.lang( 'messages' ).'.zip;' );
+		$this->_setContentDisposition( lang( 'messages' ).'.zip' );
 		header( 'Content-Length: '.filesize( $dir_exp.'/messages.zip' ) );
 		readfile( $dir_exp.'/messages.zip' );
 		$this->_removeTmpDir( $dir_exp );
-		
 		ob_flush();
 		flush();
 		exit;
@@ -104,76 +109,55 @@ class ExportEml
 	 */
 	public function exportAttachments( $params = array() )
 	{
-		$args       = isset($params['json'])? json_decode( urldecode( $params['json'] ), true ) : array();
-		$folder     = isset($args['folder'])? $args['folder'] : false;
-		$msg_number = isset($args['msg_number'])? $args['msg_number'] : false;
-		$section    = isset($args['section'])? $args['section'] : false;
-		
-		if ( !$this->_getImapStream( $folder ) ) return $this->_resultNotFound();
-		
-		include_once 'class.imap_attachment.inc.php';
-		$imap_att = new imap_attachment();
-		$attachments = $imap_att->download_attachmentByPid( $this->_getImapStream(), $msg_number );
-		if ( !count( $attachments ) ) return $this->_resultNotFound();
-		
-		if ( $section === '*' ) {
-			
+		if ( !$this->_getImapStream( $params['folder'] ) ) return $this->_resultNotFound();
+
+		include_once 'class.message_reader.inc.php';
+		$mail_reader = new MessageReader();
+		$info        = $mail_reader->setMessage( $this->_getImapStream(), $params['folder'], $params['msg_number'] )->getAttachInfo();
+
+		if ( $params['section'] === '*' ) {
+
 			$dir_exp = false;
-			
-			foreach ( $attachments as $attch ) {
-				
+			foreach ( $info as $attch ) {
+
 				// Lazy make temporary directory
 				if ( $dir_exp === false ) $dir_exp = $this->_makeTmpDir();
-				
-				$nameAttachment = $this->_utf8Encode( trim( str_replace('\\', '/', $attch['name']), '/' ) );
-				
-				$_count = 1;
 
-				if( !file_exists( $dir_exp.'/'.$nameAttachment ) )
-				{	
-					file_put_contents (
-						$dir_exp.'/'.$nameAttachment,
-						$this->_getAttachmentContent( $msg_number, $attch['pid'], $attch['encoding'] )
-					);
-				}
-				else
-				{
-					$infoFile = pathinfo( $nameAttachment );
-
-					file_put_contents (
-						$dir_exp.'/'.$infoFile['filename'].'_'.$_count.'.'.$infoFile['extension'],
-						$this->_getAttachmentContent( $msg_number, $attch['pid'], $attch['encoding'] )
-					);
-
+				$obj      = $mail_reader->getAttach( $attch->section );
+				$filename = $obj->filename;
+				$_count   = 1;
+				while ( file_exists( $dir_exp.'/'.$filename ) ) {
+					$infoFile = pathinfo( $obj->filename );
+					$filename = $infoFile['filename'].'_'.$_count.'.'.$infoFile['extension'];
 					$_count++;
 				}
+
+				file_put_contents( $dir_exp.'/'.$filename, $obj->data );
 			}
-			
+
 			if ( $dir_exp === false ) return $this->_resultNotFound();
-			
-			//exec( 'nice '.escapeshellarg(PHPGW_SERVER_ROOT.'/prototype/bin/zip/zip').' '.escapeshellarg($dir_exp) );
+
 			exec( 'cd '.escapeshellarg($dir_exp).' && find -type f ! -name messages.zip | nice zip -9 messages.zip -@' );
-			
+
 			header( 'Content-Type: application/zip' );
-			header( 'Content-Disposition: attachment; filename='.lang( 'messages' ).'.zip;' );
+			$this->_setContentDisposition( lang( 'attachments' ).'.zip' );
 			header( 'Content-Length: '.filesize( $dir_exp.'/messages.zip' ) );
 			readfile( $dir_exp.'/messages.zip' );
-			
+
 			$this->_removeTmpDir( $dir_exp );
-			
+
 		} else {
+			if ( array_search( $params['section'], array_column( $info, 'section' ) ) === false ) return $this->_resultNotFound();
+			$obj = $mail_reader->getAttach( $params['section'] );
 			
-			if ( !( $attch = isset( $attachments[$section] )? $attachments[$section] : false ) ) return $this->_resultNotFound();
-			
-			$content = $this->_getAttachmentContent( $msg_number, $attch['pid'], $attch['encoding'] );
-			header( 'Content-Type: '.$this->_getFileType( $attch['name'] ) );
-			header( 'Content-Disposition: attachment; filename="'.$attch['name'].'";' );
-			header( 'Content-Length: '.strlen( $content ) );
+			header( 'Content-Type: '.$this->_getFileType( $obj->filename ) );
+			$this->_setContentDisposition( $obj->filename );
+			header( 'Content-Length: '.strlen( $obj->data ) );
 
 			ob_flush();
 			flush();
 			
-			echo $content;
+			echo $obj->data;
 		}
 		ob_flush();
 		flush();
@@ -236,7 +220,7 @@ class ExportEml
 	private function _getFileType( $fname )
 	{
 		switch ( strtolower( substr( $fname, strrpos( $fname, '.' ) ) ) ) {
-			case '.eml': return 'text/plain';
+			case '.eml': return 'message/rfc822';
 			case '.asf': return 'video/x-ms-asf';
 			case '.avi': return 'video/avi';
 			case '.doc': return 'application/msword';
@@ -294,55 +278,33 @@ class ExportEml
 	{
 		// Header
 		$header = imap_headerinfo( $this->_getImapStream(), imap_msgno( $this->_getImapStream(), $id ), 80, 255 );
-		
 		// Subject
-		$subject = $this->_stripWinBadChars( trim( $this->_decode_subject( $header->fetchsubject ) ) );
-		$subject = $this->_squeeze( '_', str_replace( ' ', '_', $this->_squeeze( ' ', $subject ) ) );
-		$subject = ( strlen($subject) > 60 ) ? substr( $subject, 0, 59 ) : $subject;
-		$subject = ( strlen($subject) == 0 ) ? $this->_squeeze( '_', lang('No Subject')) : $subject;
-		
+		$subject = trim( $this->_decode_subject( $header->fetchsubject ) );
+		$subject = ( strlen( $subject ) == 0 )? lang( 'No Subject' ) : $subject;
+		$subject = $this->_squeeze( '_', $this->_squeeze( ' ', $subject ) );
+		$subject = $this->_stripWinBadChars( $subject );
 		return $subject;
 	}
 	
 	private function _stripWinBadChars( $filename )
 	{
 		$bad = array_merge( array_map( 'chr', range( 0, 31 ) ), array('<', '>', ':', '"', '/', '\\', '|', '?', '*') );
-		
-		return str_replace( $bad, '', $filename );
+		return str_replace( $bad, '-', $filename );
 	}
 	
 	private function _squeeze( $ch, $str ) {
 		return preg_replace( '/(['.preg_quote($ch,'/').'])\1+/', '$1', $str );
 	}
 	
-	private function _decode_subject( $string )
+	private function _decode_subject( $str)
 	{
-		$lstr = strtolower( $string );
-		$result = '';
-		
-		if ( strpos( $lstr, '=?utf-8' ) !== false ) {
-			
-			$elements = imap_mime_header_decode( $string );
-			
-			foreach ( $elements as $el ) {
-				$charset = $el->charset;
-				$text    = $el->text;
-				
-				if ( !strcasecmp( $charset, 'utf-8' ) || !strcasecmp( $charset, 'utf-7' ) ) {
-					$text = iconv( $charset, 'ISO-8859-1', $text );
-				}
-				$result .= $text;
-			}
-			
-		} else if ( ( strpos( $lstr, '=?iso-8859-1' ) !== false ) || ( strpos( $lstr, '=?windows-1252') !== false ) ) {
-			
-			$elements = imap_mime_header_decode( $string );
-			
-			foreach ( $elements as $el ) $result .= $el->text;
-			
-		} else $result = $string;
-		
-		return $result;
+		if ( preg_match( '/=\?[\w-#]+\?[QB]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		return mb_convert_encoding( $str, 'UTF-8', mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) );
+	}
+	
+	private function _setContentDisposition( $filename )
+	{
+		header( 'Content-Disposition: attachment; filename="=?UTF-8?B?'.base64_encode( $this->_decode_subject( $filename ) ).'?="' );
 	}
 	
 	private function _resultNotFound()
@@ -375,16 +337,6 @@ class ExportEml
 			if ( is_dir( dirname( $dir ) ) ) rmdir( dirname( $dir ) );
 		} else return false;
 		return true;
-	}
-	
-	/**
-	 * Encode to UTF-8 with check
-	 * @param string $str
-	 * @return string
-	 */
-	private function _utf8Encode( $str )
-	{
-		return ( mb_check_encoding( $str, 'UTF-8' ) )? $str : utf8_encode( $str );
 	}
 	
 	private function _closeImap()

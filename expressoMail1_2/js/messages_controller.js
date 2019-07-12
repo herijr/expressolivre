@@ -331,10 +331,5 @@
 		if ( ttree.FOLDER == "local_root" ) return false;
 		ttreeBox.export_all_msg();
 	}
-	
-	messages_proxy.prototype.exportEml = function( action, json )
-	{
-		iframe_download( '/expressoMail1_2/controller.php?action=$this.exporteml.'+action, { 'json' : json } );
-	}
 
 	var proxy_mensagens = new messages_proxy();
