@@ -2028,46 +2028,26 @@ function print_all(){
 
 
 function print_msg(msg_folder, msg_number, border_ID){
-	var div_toaddress_full  = Element("div_toaddress_full_"+border_ID);
-	var div_ccaddress_full  = Element("div_ccaddress_full_"+border_ID);
-	var div_ccoaddress_full = Element("div_ccoaddress_full_"+border_ID);
-	var printListTO         = (div_toaddress_full && div_toaddress_full.style.display != 'none') || toaddress_array[border_ID].length == 1 ? true : false;
-	var printListCC         = (div_ccaddress_full && div_ccaddress_full.style.display != 'none') || !div_ccaddress_full ? true : false;
-	var printListCCO        = (div_ccoaddress_full && div_ccoaddress_full.style.display != 'none') || !div_ccoaddress_full ? true : false;
-	var sender              = Element('sender_values_'+border_ID) ? Element('sender_values_'+border_ID).value : null;
-	var from                = Element('from_values_'+border_ID) ? Element('from_values_'+border_ID).value : null;
-	var to                  = Element('to_values_'+border_ID) ? Element('to_values_'+border_ID).value :null;
-	var cco                 = Element('cco_values_'+border_ID) ? Element('cco_values_'+border_ID).value : null;
-	var cc                  = Element('cc_values_'+border_ID) ? Element('cc_values_'+border_ID).value : null;
-	var date                = Element('date_'+border_ID);
-	var subject             = Element('subject_'+border_ID);
-	var attachments         = Element('attachments_'+border_ID);
-	var body                = Element('body_'+border_ID);
-	
-	if(!is_ie)
-	{
-		var link = location.href.replace(/\/expressoMail1_2\/(.*)/, "");
-		var tab_tags = body.getElementsByTagName("IMG");
-		for(var i = 0; i < tab_tags.length;i++)
-		{
-			var _img = document.createElement("IMG");
 
-			_img.src = tab_tags[i].src;
-
-			if( tab_tags[i].align )
-			{
-				_img.align = tab_tags[i].align;
-			}
-
-			if(tab_tags[i].src.toUpperCase().indexOf('/INC/SHOW_EMBEDDED_ATTACH.PHP?MSG_FOLDER=') > -1)
-			{
-				_img.src = link + '/expressoMail1_2'+tab_tags[i].src.substr(tab_tags[i].src.toUpperCase().indexOf('/INC/SHOW_EMBEDDED_ATTACH.PHP?MSG_FOLDER='));
-			}
-			tab_tags[i].parentNode.replaceChild(_img,tab_tags[i]);
-		}
-	}
+	let div_toaddress_full  = $("#div_toaddress_full_"+border_ID)[0];
+	let div_ccaddress_full  = $("#div_ccaddress_full_"+border_ID)[0];
+	let div_ccoaddress_full = $("#div_ccoaddress_full_"+border_ID)[0];
+	let printListTO         = (div_toaddress_full && div_toaddress_full.style.display != 'none') || toaddress_array[border_ID].length == 1 ? true : false;
+	let printListCC         = (div_ccaddress_full && div_ccaddress_full.style.display != 'none') || !div_ccaddress_full ? true : false;
+	let printListCCO        = (div_ccoaddress_full && div_ccoaddress_full.style.display != 'none') || !div_ccoaddress_full ? true : false;
+	let sender              = $('#sender_values_'+border_ID).length > 0 ? $('#sender_values_'+border_ID)[0].value : null;
+	let from                = $('#from_values_'+border_ID).length > 0 ? $('#from_values_'+border_ID)[0].value : null;
+	let to                  = $('#to_values_'+border_ID).length > 0 ? $('#to_values_'+border_ID)[0].value :null;
+	let cco                 = $('#cco_values_'+border_ID).length > 0 ? $('#cco_values_'+border_ID)[0].value : null;
+	let cc                  = $('#cc_values_'+border_ID).length > 0 ? $('#cc_values_'+border_ID)[0].value : null;
+	let date                = $('#date_'+border_ID)[0];
+	let subject             = $('#subject_'+border_ID)[0];
+	let attachments         = $('#attachments_'+border_ID)[0];
+	let body                = $('#body_'+border_ID).clone();
 	
 	//needed to get the names of the attachments... only.
+	let show_attachs = "";
+	
 	if( $(attachments).length > 0 )
 	{
 		let attachs = "";
@@ -2077,46 +2057,49 @@ function print_msg(msg_folder, msg_number, border_ID){
 		});
 
 		show_attachs = "<tr><td width=7%><font size='2'>" + get_lang('Attachments: ')+ " </font></td><td><font size='2'>"+attachs+"</font></td></tr>";
-	} else{
-		show_attachs = "";
 	}
-	var current_path = window.location.href.substr(0,window.location.href.lastIndexOf("/"));
-	var head = '<head><title></title><link href="'+current_path+'/templates/default/main.css" type="text/css" rel="stylesheet"></head>';
+
+	let current_path = window.location.href.substr(0,window.location.href.lastIndexOf("/"));
+	let head = '<head><title></title><link href="'+current_path+'/templates/default/main.css" type="text/css" rel="stylesheet"></head>';
 	
-	var window_print = popup_create();
-	while (1){
-		try{
+	let window_print = popup_create();
+	let html = "";
+	while (1) {
+		try {
+			
 			window_print.document.write(head);
-			var html ='<body>';
+			html = "<body>";
 			html += "<h4>ExpressoLivre - ExpressoMail</h4><hr>";
-			html += '<table><tbody>';
-			if(sender)
-				html += "<tr><td width=7% noWrap><font size='2'>" + get_lang('Sent by') + ": </font></td><td><font size='2'>"+sender+"</font></td></tr>";
-			if(from)
-				html += "<tr><td width=7%><font size='2'>" + get_lang('From') + ": </font></td><td><font size='2'>"+from+"</font></td></tr>";
-			if(to) {
-				if(!printListTO)
-					to = 'Os destinatários não estão sendo exibidos para esta impressão';
-				html += "<tr><td width=7%><font size='2'>" + get_lang('To') + ": </font></td><td><font size='2'>"+to+"</font></td></tr>";
+			html += "<table><tbody>";
+			html += ( sender ) ? "<tr><td width=7% noWrap><font size='2'>" + get_lang('Sent by') + ": </font></td><td><font size='2'>"+sender+"</font></td></tr>" : "";
+			html += ( from ) ? "<tr><td width=7%><font size='2'>" + get_lang('From') + ": </font></td><td><font size='2'>"+from+"</font></td></tr>" : "";
+
+			if( to ){
+				to = (!printListTO) ? 'Os destinatários não estão sendo exibidos para esta impressão' : to;
+				html += ( to ) ? "<tr><td width=7%><font size='2'>" + get_lang('To') + ": </font></td><td><font size='2'>"+to+"</font></td></tr>" : "";
 			}
+
 			if (cc) {
-				if(!printListCC)
-					cc = 'Os destinatários não estão sendo exibidos para esta impressão';
+				cc = ( !printListCC ) ? 'Os destinatários não estão sendo exibidos para esta impressão' : cc ;
 				html += "<tr><td width=7%><font size='2'>" + get_lang('Cc') + ": </font></td><td><font size='2'>"+cc+"</font></td></tr>";
 			}
+			
 			if (cco) {
-				if(!printListCCO)
-					cco = 'Os destinatários não estão sendo exibidos para esta impressão';
+				cco = ( !printListCCO ) ? 'Os destinatários não estão sendo exibidos para esta impressão' : cco;
 				html += "<tr><td width=7%><font size='2'>" + get_lang('Cco') + ": </font></td><td><font size='2'>"+cco+"</font></td></tr>";
 			}
-			if(date)
-				html += "<tr><td width=7%><font size='2'>" + get_lang('Date') + ": </font></td><td><font size='2'>"+date.innerHTML+"</font></td></tr>";
+			
+			html += ( date ) ? "<tr><td width=7%><font size='2'>" + get_lang('Date') + ": </font></td><td><font size='2'>"+date.innerHTML+"</font></td></tr>" : "";
 			html += "<tr><td width=7%><font size='2'>" + get_lang('Subject')+ ": </font></td><td><font size='2'>"+subject.innerHTML+"</font></td></tr>";
-			html += show_attachs; //to show the names of the attachments
+			html += show_attachs;
 			html += "</tbody></table><hr>";
-			window_print.document.write(html + body.innerHTML);
-			if(!is_ie){
+			
+			window_print.document.write( html + $(body).html() );
+
+			if( !is_ie ){
+				
 				var tab_tags = window_print.document.getElementsByTagName("IMG");
+				
 				for(var i = 0; i < tab_tags.length;i++)
 				{
 					var _img = document.createElement("IMG");
@@ -2132,9 +2115,7 @@ function print_msg(msg_folder, msg_number, border_ID){
 				}
 			}
 			break;
-		}
-		catch(e)
-		{
+		} catch(e) {
 			//alert(e.message);
 		}
 	}
