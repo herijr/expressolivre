@@ -2078,25 +2078,8 @@ function print_msg(msg_folder, msg_number, border_ID){
 			
 			window_print.document.write( html + $(body).html() );
 
-			if( !is_ie ){
-				
-				var tab_tags = window_print.document.getElementsByTagName("IMG");
-				
-				for(var i = 0; i < tab_tags.length;i++)
-				{
-					var _img = document.createElement("IMG");
-
-					_img.src = tab_tags[i].src;
-
-					if( tab_tags[i].align )
-					{
-						_img.align = tab_tags[i].align;
-					}
-
-					tab_tags[i].parentNode.replaceChild(_img,tab_tags[i]);
-				}
-			}
 			break;
+			
 		} catch(e) {
 			//alert(e.message);
 		}
