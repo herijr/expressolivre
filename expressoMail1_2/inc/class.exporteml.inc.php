@@ -147,7 +147,7 @@ class ExportEml
 			$this->_removeTmpDir( $dir_exp );
 
 		} else {
-			if ( array_search( $params['section'], array_column( $info, 'section' ) ) === false ) return $this->_resultNotFound();
+			if ( array_search( $params['section'], array_map( function( $obj ) { return $obj->section; }, $info ) ) === false ) return $this->_resultNotFound();
 			$obj = $mail_reader->getAttach( $params['section'] );
 			
 			header( 'Content-Type: '.$this->_getFileType( $obj->filename ) );
