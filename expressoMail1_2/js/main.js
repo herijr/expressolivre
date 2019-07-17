@@ -1130,6 +1130,8 @@ function new_message(type, border_ID)
 	if (document.getElementById("body_" + border_ID)) {
 		data.body = $('#content_id_'+border_ID).data('body');
 		data.type = $('#content_id_'+border_ID).data('type');
+
+		data.body = ( ( $.trim(data.type) === "plain" ) ? "<pre>"+data.body+"</pre>" : data.body );
 	}
 
 	if (Element('date_' + border_ID)){
