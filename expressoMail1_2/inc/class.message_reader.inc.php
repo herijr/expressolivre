@@ -27,6 +27,7 @@ class MessageReader
 	private $_mbox          = false;
 	private $_folder        = false;
 	private $_attachs       = array();
+	private $_attachs_root  = array();
 	private $_sections      = false;
 	//private $_structure     = null;
 	//private $_plain         = '';
@@ -67,12 +68,12 @@ class MessageReader
 		);
 	}
 
-	public function getAttachInfo( $section = false )
+	public function getAttachInfo( $section = false, $deep = false )
 	{
 		if ( $this->_sections === false ) $this->_load();
 		if ( $section !== false ) return $this->_sections[$section];
 		$result = array();
-		foreach ( $this->_attachs as $section ) $result[] = $this->_sections[$section];
+		foreach ( $this->{$deep?'_attachs':'_attachs_root'} as $section ) $result[] = $this->_sections[$section];
 		return $result;
 	}
 
@@ -99,11 +100,12 @@ class MessageReader
 
 	private function _clear()
 	{
-		$this->_uid      = false;
-		$this->_mbox     = false;
-		$this->_folder   = false;
-		$this->_attachs  = array();
-		$this->_sections = false;
+		$this->_uid          = false;
+		$this->_mbox         = false;
+		$this->_folder       = false;
+		$this->_attachs      = array();
+		$this->_attachs_root = array();
+		$this->_sections     = false;
 	}
 
 	private function _readSection( $node, $prefix = '' )
@@ -127,7 +129,8 @@ class MessageReader
 
 		// ATTACHMENTS
 		if ( ( $node->ifdisposition && strtolower( $node->disposition ) === 'attachment' ) || $params['filename'] || $params['name'] ) {
-			$this->_attachs[] = $prefix;
+			$this->_attachs[] = $obj->section;
+			if ( strlen( $prefix ) === 1 ) $this->_attachs_root[] = $obj->section;
 			$obj->filename = isset( $params['filename'] )? $params['filename'] : ( isset( $params['name'] )? $params['name'] : false );
 			if ( $obj->filename === false ) {
 				preg_match('/name=["\']?(.*)["\']?/', imap_fetchmime( $this->_mbox, $this->_uid , $obj->section, FT_UID ), $matchs );
