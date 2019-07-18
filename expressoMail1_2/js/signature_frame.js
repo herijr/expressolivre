@@ -27,7 +27,13 @@ var SignatureFrame = new function() {
 
 	this.redrawOnCaret = function( $bdy_ifrm )
 	{
-		return SignatureFrame.redraw( $bdy_ifrm, undefined, 'after', false );
+		var _redraw = SignatureFrame.redraw( $bdy_ifrm, undefined, 'after', false );
+
+		if( $bdy_ifrm.contents().find('iframe#use_signature_anchor').length == 0 ){
+			_redraw = SignatureFrame.redraw( $bdy_ifrm, $bdy_ifrm.contents().find('body'), 'append' );
+		}
+		
+		return _redraw;
 	}
 
 	this.caretPosition = function( $bdy_ifrm )
@@ -66,7 +72,7 @@ var SignatureFrame = new function() {
 		funct     = funct !== undefined? funct : 'append';
 		extra     = extra !== undefined? extra : $('<br>');
 
-		var ID = $bdy_ifrm.attr('id').replace( 'body_', '' )
+		var ID = $bdy_ifrm.attr('id').replace( 'body_', '' );
 
 		var data = $('select#from_'+ID).find(':selected').data();
 		if ( !data ) return;
@@ -77,9 +83,18 @@ var SignatureFrame = new function() {
 
 		var $ifrm = $bdy_ifrm.contents().find('iframe#use_signature_anchor');
 		if ( !$ifrm.length ) {
-			$ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contentEditable': 'true' }).css({ 'width': '100%' }).on('load',function(){
+			$ifrm = $('<iframe>').attr({ 'id': 'use_signature_anchor', 'frameborder': '0', 'contentEditable': 'true', 'scrolling' : 'no' }).css({ 'width': '100%' }).on('load',function(){
 				var data = $('select#from_'+ID).find(':selected').data();
 				if ( $ifrm.data('writed') != $ifrm.contents().find('body').html() ) SignatureFrame.write( $ifrm, data.mail, $ifrm.data('writed'), true, data.default_signature );
+
+				$ifrm.contents().find('head').append(
+					$('<style>').attr({'type':'text/css'}).text(
+						'body { margin:0; }'+
+						'body:hover { background-color: aliceblue; }'+
+						'pre { margin:0; white-space:pre-wrap; overflow-wrap:break-word; font-family: monospace; font-size:11px;}'
+					)
+				);
+
 				SignatureFrame.setHeight( $ifrm );
 			});
 
@@ -88,14 +103,14 @@ var SignatureFrame = new function() {
 				$has_div.after( $ifrm );
 				$has_div.remove();
 			} else {
-				location = location !== undefined? location : SignatureFrame.caretPosition( $bdy_ifrm );
-				if ( location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
+				location = typeof(location) !== 'undefined' ? location : SignatureFrame.caretPosition( $bdy_ifrm );
+				if ( typeof(location) !== 'undefined' && location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
 				$(location)[funct]( extra, $ifrm );
 			}
 		} else if ( data.mail == $ifrm.data('mail') && data.use_signature == '1' ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
 
 		$ifrm.toggle( ( data.default_signature || data.use_signature == '1' ) );
-		var signature = data.signature ? (
+		var signature = ( data.default_signature || ( data.use_signature == '1' && data.signature ) )? (
 			( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
 			'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>' : data.signature
 		) : '';
@@ -121,13 +136,6 @@ var SignatureFrame = new function() {
 			var doc = $ifrm.contents().get(0);
 
 			$(doc).find('body').attr( 'contentEditable', !isDefault ).html( signature ).find('img').off('load').on('load',function(){ SignatureFrame.setHeight( $ifrm ); });
-			$(doc).find('head').append(
-				$('<style>').attr({'type':'text/css'}).text(
-					'body{ margin:0; }'+
-					'body:hover{ background-color: aliceblue !important; }'+
-					'pre{ margin:0;white-space: pre-wrap !important;overflow-wrap: break-word !important;font-family: !monospace important;font-size: 11px !important; }'
-				)
-			);
 
 			SignatureFrame.setHeight( $ifrm );
 
