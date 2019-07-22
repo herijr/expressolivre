@@ -6,9 +6,29 @@ var SignatureFrame = new function() {
 
 		SignatureFrame.redraw( $bdy_ifrm, $bdy_ifrm.contents().find('body'), insert_mode );
 
-		$bdy_ifrm.contents().on( 'selectionchange.edit,mouseup.edit,mousedown.edit,keyup.edit', function(){
-			SignatureFrame.persist( $bdy_ifrm );
-		});
+		var disableEnableSignature = function(){
+
+			var ID = $($bdy_ifrm).attr("id").replace( 'body_', '' );
+
+			var data = $('select#from_'+ID).find(':selected').data();
+
+			if( $bdy_ifrm.contents().find('iframe#use_signature_anchor').contents().find('body').contents().children().length == 0 ){
+				
+				if( !data.default_signature ){ 
+					window.clearTimeout( $bdy_ifrm.data('timer') ); 
+				}
+			} else {
+				SignatureFrame.persist( $bdy_ifrm );
+			}			
+		};
+
+		$bdy_ifrm.contents().on('selectionchange.edit', function(){ disableEnableSignature(); });
+
+		$bdy_ifrm.contents().on('mouseup.edit', function(){ disableEnableSignature(); });
+
+		$bdy_ifrm.contents().on('mousedown.edit', function(){ disableEnableSignature(); });
+
+		$bdy_ifrm.contents().on('keyup.edit', function(){ disableEnableSignature(); });
 	};
 
 	this.persist = function( $bdy_ifrm )
@@ -69,8 +89,8 @@ var SignatureFrame = new function() {
 	this.redraw = function( $bdy_ifrm, location, funct, extra )
 	{
 		$bdy_ifrm = $bdy_ifrm.jquery? $bdy_ifrm : $($bdy_ifrm);
-		funct     = funct !== undefined? funct : 'append';
-		extra     = extra !== undefined? extra : $('<br>');
+		funct     = typeof(funct) !== 'undefined'? funct : 'append';
+		extra     = typeof(extra) !== 'undefined'? extra : $('<br>');
 
 		var ID = $bdy_ifrm.attr('id').replace( 'body_', '' );
 
@@ -107,16 +127,18 @@ var SignatureFrame = new function() {
 				if ( typeof(location) !== 'undefined' && location.tagName == 'BODY') funct = ( funct == 'after' )? 'append' : ( ( funct == 'before' )? 'prepend' : funct );
 				$(location)[funct]( extra, $ifrm );
 			}
-		} else if ( data.mail == $ifrm.data('mail') && data.use_signature == '1' ) $('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
+		} else if ( data.mail == $ifrm.data('mail') && data.use_signature == '1' ) {
+			$('select#from_'+ID).find(':selected').data( 'signature', $ifrm.contents().find('body').html() );
+		}
 
 		$ifrm.toggle( ( data.default_signature || data.use_signature == '1' ) );
 		var signature = ( data.default_signature || ( data.use_signature == '1' && data.signature ) )? (
-			( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( data.type_signature !== undefined && data.type_signature != 'html' ) )?
+			( $('#textplain_rt_checkbox_'+ID).is(':checked') || ( typeof(data.type_signature) !== 'undefined' && data.type_signature != 'html' ) )?
 			'<pre>'+RichTextEditor.stripHTML( data.signature ).join('')+'</pre>' : data.signature
 		) : '';
 
 		SignatureFrame.write( $ifrm, data.mail, signature, ( data.mail != $ifrm.data('mail') ), data.default_signature );
-		
+
 	}
 
 	this.write = function( $ifrm, mail, signature, force, isDefault )
@@ -124,8 +146,8 @@ var SignatureFrame = new function() {
 		try {
 			if ( !$ifrm.contents() ) return;
 
-			signature = signature !== undefined? signature : '';
-			force     = force     !== undefined? force : false;
+			signature = typeof(signature) !== 'undefined'? signature : '';
+			force     = typeof(force)     !== 'undefined'? force : false;
 
 			if ( ( !force ) && $ifrm.data( 'writed' ) == signature ) return;
 
