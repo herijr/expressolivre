@@ -12,12 +12,18 @@ var SignatureFrame = new function() {
 
 			var data = $('select#from_'+ID).find(':selected').data();
 
-			if( $bdy_ifrm.contents().find('iframe#use_signature_anchor').contents().find('body').contents().children().length == 0 ){
+			if( $bdy_ifrm.contents().find('iframe#use_signature_anchor').contents().find('body').contents().length == 0 ){
 				
 				if( !data.default_signature ){ 
+					
 					window.clearTimeout( $bdy_ifrm.data('timer') ); 
+					
+					$('select#from_'+ID).find(':selected').data( 'use_signature', '0' );
 				}
 			} else {
+				
+				$('select#from_'+ID).find(':selected').data( 'use_signature', '1' );
+				
 				SignatureFrame.persist( $bdy_ifrm );
 			}			
 		};
