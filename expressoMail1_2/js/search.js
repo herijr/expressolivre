@@ -427,7 +427,7 @@
 			
 			var _onclick = function()
 			{
-				proxy_mensagens.get_msg(this.parentNode.id,url_encode(this.parentNode.getAttribute('name')),false,show_msg);
+				proxy_mensagens.get_msg(this.parentNode.id,url_encode(this.parentNode.getAttribute('name')),show_msg);
 			};
 			
             for(var j=0 ; j <= 10 ; j++)
@@ -837,7 +837,7 @@
 				draw_message( data, create_border(url_decode(subject), uid_msg + "_r") );
 		}
 		
-		proxy_mensagens.get_msg(uid_msg,mailbox,false,handler_get_msg);
+		proxy_mensagens.get_msg(uid_msg,mailbox,handler_get_msg);
 	}
 
 	// Adiciona caixas postais na busca;

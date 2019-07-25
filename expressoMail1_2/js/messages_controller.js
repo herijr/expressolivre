@@ -19,7 +19,7 @@
 		}
 	}
 
-	messages_proxy.prototype.get_msg = function( msg_number, msg_folder, set_flag, callback )
+	messages_proxy.prototype.get_msg = function( msg_number, msg_folder, callback )
 	{
 		Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': msg_number, 'msg_folder': msg_folder }, callback );
 	}

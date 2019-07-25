@@ -1871,30 +1871,6 @@ function set_messages_flag(flag, msgs_to_set){
 		}
 
 		for (var i=0; i<msgs_to_set.length; i++){
-			if (preferences.use_cache == 'True')
-			{
-				if (current_folder == '')
-					current_folder = 'INBOX';
-				var setFlag = function(msgObj) {
-					switch(data.flag){
-						case "unseen":
-							msgObj.Unseen = "U";
-							break;
-						case "seen":
-							msgObj.Unseen = "";
-							break;
-						case "flagged":
-							msgObj.Flagged = "F";
-							break;
-						case "unflagged":
-							msgObj.Flagged = "";
-							break;
-					}
-				}
-				proxy_mensagens.get_msg(msgs_to_set[i],current_folder, false, setFlag);
-
-
-			}
 			if(Element("check_box_message_" + msgs_to_set[i])){
 				switch(data.flag){
 					case "unseen":

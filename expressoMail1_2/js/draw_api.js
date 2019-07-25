@@ -967,7 +967,7 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
 		td_element3.className = "td_msg";
 		td_element3.id = "td_who_"+ headers_msgs.msg_number;
 		td_element3.setAttribute("width", "20%");
-		var _onclick = function(){InfoContact.hide();proxy_mensagens.get_msg(headers_msgs.msg_number, msg_folder,true, show_msg);};
+		var _onclick = function(){InfoContact.hide();proxy_mensagens.get_msg(headers_msgs.msg_number, msg_folder, show_msg);};
 		td_element3.onclick = _onclick;
 		td_element3.innerHTML = '&nbsp;';
 		
@@ -1208,7 +1208,7 @@ function draw_message( info_msg, ID )
 			{
 				currentTab = ID;
 				openTab.type[ID] = 2;
-				proxy_mensagens.get_msg(folder.nextSibling.id,nextMsgBox,true,show_msg);
+				proxy_mensagens.get_msg(folder.nextSibling.id,nextMsgBox,show_msg);
 			};
 		}
 		else
@@ -1254,7 +1254,7 @@ function draw_message( info_msg, ID )
 			{
 				currentTab = ID;
 				openTab.type[ID] = 2;
-				proxy_mensagens.get_msg(folder.previousSibling.id,previousMsgBox,true,show_msg);
+				proxy_mensagens.get_msg(folder.previousSibling.id,previousMsgBox,show_msg);
 			};
 		}
 		else
