@@ -16,7 +16,14 @@ class CatalogAdapter extends ExpressoAdapter {
 	{
 		$newContact = CreateObject('contactcenter.ui_data');
 
-		return $newContact->quick_add_mobile(serialize($contact));
+		return $newContact->quick_save_mobile(serialize($contact));
+	}
+
+	protected function updateContact($contactID, $contact)
+	{	
+		$contactUpdate = CreateObject('contactcenter.ui_data');
+	
+		return $contactUpdate->quick_save_mobile(serialize($contact),$contactID);
 	}
 
 	protected function deleteContact($contactID)

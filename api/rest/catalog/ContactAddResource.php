@@ -7,7 +7,7 @@ class ContactAddResource extends CatalogAdapter {
 		$this->setResource("Catalog","Catalog/ContactAdd","Adiciona um contato no catálogo pessoal.",array("POST"));
 		$this->setIsMobile(true);
 		$this->addResourceParam("auth","string",true,"Chave de autenticação do Usuário.",false);
-
+		$this->addResourceParam("contactID","string",false,"Código do contato (Informado quando for alterar o contato existente.");
 		$this->addResourceParam("contactAlias","string",false,"Apelido do contato.");
 		$this->addResourceParam("contactGivenName","string",false,"Primeiro nome do contato.");
 		$this->addResourceParam("contactFamilyName","string",false,"Sobrenome do contato.");
@@ -23,6 +23,7 @@ class ContactAddResource extends CatalogAdapter {
 
  		if( $this->isLoggedIn() )
 		{
+			$contactID = $this->getParam('contactID');
 			//New Contact
 			$newContact 	= array();
 			$newContact[0]	= trim($this->getParam('contactAlias'));
@@ -32,19 +33,37 @@ class ContactAddResource extends CatalogAdapter {
 			$newContact[4]	= trim($this->getParam('contactEmail'));			
 
 			// Field Validation
-		    if( $newContact[4] === "" )
-		    {
-				Errors::runException( "CATALOG_EMAIL_EMPTY" );
-		    }
-		    else
-		    {	
-		        if( !preg_match("/^[[:alnum:]]+([\.\_\-]?([[:alnum:]]+))+\@(([[:alnum:]\-]+)\.)+[[:alpha:]]{2,4}$/", $newContact[4]) )
-		        {
-					Errors::runException( "CATALOG_EMAIL_INVALID" );		        	
-		        }
-		    }
+			$lastChar = substr($newContact[4], -1);
+			if ($lastChar == ",") {
+				$newContact[4] = substr($newContact[4],0,-1);
+			}
 
-			$result = unserialize($this->addContact($newContact));
+			$lastChar = substr($newContact[3], -1);
+			if ($lastChar == ",") {
+				$newContact[3] = substr($newContact[3],0,-1);
+			}
+
+			$contactEmails = explode(",", $newContact[4]);
+			foreach ($contactEmails as $contactEmail) {
+				$contactEmail = trim($contactEmail);
+				if( $contactEmail === "" )
+				{
+					Errors::runException( "CATALOG_EMAIL_EMPTY" );
+				}
+				else
+				{
+					if( !preg_match("/^[[:alnum:]]+([\.\_\-]?([[:alnum:]]+))+\@(([[:alnum:]\-]+)\.)+[[:alpha:]]{2,4}$/", $contactEmail) )
+					{
+						Errors::runException( "CATALOG_EMAIL_INVALID" );
+					}
+				}
+			}
+
+			if ($contactID != "") {
+				$result = unserialize($this->updateContact($contactID,$newContact));
+			} else {
+				$result = unserialize($this->addContact($newContact));
+			}
 
 			if( $result['status'] === "false")
 			{	

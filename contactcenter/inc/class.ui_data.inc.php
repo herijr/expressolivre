@@ -1803,6 +1803,80 @@
 			echo 0;
 		}
 
+		function quick_save_mobile($sdata,$id = false)
+		{
+			$updateContact = unserialize($sdata);
+
+			$data = array();
+			if ($id != false) {
+
+				ob_start();
+				$this->get_full_data($id,"bo_people_catalog");
+				$dataContact = unserialize(ob_get_contents());
+				ob_end_clean();
+
+				$i = 0;
+				foreach ($dataContact['connections'] as $connection) {
+					foreach ($connection as $conn){
+						$data['connections']['removed_conns'][$i] = $conn['id'];
+						$i++;
+					}
+				}
+			}
+
+			$count = 0;
+			// $data['id_status'] = 2;
+			$data['alias'] = addslashes($updateContact[0]);
+			$data['given_names'] = addslashes($updateContact[1]);
+			$data['family_names'] = addslashes($updateContact[2]);
+			$data['names_ordered'] = addslashes($updateContact[1]) . ' ' . addslashes($updateContact[2]);
+			$data['pgp_key'] = '';
+			$data['notes'] = '';
+			$data['addresses'] = '';
+
+			$emails = explode(",", $updateContact[4]);
+			foreach ($emails as $email) {
+				$data['connections']['connection' . $count]['id_connection'] = '_NEW_';
+				$data['connections']['connection' . $count]['id_typeof_connection'] = 1;
+				$data['connections']['connection' . $count]['connection_name'] = lang('Main');
+				$data['connections']['connection' . $count]['connection_value'] = $email;
+				$data['connections']['connection' . $count]['connection_is_default'] = true;
+				$count++;
+			}
+
+			$phones = explode(",", $updateContact[3]);
+			foreach ($phones as $phone) {
+				$data['connections']['connection' . $count]['id_connection'] = '_NEW_';
+				$data['connections']['connection' . $count]['id_typeof_connection'] = 2;
+				$data['connections']['connection' . $count]['connection_name'] = lang('Main');
+				$data['connections']['connection' . $count]['connection_value'] = $phone;
+				$data['connections']['connection' . $count]['connection_is_default'] = true;
+				$count++;
+			}
+
+			if ($id == false) {
+				$id = $this->bo->catalog->add_single_entry($data); 
+			} else {
+				$id = $this->bo->catalog->update_single_info($id, $data); 
+			}
+
+			$result = array(
+				'msg' => lang('Updated Successfully!'),
+				'status' => 'ok'
+			);
+
+			if (!($id))
+			{
+				$result = array(
+					'msg' => lang('Some problem occured when trying to insert/update contact information.<br>'.
+				                   'Report the problem to the Administrator.'),
+					'status' => 'fail'
+				);
+			}
+
+			return $result;
+		}
+
 		function quick_add_mobile($sdata)
 		{
 			$newContact = unserialize($sdata);
