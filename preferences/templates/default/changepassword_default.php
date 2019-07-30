@@ -37,7 +37,7 @@ preg_match_all('/[^[:alnum:]]/', $n_passwd, $matchesChars);
 //Upper Case
 $upperCase = (is_array($matchesUpperCase[0]) && isset($matchesUpperCase[0]) ? count($matchesUpperCase[0]) : 0);
 if ($upperCase < $GLOBALS['phpgw_info']['server']['num_uppercase_letters']) {
-	$errors[] = lang('Sua senha deve possuir pelo menos %1 letra(s) maiúscula(s)', $GLOBALS['phpgw_info']['server']['num_uppercase_letters']);
+	$errors[] = lang('Your password must contain at least %1 uppercase letters', $GLOBALS['phpgw_info']['server']['num_uppercase_letters']);
 }
 
 //Number or characters special
