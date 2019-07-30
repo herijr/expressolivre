@@ -243,7 +243,8 @@ How many days the password should be kept(empty to disable this) ?	admin	pt-br	Q
 how many days should entries stay in the access log, before they get deleted (default 90) ?	admin	pt-br	Quantos dias as entradas devem ser mantidas no registro de acessos, antes de serem apagadas (padrão 90)?
 How many letters the user password must contain (default 3) ?	admin	pt-br	Quantas letras a senha do usuário precisa ter (padrão 3) ?
 how many minutes should an account or ip be blocked (default 30) ?	admin	pt-br	Quantos minutos uma conta ou endereço IP devem ser bloqueados (padrão 30)?
-How many special letters the user password must contain (default 0) ?	admin	pt-br	Quantas letras especiais a senha do usuários precisa ter (padrão 0) ?
+How many special letters the user password must contain (default 0) ?	admin	pt-br	Quantas letras especiais a senha do usuário precisa ter (padrão 0) ?
+How many uppercase letters the user password must contain (default 1) ?	admin	pt-br	Quantas letras maiúsculas a senha do usuário precisa ter (padrão 1) ?
 HTML code of the organization login	admin	pt-br	Insira o código HTML referente ao rodapé do login (logotipo da empresa)
 icon	admin	pt-br	Ícone
 idle	admin	pt-br	ocioso

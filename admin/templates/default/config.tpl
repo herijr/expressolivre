@@ -217,8 +217,15 @@ que ser&atilde;o suportados (At&eacute; 10):<br/>
      <input name="newsettings[num_special_letters_userpass]" value="{value_num_special_letters_userpass}" size="5">
     </td>
    </tr>
-      
+
    <tr class="row_on">
+    <td>{lang_How_many_uppercase_letters_the_user_password_must_contain_(default_1)_?}:</td>
+    <td>
+     <input name="newsettings[num_uppercase_letters]" value="{value_num_uppercase_letters}" size="5">
+    </td>
+   </tr>
+
+   <tr class="row_off">
     <td>{lang_Admin_email_addresses_(comma-separated)_to_be_notified_about_the_blocking_(empty_for_no_notify)}:</td>
     <td>
      <input name="newsettings[admin_mails]" value="{value_admin_mails}" size="40">

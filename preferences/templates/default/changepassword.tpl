@@ -1,5 +1,5 @@
 <br>
-   <center>{messages}</center>
+   <center style="color:red">{messages}</center>
    <form method="POST" action="{form_action}">
     <table border="0">
      <tr>
