@@ -15,6 +15,9 @@ if (!$GLOBALS['phpgw_info']['server']['num_uppercase_letters']) {
 	$GLOBALS['phpgw_info']['server']['num_uppercase_letters'] = 1;
 }
 
+// Password : validate fields;
+$errors = array();
+
 if (!$GLOBALS['phpgw']->auth->authenticate($GLOBALS['phpgw_info']['user']['account_lid'], $a_passwd)) {
 	$errors[] = lang('Your actual password is wrong');
 } else if ($n_passwd != $n_passwd_2) {
@@ -26,6 +29,18 @@ if (!$GLOBALS['phpgw']->auth->authenticate($GLOBALS['phpgw_info']['user']['accou
 } else if (strlen($n_passwd) < $GLOBALS['phpgw_info']['server']['num_letters_userpass']) {
 	$errors[] = lang('Your password must contain %1 or more letters', $GLOBALS['phpgw_info']['server']['num_letters_userpass']);
 }
+
+if (is_array($errors) && count($errors) > 0 ) {
+	$GLOBALS['phpgw']->common->phpgw_header();
+	echo parse_navbar();
+	$GLOBALS['phpgw']->template->set_var('messages', "<span style='font-weight:bold;'>Erro(s) :</span> " . implode("<br>", $errors ) );
+	$GLOBALS['phpgw']->template->pfp('out', 'form');
+	$GLOBALS['phpgw']->common->phpgw_exit(True);
+}
+
+
+// Password : validate rules expresso admin;
+$errors = array();
 
 // Tests uppercase, digits and characteres
 preg_match_all('/[[:upper:]]/', $n_passwd, $matchesUpperCase);
@@ -49,10 +64,10 @@ if ($specialChars < $GLOBALS['phpgw_info']['server']['num_special_letters_userpa
 	$errors[] = lang('Your password must contain at least %1 special characters', $GLOBALS['phpgw_info']['server']['num_special_letters_userpass']);
 }
 
-if (is_array($errors)) {
+if (is_array($errors) && count($errors) > 0 ) {
 	$GLOBALS['phpgw']->common->phpgw_header();
 	echo parse_navbar();
-	$GLOBALS['phpgw']->template->set_var('messages', $GLOBALS['phpgw']->common->error_list($errors));
+	$GLOBALS['phpgw']->template->set_var('messages', "<span style='font-weight:bold;'>Erro(s) :</span><br>" . implode("<br>", $errors ) );
 	$GLOBALS['phpgw']->template->pfp('out', 'form');
 	$GLOBALS['phpgw']->common->phpgw_exit(True);
 }
