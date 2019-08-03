@@ -64,6 +64,11 @@ class MailAdapter extends ExpressoAdapter {
 			$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['quick_search_default'] = $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['quick_search_default'] ? $GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['quick_search_default'] : 1;
 		}
 
+		// setting timezone preference
+		$_SESSION['phpgw_info']['user']['preferences']['expressoMail']['timezone'] =
+			$GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['timezone'] ?
+			$GLOBALS['phpgw_info']['user']['preferences']['expressoMail']['timezone'] : 'America/Sao_Paulo';
+
 		if( !isset($_SESSION['phpgw_info']['expressomail']) ){
 			$_SESSION['phpgw_info']['expressomail']['email_server'] = $boemailadmin->getProfile($emailadmin_profile[0]['profileid']);
 		}
