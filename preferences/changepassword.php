@@ -79,7 +79,7 @@ $a_passwd   = $_POST['a_passwd'];
 $n_passwd   = $_POST['n_passwd'];
 $n_passwd_2 = $_POST['n_passwd_2'];
 
-$acl_change_password = ( !$GLOBALS['phpgw']->acl->check('changepassword', 1 ) || $_POST['cancel'] ) ? false : true;
+$acl_change_password = ( !$GLOBALS['phpgw']->acl->check('changepassword', 1 ) ) ? false : true;
 
 // Default number of letters = 3
 if (!$GLOBALS['phpgw_info']['server']['num_letters_userpass']) {

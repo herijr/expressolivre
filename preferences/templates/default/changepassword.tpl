@@ -1,4 +1,5 @@
 <!-- BEGIN form -->
+<script type="text/javascript" src="../prototype/plugins/jquery/jquery-latest.min.js" language="javascript" charset="utf-8"></script>
 <div style="margin:0 auto; width:90%; padding:10px;">
     <div style="display: inline-block; padding:2px; width:400px; vertical-align:top;">
         <div style="color:red;font-size:9pt;">{messages}</div>
@@ -6,7 +7,7 @@
             <table style='height:200px;width:300px;'>
                 <tr>
                     <td>{lang_enter_actual_password}</td>
-                    <td><input type="password" name="a_passwd" style="overflow:auto !important"></td>
+                    <td><input type="password" name="a_passwd" style="overflow:auto !important" autofocus></td>
                 </tr>
                 <tr>
                     <td>{lang_enter_password}</td>
@@ -32,4 +33,13 @@
         <p>- Sua nova senha n&atilde;o pode ser igual &agrave; senha anterior;</p>
     </div>
 </div>
+<script>
+    $(document).on('keydown.changePassword', function( event ){
+        if( event.keyCode === 13 ){
+            if( event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT' ){
+                return false;
+            }
+        }
+    });
+</script>
 <!-- END form -->
