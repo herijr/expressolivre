@@ -28,7 +28,7 @@
     <div style=" display:inline-block;font-size:10pt; background-color:#fff; border:1px solid #000; padding:5px;">
         <h4>Orientações: </h4>
         <p>- Tamanho m&iacute;nimo da senha: <span style="color:red;font-weight:bold;">{num_letters_userpass}</span> caracteres; </p>
-        <p>- Ao menos <span style="color:red;font-weight:bold;">{num_special_letters_userpass}</span> caracteres especiais ou n&uacute;meros; </p> 
+        <p>- Ao menos <span style="color:red;font-weight:bold;">{num_special_letters_userpass}</span> n&uacute;meros; </p> 
         <p>- Ao menos <span style="color:red;font-weight:bold;">{num_uppercase_letters}</span> letra mai&uacute;scula;</p>
         <p>- Sua nova senha n&atilde;o pode ser igual &agrave; senha anterior;</p>
     </div>
