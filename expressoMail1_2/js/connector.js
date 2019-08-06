@@ -50,44 +50,45 @@ var handlerExecuteForm = null;
 	}
 	
 	cConnector.prototype.buildBar = function()
-		{			
-			var div = document.getElementById('divProgressBar');
-		
-			if(! div) {												
-				div = document.createElement("DIV");
-				div.style.visibility	= "hidden";		
-				div.style.width = "103px";
-				div.id = 'divProgressBar';
-				div.align = "center";
-				div.innerHTML = '&nbsp;&nbsp;<font face="Verdana" size="2" color="WHITE">'+document.getElementById('txt_loading').value+'...</font>&nbsp;';
-				div.style.background = "#cc4444";
-				div.style.position = 'fixed';
-				div.style.top = '0px';
-				div.style.right = '0px';
-				document.body.appendChild(div);																
-				
-				if(is_ie) {
-					var elem = document.all[div.id]; 
-					elem.style.position="absolute";
-					var root = document.body;
-					var posX = elem.offsetLeft-root.scrollLeft;
-					var posY = elem.offsetTop-root.scrollTop;
-					root.onscroll = function() {
-						elem.style.right = '0px';
-						elem.style.top = (posY + root.scrollTop) + "px";
-					};					
-				}
-				
-				if(debug_controller) {
-					div = document.createElement("DIV");
-					div.style.width	= "800px";
-					div.style.height= "400px";
-					div.id = "debug_controller";
-					div.align='right';
-					document.body.appendChild(div);																
-				}
-			}								
-	}	
+	{
+		var div = document.getElementById('divProgressBar');
+		if ( div ) return div;
+
+		div                  = document.createElement( 'DIV' );
+		div.style.visibility = 'hidden';
+		div.style.width      = '103px';
+		div.id               = 'divProgressBar';
+		div.align            = 'center';
+		div.innerHTML        = '&nbsp;&nbsp;<font face="Verdana" size="2" color="WHITE">'+document.getElementById('txt_loading').value+'...</font>&nbsp;';
+		div.style.background = '#cc4444';
+		div.style.position   = 'fixed';
+		div.style.top        = '0px';
+		div.style.right      = '0px';
+		document.body.appendChild( div );
+
+		if ( is_ie ) {
+			var elem             = document.all[div.id];
+			elem.style.position  = 'absolute';
+			var root             = document.body;
+			var posX             = elem.offsetLeft - root.scrollLeft;
+			var posY             = elem.offsetTop - root.scrollTop;
+			root.onscroll        = function() {
+				elem.style.right = '0px';
+				elem.style.top   = ( posY + root.scrollTop )+'px';
+			};
+		}
+
+		if ( debug_controller ) {
+			var debug          = document.createElement( 'DIV' );
+			debug.style.width  = '800px';
+			debug.style.height = '400px';
+			debug.id           = 'debug_controller';
+			debug.align        = 'right';
+			document.body.appendChild( debug );
+		}
+
+		return div;
+	}
 //------------------------------------ BEGIN: Functions for Connector HTTPRequest  -------------------------------------------------//	
 	// Serialize Data Method
 	cConnector.prototype.serialize = function(data)
@@ -458,15 +459,16 @@ var handlerExecuteForm = null;
 	cConnector.prototype.hideProgressBar = function ()
 	{
 		var div = document.getElementById('divProgressBar');
+		if ( !div ) div = this.buildBar();
 		div.style.visibility = 'hidden';
-		this.isVisibleBar = false;
+		this.isVisibleBar    = false;
 	}
 	
 	cConnector.prototype.showProgressBar = function(){
 		var div = document.getElementById('divProgressBar');
-		div.style.visibility = 'visible';			
-
-		this.isVisibleBar = true;
+		if ( !div ) div = this.buildBar();
+		div.style.visibility = 'visible';
+		this.isVisibleBar    = true;
 	}
 
 	cConnector.prototype.loadAllScripts = function(scripts) {	
@@ -475,27 +477,22 @@ var handlerExecuteForm = null;
 		}
 	}
 
-	cConnector.prototype.loadScript = function(scriptPath)	{
-      	if (document.getElementById('uploadscript_'+scriptPath)) {
-      		return;
-      	}
-		var head = document.getElementsByTagName("head")[0];
-		var script = document.createElement("SCRIPT");
-		script.id = 'uploadscript_'+scriptPath;
+	cConnector.prototype.loadScript = function( scriptPath ) {
+		if ( document.getElementById( 'uploadscript_'+scriptPath ) ) return;
+		var version = ( this.updateVersion[scriptPath] )? this.updateVersion[scriptPath] : '';
+		var head    = document.getElementsByTagName( 'head' )[0];
+		var script  = document.createElement( 'SCRIPT' );
+		script.id   = 'uploadscript_'+scriptPath;
 		script.type = 'text/javascript';
-  		if(is_ie) {
-			this.oxmlhttp.open("GET", "js/"+scriptPath+".js?"+this.updateVersion, false);
-			this.oxmlhttp.setRequestHeader('Content-Type','text/plain');
-			this.oxmlhttp.send(null);
-			if(this.oxmlhttp.status != 0 && this.oxmlhttp.status != 200 || 	this.oxmlhttp.status == 0 && this.oxmlhttp.responseText.length == 0)
-				throw new Error("Error " + this.oxmlhttp.status + "("+this.oxmlhttp.statusText+") when loading script file '"+scriptPath+"'");
+		if ( is_ie ) {
+			this.oxmlhttp.open( 'GET', 'js/'+scriptPath+'.js'+version, false );
+			this.oxmlhttp.setRequestHeader( 'Content-Type', 'text/plain' );
+			this.oxmlhttp.send( null );
+			if ( this.oxmlhttp.status != 0 && this.oxmlhttp.status != 200 || this.oxmlhttp.status == 0 && this.oxmlhttp.responseText.length == 0 )
+				throw new Error( 'Error '+this.oxmlhttp.status+'('+this.oxmlhttp.statusText+') when loading script file "'+scriptPath+'"' );
 			script.text = this.oxmlhttp.responseText;
-		}
-		else {
-			script.src =  "js/"+scriptPath+".js?"+this.updateVersion;
-		}
-
-		head.appendChild(script);
+		} else script.src = 'js/'+scriptPath+'.js'+version;
+		head.appendChild( script );
 		return;
 	}
 //------------------------------------  END: Functions for Progress Bar  -------------------------------------------------//

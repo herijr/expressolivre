@@ -16,6 +16,7 @@
 /security/classes/*.pem
 /phpgwapi/templates/news/config_images.ini
 *.orig
+*.lang.js
 hook_changepassword.ini.php
 .DS_Store
 

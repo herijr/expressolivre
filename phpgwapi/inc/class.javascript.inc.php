@@ -137,10 +137,8 @@
 							{
 								foreach($files as $file => $ignored)
 								{
-									$links .= '<script type="text/javascript" src="'
-								 	. $GLOBALS['phpgw_info']['server']['webserver_url']
-								 	. "/$app/js/$pkg/$file" . '.js">'
-								 	. "</script>\n";
+									$fname = $GLOBALS['phpgw_info']['server']['webserver_url']."/$app/js/$pkg/$file".'.js';
+									$links .= '<script type="text/javascript" src="'.$fname.$this->version( $fname ).'"></script>'."\n";
 								}
 							}
 						}
@@ -228,19 +226,22 @@
 			}
 		}
 		
-		function add($type, $value)
+		function add( $type, $value, $charset = false )
 		{
 			$value = (string)$value;
+			$type  = strtolower( $type );
+			if ( empty( $value ) || !( $type === 'txt' || $type === 'file' ) ) return;
 			
-			if (empty($value)) return;
+			$obj = array( 'type' => $type, 'src' => $value );
+			if ( $charset !== false ) $obj['charset'] = $charset;
 			
 			switch (strtolower($type)) {
 				case 'txt':
-					$this->_scripts[] = array('type'=>'txt','src'=>$value);
+					$this->_scripts[] = $obj;
 					break;
 				case 'file': case 'src':
 					if (!count(array_filter($this->_scripts,create_function('$a','return (($a["type"] == "file") && ($a["src"] == "'.$value.'"));'))))
-						$this->_scripts[] = array('type'=>'file','src'=>$value);
+						$this->_scripts[] = $obj;
 					break;
 				default:
 					break;
@@ -254,11 +255,17 @@
 			foreach ($this->_scripts as $value) {
 				switch ($value['type']) {
 					case 'txt': $buf .= '<script type="text/javascript">'.$n.$t.'//<![CDATA['.$n.$value['src'].$n.$t.'//]]>'.$n.'</script>'.$n; break;
-					case 'file': $buf .= '<script type="text/javascript" src="'.$value['src'].'"/></script>'.$n; break;
+					case 'file':
+						$buf .= '<script type="text/javascript" language="javascript" src="'.$value['src'].$this->version( $value['src'] ).'"'.(isset( $value['charset'] )? ' charset="'.$value['charset'].'"' : '' ).'/></script>'.$n;
+						break;
 				}
 			}
+			$this->_scripts = array();
 			$buf .= '<!-- end: get_scripts --> '.$n;
 			return $buf;
+		}
+		public function version( $fname ) {
+			return ( $stat = stat( ( substr( $fname, 0, 1 ) === '/'? $_SERVER['DOCUMENT_ROOT'] : dirname( $_SERVER['SCRIPT_FILENAME'] ) ).SEP.$fname ) )? '?v'.$stat['mtime'] : '';
 		}
 	}
 ?>

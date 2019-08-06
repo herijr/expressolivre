@@ -82,29 +82,29 @@
 		   	
 		   return $files;
 		}
-				
-		function getFilesJs($includeFiles = '', $update_version = ''){
-			
-			$files = $this -> getDirContents('js');
-			$str_files = '';
-			
-			if($includeFiles) {
-				$includeFiles = explode(",",trim($includeFiles));
-				// Bug fixed for array_search function
-				$includeFiles[count($includeFiles)] = $includeFiles[0];
-				$includeFiles[0] = null;
-				// End Bug fixed.
-			}														
-			for($i = 0; $i < count($files); $i++) {				
-				if(count(explode('.js',$files[$i])) > 1) {
-					if($includeFiles  && array_search(trim($files[$i]),$includeFiles)){	
-						$str_files .= "<script src='".$files[$i]."?".$update_version."' type='text/javascript'></script>";						
-					}
+
+	function getFilesJs( $includeFiles = '', $update_version = '' )
+	{
+		$files     = $this -> getDirContents('js');
+		$str_files = '';
+
+		if( $includeFiles ) {
+			$includeFiles = explode(",",trim($includeFiles));
+			// Bug fixed for array_search function
+			$includeFiles[count($includeFiles)] = $includeFiles[0];
+			$includeFiles[0] = null;
+			// End Bug fixed.
+		}
+		for ( $i = 0; $i < count( $files ); $i++ ) {
+			if ( count( explode( '.js', $files[$i] ) ) > 1 ) {
+				if ( $includeFiles && array_search( trim( $files[$i] ), $includeFiles ) ) {
+					if ( ( $stat = stat( dirname($_SERVER['SCRIPT_FILENAME']).SEP.$files[$i] ) ) ) $update_version = 'v'.$stat['mtime'];
+					$str_files .= '<script src="'.$files[$i].'?'.$update_version.'" type="text/javascript"></script>';
 				}
 			}
-			
-			return $str_files;
-		}								
+		}
+		return $str_files;
+	}
 
 		function getReturnExecuteForm(){
 			if(isset($_SESSION['response'])){

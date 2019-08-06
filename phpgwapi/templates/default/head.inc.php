@@ -9,6 +9,7 @@
 	*  option) any later version.                                              *
 	\**************************************************************************/
 
+	if ( !isset( $GLOBALS['phpgw']->js ) ) $GLOBALS['phpgw']->js = createobject( 'phpgwapi.javascript' );
 
 	if($GLOBALS['phpgw_info']['user']['preferences']['common']['show_generation_time'])
 	{
@@ -54,11 +55,12 @@
 	else
 	{
 		$simple_show_hide_src = $GLOBALS['phpgw_info']['server']['webserver_url'] . '/phpgwapi/templates/'.$GLOBALS['phpgw_info']['server']['template_set'].'/js/simple_show_hide.js';
-		$simple_show_hide = '<script src="'.$simple_show_hide_src.'" type="text/javascript">
-		</script>';
+		if ( isset( $GLOBALS['phpgw']->js ) ) $GLOBALS['phpgw']->js->add( 'file', $simple_show_hide_src );
+		else $simple_show_hide = '<script src="'.$simple_show_hide_src.'" type="text/javascript"></script>';
 	}
 
-	$cookie_manager = '<script src="'.$GLOBALS['phpgw_info']['server']['webserver_url'] . '/phpgwapi/templates/'.$GLOBALS['phpgw_info']['server']['template_set'].'/js/cookieManager.js" type="text/javascript"></script>';	
+	if ( isset( $GLOBALS['phpgw']->js ) ) $GLOBALS['phpgw']->js->add( 'file', $GLOBALS['phpgw_info']['server']['webserver_url'].'/phpgwapi/templates/'.$GLOBALS['phpgw_info']['server']['template_set'].'/js/cookieManager.js' );
+	else $cookie_manager = '<script src="'.$GLOBALS['phpgw_info']['server']['webserver_url'] . '/phpgwapi/templates/'.$GLOBALS['phpgw_info']['server']['template_set'].'/js/cookieManager.js" type="text/javascript"></script>';	
 
 	$app = $GLOBALS['phpgw_info']['flags']['currentapp'];
 	$app = $app ? ' ['.(isset($GLOBALS['phpgw_info']['apps'][$app]) ? $GLOBALS['phpgw_info']['apps'][$app]['title'] : lang($app)).']':'';
@@ -99,7 +101,7 @@
 		'body_tags'        => $bodyheader .' '. $GLOBALS['phpgw']->common->get_body_attribs(),
 		'css'              => $GLOBALS['phpgw']->common->get_css(),
 		'java_script'      => $GLOBALS['phpgw']->common->get_java_script(),
-		'cookie_manager'   => $cookie_manager,
+		'cookie_manager'   => isset( $cookie_manager )? $simple_show_hide : '',
 		'webserver_url'    => $webserver_url
 	);
 	$tpl->set_var($var);
