@@ -166,7 +166,6 @@ function resizeWindow()
 	var innerW = $(window).innerWidth();
 
 	var positionDiv 	= divScrollMain.position();
-	var positionTable	= table_message.position();
 
 	if( divScrollMain.length > 0 )
 	{
