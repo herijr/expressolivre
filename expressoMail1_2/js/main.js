@@ -1302,9 +1302,6 @@ function new_message(type, border_ID)
 		default:
 	}
 
-	if ( type != 'new' ) buildAttachments( $('#divFiles_'+new_border_ID).data( $('#attachments_'+border_ID).data() ), true, ( type == 'edit' || type == 'forward' ) );
-
-
 	// Write main editor frame
 	var body = $('iframe#body_'+new_border_ID)[0];
 	var doc = body.contentWindow.document;
@@ -1312,6 +1309,8 @@ function new_message(type, border_ID)
 	doc.write('<html><body bgcolor="#FFFFFF">'+mail_content+'</body></html>');
 	doc.close();
 	doc.designMode = 'on';
+
+	if ( type != 'new' ) buildAttachments( $('#divFiles_'+new_border_ID).data( $('#attachments_'+border_ID).data() ), true, !( type == 'edit' || type == 'forward' ) );
 
 	// Set signature frame
 	SignatureFrame.init( body, target_signature );
@@ -1378,42 +1377,45 @@ function new_message(type, border_ID)
 	return new_border_ID; //Preciso retornar o ID da nova mensagem.
 }
 
-function buildAttachments( $obj, edit, deflt )
+function buildAttachments( $obj, editable, selected )
 {
 	if ( typeof $obj === 'undefined' ) return false;
 	$obj     = ( $obj.__proto__ === jQuery.fn )? $obj : $($obj);
-	edit     = ( edit )? undefined : 'none';
-	deflt    = ( deflt === false );
+	editable = ( editable === true );
+	selected = ( selected === false );
 	var msg  = $obj.data();
 	$obj.empty();
 	if ( msg.attachs == undefined || ( msg.attachs && msg.attachs.length == 0 ) ) return true;
 	$obj.append($('<div>').addClass('cids')).append($('<div>').addClass('common'));
 
+	var msg_text = $obj.parents('.conteudo').find('iframe').contents().find('body').html();
+
 	for ( var key in msg.attachs ) {
-		if ( typeof msg.attachs[key].cid !== 'undefined' ) {
+		var size = $('<font>').attr( { 'color': 'grey' } ).html( ' ('+borkb( parseInt( msg.attachs[key].size ) )+')' );
+		if ( editable && typeof msg.attachs[key].cid !== 'undefined' && msg_text.indexOf( ' cid="'+msg.attachs[key].cid+'"' ) >= 0 ) {
 			$obj.parents('.conteudo').find('iframe').contents().find('img[cid="'+msg.attachs[key].cid+'"]')
-				.attr({ 'src': './inc/show_embedded_attach.php?msg_folder='+msg.folder+'&msg_num='+msg.uid+'&msg_part='+msg.attachs[key].section });
+				.attr({ 'src': './inc/show_img.php?msg_folder='+msg.folder+'&msg_num='+msg.uid+'&msg_part='+msg.attachs[key].section });
 			$obj.find('.cids').append(
 				$('<a>')
-					.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");' } )
-					.html( msg.attachs[key].filename+' (cid:'+msg.attachs[key].cid+') ('+borkb( parseInt( msg.attachs[key].size ) )+')' )
+					.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");', 'title' : msg.attachs[key].filename+'\ncid:'+msg.attachs[key].cid } )
+					.html( msg.attachs[key].filename ).append( size )
 			).append( $('<br>') );
 		} else {
-			$obj.find('.common').css({ 'display': deflt? 'none' : undefined }).append(
+			$obj.find('.common').append(
 				$('<div>').addClass('ckb_center').append(
-					$('<input>').css({ 'display': edit })
-						.attr( { 'type': 'checkbox', 'name': 'forwarding_attachments[]', 'checked': deflt? undefined : 'checked' } )
+					$('<input>').css({ 'display': editable? undefined : 'none' })
+						.attr( { 'type': 'checkbox', 'name': 'forwarding_attachments[]', 'checked': selected? 'checked' : undefined } )
 						.val( JSON.stringify( Object.assign( msg.attachs[key], { folder: msg.folder, msg_no: msg.uid } ) ) )
 				).append(
 					$('<a>')
 						.attr( { 'href': 'javascript:export_attachments("'+msg.folder+'","'+msg.uid+'","'+msg.attachs[key].section+'");' } )
-						.html( msg.attachs[key].filename+' ('+borkb( parseInt( msg.attachs[key].size ) )+')' )
+						.html( msg.attachs[key].filename ).append( size )
 				)
 			);
 		}
 	}
 
-	if ( edit === 'none' ) {
+	if ( !editable ) {
 		if ( msg.attachs.length > 1 ) {
 			if ( parseInt( preferences.remove_attachments_function ) )
 				$obj.prepend(
@@ -1425,11 +1427,11 @@ function buildAttachments( $obj, edit, deflt )
 				.html( msg.attachs.length+' '+get_lang( 'files' )+' :: '+get_lang( 'Download all atachments' ) )
 			);
 		}
-	} else if ( deflt && $obj.find('.common div').length ) $obj.find('.common').before(
-		$('<a>').attr({ 'href': 'javascript:void(0)', 'tabIndex': '-1' }).addClass('add_link').html( get_lang( 'Original attachments: add' ) ).on('click',function(e){
+	} else if ( $obj.find('.common div').length ) $obj.find('.common').before(
+		$('<a>').attr({ 'href': 'javascript:void(0)', 'tabIndex': '-1' }).addClass( ( selected? '' : 'add_link' ) ).html( get_lang( 'Original attachments: '+( selected? 'remove' : 'add' ) ) ).on('click',function(e){
 			var is_add = $(e.currentTarget).hasClass( 'add_link' );
-			$(e.currentTarget).siblings('.common').toggle( is_add ).find('input[type=checkbox]').prop( 'checked', is_add );
-			$(e.currentTarget).toggleClass( 'add_link' ).html( get_lang( 'Original attachments: '+(is_add? 'remove' : 'add' ) ) );
+			$(e.currentTarget).siblings('.common').find('input[type=checkbox]').prop( 'checked', is_add );
+			$(e.currentTarget).toggleClass( 'add_link' ).html( get_lang( 'Original attachments: '+( is_add? 'remove' : 'add' ) ) );
 		})
 	);
 
