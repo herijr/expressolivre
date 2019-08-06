@@ -15,7 +15,14 @@
 			eval('call_back(msgs)');
 			draw_tree_local_folders();
 		}else {
-			cExecute("$this.imap_functions.get_range_msgs2&folder="+encodeURIComponent(folder)+"&msg_range_begin="+msg_range_begin+"&msg_range_end="+emails_per_page+"&sort_box_type="+sort_box_type+ "&search_box_type="+ search_box_type +"&sort_box_reverse="+sort_box_reverse+"", call_back);
+			Ajax( '$this.imap_functions.get_range_msgs2', {
+				'folder'          : folder,
+				'msg_range_begin' : msg_range_begin,
+				'msg_range_end'   : emails_per_page,
+				'sort_box_type'   : sort_box_type,
+				'search_box_type' : search_box_type,
+				'sort_box_reverse': sort_box_reverse
+			}, call_back );
 		}
 	}
 
@@ -55,18 +62,6 @@
 				expresso_local_messages.delete_msgs(msgs_number, border_ID);
 				delete_border(currentTab,'false');
 			}
-		}
-	}
-	
-	messages_proxy.prototype.link_anexo = function (info_msg,numero_ordem_anexo) {
-
-		if(info_msg.local_message==true) {
-			return "javascript:download_local_attachment('"+
-					expresso_local_messages.get_url_anexo(info_msg.msg_number,info_msg.attachments[numero_ordem_anexo].pid)+
-					"')";
-		}
-		else {
-			return "javascript:download_attachments('"+info_msg.msg_folder+"','"+info_msg.msg_number+"',"+numero_ordem_anexo+",'"+info_msg.attachments[numero_ordem_anexo].pid+"','"+info_msg.attachments[numero_ordem_anexo].encoding+"','"+info_msg.attachments[numero_ordem_anexo].name+"')";
 		}
 	}
 	

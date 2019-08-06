@@ -38,7 +38,7 @@ var ttreeBox = new function()
 		}
 		
 		if ( !expresso_offline ) {
-			cExecute( '$this.imap_functions.get_folders_list&folder='+current_folder, handler_update_folders );
+			Ajax( '$this.imap_functions.get_folders_list', { 'folder': current_folder }, handler_update_folders );
 		} else handler_update_folders( '' );
 	}
 	
@@ -177,9 +177,7 @@ var ttreeBox = new function()
 		}
 		
 		if ( $.trim(newp) !== '' ){
-			
-			var handler_return = function( data )
-			{
+			Ajax( '$this.imap_functions.create_mailbox', { 'newp': newp }, function( data ) {
 				if( eval(data.status) == false && data.error ){
 					if( data.error ) {
 						if( ( new RegExp("Permission denied") ).test( $.trim(data.error) ) ){ 
@@ -194,10 +192,7 @@ var ttreeBox = new function()
 					connector.purgeCache();
 					ttreeBox.update_folder();
 				}
-			}
-			var args = '$this.imap_functions.create_mailbox';
-			var params = 'newp='+newp;
-			cExecute( args, handler_return, params );
+			} );
 		}
 	}
 	

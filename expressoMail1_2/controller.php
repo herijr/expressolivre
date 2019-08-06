@@ -7,7 +7,7 @@ function set_response( $data, $isJSON = true ){
 }
 
 function utf8enc( $data ) {
-	if ( !is_array( $data ) ) return $data;
+	if ( !is_array( $data ) ) return  sconv( $data );
 	$result = array();
 	foreach ( $data as $k => $v ) $result[sconv($k)] = is_array($v) ? utf8enc($v) : sconv($v);
 	return $result;

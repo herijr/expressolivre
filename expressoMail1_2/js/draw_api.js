@@ -17,7 +17,7 @@ var tabTypes = {
 	'edit':5
 	}
 var currentTab,numBox = 0; // Open Tab and num of mailboxes opened at context
-// Objeto Map, talvez o ideal fosse adicionar este objeto ï¿½ Api do egroupware, e carregï¿½-lo
+// Objeto Map, talvez o ideal fosse adicionar este objeto a Api do egroupware, e carrega-lo
 // aqui no expressoMail.
 function Map()
 {
@@ -106,7 +106,7 @@ function draw_tree_folders(folders){
 			}
 		}
 		
-		cExecute("$this.imap_functions.get_folders_list&folder=" + current_folder, update_tree_folders);
+		Ajax( '$this.imap_functions.get_folders_list', { 'folder': current_folder }, update_tree_folders );
 
 		return;
 
@@ -403,18 +403,12 @@ function update_menu(data)
 	}
 }
 
-var handler_draw_box = function(data){
-	draw_box(data, 'INBOX', true);
-	//alternate_border(0);
-}
-
 // Action on change folders.
 function change_folder(folder, folder_name){
 	if (openTab.imapBox[0] != folder)
 	{
 		current_folder = folder;
-		var handler_draw_box = function(data)
-		{
+		proxy_mensagens.messages_list(current_folder,1,preferences.max_email_per_page,sort_box_type,search_box_type,sort_box_reverse,preferences.preview_msg_subject,preferences.preview_msg_tip, function( data ) {
 			if(!verify_session(data))
 				return;
 			alternate_border(0);
@@ -425,8 +419,7 @@ function change_folder(folder, folder_name){
 			Element("tot_m").innerHTML = data.num_msgs;
 			update_menu();
 			return true;
-		}
-		proxy_mensagens.messages_list(current_folder,1,preferences.max_email_per_page,sort_box_type,search_box_type,sort_box_reverse,preferences.preview_msg_subject,preferences.preview_msg_tip,handler_draw_box);
+		} );
 	}
 	else
 		alternate_border(0);
@@ -435,7 +428,14 @@ function change_folder(folder, folder_name){
 function open_folder(folder, folder_name){
 	if (current_folder!= folder) {
 		current_folder = folder;
-		var handler_draw_box = function(data){
+		Ajax( '$this.imap_functions.get_range_msgs2', {
+			'folder'          : current_folder,
+			'msg_range_begin' : '1',
+			'msg_range_end'   : preferences.max_email_per_page,
+			'sort_box_type'   : sort_box_type,
+			'search_box_type' : search_box_type,
+			'sort_box_reverse': sort_box_reverse
+		}, function( data ) {
 			if(!verify_session(data))
 				return false;
 			numBox++;
@@ -443,8 +443,7 @@ function open_folder(folder, folder_name){
 			draw_box(data, current_folder, false);
 			alternate_border(numBox);
 			return true;
-		}
-		cExecute ("$this.imap_functions.get_range_msgs2&folder="+encodeURIComponent(current_folder)+"&msg_range_begin=1&msg_range_end="+preferences.max_email_per_page+"&sort_box_type="+sort_box_type+ "&search_box_type="+ search_box_type +"&sort_box_reverse="+sort_box_reverse+"", handler_draw_box);
+		} );
 	}
 	else
 		alternate_border(numBox);
@@ -817,7 +816,7 @@ function draw_box(headers_msgs, msg_folder, alternate){
 	connector.loadScript("QuickAddTelephone");
 }
 
-// Passar o parï¿½metro offset para esta funï¿½ï¿½o
+// Passar o parametro offset para esta funcao
 function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
                 if (typeof offsetToGMT == 'undefined')
                 {
@@ -1119,14 +1118,6 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
 
 function sort_box(search, sort){
 	var message_header = Element("message_header_"+search);
-	var handler_draw_box = function(data){
-		draw_box(data, current_folder,true);
-		//Mostrar as msgs nao lidas de acordo com o filtro de relevancia
-        var msgs_unseen = 0;
-		draw_paging(data.num_msgs);
-		Element("new_m").innerHTML = '<font style="color:'+(data.tot_unseen == 0 ? '': 'red')+'">' + data.tot_unseen + '</font>';
-		Element("tot_m").innerHTML = data.num_msgs;
-	}
 
 	if(sort_box_type == sort && search_box_type == search){
 		sort_box_reverse = sort_box_reverse ? 0 : 1;
@@ -1142,7 +1133,14 @@ function sort_box(search, sort){
 	sort_box_type = sort;
 	search_box_type = search;
 
-	proxy_mensagens.messages_list(current_folder,1,preferences.max_email_per_page,sort,search,sort_box_reverse,preferences.preview_msg_subject,preferences.preview_msg_tip,handler_draw_box);
+	proxy_mensagens.messages_list(current_folder,1,preferences.max_email_per_page,sort,search,sort_box_reverse,preferences.preview_msg_subject,preferences.preview_msg_tip, function( data ) {
+		draw_box(data, current_folder,true);
+		//Mostrar as msgs nao lidas de acordo com o filtro de relevancia
+		var msgs_unseen = 0;
+		draw_paging(data.num_msgs);
+		Element("new_m").innerHTML = '<font style="color:'+(data.tot_unseen == 0 ? '': 'red')+'">' + data.tot_unseen + '</font>';
+		Element("tot_m").innerHTML = data.num_msgs;
+	} );
 	current_page = 1;
 }
 function draw_header_box(){
@@ -1188,7 +1186,7 @@ function draw_message( info_msg, ID )
         var folder_id = ID.match(/\d+/)[0];
         var folder;
 
-        //Correï¿½ï¿½o para fazer funcionar e-mails assinados no formato encapsulado.
+        //Correcao para fazer funcionar e-mails assinados no formato encapsulado.
        // folder_id = info_msg.original_ID ? info_msg.original_ID: info_msg.msg_number;
         if ((folder = document.getElementById(info_msg.original_ID)) == null)
         //if ((folder = document.getElementById(info_msg.msg_number)) == null)
@@ -1559,7 +1557,7 @@ function draw_message( info_msg, ID )
 
             }
             else{
-                //this.innerHTML += "Mais Informaï¿½ï¿½es";
+                //this.innerHTML += "Mais Informacoes";
                 this.value = 'more_cert';
                 Element("div_message_scroll_"+ID).style.height = (_height - _offset)+"px";
                 Element('tr_signature_'+ID).style.display = '';
@@ -1923,10 +1921,10 @@ function draw_message( info_msg, ID )
 			var delim = img_tag.toLowerCase().match( /src=\\?(['"])?/i );
 			delim = ( delim && delim[1] )? delim[1] : ' ';
 
-			img_tag = img_tag.replace( new RegExp( jQuery.ui.autocomplete.escapeRegex( '\\'+delim ), 'g' ), '§' ).replace( /\\/g, '' );
+			img_tag = img_tag.replace( new RegExp( jQuery.ui.autocomplete.escapeRegex( '\\'+delim ), 'g' ), 'Â§' ).replace( /\\/g, '' );
 
 			var img_src = img_tag.match( new RegExp( 'src=['+delim+']?([^'+delim+']*)', 'i' ) );
-			img_src = ( img_src && img_src[1] )? img_src[1].replace( /§/g, delim ) : false;
+			img_src = ( img_src && img_src[1] )? img_src[1].replace( /Â§/g, delim ) : false;
 			if ( !img_src ) return get_lang( 'unknown' );
 
 			if ( img_src.search( /^.\/inc\/show_embedded_attach\.php/ ) == 0 ) return false;
@@ -2043,7 +2041,7 @@ function draw_message( info_msg, ID )
 				var anchor_pattern = "http://"+location.host+location.pathname+"#"; 
 				
 				if ( ( links.item( i ).href.indexOf( 'javascript:' ) !== 0 ) && 
-					(links.item( i ).href.indexOf(anchor_pattern) !== 0) ) //se nï¿½o for ï¿½ncora
+					(links.item( i ).href.indexOf(anchor_pattern) !== 0) ) //se nao for ancora
 						links.item( i ).setAttribute( 'target', '_blank' );
 			}
 		}catch(e){
@@ -2430,7 +2428,7 @@ function draw_new_message(border_ID){
 	}
 	td_to.appendChild(input_to);
 
-	var forwarded_local_message = document.createElement("INPUT"); //Hidden para indicar se ï¿½ um forward de uma mensagem local
+	var forwarded_local_message = document.createElement("INPUT"); //Hidden para indicar se eh um forward de uma mensagem local
 	forwarded_local_message.id = "is_local_forward"+ID;
 	forwarded_local_message.name = "is_local_forward";
 	forwarded_local_message.type = "HIDDEN";
@@ -3109,7 +3107,7 @@ function draw_search(headers_msgs){
 
 	var tbody = Element('tbody_box');
 	for (var i=0; i<(headers_msgs.length); i++){
-            // passa parï¿½metro offset
+            // passa parametro offset
 		var tr = this.make_tr_message(headers_msgs[i], headers_msgs[i].msg_folder);
 		if (tr)
 			tbody.appendChild(tr);
@@ -3329,8 +3327,8 @@ function show_div_address_full(id, type) {
 		var isOverLimit = (_address.length > 100);
 
 		if(isOverLimit) {
-			alert("Esse campo possui muitos endereï¿½os ("+_address.length+" destinatï¿½rios).\r\n"+
-			"Para evitar o travamento do navegador, o botï¿½o 'Adicionar Contato' foi desabilitado!");
+			alert("Esse campo possui muitos enderecos ("+_address.length+" destinatarios).\r\n"+
+			"Para evitar o travamento do navegador, o botao 'Adicionar Contato' foi desabilitado!");
 		}
 
 		for(var idx = 1 ; idx  < _address.length;idx++) {

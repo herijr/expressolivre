@@ -78,10 +78,18 @@ function init(){
 			setTimeout('auto_archiving()', 30000);
 			
 		}
-		cExecute ("$this.imap_functions.get_range_msgs2&folder=INBOX&msg_range_begin=1&msg_range_end="+preferences.max_email_per_page+"&sort_box_type=SORTARRIVAL&search_box_type=ALL&sort_box_reverse=1", handler_draw_box);
-		cExecute ("$this.imap_functions.get_folders_list&onload=true", update_menu);
-		cExecute ("$this.db_functions.get_dropdown_contacts", save_contacts); //Save contacts needs preferences.
-		
+
+		Ajax( '$this.imap_functions.get_range_msgs2', {
+			'folder'          : 'INBOX',
+			'msg_range_begin' : '1',
+			'msg_range_end'   : preferences.max_email_per_page,
+			'sort_box_type'   : 'SORTARRIVAL',
+			'search_box_type' : 'ALL',
+			'sort_box_reverse': '1'
+		}, function( data ) { draw_box( data, 'INBOX', true ); } );
+		Ajax( '$this.imap_functions.get_folders_list', { 'onload': true }, update_menu );
+		Ajax( '$this.db_functions.get_dropdown_contacts', undefined, save_contacts ); //Save contacts needs preferences.
+
 		if(preferences.hide_folders == "1")
 		{
 			$('#divAppboxHeader').html(title_app_menu);
@@ -114,9 +122,8 @@ function init(){
 	// Get cyrus delimiter
 	cyrus_delimiter = Element('cyrus_delimiter').value;
 
-	cExecute ("$this.functions.get_preferences", save_preferences);
-	cExecute ("phpgwapi.browser.isMobile", function( data )
-	{
+	Ajax( '$this.functions.get_preferences', undefined, save_preferences );
+	Ajax( 'phpgwapi.browser.isMobile', undefined, function( data ) {
 		mobile_device = ( ( data.constructor == Boolean ) ? data : ( data === 'true' ) );
 	} );
 	setTimeout('auto_refresh()', time_refresh);
@@ -627,7 +634,15 @@ function refresh(alert_new_msg){
 
 	string_msgs_in_main = tmp.substring(0,(tmp.length-1));
 	if(!expresso_offline)
-		cExecute ("$this.imap_functions.refresh&folder="+current_folder+"&msgs_existent="+string_msgs_in_main+"&msg_range_begin="+msg_range_begin+"&msg_range_end="+msg_range_end+"&sort_box_type="+sort_box_type+"&search_box_type="+search_box_type+"&sort_box_reverse="+sort_box_reverse, handler_refresh);
+		Ajax( '$this.imap_functions.refresh', {
+			'folder'          : current_folder,
+			'msgs_existent'   : string_msgs_in_main,
+			'msg_range_begin' : msg_range_begin,
+			'msg_range_end'   : msg_range_end,
+			'sort_box_type'   : sort_box_type,
+			'search_box_type' : search_box_type,
+			'sort_box_reverse': sort_box_reverse
+		}, handler_refresh );
 }
 
 function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
@@ -936,7 +951,18 @@ function move_msgs2(folder, msgs_number, border_ID, new_folder, new_folder_name,
 	}
 
 	if (parseInt(msgs_number) > 0 || msgs_number.length > 0){
-		cExecute("$this.imap_functions.move_messages&folder=" + encodeURIComponent(folder) + "&msgs_number=" + msgs_number + "&border_ID=" + border_ID + "&sort_box_type=" + sort_box_type + "&search_box_type=" + search_box_type + "&sort_box_reverse=" + sort_box_reverse + "&reuse_border=" + border_ID + "&new_folder=" + encodeURIComponent(new_folder) + "&new_folder_name=" + encodeURIComponent(new_folder_name) + "&get_previous_msg=" + preferences.delete_and_show_previous_message, handler_move_msgs);
+		Ajax( '$this.imap_functions.move_messages', {
+			'folder'           : folder,
+			'msgs_number'      : msgs_number,
+			'border_ID'        : border_ID,
+			'sort_box_type'    : sort_box_type,
+			'search_box_type'  : search_box_type,
+			'sort_box_reverse' : sort_box_reverse,
+			'reuse_border'     : border_ID,
+			'new_folder'       : new_folder,
+			'new_folder_name'  : new_folder_name,
+			'get_previous_msg' : preferences.delete_and_show_previous_message
+		}, handler_move_msgs );
 	} else {
 		write_msg(get_lang('No selected message.'));
 	}
@@ -2308,7 +2334,7 @@ function import_msgs(wfolders_tree){
 	document.form_import.appendChild(folder);
 	write_msg(get_lang('You must wait while the messages will be imported...'));
 
-	cExecuteForm('$this.imap_functions.import_msgs', document.form_import, handler);
+	Ajax( '$this.imap_functions.import_msgs', document.form_import, handler );
 }
 function return_import_msgs(data, wfolders_tree){
 	if(data && data.error){
@@ -2591,5 +2617,19 @@ function Ajax( action, data, callback, method )
 			opts.contentType = false;
 		} else opts.data = data;
 	}
-	return $.ajax( opts ).done( callback ).fail(function() { write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) ); });
+	// Set length for objects to compatibility in loops for( var i=0; data.length; i++ )
+	var f_count = function( node ) {
+		if ( node === null ) return;
+		if ( typeof node === 'object' ) {
+			for (var m in node ) node[m] = f_count( node[m] );
+			if ( node[0] && typeof node.length === 'undefined' ) {
+				node.length = 0;
+				while ( node[node.length] ) node.length++;
+			}
+		} 
+		return node;
+	};
+	return $.ajax( opts ).done( function( data, textStatus, jqXHR ) {
+		if ( typeof callback === 'function' ) callback( f_count( data ), textStatus, jqXHR );
+	} ).fail(function() { write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) ); });
 }
