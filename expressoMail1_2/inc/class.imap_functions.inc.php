@@ -350,8 +350,27 @@ class imap_functions
 		$quota   = @imap_get_quotaroot( $this->mbox, $mailbox );
 		$errors  = array();
 
-		if ( ( ( $quota['limit'] - $quota['usage'] ) * 1024 ) <= $file['size'] )
+		if( isset($file['error']) && $file['error'] != 0 ){
+
+			$fileUploadErrors = array(
+				1 => 'The uploaded file exceeds the upload max filesize allowed',
+				2 => 'The uploaded file exceeds the upload max filesize allowed by the form',
+				3 => 'The uploaded file was only partially uploaded',
+				4 => 'No file was uploaded',
+				6 => 'Missing a temporary folder',
+				7 => 'Failed to write file to disk.',
+				8 => 'A PHP extension stopped the file upload.',
+			);
+
+			$msgError = ( isset($fileUploadErrors[$file['error']]) ? 
+								$this->functions->getLang( $fileUploadErrors[$file['error']] ) : $this->functions->getLang( 'An unknown error occurred' ));
+
+			return array( 'error' => $this->functions->getLang( 'fail in import:' ).' '. $msgError );
+		}
+		
+		if ( ( ( $quota['limit'] - $quota['usage'] ) * 1024 ) <= $file['size'] ){
 			return array( 'error' => $this->functions->getLang( 'fail in import:' ).' '.$this->functions->getLang( 'Over quota' ) );
+		}
 
 		if ( preg_match( '/\.zip$/i', $file['name'] ) ) {
 			if ( $zip = zip_open( $file['tmp_name'] ) ) {
