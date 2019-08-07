@@ -2743,7 +2743,7 @@ class imap_functions
 		foreach( $fwrd_attachs as $msg ) {
 			$this->open_mbox( $msg->folder );
 			$info = $mail_reader->setMessage( $this->mbox, $msg->folder, $msg->msg_no )->getAttach( $msg->section );
-			$mail->AddStringAttachment( $info->data, $info->filename, $info->encoding, $info->type, ( isset( $info->params['name'] )? $info->params['name'] : false ) );
+			$mail->AddStringAttachment( $info->data, $info->filename, $info->encoding, $info->type, ( isset( $info->params->name )? $info->params->name : false ) );
 		}
 
 		// Uploading New Attachments
@@ -2782,7 +2782,7 @@ class imap_functions
 			if ( !$info->cid ) continue;
 			$cids[$cid_str] = $info->cid;
 
-			$mail_writer->AddStringEmbeddedImage( $info->data, $cids[$cid_str], ( isset( $info->params['name'] )? $info->params['name'] : false ), $info->encoding, $info->type, $info->filename );
+			$mail_writer->AddStringEmbeddedImage( $info->data, $cids[$cid_str], ( isset( $info->params->name )? $info->params->name : false ), $info->encoding, $info->type, $info->filename );
 			$mail_writer->Body = str_replace( $cid_str, 'cid="'.$cids[$cid_str].'" src="cid:'.$cids[$cid_str].'"', $mail_writer->Body );
 		}
 		return true;

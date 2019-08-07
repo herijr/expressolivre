@@ -236,7 +236,7 @@ class MessageReader
 	{
 		$thumbs_array = array();
 		$i = 0;
-		foreach ( $this->_attachs as $section ) {
+		foreach ( $this->_attachs_root as $section ) {
 			$section = $this->_sections[$section];
 			if ( !preg_match( '#^image/(p?jpeg|gif|png)$#', $section->type ) ) continue;
 			if ( $section->encoding !== 'base64' ) continue;
