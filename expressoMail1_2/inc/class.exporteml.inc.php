@@ -113,7 +113,7 @@ class ExportEml
 
 		include_once 'class.message_reader.inc.php';
 		$mail_reader = new MessageReader();
-		$info        = $mail_reader->setMessage( $this->_getImapStream(), $params['folder'], $params['msg_number'] )->getAttachInfo();
+		$info        = $mail_reader->setMessage( $this->_getImapStream(), $params['folder'], $params['msg_number'] )->getAttachInfo( false, true );
 
 		if ( $params['section'] === '*' ) {
 
@@ -178,15 +178,12 @@ class ExportEml
 			($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes')? '/tls' : '/notls'
 		);
 	}
-	
+
 	private function _getImapMailbox( $folder = null )
 	{
-		$folder = ( $folder === null )? '' : mb_convert_encoding( $folder, 'UTF7-IMAP',
-			mb_detect_encoding( $folder, 'UTF-8, ISO-8859-1', true )
-		);
-		return '{'.$this->_getImapServer().$this->_getImapOpts().'}'.$folder;
+		return '{'.$this->_getImapServer().$this->_getImapOpts().'}'.$this->_toMaibox( $folder );
 	}
-	
+
 	private function _getImapStream( $folder = null )
 	{
 		if ( $folder !== null ) $this->_closeImap();
@@ -198,16 +195,6 @@ class ExportEml
 			);
 		}
 		return $this->_imap_stream;
-	}
-	
-	private function _getAttachmentContent( $msg_number, $section, $encoding = 'none' )
-	{
-		$content = imap_fetchbody( $this->_getImapStream(), $msg_number, $section, FT_UID | FT_PEEK );
-		switch ( $encoding ) {
-			case 'base64':           return base64_decode( $content );
-			case 'quoted-printable': return quoted_printable_decode( $content );
-		}
-		return $content;
 	}
 	
 	private function _getSourceMessage( $msg_number )
@@ -279,34 +266,51 @@ class ExportEml
 		// Header
 		$header = imap_headerinfo( $this->_getImapStream(), imap_msgno( $this->_getImapStream(), $id ), 80, 255 );
 		// Subject
-		$subject = trim( $this->_decode_subject( $header->fetchsubject ) );
+		$subject = trim( $this->_str_decode( $header->fetchsubject ) );
 		$subject = ( strlen( $subject ) == 0 )? lang( 'No Subject' ) : $subject;
 		$subject = $this->_squeeze( '_', $this->_squeeze( ' ', $subject ) );
 		$subject = $this->_stripWinBadChars( $subject );
 		return $subject;
 	}
-	
+
 	private function _stripWinBadChars( $filename )
 	{
-		$bad = array_merge( array_map( 'chr', range( 0, 31 ) ), array('<', '>', ':', '"', '/', '\\', '|', '?', '*') );
-		return str_replace( $bad, '-', $filename );
+		return preg_replace( '/[<>:"|?*\/\\\]/', '-', preg_replace( '/[\x00-\x1F\x7F]/u', '', $filename ) );
 	}
-	
+
 	private function _squeeze( $ch, $str ) {
 		return preg_replace( '/(['.preg_quote($ch,'/').'])\1+/', '$1', $str );
 	}
-	
-	private function _decode_subject( $str)
+
+	private function _str_decode( $str, $charset = false )
 	{
-		if ( preg_match( '/=\?[\w-#]+\?[QB]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
-		return mb_convert_encoding( $str, 'UTF-8', mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) );
+		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		return $this->_toUTF8( $str, $charset );
 	}
-	
+
+	private function _toMaibox( $folder )
+	{
+		return $this->_toUTF8( $folder, false, 'UTF7-IMAP' );
+	}
+
+	private function _toUTF8( $str, $charset = false, $to = 'UTF-8' )
+	{
+		return mb_convert_encoding( $str, $to, ( $charset === false? mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) : $charset ) );
+	}
+
 	private function _setContentDisposition( $filename )
 	{
-		header( 'Content-Disposition: attachment; filename="=?UTF-8?B?'.base64_encode( $this->_decode_subject( $filename ) ).'?="' );
+		header( 'Content-Disposition: attachment; filename="'.$this->_mimeEncode( $filename ).'"' );
 	}
-	
+
+	private function _mimeEncode( $str )
+	{
+		$str = $this->_str_decode( $str );
+		$qpe = str_replace( "=\r\n", '', quoted_printable_encode( $str ) );
+		$enc = ( ceil( 4*strlen( $str )/3 ) < strlen( $qpe ) )? 'B' : 'Q';
+		return '=?UTF-8?'.$enc.'?'.( $enc=='Q'? $qpe : base64_encode( $str ) ).'?=';
+	}
+
 	private function _resultNotFound()
 	{
 		header( $_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found', true, 404 );
@@ -314,7 +318,7 @@ class ExportEml
 		flush();
 		exit;
 	}
-	
+
 	private function _makeTmpDir()
 	{
 		$tmp_dir = ( isset( $_SESSION['phpgw_info']['server']['temp_dir'] ) ) ? $_SESSION['phpgw_info']['server']['temp_dir']: '/tmp';

@@ -11,9 +11,6 @@ class AttachmentResource extends MailAdapter {
 		$this->addResourceParam("folderID","string",true,"ID da pasta da mensagem.");
 		$this->addResourceParam("msgID","string",true,"ID da mensagem que contém o Anexo.");
 		$this->addResourceParam("attachmentID","string",true,"ID do Anexo.");
-		$this->addResourceParam("attachmentIndex","string",true,"Índice do Anexo, parametro somente necessário para a versão 2.2 do Expresso.");
-		$this->addResourceParam("attachmentName","string",true,"Nome do arquivo anexado, parametro somente necessário para a versão 2.2 do Expresso.");
-		$this->addResourceParam("attachmentEncoding","string",true,"Codificação do Anexo, parametro somente necessário para a versão 2.2 do Expresso.");
 	}
 
 	public function post($request){		
@@ -25,24 +22,14 @@ class AttachmentResource extends MailAdapter {
  		
 		if($this-> isLoggedIn()) {
 								
-			if( $folderID && $msgID && $attachmentID) {				
-				$dir = PHPGW_INCLUDE_ROOT."/expressoMail1_2/inc";
-				
-				if($this->getExpressoVersion() != "2.2"){
-					$_GET['msgFolder'] = $folderID;
-					$_GET['msgNumber'] = $msgID;
-					$_GET['indexPart'] = $attachmentID;
-					include("$dir/get_archive.php");
-					
-				}else{
-					$_GET['msg_folder'] = $folderID;
-					$_GET['msg_number'] = $msgID;
-					$_GET['msg_part'] = $attachmentID;
-					$_GET['idx_file']	= $this->getParam('attachmentIndex');
-					$_GET['newfilename']= $this->getParam('attachmentName');
-					$_GET['encoding']	= $this->getParam('attachmentEncoding');
-					include("$dir/gotodownload.php");
-				}
+			if( $folderID && $msgID && $attachmentID) {
+				include ( PHPGW_INCLUDE_ROOT.'/expressoMail1_2/inc/class.exporteml.inc.php' );
+				$exp = new ExportEml();
+				$exp->exportAttachments( array(
+					'folder'     => $folderID,
+					'msg_number' => $msgID,
+					'section'    => $attachmentID,
+				) );
 				// Dont modify header of Response Method to 'application/json'
 				$this->setCannotModifyHeader(true);
 				return $this->getResponse();

@@ -414,23 +414,6 @@ function download_local_attachment(url) {
 	div_attachment.innerHTML="<iframe style='display:none;width:0;height:0' name='attachment' src='"+url+"'></iframe>";
 }
 
-function download_attachments(msg_folder, msg_number, idx_file, msg_part, encoding, new_file_name, show_iframe){
-	div_attachment = document.getElementById("id_div_attachment");
-	var params = '';
-
-	if (div_attachment == null){
-		var div_attachment = document.createElement("DIV");
-		div_attachment.id="id_div_attachment";
-		document.body.appendChild(div_attachment);
-	}
-	if(new_file_name)
-		params = "&newfilename="+escape(new_file_name);
-	if(encoding)
-		params += "&encoding="+encoding;
-
-	div_attachment.innerHTML="<iframe style='display:none;width:0;height:0' name='attachment' src='inc/gotodownload.php?msg_folder="+msg_folder+"&msg_number="+msg_number+"&idx_file="+idx_file+"&msg_part="+msg_part+params+"'></iframe>";
-}
-
 // Add Input File Dynamically.
 function addFile(id_border){
 	divFiles = document.getElementById("divFiles_"+id_border);

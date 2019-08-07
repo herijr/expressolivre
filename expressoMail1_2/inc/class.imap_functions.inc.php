@@ -1481,9 +1481,9 @@ class imap_functions
 				$msg_part = $msg->pid[$msgno][$index];
 				//$body = preg_replace("/alt=\"\"/i", "", $body);
 				$body = preg_replace("/<br\/>/i", "", $body);
-				$body = str_replace("src=\"cid:".$cid."\"", " src=\"./inc/show_embedded_attach.php?msg_folder=$msg_folder&msg_num=$msgno&msg_part=$msg_part\" ", $body);
-				$body = str_replace("src='cid:".$cid."'", " src=\"./inc/show_embedded_attach.php?msg_folder=$msg_folder&msg_num=$msgno&msg_part=$msg_part\" ", $body);
-				$body = str_replace("src=cid:".$cid, " src=\"./inc/show_embedded_attach.php?msg_folder=$msg_folder&msg_num=$msgno&msg_part=$msg_part\" ", $body);
+				$body = str_replace("src=\"cid:".$cid."\"", " src=\"./inc/show_img.php?msg_folder=$msg_folder&msg_num=$msgno&msg_part=$msg_part\" ", $body);
+				$body = str_replace("src='cid:".$cid."'", " src=\"./inc/show_img.php?msg_folder=$msg_folder&msg_num=$msgno&msg_part=$msg_part\" ", $body);
+				$body = str_replace("src=cid:".$cid, " src=\"./inc/show_img.php?msg_folder=$msg_folder&msg_num=$msgno&msg_part=$msg_part\" ", $body);
 			}
 		}
 
@@ -1723,7 +1723,7 @@ class imap_functions
     		$file_type = strtolower($file_type);
     		if(strtolower($msg->encoding[$msg_number][$index]) == 'base64') {
 	    		if (($file_type == 'image/jpeg') || ($file_type == 'image/pjpeg') || ($file_type == 'image/gif') || ($file_type == 'image/png')) {
-	    			$img = "<IMG id='".$url_msg_folder.";;".$msg_number.";;".$i.";;".$msg->pid[$msg_number][$index].";;".$msg->encoding[$msg_number][$index]."' style='border:2px solid #fde7bc;padding:5px' title='".$this->functions->getLang("Click here do view (+)")."'src=./inc/show_thumbs.php?file_type=".$file_type."&msg_num=".$msg_number."&msg_folder=".$msg_folder."&msg_part=".$msg->pid[$msg_number][$index].">";
+	    			$img = "<IMG id='".$url_msg_folder.";;".$msg_number.";;".$i.";;".$msg->pid[$msg_number][$index].";;".$msg->encoding[$msg_number][$index]."' style='border:2px solid #fde7bc;padding:5px' title='".$this->functions->getLang("Click here do view (+)")."'src=./inc/show_img.php?msg_num=".$msg_number."&msg_folder=".$msg_folder."&msg_part=".$msg->pid[$msg_number][$index]."&thumb=true&file_type=".$file_type.">";
 	    			$href = "<a onMouseDown=\"save_image(event,this,'".$msg_folder."','".$msg_number."','".$msg->pid[$msg_number][$index]."')\" href='#".$url_msg_folder.";;".$msg_number.";;".$i.";;".$msg->pid[$msg_number][$index].";;".$msg->encoding[$msg_number][$index]."' onClick=\"window.open('./inc/show_img.php?msg_num=".$msg_number."&msg_folder=".$msg_folder."&msg_part=".$msg->pid[$msg_number][$index]."','mywindow','width=700,height=600,scrollbars=yes');\">". $img ."</a>";
 					$thumbs_array[] = $href;
 	    		}
@@ -2859,7 +2859,7 @@ class imap_functions
 	protected function buildEmbeddedImages( &$mail_writer, &$mail_reader )
 	{
 		$transpose = function( $a ) { array_unshift( $a, null); return call_user_func_array( 'array_map', $a ); };
-		$pattern   = '/src="([^"]*?show_embedded_attach.php\?msg_folder=(.+)?&(?:amp;)?msg_num=(.+)?&(?:amp;)?msg_part=(.+)?)"/isU';
+		$pattern   = '/src="([^"]*?show_img.php\?msg_folder=(.+)?&(?:amp;)?msg_num=(.+)?&(?:amp;)?msg_part=(.+)?)"/isU';
 		$cids      = array();
 		if ( !preg_match_all( $pattern, $mail_writer->Body, $cid_imgs, PREG_PATTERN_ORDER ) ) return true;
 

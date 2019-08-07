@@ -1927,7 +1927,7 @@ function draw_message( info_msg, ID )
 			img_src = ( img_src && img_src[1] )? img_src[1].replace( /§/g, delim ) : false;
 			if ( !img_src ) return get_lang( 'unknown' );
 
-			if ( img_src.search( /^.\/inc\/show_embedded_attach\.php/ ) == 0 ) return false;
+			if ( img_src.search( /^.\/inc\/show_img\.php/ ) == 0 ) return false;
 
 			var img_scheme = img_src.match( /^([a-z]+):[//]*(.*)/ );
 			if ( !( img_scheme && img_scheme[1] ) ) return quoteprt( img_src.substring( 0, 25 ) );

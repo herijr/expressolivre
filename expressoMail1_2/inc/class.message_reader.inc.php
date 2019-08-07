@@ -267,7 +267,7 @@ class MessageReader
 	}
 	
 	private function _makeCIDReplace( $text, $params ) {
-		$str = './inc/show_embedded_attach.php?msg_folder='.$this->_folder.'&msg_num='.$this->_uid.'&msg_part='.$params['pid'];
+		$str = './inc/show_img.php?msg_folder='.$this->_folder.'&msg_num='.$this->_uid.'&msg_part='.$params['pid'];
 		return preg_replace( '/cid:'.preg_quote( $params['cid'], '/' ).'/', $str, $text );
 	}
 	

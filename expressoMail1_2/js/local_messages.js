@@ -459,7 +459,7 @@ local_messages.prototype.get_local_mail = function(id_mail) {
 	retorno['subject'] = rs.field(3);
 	retorno['body'] = rs.field(4);
 	//Codigo que as imagens embutidas em emails (com multipart/related ou multipart/mixed) sejam corretamente mostradas em emails arquivados. Os links do
-	//tipo "./inc/show_embedded_attach.php?msg_folder=[folder]&msg_num=[msg_num]&msg_part=[part]"
+	//tipo "./inc/show_img.php?msg_folder=[folder]&msg_num=[msg_num]&msg_part=[part]"
 	//são substituidos pelos links dos anexos capturados pelo gears.
 
 	var thumbs= retorno.thumbs;
@@ -468,11 +468,11 @@ local_messages.prototype.get_local_mail = function(id_mail) {
 	{
 	    if(anexos[i]['url'] && anexos[i]['url'].match(/((jpg)|(jpeg)|(png)|(gif)|(bmp))/gi))
 	    {
-		var er_imagens = new RegExp("\\.\\/inc\\/show_embedded_attach.php\\?msg_folder=[\\w/]+\\&msg_num=[0-9]+\\&msg_part="+anexos[i]['pid']);
+		var er_imagens = new RegExp("\\.\\/inc\\/show_img.php\\?msg_folder=[\\w/]+\\&msg_num=[0-9]+\\&msg_part="+anexos[i]['pid']);
 		var Result_imagens = er_imagens.exec(retorno['body']);
 		retorno['body'] = retorno['body'].replace(Result_imagens,anexos[i]['url']);
 		if(thumbs && thumbs[i]){
-		    er_imagens = new RegExp("\\.\\/inc\\/show_thumbs.php\\?file_type=image\\/[\\w]+\\&msg_num=[0-9]+\\&msg_folder=[\\w/%]+\\&msg_part="+anexos[i]['pid']);
+		    er_imagens = new RegExp("\\.\\/inc\\/show_img.php\\?msg_num=[0-9]+\\&msg_folder=[\\w/%]+\\&msg_part="+anexos[i]['pid']+"\\&thumb=true\\&file_type=image\\/[\\w]+");
 		    Result_imagens = er_imagens.exec(thumbs[i]);
 		    thumbs[i] = thumbs[i].replace(Result_imagens,"'"+anexos[i]['url']+"'");
 		    er_imagens = new RegExp("\\.\\/inc\\/show_img.php\\?msg_num=[0-9]+\\&msg_folder=[\\w/%]+\\&msg_part="+anexos[i]['pid']);
