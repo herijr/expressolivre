@@ -268,7 +268,7 @@ class imap_functions
 		}
 		else {
 			$tmp = ( isset( $to[0]->personal ) ) ? imap_mime_header_decode($to[0]->personal) : NULL;
-			$head_array['to']['name'] = ( isset( $tmp[0]->text ) ) ? $this->decode_string($this->decode_string($tmp[0]->text)) : NULL;
+			$head_array['to']['name'] = ( isset( $tmp[0]->text ) ) ? $this->decode_string($tmp[0]->text) : NULL;
 			$head_array['to']['email'] = ( isset( $to[0]->mailbox ) ) ? ( $this->decode_string($to[0]->mailbox) . "@" . ( ( isset( $to[0]->host ) ) ? $to[0]->host : '' ) ) : NULL;
 			if(!$head_array['to']['name'])
 				$head_array['to']['name'] = $head_array['to']['email'];
