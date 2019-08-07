@@ -300,7 +300,7 @@ class ExportEml
 
 	private function _setContentDisposition( $filename )
 	{
-		header( 'Content-Disposition: attachment; filename="'.$this->_mimeEncode( $filename ).'"' );
+		header( 'Content-Disposition: attachment; filename="'. $filename .'"' );
 	}
 
 	private function _mimeEncode( $str )
