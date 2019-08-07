@@ -23,16 +23,35 @@ class MessageReader
 		ENCOTHER            => 'other',
 	);
 
-	private $_uid           = false;
-	private $_mbox          = false;
-	private $_folder        = false;
-	private $_attachs       = array();
-	private $_attachs_root  = array();
-	private $_sections      = false;
-	//private $_structure     = null;
-	//private $_plain         = '';
-	//private $_charset       = '';
-	//private $_html          = '';
+	private $_uid               = false;
+	private $_mbox              = false;
+	private $_folder            = false;
+	private $_sections          = false;
+	private $_isCripted         = false;
+	private $_hash_vcalendar    = false;
+	private $_content_plain     = array();
+	private $_content_html      = array();
+	private $_attachs           = array();
+	private $_attachs_root      = array();
+
+	private function _clear()
+	{
+		$this->_uid             = false;
+		$this->_mbox            = false;
+		$this->_folder          = false;
+		$this->_sections        = false;
+		$this->_isCripted       = false;
+		$this->_hash_vcalendar  = false;
+		$this->_content_plain   = array();
+		$this->_content_html    = array();
+		$this->_attachs         = array();
+		$this->_attachs_root    = array();
+	}
+
+	public function __construct()
+	{
+		$this->_clear();
+	}
 
 	protected function getPartType( $type )
 	{
@@ -44,23 +63,19 @@ class MessageReader
 		return isset( self::$encoding[$encoding] )? self::$encoding[$encoding] :'unknown';
 	}
 
-	public function __construct()
-	{
-		$this->_clear();
-	}
-
 	public function setMessage( $mbox, $folder, $uid )
 	{
-		if ( $this->_uid !== $uid || $this->_folder !== $folder ) $this->_clear();
-		$this->_uid       = $uid;
-		$this->_mbox      = $mbox;
-		$this->_folder    = $folder;
+		if ( $this->_uid === $uid && $this->_folder === $folder ) return $this;
+		$this->_clear();
+		$this->_uid    = $uid;
+		$this->_mbox   = $mbox;
+		$this->_folder = $folder;
+		$this->_load();
 		return $this;
 	}
 
 	public function getInfo()
 	{
-		if ( $this->_sections === false ) $this->_load();
 		return (object)array(
 			'uid'     => $this->_uid,
 			'folder'  => $this->_folder,
@@ -68,9 +83,23 @@ class MessageReader
 		);
 	}
 
+	public function getBody()
+	{
+		$is_html = count( $this->_content_html )? true : false;
+		$obj     = (object)array( 'type' => $is_html? 'html' : 'plain' );
+		$plain   = implode( PHP_EOL, array_map( array( $this, '_fetchBody' ), $this->_content_plain ) );
+		$obj->body = $is_html? ( ( count( $this->_content_html ) === 1 )? $this->_fetchBody( $this->_content_html[0] ) :
+			'<div>'.implode( '</div><div>', array_map( array( $this, '_fetchBody' ), $this->_content_html ) ).'</div>' ) :
+				$plain;
+		if ( $is_html ) {
+			$obj->body = $this->_replaceCID( $obj->body );
+			if( !empty( $plain ) ) $obj->body_alternative = $plain;
+		}
+		return $obj;
+	}
+
 	public function getAttachInfo( $section = false, $deep = false )
 	{
-		if ( $this->_sections === false ) $this->_load();
 		if ( $section !== false ) return $this->_sections[$section];
 		$result = array();
 		foreach ( $this->{$deep?'_attachs':'_attachs_root'} as $section ) $result[] = $this->_sections[$section];
@@ -79,8 +108,17 @@ class MessageReader
 
 	public function getAttach( $section )
 	{
-		if ( $this->_sections === false ) $this->_load();
 		return $this->_getData( $this->_sections[$section] );
+	}
+
+	public function isCripted()
+	{
+		return $this->_isCripted;
+	}
+
+	public function getHashCalendar()
+	{
+		return $this->_hash_vcalendar;
 	}
 
 	private function _getData( &$node ) {
@@ -98,20 +136,13 @@ class MessageReader
 		$this->_readSection( $data );
 	}
 
-	private function _clear()
-	{
-		$this->_uid          = false;
-		$this->_mbox         = false;
-		$this->_folder       = false;
-		$this->_attachs      = array();
-		$this->_attachs_root = array();
-		$this->_sections     = false;
-	}
-
 	private function _readSection( $node, $prefix = '' )
 	{
-		$obj = (object)array();
-		$obj->type     = strtolower( $this->getPartType( $node->type ).( $node->ifsubtype? '/'.$node->subtype : '' ) );
+		$is_root   = ( strpos( $prefix, '.' ) === false );
+		$obj       = (object)array();
+
+		$obj->type = strtolower( $this->getPartType( $node->type ).( $node->ifsubtype? '/'.$node->subtype : '' ) );
+		if ( $is_root && preg_match( '/^(?:x-|)pkcs7-mime$/', strtolower( $node->subtype ) ) ) $this->_isCripted = true;
 		if ( $node->ifid ) $obj->cid= trim( $node->id, '<>' );
 		if ( isset( $node->lines ) ) $obj->lines = $node->lines;
 		if ( isset( $node->bytes ) ) {
@@ -123,19 +154,23 @@ class MessageReader
 
 		// PARAMETERS
 		$params = array();
-		if ( $node->parameters  ) foreach ( $node->parameters as $x  ) $params[strtolower( $x->attribute )] = $this->_str_decode( $x->value );
-		if ( $node->dparameters ) foreach ( $node->dparameters as $x ) $params[strtolower( $x->attribute )] = $this->_str_decode( $x->value );
-		if ( count( $params ) ) $obj->params = $params;
+		if ( $node->parameters  ) foreach ( $node->parameters  as $x ) $params = array_merge( $params, $this->_attr_decode( $x->attribute, $x->value ) );
+		if ( $node->dparameters ) foreach ( $node->dparameters as $x ) $params = array_merge( $params, $this->_attr_decode( $x->attribute, $x->value ) );
+		if ( count( $params ) ) $obj->params = (object)$params;
 
 		// ATTACHMENTS
 		if ( ( $node->ifdisposition && strtolower( $node->disposition ) === 'attachment' ) || $params['filename'] || $params['name'] ) {
 			$this->_attachs[] = $obj->section;
-			if ( strlen( $prefix ) === 1 ) $this->_attachs_root[] = $obj->section;
+			if ( $is_root ) $this->_attachs_root[] = $obj->section;
 			$obj->filename = isset( $params['filename'] )? $params['filename'] : ( isset( $params['name'] )? $params['name'] : false );
 			if ( $obj->filename === false ) {
 				preg_match('/name=["\']?(.*)["\']?/', imap_fetchmime( $this->_mbox, $this->_uid , $obj->section, FT_UID ), $matchs );
 				$obj->filename = isset( $matchs[1] )? $this->_str_decode( $matchs[1] ) : 'attachment.bin';
 			}
+			$obj->filename = $this->_stripWinBadChars( $obj->filename );
+		} else if ( ( $node->type === TYPETEXT || $node->type === TYPEMESSAGE ) ) {
+			if ( strtolower( $node->subtype ) === 'plain' ) $this->_content_plain[] = $obj->section;
+			else $this->_content_html[] = $obj->section;
 		}
 
 		$this->_sections[$obj->section] = $obj;
@@ -143,10 +178,96 @@ class MessageReader
 		if ( isset( $node->parts ) ) foreach ( $node->parts as $i => $part ) $this->_readSection( $part, $prefix.($prefix?'.':'').($i+1) );
 	}
 
-	private function _str_decode( $str )
+	private function _attr_decode( $attr, $value )
+	{
+		if ( preg_match( '/\*$/', $attr ) ) {
+			$charset = false;
+			if ( preg_match( '/([^\']*)\'([^\']*)\'(.*)/', $value, $matches ) ) list( , $charset, $lang, $value ) = $matches;
+			return array( strtolower( mb_substr( $attr, 0, -1 ) ) => $this->_str_decode( urldecode( $value ), $charset ) );
+		}
+		return array( strtolower( $attr ) => $this->_str_decode( $value ) );
+	}
+
+	private function _str_decode( $str, $charset = false )
 	{
 		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
-		return mb_convert_encoding( $str, 'UTF-8', mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) );
+		return $this->_toUTF8( $str, $charset );
+	}
+	
+	private function _toUTF8( $str, $charset = false, $to = 'UTF-8' )
+	{
+		return mb_convert_encoding( $str, $to, ( $charset === false? mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) : $charset ) );
+	}
+
+	private function _stripWinBadChars( $filename )
+	{
+		return preg_replace( '/[<>:"|?*\/\\\]/', '-', preg_replace( '/[\x00-\x1F\x7F]/u', '', $filename ) );
+	}
+
+	private function _fetchBody( $section )
+	{
+		$sec = $this->_sections[$section];
+		$body = ( $section === '0' )? imap_body( $this->_mbox, $this->_uid, FT_UID ) : imap_fetchbody( $this->_mbox, $this->_uid, $sec->section, FT_UID );
+		$body = $this->_decodeBody( $body, $sec->encoding, $sec->params->charset );
+		if ( $sec->type === 'text/calendar' ) $body = $this->_decodeBody( $body, 'calendar' );
+		return $body;
+	}
+
+	private function _decodeBody( $body, $encoding, $charset = false )
+	{
+		switch ( strtolower( $encoding ) ) {
+			case 'base64':           $body = base64_decode( $body );           break;
+			case 'calendar':         $body = $this->_calendar_decode( $body ); break;
+			case 'quoted-printable': $body = quoted_printable_decode( $body ); break;
+		}
+		return $this->_toUTF8( $body, $charset );
+	}
+
+	private function _replaceCID( $body )
+	{
+		foreach ( $this->_attachs as $section )
+			if ( isset( $this->_sections[$section]->cid ) )
+				$body = preg_replace( '/[Cc][Ii][Dd]:'.preg_quote( $this->_sections[$section]->cid ).'/',
+					'./inc/show_img.php?msg_folder='.$this->_folder.'&msg_num='.$this->_uid.'&msg_part='.$section, $body );
+		return $body;
+	}
+
+	public function getThumbs()
+	{
+		$thumbs_array = array();
+		$i = 0;
+		foreach ( $this->_attachs as $section ) {
+			$section = $this->_sections[$section];
+			if ( !preg_match( '#^image/(p?jpeg|gif|png)$#', $section->type ) ) continue;
+			if ( $section->encoding !== 'base64' ) continue;
+			$url = urlencode( $this->_folder ).';;'.$this->_uid.';;'.$i.';;'.$section->section.';;'.$section->encoding;
+			$thumbs_array[] = '<a '.
+				'onMouseDown="save_image(event,this,\''.$this->_folder.'\',\''.$this->_uid.'\',\''.$section->section.'\')" '.
+				'href="#'.$url.'" '.
+				'onClick="window.open(\'/inc/show_img.php?msg_num='.$this->_uid.'&msg_folder='.$this->_folder.'&msg_part='.$section->section.'\',\'mywindow\',\'width=700,height=600,scrollbars=yes\');" '.
+			'>'.
+				'<img id="'.$url.'" style="border:2px solid #fde7bc;padding:5px" title="'.$this->getLang( 'Click here do view (+)' ).'" '.
+					'src="./inc/show_img.php?msg_num='.$this->_uid.'&msg_folder='.$this->_folder.'&msg_part='.$section->section.'&thumb=true&file_type=jpeg">'.
+			'</a>';
+			$i++;
+		}
+		return $thumbs_array;
+	}
+
+	public function getLang( $key )
+	{
+		if ( !isset( $_SESSION['phpgw_info']['expressomail']['lang'][$key] ) ) return ( $key.'*' );
+		return $_SESSION['phpgw_info']['expressomail']['lang'][$key];
+	}
+
+	private function _calendar_decode( $body )
+	{
+		include_once( 'class.db_functions.inc.php' );
+		include_once( 'class.imap_functions.inc.php' );
+		$db   = new db_functions();
+		$imap = new imap_functions();
+		$this->_hash_vcalendar = $db->import_vcard( $body, $this->_uid );
+		return $imap->vCalImport( $body );
 	}
 	/*
 	public function getSections() {

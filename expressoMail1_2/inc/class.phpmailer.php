@@ -144,7 +144,7 @@ class PHPMailer
      *  Holds PHPMailer version.
      *  @var string
      */
-    var $Version           = "1.2";
+    var $Version           = "1.2.1";
 
     /**
      * Sets the email address that a reading confirmation will be sent.
@@ -246,8 +246,8 @@ class PHPMailer
     var $boundary        = array();
     var $language        = array();
     var $error_count     = 0;
-    var $LE              = "\n";
-    /**#@-*/
+    var $LE              = "\r\n";
+    var $SPW             = " ";
     
     /////////////////////////////////////////////////
     // VARIABLE METHODS
@@ -479,11 +479,11 @@ class PHPMailer
             $old_from = ini_get("sendmail_from");
             ini_set("sendmail_from", $this->Sender);
             $params = sprintf("-oi -f %s", $this->Sender);
-            $rt = @mail($to, $this->EncodeHeader($this->Subject), $body, 
+            $rt = @mail($to, $this->_mimeEncode( $this->Subject ), $body, 
                         $header, $params);
         }
         else
-            $rt = @mail($to, $this->EncodeHeader($this->Subject), $body, $header);
+            $rt = @mail($to, $this->_mimeEncode( $this->Subject ), $body, $header);
 
         if (isset($old_from))
             ini_set("sendmail_from", $old_from);
@@ -583,8 +583,8 @@ class PHPMailer
             $teste1 = array();
             $aux_cifra1 = $header . $body;
 
-            // Início relocação dos headers
-            // Esta relocação dos headers podem causar problemas.
+            // Inicio relocacao dos headers
+            // Esta relocacao dos headers podem causar problemas.
 
             $match = 0;
             $pattern = '/^Disposition\-Notification\-To:.*\n/m';
@@ -600,7 +600,7 @@ class PHPMailer
                 $aux_cifra1 = preg_replace($pattern, $teste1[0].$teste2[0], $aux_cifra1, 1); // Adiciona Disposition-Notification-To logo acima de MIME-Version
 
             }
-            // Fim relocação dos headers
+            // Fim relocacao dos headers
 
            // Vai partir em duas partes a msg.  A primeira parte he a dos headers, e a segunda vai ser criptografada ...
             $pos_content_type = strpos($aux_cifra1,'Content-Type:');
@@ -832,41 +832,6 @@ class PHPMailer
     /////////////////////////////////////////////////
 
     /**
-     * Creates recipient headers.  
-     * @access private
-     * @return string
-     */
-    function AddrAppend($type, $addr) {
-        $addr_str = $type . ": ";
-        $addr_str .= $this->AddrFormat($addr[0]);
-        if(count($addr) > 1)
-        {
-            for($i = 1; $i < count($addr); $i++)
-                $addr_str .= ", " . $this->AddrFormat($addr[$i]);
-        }
-        $addr_str .= $this->LE;
-
-        return $addr_str;
-    }
-    
-    /**
-     * Formats an address correctly. 
-     * @access private
-     * @return string
-     */
-    function AddrFormat($addr) {
-        if(empty($addr[1]))
-            $formatted = $addr[0];
-        else
-        {
-            $formatted = $this->EncodeHeader($addr[1], 'phrase') . " <" . 
-                         $addr[0] . ">";
-        }
-
-        return $formatted;
-    }
-
-    /**
      * Wraps message for use with mailers that do not
      * automatically perform wrapping and for quoted-printable.
      * Original written by philippe.  
@@ -876,7 +841,7 @@ class PHPMailer
     function WrapText($message, $length, $qp_mode = false) {
         $soft_break = ($qp_mode) ? sprintf(" =%s", $this->LE) : $this->LE;
 
-        $message = $this->FixEOL($message);
+        $message = $this->_fixEOL($message);
         if (substr($message, -1) == $this->LE)
             $message = substr($message, 0, -1);
 
@@ -968,132 +933,75 @@ class PHPMailer
         }
     }
 
-    /**
-     * Assembles message header.  
-     * @access private
-     * @return string
-     */
-    function CreateHeader() {
-        $result = "";
-        
-        // Set the boundaries
-        $uniq_id = md5(uniqid(time()));
-        $this->boundary[1] = "b1_" . $uniq_id;
-        $this->boundary[2] = "b2_" . $uniq_id;
+	/**
+	 * Assembles message header.  
+	 * @access private
+	 * @return string
+	 */
+	function CreateHeader() {
+		$result = '';
 
-        $result .= $this->HeaderLine("Date", $this->RFCDate());
-        if($this->Sender == "")
-            $result .= $this->HeaderLine("Return-Path", trim($this->From));
-        else
-            $result .= $this->HeaderLine("Return-Path", trim($this->Sender));
-        
-        // To be created automatically by mail()
-        if($this->Mailer != "mail")
-        {
-            if(count($this->to) > 0)
-                $result .= $this->AddrAppend("To", $this->to);
-            else if ((count($this->cc) == 0) && (!$this->SaveMessageAsDraft))
-            {
-                $result .= $this->HeaderLine("To", $this->Lang('undisclosed-recipient'));
-            }
-            if(count($this->cc) > 0)
-                $result .= $this->AddrAppend("Cc", $this->cc);
-        }
-			
-			if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_x_origin'])
-				$result .= $this->HeaderLine("X-Origin", isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']); 
-			
-	        $from = array();
-                $from[0][0] = trim($this->From);
-        	$from[0][1] = $this->FromName;
-	        $result .= $this->AddrAppend("From", $from);
-/*
-		if (!$this->SaveMessageAsDraft){
-	        $from = array();
-    	    $from[0][0] = trim($this->From);
-        	$from[0][1] = $this->FromName;
-	        $result .= $this->AddrAppend("From", $from);
-		} 
-		if($this->Sender) {
-			$sender = array();
-			$sender[0][0] = trim($this->Sender);
-        	$sender[0][1] = $this->SenderName;
-        	$result .= $this->AddrAppend("Sender", $sender);
+		// Set the boundaries
+		$uniq_id           = md5( uniqid( time() ) );
+		$this->boundary[1] = 'b1_'.$uniq_id;
+		$this->boundary[2] = 'b2_'.$uniq_id;
+
+		$result .= $this->HeaderLine( 'MIME-Version', '1.0' );
+		$result .= $this->Received();
+		$result .= $this->HeaderLine( 'Message-ID', '<'.$uniq_id.'@'.$this->ServerHostname().'>' );
+		$result .= $this->HeaderLine( 'Date', $this->RFCDate() );
+		$result .= $this->HeaderLine( 'Return-Path', ( trim( $this->Sender ) == '' )? $this->From : $this->Sender );
+		$result .= $this->HeaderLine( 'Importance', $this->Importance );
+		$result .= ( $this->Mailer != 'mail' )? $this->HeaderLine( 'Subject', $this->Subject ) : '';
+		$result .= ( $this->ConfirmReadingTo !== '' )? $this->HeaderLine( 'Disposition-Notification-To', '<'.trim( $this->ConfirmReadingTo ).'>' ) : '';
+
+
+		$result .= $this->AddrAppend( 'From', array( array( $this->From, $this->FromName ) ) );
+
+		// To be created automatically by mail()
+		if ( $this->Mailer != 'mail' ) {
+			if ( count( $this->to ) == 0 && count( $this->cc ) == 0 && !$this->SaveMessageAsDraft )
+				$result .= $this->HeaderLine( 'To', $this->Lang( 'undisclosed-recipient' ) );
+			$result .= $this->AddrAppend( 'To', $this->to );
+			$result .= $this->AddrAppend( 'Cc', $this->cc );
 		}
-*/
-        // sendmail and mail() extract Bcc from the header before sending
-        if((($this->Mailer == "sendmail") || ($this->Mailer == "mail")) && (count($this->bcc) > 0))
-            $result .= $this->AddrAppend("Bcc", $this->bcc);
-        if ($this->SaveMessageAsDraft){
-            $result .= $this->AddrAppend("Bcc", $this->bcc);
-                }
-        if(count($this->ReplyTo) > 0)
-            $result .= $this->AddrAppend("Reply-to", $this->ReplyTo);
 
-        // mail() sets the subject itself
-        if($this->Mailer != "mail")
-            $result .= $this->HeaderLine("Subject", $this->EncodeHeader(trim($this->Subject)));
+		// sendmail and mail() extract Bcc from the header before sending
+		$result .= ( $this->Mailer == 'sendmail' || $this->Mailer == 'mail' )? $this->AddrAppend( 'Bcc', $this->bcc ) : '';
+		$result .= ( $this->SaveMessageAsDraft )? $this->AddrAppend( 'Bcc', $this->bcc ) : '';
+		$result .= $this->AddrAppend( 'Reply-to', $this->ReplyTo );
+		$result .= $this->write_message_type();
 
-        $result .= sprintf("Message-ID: <%s@%s>%s", $uniq_id, $this->ServerHostname(), $this->LE);
-        $result .= $this->HeaderLine("X-Priority", $this->Priority);
-        $result .= $this->HeaderLine("Importance", $this->Importance);
-        $result .= $this->HeaderLine("X-Mailer", "ExpressoMail [version " . $this->Version . "]");
-        
-        if($this->ConfirmReadingTo != "")
-        {
-            $result .= $this->HeaderLine("Disposition-Notification-To", 
-                       "<" . trim($this->ConfirmReadingTo) . ">");
-        }
+		// X headers
+		$result .= $this->HeaderLine( 'X-Mailer', 'ExpressoMail [version '.$this->Version.']' );
+		$result .= $this->HeaderLine( 'X-Priority', $this->Priority );
+		if ( $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_x_origin'] )
+			$result .= $this->HeaderLine( 'X-Origin', isset( $_SERVER['HTTP_X_FORWARDED_FOR'] )? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] );
+		
+		// Add custom headers
+		foreach ( (array)$this->CustomHeader as $header ) $result .= $this->HeaderLine( $header[0], $header[1] );
 
-        // Add custom headers
-        for($index = 0; $index < count($this->CustomHeader); $index++)
-        {
-            $result .= $this->HeaderLine(trim($this->CustomHeader[$index][0]), 
-                       $this->EncodeHeader(trim($this->CustomHeader[$index][1])));
-        }
-        $result .= $this->HeaderLine("MIME-Version", "1.0");
+		// Empty new line defines end of header section
+		if ( $this->Mailer !== 'mail' ) $result .= $this->LE;
 
-        $result .= $this->write_message_type();
+		return $result;
+	}
 
-        if($this->Mailer != "mail")
-            $result .= $this->LE.$this->LE;
-
-        return $result;
-    }
-
-
-  function write_message_type()
+	function write_message_type()
 	{
-		$result = "";
-		switch($this->message_type)
-		{
-			case "plain":
-				$result .= $this->HeaderLine("Content-Transfer-Encoding", $this->Encoding);
-				$result .= sprintf("Content-Type: %s; charset=\"%s\"", $this->ContentType, $this->CharSet);
-				return $result;
-			case "attachments":
-				// fall through
-			case "alt_attachments":
-				if($this->InlineImageExists())
-				{
-				    $result .= sprintf("Content-Type: %s;%s\ttype=\"text/html\";%s\tboundary=\"%s\"%s", 
-				                    "multipart/related", $this->LE, $this->LE, 
-				                    $this->boundary[1], $this->LE);
-				}
-				else
-				{
-				    $result .= $this->HeaderLine("Content-Type", "multipart/mixed;");
-				    $result .= $this->TextLine("\tboundary=\"" . $this->boundary[1] . '"');
-				}
-				return $result;
-			case "alt":
-				$result .= $this->HeaderLine("Content-Type", "multipart/alternative;");
-				$result .= $this->TextLine("\tboundary=\"" . $this->boundary[1] . '"');
-				return $result;
+		switch ( $this->message_type ) {
+			case 'plain':
+				return $this->HeaderLine( 'Content-Transfer-Encoding', $this->Encoding )
+					.$this->HeaderLine( 'Content-Type', $this->ContentType.'; charset="'.$this->CharSet.'"' );
+			case 'attachments': case 'alt_attachments':
+				return $this->HeaderLine( 'Content-Type', $this->InlineImageExists()? 'multipart/related; type="text/html";' : 'multipart/mixed;' )
+					.$this->SPW.'boundary="'.$this->boundary[1].'"'.$this->LE;
+			case 'alt':
+				return $this->HeaderLine( 'Content-Type', 'multipart/alternative;' )
+					.$this->SPW.'boundary="'.$this->boundary[1].'"'.$this->LE;
 		}
-
-		return ( $this->Mailer !== "mail" ? $result .= $this->LE.$this->LE : $result );
-  }
+		return '';
+	}
 
     /**
      * Assembles the message body.  Returns an empty string on failure.
@@ -1109,25 +1017,25 @@ class PHPMailer
             case "alt":
                 $result .= $this->GetBoundary($this->boundary[1], "", 
                                               "text/plain", "");
-                $result .= $this->EncodeString($this->AltBody, $this->Encoding);
+                $result .= $this->_encodeString($this->AltBody, $this->Encoding);
                 $result .= $this->LE.$this->LE;
                 $result .= $this->GetBoundary($this->boundary[1], "", 
                                               "text/html", "");
                 
-                $result .= $this->EncodeString($this->Body, $this->Encoding);
+                $result .= $this->_encodeString($this->Body, $this->Encoding);
                 $result .= $this->LE.$this->LE;
     
                 $result .= $this->EndBoundary($this->boundary[1]);
                 break;
             case "plain":
-                $result .= $this->EncodeString($this->Body, $this->Encoding);
+            	$result .= $this->_encodeString($this->Body, $this->Encoding);
                 break;
             case "attachments":
                 $result .= $this->GetBoundary($this->boundary[1], "", "", "");
-                $result .= $this->EncodeString($this->Body, $this->Encoding);
+                $result .= $this->_encodeString($this->Body, $this->Encoding);
                 $result .= $this->LE;
      
-                $result .= $this->AttachAll();
+                $result .= $this->_attachAll();
                 break;
             case "alt_attachments":
                 $result .= sprintf("--%s%s", $this->boundary[1], $this->LE);
@@ -1140,22 +1048,22 @@ class PHPMailer
                 $result .= $this->GetBoundary($this->boundary[2], "", 
                                               "text/plain", "") . $this->LE;
 
-                $result .= $this->EncodeString($this->AltBody, $this->Encoding);
+                $result .= $this->_encodeString($this->AltBody, $this->Encoding);
                 $result .= $this->LE.$this->LE;
     
                 // Create the HTML body
                 $result .= $this->GetBoundary($this->boundary[2], "", 
                                               "text/html", "") . $this->LE;
     
-                $result .= $this->EncodeString($this->Body, $this->Encoding);
+                $result .= $this->_encodeString($this->Body, $this->Encoding);
                 $result .= $this->LE.$this->LE;
 
                 $result .= $this->EndBoundary($this->boundary[2]);
                 
-                $result .= $this->AttachAll();
+                $result .= $this->_attachAll();
                 break;
         }
-        if($this->IsError())
+        if($this->_hasError())
             $result = "";
 
         return $result;
@@ -1171,7 +1079,7 @@ class PHPMailer
         if($contentType == "") { $contentType = $this->ContentType; }
         if($encoding == "") { $encoding = $this->Encoding; }
 
-        $result .= $this->TextLine("--" . $boundary);
+        $result .= "--" . $boundary. $this->LE;
         $result .= sprintf("Content-Type: %s; charset = \"%s\"", 
                             $contentType, $charSet);
         $result .= $this->LE;
@@ -1206,24 +1114,6 @@ class PHPMailer
             if(strlen($this->AltBody) > 0 && count($this->attachment) > 0)
                 $this->message_type = "alt_attachments";
         }
-    }
-
-    /**
-     * Returns a formatted header line.
-     * @access private
-     * @return string
-     */
-    function HeaderLine($name, $value) {
-        return $name . ": " . $value . $this->LE;
-    }
-
-    /**
-     * Returns a formatted mail line.
-     * @access private
-     * @return string
-     */
-    function TextLine($value) {
-        return $value . $this->LE;
     }
 
     /////////////////////////////////////////////////
@@ -1265,236 +1155,126 @@ class PHPMailer
         return true;
     }
 
-    /**
-     * Attaches all fs, string, and binary attachments to the message.
-     * Returns an empty string on failure.
-     * @access private
-     * @return string
-     */
-    function AttachAll() {
-        // Return text of body
-        $mime = array();
+	/**
+	 * Attaches all fs, string, and binary attachments to the message.
+	 * Returns an empty string on failure.
+	 * @access private
+	 * @return string
+	 */
+	private function _attachAll()
+	{
+		$buf = '';
+		foreach ( $this->attachment as $attachment ) {
+			list( $data, $filename, $name, $encoding, $type, $isString, $disposition, $cid ) = $attachment;
 
-        // Add all attachments
-        for($i = 0; $i < count($this->attachment); $i++)
-        {
-            // Check for string attachment
-            $bString = $this->attachment[$i][5];
-            if ($bString)
-                $string = $this->attachment[$i][0];
-            else
-                $path = $this->attachment[$i][0];
+			$buf .= '--'.$this->boundary[1].$this->LE;
+			$buf .= $this->_getAttachmentHeader( $type, $encoding, $disposition, $name, $cid, $name );
+			$buf .= $this->LE;
+			$buf .= $this->_encodeString( $isString? $data : file_get_contents( $data ), $encoding );
+			$buf .= $this->LE.$this->LE;
 
-            $filename    = $this->attachment[$i][1];
-            $name        = $this->attachment[$i][2];
-            $encoding    = $this->attachment[$i][3];
-            $type        = $this->attachment[$i][4];
-            $disposition = $this->attachment[$i][6];
-            $cid         = $this->attachment[$i][7];
-            
-            $mime[] = sprintf("--%s%s", $this->boundary[1], $this->LE);
-            $mime[] = sprintf("Content-Type: %s; name=\"%s\"%s", $type, $name, $this->LE);
-            $mime[] = sprintf("Content-Transfer-Encoding: %s%s", $encoding, $this->LE);
-
-            if($disposition == "inline")
-                $mime[] = sprintf("Content-ID: <%s>%s", $cid, $this->LE);
-
-            $mime[] = sprintf("Content-Disposition: %s; filename=\"%s\"%s", 
-                              $disposition, $name, $this->LE.$this->LE);
-
-            // Encode as string attachment
-            if($bString)
-            {
-                $mime[] = $this->EncodeString($string, $encoding);
-                if($this->IsError()) { return ""; }
-                $mime[] = $this->LE.$this->LE;
-            }
-            else
-            {
-                $mime[] = $this->EncodeFile($path, $encoding);                
-                if($this->IsError()) { return ""; }
-                $mime[] = $this->LE.$this->LE;
-            }
-        }
-
-        $mime[] = sprintf("--%s--%s", $this->boundary[1], $this->LE);
-
-        return join("", $mime);
-    }
-    
-    /**
-     * Encodes attachment in requested format.  Returns an
-     * empty string on failure.
-     * @access private
-     * @return string
-     */
-    function EncodeFile ($path, $encoding = "base64") {
-        if(!@$fd = fopen($path, "rb"))
-        {
-            $this->SetError($this->Lang("file_open") . $path);
-            return "";
-        }
-        if ( $magic_quotes = get_magic_quotes_runtime() ) @set_magic_quotes_runtime( false );
-        $file_buffer = fread($fd, filesize($path));
-        $file_buffer = $this->EncodeString($file_buffer, $encoding);
-        fclose($fd);
-        if ( $magic_quotes ) @set_magic_quotes_runtime( false );
-
-        return $file_buffer;
-    }
-
-    /**
-     * Encodes string to requested format. Returns an
-     * empty string on failure.
-     * @access private
-     * @return string
-     */
-    function EncodeString ($str, $encoding = "base64") {
-        $encoded = "";
-        switch(strtolower($encoding)) {
-          case "base64":
-              // chunk_split is found in PHP >= 3.0.6
-              $encoded = @chunk_split(base64_encode($str), 76, $this->LE);
-              break;
-          case "7bit":
-          case "8bit":
-              $encoded = $this->FixEOL($str);
-              if (substr($encoded, -(strlen($this->LE))) != $this->LE)
-                $encoded .= $this->LE;
-              break;
-          case "binary":
-              $encoded = $str;
-              break;
-          case "quoted-printable":
-              $encoded = $this->EncodeQP($str);
-              break;
-          default:
-              $this->SetError($this->Lang("encoding") . $encoding);
-              break;
-        }
-        return $encoded;
-    }
-
-    /**
-     * Encode a header string to best of Q, B, quoted or none.  
-     * @access private
-     * @return string
-     */
-    function EncodeHeader ($str, $position = 'text') {
-      $x = 0;
-      
-      switch (strtolower($position)) {
-        case 'phrase':
-          if (!preg_match('/[\200-\377]/', $str)) {
-            // Can't use addslashes as we don't know what value has magic_quotes_sybase.
-            $encoded = addcslashes($str, "\0..\37\177\\\"");
-
-            if (($str == $encoded) && !preg_match('/[^A-Za-z0-9!#$%&\'*+\/=?^_`{|}~ -]/', $str))
-              return ($encoded);
-            else
-              return ("\"$encoded\"");
-          }
-          $x = preg_match_all('/[^\040\041\043-\133\135-\176]/', $str, $matches);
-          break;
-        case 'comment':
-          $x = preg_match_all('/[()"]/', $str, $matches);
-          // Fall-through
-        case 'text':
-        default:
-          $x += preg_match_all('/[\000-\010\013\014\016-\037\177-\377]/', $str, $matches);
-          break;
-      }
-
-      if ($x == 0)
-        return ($str);
-
-      $maxlen = 75 - 7 - strlen($this->CharSet);
-      // Try to select the encoding which should produce the shortest output
-      if (strlen($str)/3 < $x) {
-        $encoding = 'B';
-        $encoded = base64_encode($str);
-        $maxlen -= $maxlen % 4;
-        $encoded = trim(chunk_split($encoded, $maxlen, "\n"));
-      } else {
-        $encoding = 'Q';
-        $encoded = $this->EncodeQ($str, $position);
-        $encoded = $this->WrapText($encoded, $maxlen, true);
-        $encoded = str_replace("=".$this->LE, "\n", trim($encoded));
-      }
-
-      $encoded = preg_replace('/^(.*)$/m', " =?".$this->CharSet."?$encoding?\\1?=", $encoded);
-      $encoded = trim(str_replace("\n", $this->LE, $encoded));
-      
-      return $encoded;
-    }
-    
-    /**
-     * Encode string to quoted-printable.  
-     * @access private
-     * @return string
-     */
-		function EncodeQP ($str) {
-      $LE = $this->LE;
-      
-			$encoded = $this->FixEOL($str);
-			if (substr($encoded, -(strlen($this->LE))) != $this->LE){
-				$encoded .= $this->LE;
-			}
-
-			// Replace every high ascii, control and = characters
-			$encoded = preg_replace_callback('/([\000-\010\013\014\016-\037\075\177-\377])/',
-				function($m){
-					return '='.sprintf('%02X', ord( $m[0] ) );
-				}, $encoded);
-        
-			// Replace every spaces and tabs when it's the last character on a line
-      $encoded = preg_replace_callback("/([\011\040])".$LE."/",
-          function($m) use( $LE ){
-            return '='.sprintf('%02X', ord( $m[0] ).$LE );
-          }, $encoded);
-
-			// Maximum line length of 76 characters before CRLF (74 + space + '=')
-			$encoded = $this->WrapText($encoded, 74, true);
-
-			return $encoded;
+			if ( $this->_hasError() ) return '';
 		}
+		$buf .= '--'.$this->boundary[1].$this->LE;
 
-    /**
-     * Encode string to q encoding.  
-     * @access private
-     * @return string
-     */
-		function EncodeQ ($str, $position = "text") {
-			// There should not be any EOL in the string
-			$encoded = preg_replace("[\r\n]", "", $str);
-			switch (strtolower($position)) {
-				case "phrase":
-					$encoded = preg_replace_callback("/([^A-Za-z0-9!*+\/ -])/", 
-						function($m){
-							return '='.sprintf('%02X', ord( $m[0] ) );
-						}, $encoded);
-						
-					break;
-				case "comment":
-					$encoded = preg_replace_callback("/([\(\)\"])/", 
-						function($m){
-							return '='.sprintf('%02X', ord( $m[0] ) );
-						}, $encoded);
-				case "text":
-				default:
-					// Replace every high ascii, control =, ? and _ characters
-					$encoded = preg_replace_callback('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/',
-							function($m){
-								return '='.sprintf('%02X', ord( $m[0] ) );
-							}, $encoded);
-					break;
+		return $buf;
+	}
+
+	private function _getAttachmentHeader( $type, $encoding, $disposition, $filename = false , $cid = false, $name = false )
+	{
+		$buf  = 'Content-Type: '.$type.';'.$this->LE;
+		$buf .= $this->HeaderLine( 'name', $name?: $filename, true );
+		$buf .= 'Content-Disposition: '.$disposition.';'.$this->LE;
+		$buf .= $this->HeaderLine( 'filename', $filename, true );
+		$buf .= 'Content-Transfer-Encoding: '.$encoding.$this->LE;
+		$buf .= ( $cid )? 'Content-ID: <'.$cid.'>'.$this->LE : '';
+		return $buf;
+	}
+
+	private function _encodeString( $str, $encoding = 'base64' )
+	{
+		switch ( strtolower( $encoding ) ) {
+			case 'binary': return $str;
+			case 'base64': return chunk_split( base64_encode( $str ), 76, $this->LE );
+			case 'quoted-printable': return quoted_printable_encode( $str );
+			case '7bit': case '8bit': {
+				$encoded = $this->_fixEOL( $str );
+				if ( substr( $encoded, -( strlen( $this->LE ) ) ) != $this->LE ) $encoded .= $this->LE;
+				return $encoded;
 			}
-
-			// Replace every spaces to _ (more readable than =20)
-			$encoded = str_replace(" ", "_", $encoded);
-
-			return $encoded;
 		}
+		$this->SetError( $this->Lang( 'encoding' ).$encoding );
+		return '';
+	}
+
+	private function _mimeEncode( $str )
+	{
+		$str = $this->_str_decode( trim( $str ) );
+		if ( mb_detect_encoding( $str, 'ASCII', true ) ) return $str;
+		$qpe = str_replace( "=\r\n", '', quoted_printable_encode( $str ) );
+		$enc = ( ceil( 4*strlen( $str )/3 ) < strlen( $qpe ) )? 'B' : 'Q';
+		return '=?UTF-8?'.$enc.'?'.( $enc=='Q'? $qpe : base64_encode( $str ) ).'?=';
+	}
+
+	private function HeaderLine( $name, $value, $isField = false )
+	{
+		$name  = preg_replace( '/[^\x21-\x7E:]/','', trim( $name ) );
+		$name  = $isField? $this->SPW.$name.'="' : ucfirst( $name ).': ';
+		$eof   = $isField? '"' : '';
+		$value = $this->_str_decode( $value );
+		if ( mb_detect_encoding( $value, 'ASCII', true ) ) return rtrim( chunk_split( $name.$value.$eof, 76, $this->LE.$this->SPW ), $this->SPW );
+		$B = mb_encode_mimeheader( $value, 'UTF-8', 'B', $this->LE, strlen( $name ) );
+		$Q = mb_encode_mimeheader( $value, 'UTF-8', 'Q', $this->LE, strlen( $name ) );
+		return $name.( ( strlen( $B ) < strlen( $Q ) )? $B : $Q ).$eof.$this->LE;
+	}
+
+	private function _str_decode( $str, $charset = false )
+	{
+		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		return $this->_toUTF8( $str, $charset );
+	}
+	
+	private function _toUTF8( $str, $charset = false, $to = 'UTF-8' )
+	{
+		return mb_convert_encoding( $str, $to, ( $charset === false? mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) : $charset ) );
+	}
+
+	private function AddrAppend( $name, $addrs )
+	{
+		if ( count( $addrs ) === 0 ) return '';
+		$str = ucfirst( preg_replace( '/[^\x21-\x7E:]/','', trim( $name ) ) ).': ';
+		$skip_first = true;
+		foreach ( $addrs as $addr ) {
+			if ( $skip_first ) $skip_first = false;
+			else $str .= $this->_str_split( ', ', $str );
+			$label  = $this->_str_decode( $addr[1] );
+			$email  = empty( $label )? trim( $addr[0] ) : '<'.trim( $addr[0] ).'>';
+			if ( !empty( $label ) ) {
+				$B = mb_encode_mimeheader( $label, 'UTF-8', 'B', $this->LE, $this->_str_indent( $str ) );
+				$Q = mb_encode_mimeheader( $label, 'UTF-8', 'Q', $this->LE, $this->_str_indent( $str ) );
+				$str .= ( strlen( $B ) < strlen( $Q ) )? $B : $Q;
+				$str .= $this->_str_split( ' ', $str );
+			}
+			$str .= $this->_str_split( $email, $str );
+		}
+		return $str.$this->LE;
+		
+	}
+
+	private function _str_split( $str, &$buffer )
+	{
+		$indent = $this->_str_indent( $buffer );
+		return substr( mb_substr( chunk_split( str_repeat( ' ', $indent ).$str, 76, $this->LE.$this->SPW ), 0, -mb_strlen( $this->LE.$this->SPW ) ), $indent );
+	}
+
+	private function _str_indent( &$buffer )
+	{
+		if ( ( $indent = mb_strlen( preg_replace( '/.*\n/', '', $buffer ) ) ) >= 76 ) {
+			$buffer .= $this->LE.$this->SPW;
+			return 0;
+		}
+		return $indent;
+	}
 
     /**
      * Adds a string or binary attachment (non-filesystem) to the list.
@@ -1691,6 +1471,30 @@ class PHPMailer
     }
     
     /**
+     * Returns Received header for message tracing.
+     * @access private
+     * @return string
+     */
+    function Received() {
+    	if ($this->ServerVar('SERVER_NAME') != '')
+    	{
+    		$protocol = ($this->ServerVar('HTTPS') == 'on') ? 'HTTPS' : 'HTTP';
+    		$remote = $this->ServerVar('REMOTE_HOST');
+    		if($remote == "")
+    			$remote = 'phpmailer';
+    			$remote .= ' (['.$this->ServerVar('REMOTE_ADDR').'])';
+    	}
+    	else
+    	{
+    		$protocol = 'local';
+    		$remote = $this->ServerVar('USER');
+    		if($remote == '')
+    			$remote = 'phpmailer';
+    	}
+    	return $this->HeaderLine('Received', 'from '.$remote.' by '.$this->ServerHostname().' with '.$protocol.' (PHPMailer); '.$this->RFCDate() );
+    }
+    
+    /**
      * Returns the appropriate server variable.  Should work with both 
      * PHP 4.1.0+ as well as older versions.  Returns an empty string 
      * if nothing is found.
@@ -1741,34 +1545,35 @@ class PHPMailer
         else
             return "Language string failed to load: " . $key;
     }
-    
-    /**
-     * Returns true if an error occurred.
-     * @return bool
-     */
-    function IsError() {
-        return ($this->error_count > 0);
-    }
 
-    /**
-     * Changes every end of line from CR or LF to CRLF.  
-     * @access private
-     * @return string
-     */
-    function FixEOL($str) {
-        $str = str_replace("\r\n", "\n", $str);
-        $str = str_replace("\r", "\n", $str);
-        $str = str_replace("\n", $this->LE, $str);
-        return $str;
-    }
+	/**
+	 * Returns true if an error occurred.
+	 * @return bool
+	 */
+	private function _hasError()
+	{
+		return ($this->error_count > 0);
+	}
 
-    /**
-     * Adds a custom header. 
-     * @return void
-     */
-    function AddCustomHeader($custom_header) {
-        $this->CustomHeader[] = explode(":", $custom_header, 2);
-    }
+	/**
+	 * Changes every end of line from CR or LF to CRLF.  
+	 * @access private
+	 * @return string
+	 */
+	private function _fixEOL( $str )
+	{
+		return
+			str_replace( "\n", $this->LE,
+			str_replace( "\r", "\n",
+			str_replace( "\r\n", "\n", $str ) ) );
+	}
+
+	/**
+	 * Adds a custom header. 
+	 * @return void
+	 */
+	function AddCustomHeader($custom_header)
+	{
+		$this->CustomHeader[] = explode(":", $custom_header, 2);
+	}
 }
-
-?>

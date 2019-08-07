@@ -60,22 +60,22 @@ class imap_functions
 	// BEGIN of functions.
 	function open_mbox($folder = false , $force_die = true)
 	{
-		$folder = mb_convert_encoding($folder, "UTF7-IMAP","UTF8, ISO-8859-1");
+		$mailbox = $this->_toMaibox( $folder );
 		if (is_resource($this->mbox))
         	{
 			if ($force_die)
 			{
-				@imap_reopen($this->mbox, "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
+				@imap_reopen($this->mbox, "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$mailbox) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
 			} else {
-				@imap_reopen($this->mbox, "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder);
+				@imap_reopen($this->mbox, "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$mailbox);
 			}
         	} else {
 
 			if($force_die)
 			{
-				$this->mbox = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder, $this->username, $this->password) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
+				$this->mbox = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$mailbox, $this->username, $this->password) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
 			} else {
-				$this->mbox = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder, $this->username, $this->password);
+				$this->mbox = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$mailbox, $this->username, $this->password);
 			}
 		}
 
@@ -125,88 +125,71 @@ class imap_functions
 		return $error;
 	}
 
-    function get_range_msgs2($params)
+	function get_range_msgs2($params)
 	{
 		// Verify migrate MB
 		$db = new db_functions();
-		
-		if( $db->getMigrateMailBox() )
-			return false;
+
+		if ( $db->getMigrateMailBox() ) return false;
 
 		// Free others requests 
-		session_write_close(); 
-		$folder = $params['folder'];
-		$folder = mb_convert_encoding( $folder, "ISO-8859-1", mb_detect_encoding( $folder, "UTF-8, ISO-8859-1" ) );
-		$msg_range_begin = $params['msg_range_begin'];
-		$msg_range_end = $params['msg_range_end'];
-		$sort_box_type = $params['sort_box_type'];
+		session_write_close();
+
+		$folder           = $this->_toUTF8( $params['folder'] );
+		$msg_range_begin  = $params['msg_range_begin'];
+		$msg_range_end    = $params['msg_range_end'];
+		$sort_box_type    = $params['sort_box_type'];
 		$sort_box_reverse = $params['sort_box_reverse'];
-		$search_box_type = $params['search_box_type'] != "ALL" && $params['search_box_type'] != "" ? $params['search_box_type'] : false;
+		$search_box_type  = $params['search_box_type'] != "ALL" && $params['search_box_type'] != "" ? $params['search_box_type'] : false;
 
-		if(!$this->mbox || !is_resource($this->mbox))
-			$this->mbox = $this->open_mbox($folder);
-		
+		if ( !$this->mbox || !is_resource( $this->mbox ) ) $this->mbox = $this->open_mbox( $folder );
+
 		$return = array();
-		
+
 		$return['folder'] = $folder;
-		
-		//Para enviar o offset entre o timezone definido pelo usuário e GMT
+
+		//Para enviar o offset entre o timezone definido pelo usuario e GMT
 		$return['offsetToGMT'] = $this->functions->CalculateDateOffset();
-		
-		if(!$search_box_type || $search_box_type=="UNSEEN" || $search_box_type=="SEEN") {
-			$msgs_info = imap_status($this->mbox,"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".mb_convert_encoding( $folder, "UTF7-IMAP", "ISO-8859-1" ) ,SA_ALL);
 
-
-			$return['tot_unseen'] = $search_box_type == "SEEN" ? 0 : ( isset($msgs_info->unseen) ? $msgs_info->unseen : false );
-
-			$sort_array_msg = $this-> get_msgs($folder, $sort_box_type, $search_box_type, $sort_box_reverse,$msg_range_begin,$msg_range_end);
-
-			$num_msgs = 0;
-			if( isset($msgs_info->unseen) && isset($msgs_info->messages) ){
-				$num_msgs = (($search_box_type=="UNSEEN") ? $msgs_info->unseen : 
-												( ($search_box_type=="SEEN") ? ($msgs_info->messages - $msgs_info->unseen) : $msgs_info->messages ));
-			}
+		if ( !$search_box_type || $search_box_type === 'UNSEEN' || $search_box_type === 'SEEN' ) {
+			$msgs_info            = imap_status( $this->mbox,'{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}'.$this->_toMaibox( $folder ), SA_ALL );
+			$return['tot_unseen'] = $search_box_type === 'SEEN'? 0 : ( isset( $msgs_info->unseen )? $msgs_info->unseen : false );
+			$sort_array_msg       = $this->get_msgs( $folder, $sort_box_type, $search_box_type, $sort_box_reverse, $msg_range_begin, $msg_range_end );
+			$num_msgs             = ( isset( $msgs_info->unseen ) && isset( $msgs_info->messages ) )? (
+				$search_box_type === 'UNSEEN'? $msgs_info->unseen : (
+					$search_box_type === 'SEEN'? ( $msgs_info->messages - $msgs_info->unseen ) : $msgs_info->messages
+				)
+			) : 0;
 
 			$i = 0;
-			if(is_array($sort_array_msg)){
-				foreach($sort_array_msg as $msg_number => $value)
-				{
-					$temp = $this->get_info_head_msg($msg_number);
-					$temp['msg_sample'] = $this->get_msg_sample($msg_number,$folder);
-					if(!$temp)
-						return false;
-
+			if ( is_array( $sort_array_msg ) ) {
+				foreach ( $sort_array_msg as $msg_number => $value ) {
+					$temp = $this->get_info_head_msg( $msg_number );
+					$temp['msg_sample'] = $this->get_msg_sample( $msg_number, $folder );
+					if ( !$temp ) return false;
 					$return[$i] = $temp;
 					$i++;
 				}
 			}
-			$return['num_msgs'] =  $num_msgs;
-		}
-		else {
-			$num_msgs = imap_num_msg($this->mbox);	
-			$sort_array_msg = $this-> get_msgs($folder, $sort_box_type, $search_box_type, $sort_box_reverse,$msg_range_begin,$num_msgs);
+			$return['num_msgs'] = $num_msgs;
 
+		} else {
 
 			$return['tot_unseen'] = 0;
-			$i = 0;		
+			$num_msgs             = imap_num_msg( $this->mbox );
+			$sort_array_msg       = $this->get_msgs( $folder, $sort_box_type, $search_box_type, $sort_box_reverse, $msg_range_begin, $num_msgs );
 
-			if(is_array($sort_array_msg)){
-				foreach($sort_array_msg as $msg_number => $value)
-				{
-					$temp = $this->get_info_head_msg($msg_number);
-					if(!$temp){ return false; }
-				
-					if($temp['Unseen'] == 'U' || $temp['Recent'] == 'N'){
-						$return['tot_unseen']++;
-					}
-				
-					if( $i <= ($msg_range_end-$msg_range_begin)){
-						$return[$i] = $temp;
-					}
+			$i = 0;
+			if ( is_array( $sort_array_msg ) ) {
+				foreach ( $sort_array_msg as $msg_number => $value ) {
+					$temp = $this->get_info_head_msg( $msg_number );
+					if ( !$temp ) return false;
+					if ( $temp['Unseen'] === 'U' || $temp['Recent'] === 'N' ) $return['tot_unseen']++;
+					if ( $i <= ( $msg_range_end - $msg_range_begin ) ) $return[$i] = $temp;
 					$i++;
 				}
 			}
-			$return['num_msgs'] = count($sort_array_msg)+($msg_range_begin-1);
+			$return['num_msgs'] = count( $sort_array_msg ) + ( $msg_range_begin - 1 );
 
 		}
 		return $return;
@@ -358,95 +341,44 @@ class imap_functions
 	* Função que importa arquivos .eml exportados pelo expresso para a caixa do usuário. Testado apenas
 	* com .emls gerados pelo expresso, e o arquivo pode ser um zip contendo vários emls ou um .eml.
 	*/
-	function import_msgs($params) {
-		if(!$this->mbox)
-			$this->mbox = $this->open_mbox();
+	function import_msgs( $params )
+	{
+		if ( !$this->mbox ) $this->mbox = $this->open_mbox();
 
- 		if( preg_match('/local_/',$params["folder"]) )
-		{
-			// PLEASE, BE CAREFULL!!! YOU SHOULD USE EMAIL CONFIGURATION VALUES (EMAILADMIN MODULE)
-			$tmp_box = mb_convert_encoding('INBOX'.$this->imap_delimiter.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'].$this->imap_delimiter.'tmpMoveToLocal', "UTF7-IMAP", "UTF-8");
-			if ( ! imap_createmailbox( $this -> mbox,"{".$this -> imap_server."}$tmp_box" ) )
-				return $this->functions->getLang( 'Import to Local : fail...' );
-			imap_reopen($this->mbox, "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$tmp_box);
-			$params["folder"] = $tmp_box;
-		}
-		$errors = array();
-		$invalid_format = false;
-		$filename = $params['FILES'][0]['name'];
-		$params["folder"] = mb_convert_encoding($params["folder"], "UTF7-IMAP","ISO-8859-1");
-		$quota = @imap_get_quotaroot($this->mbox, $params["folder"]);
-		if((($quota['limit'] - $quota['usage'])*1024) <= $params['FILES'][0]['size']){
-			return array( 'error' => $this->functions->getLang("fail in import:").
-							" ".$this->functions->getLang("Over quota"));
-		}
-		if(substr($filename,strlen($filename)-4)==".zip") {
-			$zip = zip_open($params['FILES'][0]['tmp_name']);
+		$mailbox = $this->_toMaibox( $params['folder'] );
+		$file    = isset( $params['FILES'] )? current( $params['FILES'] ) : current( $_FILES );
+		$quota   = @imap_get_quotaroot( $this->mbox, $mailbox );
+		$errors  = array();
 
-			if ($zip) {
-				while ($zip_entry = zip_read($zip)) {
+		if ( ( ( $quota['limit'] - $quota['usage'] ) * 1024 ) <= $file['size'] )
+			return array( 'error' => $this->functions->getLang( 'fail in import:' ).' '.$this->functions->getLang( 'Over quota' ) );
 
-					if (zip_entry_open($zip, $zip_entry, "r")) {
-						$email = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
-						$status = @imap_append($this->mbox,
-								"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$params["folder"],
-									preg_replace("/(?<=[^\r]|^)\n/", "\r\n", $email)
-									);
-						if(!$status)
-							array_push($errors,zip_entry_name($zip_entry));
-						zip_entry_close($zip_entry);
+		if ( preg_match( '/\.zip$/i', $file['name'] ) ) {
+			if ( $zip = zip_open( $file['tmp_name'] ) ) {
+				while ( $zip_entry = zip_read( $zip ) ) {
+					if ( preg_match( '/\.eml$/i', zip_entry_name( $zip_entry ) ) && zip_entry_open( $zip, $zip_entry, 'r' ) ) {
+						$email  = zip_entry_read( $zip_entry, zip_entry_filesize( $zip_entry ) );
+						$status = @imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}'.$mailbox, preg_replace( "/(?<=[^\r]|^)\n/", "\r\n", $email ) );
+						if ( !$status ) array_push( $errors, zip_entry_name( $zip_entry ) );
+						zip_entry_close( $zip_entry );
 					}
 				}
-				zip_close($zip);
+				zip_close( $zip );
 			}
-
-			if ( isset( $tmp_box ) && ! sizeof( $errors ) )
-			{
-
-				$mc = imap_check($this->mbox);
-
-				$result = imap_fetch_overview( $this -> mbox, "1:{$mc -> Nmsgs}", 0 );
-
-				$ids = array( );
-				foreach ($result as $overview)
-					$ids[ ] = $overview -> uid;
-
-				return implode( ',', $ids );
-			}
-			}
-		else if(substr($filename,strlen($filename)-4)==".eml") {
-			$email = implode("",file($params['FILES'][0]['tmp_name']));
-			$status = @imap_append($this->mbox,
-								"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$params["folder"],
-									preg_replace("/(?<=[^\r]|^)\n/", "\r\n", $email)
-									);
-			if(!$status){
-				array_push($errors,zip_entry_name($zip_entry));
-				zip_entry_close($zip_entry);
-			}
-		}
-		else
-		{
-			if ( isset( $tmp_box ) )
-				imap_deletemailbox( $this->mbox,"{".$this -> imap_server."}$tmp_box" );
-
-			return array("error" => $this->functions->getLang("wrong file format"));
-			$invalid_format = true;
+		} else if ( preg_match( '/\.eml$/i', $file['name'] ) ) {
+			$email  = implode( '',file( $file['tmp_name'] ) );
+			$status = @imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}'.$mailbox, preg_replace( "/(?<=[^\r]|^)\n/", "\r\n", $email ) );
+			if ( !$status ) array_push( $errors, $file['tmp_name'] );
+		} else {
+			return array( 'error' => $this->functions->getLang( 'wrong file format' ) );
 		}
 
-		if(!$invalid_format) {
-			if(count($errors)>0) {
-				$message = $this->functions->getLang("fail in import:")."\n";
-				foreach($errors as $arquivo) {
-					$message.=$arquivo."\n";
-				}
-				return array("error" => $message);
-			}
-			else
-				return $this->functions->getLang("The import was executed successfully.");
-		}
+		if ( count( $errors ) ) return array( 'error' => $this->functions->getLang( 'fail in import:' ).PHP_EOL.implode( PHP_EOL, $errors ) );
+
+		return $this->functions->getLang( 'The import was executed successfully.' );
 	}
-        /*
+
+	/*
 		Remove os anexos de uma mensagem. A estratégia para isso é criar uma mensagem nova sem os anexos, mantendo apenas
 		a primeira parte do e-mail, que é o texto, sem anexos.
 		O método considera que o email é multpart.
@@ -633,42 +565,39 @@ class imap_functions
 
 		if ( !$this->mbox || !is_resource( $this->mbox ) ) $this->mbox = $this->open_mbox( $msg_folder );
 
-		$header = $this->get_header($msg_number);
-		if (!$header) {
-			$return['status_get_msg_info'] = "false";
-			return $return;
-		}
+		if ( !( $header = $this->get_header( $msg_number ) ) ) return array( 'status_get_msg_info' => 'false' );
 
 		$header_src = imap_fetchheader( $this->mbox, $msg_number, FT_UID );
-		$attachments = $mail_reader->setMessage( $this->mbox, $msg_folder, $msg_number )->getAttachInfo();
 
-		$return_get_body = $this->get_body_msg( $msg_number, $msg_folder );
-		$return_get_body['attachments'] = $attachments;
+		$mail_reader->setMessage( $this->mbox, $msg_folder, $msg_number );
 
-		$body = $return_get_body['body'];
-
-		$return['type'] = isset( $return_get_body['type'] )? $return_get_body['type'] : false;
 		
-		if( isset($return_get_body['hash_vcalendar']))
-		{
-			$return['hash_vcalendar'] = $return_get_body['hash_vcalendar'];
-		}
-		
-		if ( $return_get_body['body'] == 'isCripted' ) {
+		if ( $mail_reader->isCripted() ) {
 			$return['source']       = $header_src."\r\n\r\n".imap_body( $this->mbox, $msg_number, FT_UID | FT_PEEK );
 			$return['body']         = '';
-			$return['attachments']  = array();
-			$return['thumbs']       = array();
-			$return['signature']    = array();
 			
 		} else {
 			
-			$return['body']         = $body;
-			$return['attachments']  = $return_get_body['attachments'];
-			$return['thumbs']       = $return_get_body['thumbs'];
-			$return['signature']    = $return_get_body['signature'];
+			$body_struct            = $mail_reader->getBody();
+			$return['body']         = $body_struct->body;
+			$return['type']         = $body_struct->type;
+			$return['attachments']  = $mail_reader->getAttachInfo();
+			if ( isset( $body_struct->body_alternative ) ) $return['body_alternative'] = $body_struct->body_alternative;
+
+			// TODO: Change security code for client (javascript)
+			if ( $return['type'] === 'html' ) $return['body'] = $this->replace_special_characters( $return['body'] );
+
+			$return['thumbs'] = $mail_reader->getThumbs();
+
+			if ( $mail_reader->getHashCalendar() ) $return['hash_vcalendar'] = $mail_reader->getHashCalendar();
+
+			$return_get_body = $this->get_body_msg( $msg_number, $msg_folder );
+			$return['signature'] = $return_get_body['signature'];
 		}
-		
+
+		// Force message with flag Seen (imap_fetchbody not works correctly)
+		$this->set_messages_flag( array( 'folder' => $msg_folder, 'msgs_to_set' => $msg_number, 'flag' => 'seen' ) );
+
 		$flag = preg_match('/importance *: *(.*)\r/i', $header_src, $importance);
 		$return['Importance'] = ($flag == 0) ? "Normal" : $importance[1];
 
@@ -894,15 +823,14 @@ class imap_functions
 			}
 		}
 		$return['reply_to'] = $this->decode_string($return['reply_to']);
-		$return['subject'] = $this->decode_string($header->fetchsubject);
+		$return['subject'] = $this->decode_string($header->subject);
 		$return['Size'] = $header->Size;
-		$return['reply_toaddress'] = $header->reply_toaddress;
+		$return['reply_toaddress'] = $this->decode_string($header->reply_toaddress);
 
 		//All this is to help in local messages
 		//$return['timestamp'] = $header->udate;
 		$return['timestamp'] = $header->udate;
 		$return['login'] = $_SESSION['phpgw_info']['expressomail']['user']['account_id'];//$GLOBALS['phpgw_info']['user']['account_id'];
-		$return['reply_toaddress'] = $header->reply_toaddress;
 
 		if($return_get_body['body']=='isSigned'){
 			$this->close_mbox($this->mbox);
@@ -921,6 +849,7 @@ class imap_functions
 		$return['uid']     = $return['msg_number'];
 		$return['folder']  = $return['msg_folder'];
 		$return['attachs'] = $return['attachments'];
+		ksort( $return );
 		return $return;
 	}
 
@@ -1312,19 +1241,7 @@ class imap_functions
 		$content = $this->process_embedded_images($msg,$msg_number,$content, $msg_folder);
 		$content = $this->replace_special_characters($content);
 
-		if (preg_match('/charset=(\'|\")?(utf8|utf-8)/i', $content)) {
-
-			$pos = (stripos($content, "utf-8") !== false ? stripos($content, "utf-8") : stripos($content, "utf8"));
-			$part1 = substr($content, 0, $pos);
-			$part2 = substr($content, $pos);
-
-			if (mb_detect_encoding($part2, "UTF-8", true) === "UTF-8") {
-				$part2 = mb_convert_encoding($part2, "ISO-8859-1", mb_detect_encoding($part2));
-				$content = $part1 . $part2;
-			}
-		}
-
-		$return['body'] = $content;
+		$return['body'] = $this->_str_decode( $content );
 
 		return $return;
 	}
@@ -1449,25 +1366,10 @@ class imap_functions
 
 	function decodeBody($body, $encoding, $charset = null)
 	{
-		if ($encoding == 'quoted-printable') {
-			$body = quoted_printable_decode($body);
-			while (preg_match("/=\n/", $body)) {
-				$body = preg_replace("/=\n/", '', $body);
-			}
-		} else if ($encoding === 'base64') {
-			$body = base64_decode($body);
-		}
-
-		// All other encodings are returned raw.
-		$charset = trim($charset);
-		$charset = strtoupper($charset);
-		if ($charset === "UTF-8") {
-			if (mb_detect_encoding($body, 'UTF-8', true) === 'UTF-8') {
-				$body = utf8_decode($body);
-			}
-		}
-
-		return $body;
+		$body = ( $encoding === 'quoted-printable' )? quoted_printable_decode( $body ) : (
+				( $encoding === 'base64' )? base64_decode( $body ): $body );
+		
+		return $this->_toUTF8( $body, $charset );
 	}
 
 	function process_embedded_images($msg, $msgno, $body, $msg_folder)
@@ -1628,6 +1530,7 @@ class imap_functions
                         $this->mbox = $this->open_mbox($msg_folder);
 
                         $header = @imap_headerinfo($this->mbox, imap_msgno($this->mbox, $msg_number), 80, 255);
+                        $header = $this->array_map_recursive( array( $this, '_str_decode' ), $header );
 
                         $imap_msg	 	= @imap_fetchheader($this->mbox, $msg_number, FT_UID);
                         $imap_msg		.= @imap_body($this->mbox, $msg_number, FT_UID);
@@ -1735,8 +1638,7 @@ class imap_functions
 
 	function delete_msgs($params)
 	{
-		$folder = $params['folder'];
-		$folder =  mb_convert_encoding($folder, "UTF7-IMAP","ISO-8859-1");
+		$mailbox = $this->_toMaibox( $params['folder'] );
 		$msgs_number = explode(",",$params['msgs_number']);
 		$border_ID = (isset($params['border_ID']) ? $params['border_ID'] : false );
 		$return = array();
@@ -1749,7 +1651,7 @@ class imap_functions
 			}
 		}
 
-		$mbox_stream = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$folder, $this->username, $this->password) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
+		$mbox_stream = @imap_open("{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$mailbox, $this->username, $this->password) or die(serialize(array('imap_error' => $this->parse_error(imap_last_error()))));
 
 		foreach ($msgs_number as $msg_number)
 		{
@@ -1764,7 +1666,7 @@ class imap_functions
 
 		if( $mbox_stream ){ $this->close_mbox($mbox_stream, CL_EXPUNGE); }
 		
-		$return['folder'] = $folder;
+		$return['folder'] = $params['folder'];
 		
 		$return['border_ID'] = $border_ID;
 
@@ -1902,7 +1804,7 @@ class imap_functions
 			$result[$i]['subject'] = $this->decode_string($header->fetchsubject);
 
 			$result[$i]['Size'] = $header->Size;
-			$result[$i]['reply_toaddress'] = $header->reply_toaddress;
+			$result[$i]['reply_toaddress'] = $this->decode_string($header->reply_toaddress);
 
 			$result[$i]['attachment'] = array();
 			if (!isset($imap_attachment))
@@ -1979,10 +1881,9 @@ class imap_functions
 			if (isset($_SESSION['phpgw_info']['expressomail']['server']['certificado'])) {
 				if ($_SESSION['phpgw_info']['expressomail']['server']['certificado'] == 1) {
 
-					$namebox = "INBOX" . $this->imap_delimiter . "decifradas";
 					$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
-					$namebox = mb_convert_encoding($namebox, "UTF7-IMAP", "UTF-8");
-					imap_deletemailbox($mbox_stream, "{".$imap_server."}$namebox");
+					$mailbox = $this->_toMaibox( "INBOX" . $this->imap_delimiter . "decifradas" );
+					imap_deletemailbox($mbox_stream, "{".$imap_server."}$mailbox");
 				}
 			}
 		}
@@ -2033,8 +1934,7 @@ class imap_functions
 				$status = imap_status($mbox_stream, $folder->name, SA_UNSEEN);
 
 				$tmp_folder_id = explode("}", $folder->name);
-
-				$tmp_folder_id[1] = mb_convert_encoding($tmp_folder_id[1], "ISO-8859-1", "UTF7-IMAP");
+				$tmp_folder_id[1] = $this->_toUTF8( $tmp_folder_id[1], 'UTF7-IMAP' );
 
 				if ($tmp_folder_id[1] == 'INBOX' . $this->imap_delimiter . 'decifradas') { continue; }
 
@@ -2161,19 +2061,17 @@ class imap_functions
 				}
 			}
 		}
-
 		return array_merge($result2, $arr_quota_info);
 	}
 
 
 	function create_mailbox($arr)
 	{
-		$namebox	= $arr['newp'];
+		$mailbox     = $this->_toMaibox( $arr['newp'] );
 		$mbox_stream = $this->open_mbox();
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
-		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP", "UTF-8");
 
-		if( preg_match("/^user\/.*?\//i", $namebox, $matches)) {
+		if( preg_match("/^user\/.*?\//i", $mailbox, $matches)) {
 			$userSharedFolder = $matches[0];
 			$userSharedFolder = trim($userSharedFolder);
 			$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
@@ -2185,14 +2083,14 @@ class imap_functions
 				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
 			);
 			
-			if (array_search($namebox, $foldersDefault)) {
+			if (array_search($mailbox, $foldersDefault)) {
 				return array("status" => false, "error" => "You don't have permission for this operation!");
 			}
 		}
 
 		$result['status'] = true;
 
-		if(!imap_createmailbox($mbox_stream,"{".$imap_server."}$namebox")){
+		if(!imap_createmailbox($mbox_stream,"{".$imap_server."}$mailbox")){
 			$result = array(
 				"status" => false,
 				"error" => implode("<br />\n", imap_errors())
@@ -2237,12 +2135,11 @@ class imap_functions
 
 	function delete_mailbox($arr)
 	{
-		$namebox = $arr['del_past'];
+		$mailbox     = $this->_toMaibox( $arr['del_past'] );
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 		$mbox_stream = $this->mbox ? $this->mbox : $this->open_mbox();
-		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP", "UTF-8");
 
-		if( preg_match("/^user\/.*?\//i", $namebox, $matches)) {
+		if( preg_match("/^user\/.*?\//i", $mailbox, $matches)) {
 			$userSharedFolder = $matches[0];
 			$userSharedFolder = trim($userSharedFolder);
 			$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
@@ -2254,14 +2151,14 @@ class imap_functions
 				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
 			);
 			
-			if (array_search($namebox, $foldersDefault)) {
+			if (array_search($mailbox, $foldersDefault)) {
 				return array("status" => false, "error" => "You don't have permission for this operation!");
 			}
 		}
 		
 		$result['status'] = true;
 
-		if (!imap_deletemailbox($mbox_stream,"{".$imap_server."}$namebox")) {
+		if (!imap_deletemailbox($mbox_stream,"{".$imap_server."}$mailbox")) {
 			$result = array(
 				"status" => false,
 				"error" => imap_last_error()
@@ -2275,15 +2172,12 @@ class imap_functions
 
 	function ren_mailbox($arr)
 	{
-		$namebox = $arr['current'];
-		$new_box = $arr['rename'];
+		$mailbox_old = $this->_toMaibox( $arr['current'] );
+		$mailbox_new = $this->_toMaibox( $arr['rename'] );
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 		$mbox_stream = $this->open_mbox();
 
-		$namebox = mb_convert_encoding($namebox, "UTF7-IMAP","UTF-8");
-		$new_box = mb_convert_encoding($new_box, "UTF7-IMAP","UTF-8");
-
-		if( preg_match("/^user\/.*?\//i", $namebox, $matches)) {
+		if( preg_match("/^user\/.*?\//i", $mailbox_old, $matches)) {
 			$userSharedFolder = $matches[0];
 			$userSharedFolder = trim($userSharedFolder);
 			$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
@@ -2295,14 +2189,14 @@ class imap_functions
 				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
 			);
 			
-			if (array_search($namebox, $foldersDefault)) {
+			if (array_search($mailbox_old, $foldersDefault)) {
 				return array("status" => false, "error" => "You don't have permission for this operation!");
 			}
 		}
 		
 		$result['status'] = true;
 		
-		if( !imap_renamemailbox($mbox_stream,"{".$imap_server."}$namebox","{".$imap_server."}$new_box"))
+		if( !imap_renamemailbox($mbox_stream,"{".$imap_server."}$mailbox_old","{".$imap_server."}$mailbox_new"))
 		{
 			$result = array(
 				"status" => false,
@@ -2544,23 +2438,20 @@ class imap_functions
 
 	function move_messages($params)
 	{
-		$folder = $params['folder'];
-		$folder = mb_convert_encoding($folder, "ISO-8859-1", mb_detect_encoding($folder, "UTF-8, ISO-8859-1"));
-		$mbox_stream = $this->open_mbox($folder);
-		$newmailbox = ($params['new_folder']);
-		$newmailbox = mb_convert_encoding($newmailbox, "ISO-8859-1", mb_detect_encoding($newmailbox, "UTF-8, ISO-8859-1"));
-		$newmailbox = mb_convert_encoding($newmailbox, "UTF7-IMAP","ISO-8859-1");
+		$folder          = $this->_toUTF8( $params['folder'] );
+		$msgs_number     = $params['msgs_number'];
+		$mailbox_new     = $this->_toMaibox( $params['new_folder'] );
 		$new_folder_name = $params['new_folder_name'];
-		$new_folder_name = mb_convert_encoding($new_folder_name, "ISO-8859-1", mb_detect_encoding($new_folder_name, "UTF-8, ISO-8859-1"));
-		$msgs_number = $params['msgs_number'];
-		
+
+		$mbox_stream = $this->open_mbox($folder);
+
 		// Status has been added to validate ACL permissions
 		$return = array(
-			'msgs_number' 		=> $msgs_number,
-			'folder' 			=> $folder,
-			'new_folder_name' 	=> $new_folder_name,
-			'border_ID' 		=> $params['border_ID'],
-			'status' 			=> true
+			'folder'          => $folder,
+			'msgs_number'     => $msgs_number,
+			'new_folder_name' => $new_folder_name,
+			'border_ID'       => $params['border_ID'],
+			'status'          => true,
 		); 
 
 		// This block has the purpose of transforming the uid(login) of shared folders into common name
@@ -2592,7 +2483,7 @@ class imap_functions
 
 		$mbox_stream = $this->open_mbox($folder);
 
-		if(imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
+		if(imap_mail_move($mbox_stream, $msgs_number, $mailbox_new, CP_UID)) {
 			
 			imap_expunge($mbox_stream);
 
@@ -2638,7 +2529,7 @@ class imap_functions
 					);
 				}
 
-				if(imap_mail_move($mbox_stream, $msgs_number, $newmailbox, CP_UID)) {
+				if(imap_mail_move($mbox_stream, $msgs_number, $mailbox_new, CP_UID)) {
 
 					imap_expunge($mbox_stream);
 
@@ -2684,7 +2575,7 @@ class imap_functions
 				return array( 
 					'status' => false,	
 					'error' => "move_messages : " . $imapLastError, 
-					'folder' => $newmailbox 
+					'folder' => $params['new_folder'],
 				);
 			}
 		}
@@ -2723,13 +2614,10 @@ class imap_functions
 		$mail        = $this->compose_msg( $params );
 		$mail_reader = new MessageReader();
 
-		$new_header  = str_replace( "\n", "\r\n", $mail->CreateHeader() );
-		$new_body    = str_replace( "\n", "\r\n", $mail->CreateBody()   );
-		$folder      = mb_convert_encoding( $mail->SaveMessageInFolder, 'UTF-8', 'UTF7-IMAP' );
-
+		$folder      = $this->_toUTF8( $mail->SaveMessageInFolder, 'UTF7-IMAP' );
 		$this->open_mbox( $folder );
 
-		if ( !imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, $new_header . $new_body, '\Seen \Draft' ) )
+		if ( !imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, $mail->CreateHeader(). $mail->CreateBody(), '\Seen \Draft' ) )
 			return array( 'status' => false, 'error' => imap_last_error() );
 
 		$sa_uidnext  = imap_status( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, SA_UIDNEXT );
@@ -2826,7 +2714,7 @@ class imap_functions
 			// Dots in names: enabled/disabled.
 			$folder = preg_replace( '#INBOX/#i', 'INBOX'.$this->imap_delimiter, $folder );
 			$folder = preg_replace( '#INBOX.#i', 'INBOX'.$this->imap_delimiter, $folder );
-			$mail->SaveMessageInFolder = mb_convert_encoding( $folder, 'UTF7-IMAP', 'UTF-8, ISO-8859-1' );
+			$mail->SaveMessageInFolder = $this->_toMaibox( $folder );
 			if ( strtoupper( $folder ) === 'INBOX'.$this->imap_delimiter.'DRAFTS' ) $mail->SaveMessageAsDraft = true;
 		}
 
@@ -3429,7 +3317,7 @@ class imap_functions
 					$return[$j][$i]['subject'] .= $tmp->text;
 
 				$return[$j][$i]['Size'] = $header->Size;
-				$return[$j][$i]['reply_toaddress'] = $header->reply_toaddress;
+				$return[$j][$i]['reply_toaddress'] = $this->decode_string($header->reply_toaddress);
 
 				$return[$j][$i]['attachment'] = array();
 				$return[$j][$i]['attachment'] = $imap_attachment->get_attachment_headerinfo($mbox_stream, $msg_number);
@@ -3655,7 +3543,7 @@ class imap_functions
 			{
 				$tmp1 = explode("##",$tmp);
 				$sum = 0;
-				$name_box = $tmp1[0];
+				$folder = $this->_toUTF8( $tmp1[0] );
 				unset($filter);
 				foreach($tmp1 as $index => $criteria)
 				{
@@ -3680,28 +3568,23 @@ class imap_functions
 					}
 				}
 				
-				$name_box = mb_convert_encoding(utf8_decode($name_box), "UTF7-IMAP", "ISO-8859-1" );
+				$mailbox = $this->_toMaibox( $folder );
 				$filter = $this->remove_accents($filter);
 
 				//Este bloco tem a finalidade de transformar o login (quando numerico) das pastas compartilhadas em common name
-				if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'] && substr($name_box,0,4) == 'user')
+				if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'] && substr($mailbox,0,4) == 'user')
 				{
-					$folder_name = explode($this->imap_delimiter,$name_box);
+					$folder_name = explode($this->imap_delimiter,$mailbox);
 					$this->ldap = new ldap_functions();
 					
 					if ($cn = $this->ldap->uid2cn($folder_name[1]))
 					{
 						$folder_name[1] = $cn;
 					}
-					$folder_name = implode($this->imap_delimiter,$folder_name);
+					$mailbox = implode($this->imap_delimiter,$folder_name);
 				}
-				else
-					$folder_name = mb_convert_encoding(utf8_decode($name_box), "UTF7-IMAP", "ISO-8859-1" );
 				
-				if(!is_resource($mbox_stream))
-					$mbox_stream = $this->open_mbox($name_box);
-				else
-					imap_reopen($mbox_stream, "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$name_box);
+				$mbox_stream = $this->open_mbox( $folder );
 				
 				if (preg_match("/^.?\bALL\b/", $filter))
 				{ 
@@ -3718,9 +3601,9 @@ class imap_functions
 						{
 							foreach($search_criteria as $new_search)
 							{
-								$elem = $this->get_msg_detail($new_search,$name_box,$mbox_stream); 
-								$elem['boxname'] = mb_convert_encoding( $name_box, "ISO-8859-1", "UTF7-IMAP" ); 
-								$elem['uid'] = $new_search; 
+								$elem = $this->get_msg_detail($new_search,$mailbox,$mbox_stream); 
+								$elem['boxname'] = $folder;
+								$elem['uid'] = $new_search;
 								/* compare dates in ordering */
 								$elem['udatecomp'] = substr ($elem['udate'], -4) ."-". substr ($elem['udate'], 3, 2) ."-". substr ($elem['udate'], 0, 2);
 								$retorno[] = $elem; 
@@ -3763,9 +3646,9 @@ class imap_functions
 					{
 						foreach($search_criteria as $new_search)
 						{
-							$elem = $this->get_msg_detail($new_search,$name_box,$mbox_stream); 
-							$elem['boxname'] = mb_convert_encoding( $name_box, "ISO-8859-1", "UTF7-IMAP" ); 
-							$elem['uid'] = $new_search; 
+							$elem = $this->get_msg_detail($new_search,$mailbox,$mbox_stream); 
+							$elem['boxname'] = $folder;
+							$elem['uid'] = $new_search;
 							/* compare dates in ordering */
 							$elem['udatecomp'] = substr ($elem['udate'], -4) ."-". substr ($elem['udate'], 3, 2) ."-". substr ($elem['udate'], 0, 2);
 							$retorno[] = $elem;
@@ -4143,8 +4026,8 @@ class imap_functions
 	function get_header( $msg_number )
 	{
 		$header = @imap_headerinfo( $this->mbox, imap_msgno( $this->mbox, $msg_number ), 80, 255 );
-		
 		if ( !is_object( $header ) ) return false;
+		$header = $this->array_map_recursive( array( $this, '_str_decode' ), $header );
 		
 		$use_important_flag =
 			isset($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_important_flag']) &&
@@ -4158,8 +4041,16 @@ class imap_functions
 			);
 			$header->Flagged = ( $flag == 0)? false : ( ( strtolower( $importance[1] ) == 'high' )? 'F' : false );
 		}
-		
 		return $header;
+	}
+
+	private function array_map_recursive( $callback, $obj )
+	{
+		switch ( gettype( $obj ) ) {
+			case 'array' : foreach ( $obj as $key => $value ) $obj[$key]   = $this->array_map_recursive( $callback, $value ); return $obj;
+			case 'object': foreach ( $obj as $key => $value ) $obj->{$key} = $this->array_map_recursive( $callback, $value ); return $obj;
+		}
+		return call_user_func( $callback, $obj );
 	}
 
 //Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Insere emails no imap a partir do fonte do mesmo. Se o argumento timestamp for passado ele utiliza do script python
@@ -4332,7 +4223,7 @@ class imap_functions
 		    $quota_used = str_replace(")","",$size); 
 		    $quotaPercent = ( intval($quota_used) > 0 ) ? (($quota_used / 1024) / $data["quota_root"]["quota_limit"])*100 : 0 ; 
 
-				$folder = mb_convert_encoding($folder, "ISO-8859-1", "UTF7-IMAP"); 
+				$folder = $this->_toUTF8( $folder, 'UTF7-IMAP' ); 
 
 		    if(!preg_match('/user\\'.$this->imap_delimiter.$this->username.'\\'.$this->imap_delimiter.'/i',$folder)){ 
 			    $folder = $this->functions->getLang("Inbox"); 
@@ -4349,5 +4240,21 @@ class imap_functions
 	public function __destruct()
 	{
 		$this->close_mbox( $this->mbox );
+	}
+
+	private function _str_decode( $str, $charset = false )
+	{
+		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		return $this->_toUTF8( $str, $charset );
+	}
+
+	private function _toMaibox( $folder )
+	{
+		return $this->_toUTF8( $folder, false, 'UTF7-IMAP' );
+	}
+
+	private function _toUTF8( $str, $charset = false, $to = 'UTF-8' )
+	{
+		return mb_convert_encoding( $str, $to, ( $charset === false? mb_detect_encoding( $str, 'UTF-8, ISO-8859-1', true ) : $charset ) );
 	}
 }

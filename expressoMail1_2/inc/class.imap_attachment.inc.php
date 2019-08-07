@@ -23,26 +23,13 @@ class imap_attachment
 
 	function get_attachment_headerinfo($mbox, $msgno)
 	{
-		include_once("class.message_components.inc.php");
-
-		$msg = new message_components($mbox);
-		$msg->fetch_structure($msgno);
-
-		$msg_info = array();
-		$msg_info['names'] = '';
-
-		$msg_info['number_attachments'] = count($msg->fname[$msgno]);
-		
-		if ($msg_info['number_attachments'])
-		{
-			foreach ($msg->fname[$msgno] as $fname)
-			{
-				$msg_info['names'] .= $this->flat_mime_decode($fname) . ', ';
-   			}
-		}
-		$msg_info['names'] = substr($msg_info['names'],0,(strlen($msg_info['names']) - 2));
-		
-		return $msg_info;
+		include_once 'class.message_reader.inc.php';
+		$mail_reader = new MessageReader();
+		$info        = $mail_reader->setMessage( $mbox, false, $msgno )->getAttachInfo();
+		return array(
+			'number_attachments' => count( $info ),
+			'names' => implode( ', ', array_map( function( $obj ) { return $obj->filename; }, $info ) ),
+		);
 	}
 	
 	function download_attachment($mbox, $msgno)
