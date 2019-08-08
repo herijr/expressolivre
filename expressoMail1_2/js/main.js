@@ -1310,7 +1310,7 @@ function new_message(type, border_ID)
 	doc.close();
 	doc.designMode = 'on';
 
-	if ( type != 'new' ) buildAttachments( $('#divFiles_'+new_border_ID).data( $('#attachments_'+border_ID).data() ), true, !( type == 'edit' || type == 'forward' ) );
+	if ( type != 'new' ) buildAttachments( $('#divFiles_'+new_border_ID).data( $('#attachments_'+border_ID).data() ), true, ( type == 'edit' || type == 'forward' ) );
 
 	// Set signature frame
 	SignatureFrame.init( body, target_signature );
@@ -1382,7 +1382,7 @@ function buildAttachments( $obj, editable, selected )
 	if ( typeof $obj === 'undefined' ) return false;
 	$obj     = ( $obj.__proto__ === jQuery.fn )? $obj : $($obj);
 	editable = ( editable === true );
-	selected = ( selected === false );
+	selected = ( selected === true );
 	var msg  = $obj.data();
 	$obj.empty();
 	if ( msg.attachs == undefined || ( msg.attachs && msg.attachs.length == 0 ) ) return true;
@@ -1797,7 +1797,7 @@ function return_save( data, border_id, folder_name, folder_id, message_id )
 	set_border_caption('border_id_'+border_id, newTitle);
 
 	//Replace all files to new files
-	buildAttachments( $('#divFiles_'+border_id).data( data ), true );
+	buildAttachments( $('#divFiles_'+border_id).data( data ), true, true );
 
 	if (message_id)
 	{
