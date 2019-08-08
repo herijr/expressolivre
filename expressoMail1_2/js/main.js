@@ -1778,7 +1778,7 @@ function return_save( data, border_id, folder_name, folder_id, message_id )
 				ttree.FOLDER = 'root';
 				ttreeBox.new_past(draftsfolder);
 				setTimeout('save_msg('+border_id+')',3000);
-			} else write_msg( '*' );
+			} else write_msg( data.error );
 		} else {
 			if ( data == 'Post-Content-Length' )
 				write_msg(get_lang('The size of this message has exceeded  the limit (%1B).', preferences.max_attachment_size ? preferences.max_attachment_size : Element('upload_max_filesize').value));
@@ -2603,14 +2603,17 @@ function Ajax( action, data, callback, method )
 		if ( data.nodeType === Node.ELEMENT_NODE || data.__proto__ === jQuery.fn ) {
 			var serializeForm = function( $obj ) {
 				var formData = new FormData();
-				$.each($obj.find('input[type=file]'), function(i, tag) {
-					$.each($(tag)[0].files, function(i, file) {
-						formData.append(tag.name, file);
+				var count_files = 0;
+				$.each($obj.find('input[type=file]'), function( i, tag ) {
+					$.each($(tag)[0].files, function( i, file ) {
+						formData.append( tag.name, file );
+						count_files++;
 					});
 				});
+				if ( count_files ) formData.append( 'count_files', count_files );
 				var params = $obj.serializeArray();
-				$.each(params, function (i, val) {
-					formData.append(val.name, val.value);
+				$.each(params, function ( i, val ) {
+					formData.append( val.name, val.value );
 				});
 				return formData;
 			};

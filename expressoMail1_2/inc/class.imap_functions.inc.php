@@ -337,6 +337,22 @@ class imap_functions
 		else
 			return $this->htmlspecialchars_encode($string);
 	}
+
+	protected function fileUploadErrors( $error )
+	{
+		switch ( $error ) {
+			case 0: return false;
+			case 1: return 'The uploaded file exceeds the upload max filesize allowed';
+			case 2: return 'The uploaded file exceeds the upload max filesize allowed by the form';
+			case 3: return 'The uploaded file was only partially uploaded';
+			case 4: return 'No file was uploaded';
+			case 6: return 'Missing a temporary folder';
+			case 7: return 'Failed to write file to disk.';
+			case 8: return 'A PHP extension stopped the file upload.';
+		}
+		return 'An unknown error occurred';
+	}
+
 	/**
 	* Função que importa arquivos .eml exportados pelo expresso para a caixa do usuário. Testado apenas
 	* com .emls gerados pelo expresso, e o arquivo pode ser um zip contendo vários emls ou um .eml.
@@ -350,23 +366,8 @@ class imap_functions
 		$quota   = @imap_get_quotaroot( $this->mbox, $mailbox );
 		$errors  = array();
 
-		if( isset($file['error']) && $file['error'] != 0 ){
-
-			$fileUploadErrors = array(
-				1 => 'The uploaded file exceeds the upload max filesize allowed',
-				2 => 'The uploaded file exceeds the upload max filesize allowed by the form',
-				3 => 'The uploaded file was only partially uploaded',
-				4 => 'No file was uploaded',
-				6 => 'Missing a temporary folder',
-				7 => 'Failed to write file to disk.',
-				8 => 'A PHP extension stopped the file upload.',
-			);
-
-			$msgError = ( isset($fileUploadErrors[$file['error']]) ? 
-								$this->functions->getLang( $fileUploadErrors[$file['error']] ) : $this->functions->getLang( 'An unknown error occurred' ));
-
-			return array( 'error' => $this->functions->getLang( 'fail in import:' ).' '. $msgError );
-		}
+		if ( isset($file['error']) && $file['error'] != 0 )
+			return array( 'error' => $this->functions->getLang( 'fail in import:' ).' '. $this->functions->getLang( $this->fileUploadErrors( $file['error'] ) ) );
 		
 		if ( ( ( $quota['limit'] - $quota['usage'] ) * 1024 ) <= $file['size'] ){
 			return array( 'error' => $this->functions->getLang( 'fail in import:' ).' '.$this->functions->getLang( 'Over quota' ) );
@@ -2603,6 +2604,7 @@ class imap_functions
 	public function send_mail( $params )
 	{
 		if ( !$this->has_permission_to_send( $params ) ) return lang("The server denied your request to send a mail, you cannot use this mail address.");
+		if ( ( $msg = $this->check_Attachments( $params ) ) !== true ) return $msg;
 
 		$mail = $this->compose_msg( $params );
 		
@@ -2626,6 +2628,8 @@ class imap_functions
 
 	public function save_msg( $params )
 	{
+		if ( ( $msg = $this->check_Attachments( $params ) ) !== true ) return $msg;
+
 		include_once 'class.message_reader.inc.php';
 
 		$msg_uid     = ( isset( $params['msg_id'                 ] ) && $params['msg_id'                       ] > 0      )? $params['msg_id'] : false;
@@ -2652,6 +2656,42 @@ class imap_functions
 		} else $this->close_mbox( $this->mbox );
 
 		return $return;
+	}
+
+	protected function check_Attachments( $params )
+	{
+		if ( isset( $params['count_files'] ) && isset( $_FILES ) && ( (int)$params['count_files'] ) !== count( $_FILES ) )
+			return array( 'error' => lang( 'max file uploads exceeds' ) );
+
+		if ( ( isset( $_FILES )? count( $_FILES ) : 0 )+( isset( $params['forwarding_attachments'] )? count( $params['forwarding_attachments'] ) : 0 ) > ini_get( 'max_file_uploads' ) )
+			return array( 'error' => lang( 'max file uploads exceeds' ) );
+
+		if ( isset( $_FILES ) ) foreach ( $_FILES as $file ) if ( isset( $file['error'] ) && $file['error'] > 0 )
+			return array( 'error' => $this->functions->getLang( $this->fileUploadErrors( $file['error'] ) ) );
+
+		if ( count( $_POST ) === 0 && count( $_FILES ) === 0 )
+			return array( 'error' => $this->functions->getLang( 'Value exceeds the PHP upload limit for this server' ).
+				' '.( $this->formatBytes( isset( $_SERVER['CONTENT_LENGTH'] )? $_SERVER['CONTENT_LENGTH'] : false ) ).' / '.$this->formatBytes( ini_get( 'post_max_size' ) ) );
+
+		return true;
+	}
+
+	protected function formatBytes( $size, $precision = 2 )
+	{
+		if ( $size === false ) return '?';
+		if ( preg_match('/[KMGT]$/', strtoupper( trim( $size ) ), $m ) ) {
+			$f = floatval( $size );
+			switch ( $m[0] ) {
+				case 'T': $f *= 1024;
+				case 'G': $f *= 1024;
+				case 'M': $f *= 1024;
+				case 'K': $f *= 1024;
+			}
+			$size = (int)$f;
+		}
+		$base = log( $size, 1024 );
+		$sufx = array( '', 'K', 'M', 'G', 'T' );
+		return round( pow( 1024, $base - floor( $base ) ), $precision ).$sufx[floor( $base )];
 	}
 
 	protected function compose_msg( $params )
