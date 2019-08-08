@@ -119,8 +119,11 @@ if( $acl_change_password ) {
 			. 'need to be done manually.'));
 	}
 
-	if ($_POST['change']) {
+	if ( isset($_POST['change'])) {
 		include(personalize_include_path('preferences', 'changepassword'));
+	} elseif( isset($_POST['cancel']) ) {
+		$GLOBALS['phpgw']->redirect_link('/preferences/index.php');
+		$GLOBALS['phpgw']->common->phpgw_exit();
 	} else {
 		$GLOBALS['phpgw_info']['flags']['app_header'] = lang('Change your password');
 		$GLOBALS['phpgw']->common->phpgw_header();

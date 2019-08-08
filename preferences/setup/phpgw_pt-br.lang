@@ -96,7 +96,7 @@ Your password contains characters not allowed	preferences	pt-br	Sua senha contém
 Your password has expired	preferences	pt-br	Sua senha expirou
 Your password must contain %1 or more letters	preferences	pt-br	Sua senha precisa conter %1 ou mais caracteres
 Your password must contain at least %1 uppercase letters	preferences	pt-br	Sua senha precisa conter pelo menos %1 letra(s) maiúscula(s)
-Your password must contain at least %1 special characters	preferences	pt-br	Sua senha precisa conter pelo menos %1 números
+Your password must contain at least %1 special characters	preferences	pt-br	Sua senha precisa conter pelo menos %1 número(s)
 your preferences	preferences	pt-br	Suas preferências
 Failed to change password	preferences	pt-br	Falha ao alterar sua senha
 Please contact your administrator	preferences	pt-br	Entre em contato com seu administrador
