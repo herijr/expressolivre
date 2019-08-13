@@ -3558,12 +3558,11 @@ class imap_functions
 		} else if ( !isset( $params['days'] ) ) $result['message'] = utf8_encode( $this->functions->getLang( 'No messages' ) );
 		return $result;
 	}
-	
-// 	Fix the search problem with special characters!!!!
-	function remove_accents($string) {
-		return strtr($string,
-	 	"?Ó??ó?İ?úÁÀÃÂÄÇÉÈÊËÍÌ?ÎÏÑÕÔÓÒÖÚÙ?ÛÜ?áàãâäçéèêëíì?îïñóòõôöúù?ûüıÿ",
-	 	"SOZsozYYuAAAAACEEEEIIIIINOOOOOUUUUUsaaaaaceeeeiiiiinooooouuuuuyy");
+
+	// Fix the search problem with special characters!!!!
+	function remove_accents( $string )
+	{
+		return str_replace( '?', '', iconv( mb_detect_encoding( $string, 'UTF-8, ISO-8859-1', true ), 'ASCII//TRANSLIT//IGNORE', $string ) );
 	}
 
 	function make_search_date($date){
@@ -3608,7 +3607,7 @@ class imap_functions
 				{
 					if ($index != 0 && strlen($criteria) != 0)
 					{
-						$filter_array = explode("<=>",html_entity_decode(rawurldecode($criteria)));
+						$filter_array = explode("<=>",$criteria);
 						if ( !isset( $filter ) ) $filter = '';
 						$filter .= " ".$filter_array[0];
 						if (strlen($filter_array[1]) != 0)
@@ -3742,19 +3741,11 @@ class imap_functions
 
 	    usort( $retorno, $params['sort_type']);
 	    $pageret = array_slice( $retorno, $params['page'] * $this->prefs['max_email_per_page'], $this->prefs['max_email_per_page']);
-	    
-	    $arrayRetorno['num_msgs']	=  $num_msgs;
-	    $arrayRetorno['data']		=  $pageret;
-	    $arrayRetorno['currentTab'] = isset( $params['current_tab'] )? $params['current_tab'] : '';
 
-		if ($pageret)
-		{
-			return $arrayRetorno;
-		}
-		else
-		{
-			return 'none';
-		}
+		$arrayRetorno['num_msgs'] = $num_msgs;
+		$arrayRetorno['data']     = $pageret;
+
+		return $pageret? $arrayRetorno : 'none';
 	}
 
 	function get_msg_detail($uid_msg,$name_box, $mbox_stream )

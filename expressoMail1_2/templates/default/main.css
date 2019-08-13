@@ -593,3 +593,7 @@ input.em_button_like_span:disabled {
 .msg_attachs .ckb_center { height: 22px; position: relative; }
 .msg_attachs .ckb_center a { position: absolute; top: 50%; transform: translateY(-50%); }
 
+.pg_selected {
+	font-weight: bold;
+	color: red;
+}

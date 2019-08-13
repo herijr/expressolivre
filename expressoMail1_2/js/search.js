@@ -215,201 +215,60 @@
 		}
 		ttree.make_tree(folders,"div_folders_search","_folders_tree_search","","","","");
 	}
-	
-	function openpage(data)
+
+	searchE.prototype.searchChange = function( condition, sort_type, page )
 	{
-		var _data			= [3];
-		var _gears			= [];
-    	var local_folders 	= [];
+		var is_new_tab = ( typeof condition === 'string' || condition instanceof String );
+		var params     = is_new_tab? { 'condition': condition, 'page': 0, 'sort_type' : 'SORTDATE' } : $(condition).data( 'params' );
+		if ( sort_type !== undefined ) params.sort_type = sort_type;
+		if ( page      !== undefined ) params.page      = page;
+		Ajax( '$this.imap_functions.search_msg', params, function( data ) {
+			var count = ( data.num_msgs ) ?  data.num_msgs : 0;
+			if ( count == 0 ) return alert( get_lang( 'None result was found.' ) );
+			if ( is_new_tab ) write_msg( count+' '+get_lang( 'results found' ) );
 
-    	// Gears - local
-		if ( preferences.use_local_messages == 1 )
-		{
-			temp = expresso_local_messages.list_local_folders();
-			for (var x in temp)
-			{
-				local_folders.push(temp[x][0]);
-			}
-		}
-		
-		if ( local_folders.length > 0 )
-			_gears = expresso_local_messages.search( local_folders, expresso_local_messages.getFilter() );
-
-		_data['data'] 			= data['data'];
-		_data['num_msgs']		= data['num_msgs'];
-		_data['gears_num_msgs']	= _gears.length;
-
-		delete_border( data['currentTab'], false);
-		
-		EsearchE.mount_result(_data);
-	}
-
-	searchE.prototype.show_paging = function(size)
-	{
-		var span_pg = Element("span_paging"+currentTab);
-		
-		if( span_pg == null )
-		{
-			span_pg 	= document.createElement('span');
-			span_pg.id	= "span_paging"+currentTab;
-		}
-		else
-			span_pg.innerHTML = "";
-		
-		if ( size > preferences.max_email_per_page )
-		{
-			for ( var i = (this.page > 2 ? this.page-2 : 0) ; i <= parseInt( this.page )+4 ; i+= 1 )
-			{
-				if( ( i * preferences.max_email_per_page ) > size)
-				{
-					break;
-				}
-
-				if( this.page == i )
-				{
-					var _link = document.createElement('span');
-						_link.setAttribute("style", "font-weight:bold; color:red")
-						_link.innerHTML = ( this.page + 1 ) + "&nbsp;&nbsp;";
-				}
-				else
-				{
-					var _page = i;
-					var _link = document.createElement('A');					
-						_link.innerHTML = ( _page + 1 ) + "&nbsp;&nbsp;";
-						_link.href  = 'javascript:EsearchE.page='+i+';';
-						_link.href += 'cExecute("$this.imap_functions.search_msg",openpage,"condition='+this.condition+'&sort_type='+this.sort_type+'&page='+_page+'&current_tab='+currentTab+'");';
-				}
-						
-				span_pg.appendChild( _link );
-			}
-
-			Element("div_menu_c3").appendChild(span_pg);
-		}
-	}
-
-	searchE.prototype.searchFor = function( borderID, sortType )
-	{
-		var border_id 	= borderID;
-		var sort_type	= sortType;
-
-		
-		var args   = "$this.imap_functions.search_msg";
-		var params = "condition="+EsearchE.condition+"&page="+EsearchE.page+"&sort_type="+sort_type;
-
-		var handler = function( data )
-		{
-        	var allMsg			= [3];
-    		var gears			= [];
-    		var local_folders	= [];
-
-    		if ( preferences.use_local_messages == 1 )
-    		{
-    			temp = expresso_local_messages.list_local_folders();
-    			
-    			for (var x in temp)
-    			{
-    				local_folders.push( temp[x][0] );
-    			}
-
-    		
-    			if ( local_folders.length > 0 )
-    				gears = expresso_local_messages.search( local_folders, expresso_local_messages.getFilter() );
-    		}
-        	
-        	if( data['num_msgs'] )
-            {
-            	allMsg['data'] 				= data['data'];
-            	allMsg['num_msgs']			= data['num_msgs'];
-            	allMsg['gears_num_msgs'] 	= gears.length;
-            }
-        	
-        	delete_border( border_id, false );
-			
-			EsearchE.mount_result( allMsg , sort_type ); 
-		};
-		cExecute(args,handler,params);
-	}
-	
-	searchE.prototype.viewLocalMessage = function()
-	{
-		var data		  	= [2];
-		var gears			= [];
-		var local_folders	= [];
-		
-    	// Gears - local
-		if ( preferences.use_local_messages == 1 )
-		{
-			temp = expresso_local_messages.list_local_folders();
-			
-			for (var x in temp)
-			{
-				local_folders.push( temp[x][0] );
-			}
-
-			if ( local_folders.length > 0 ){
-				if (this.folders.length >0)
-					gears = expresso_local_messages.search( this.folders, expresso_local_messages.getFilter() );
-				else
-					gears = expresso_local_messages.search( local_folders, expresso_local_messages.getFilter() );
-			}
-			data['data_gears']	= gears;
-			data['num_msgs']	= gears.length;
-	
-        	write_msg( data['num_msgs'] + " " + get_lang("results found") );
-			
+			if ( typeof $(condition).data( 'border_id' ) !== 'undefined' ) data.border_id = $(condition).data( 'border_id' );
+			data.params = params;
 			EsearchE.mount_result( data );
-		}
+		} );
 	}
 	
 	// Form resultado
-	searchE.prototype.mount_result = function( Data, sort_type )
+	searchE.prototype.mount_result = function( data )
 	{
-		var data = ( Data['data'] ) ? Data['data'] : Data['data_gears'];
-		
-		if ( data == undefined )
-			return;
-		
-		var cont = parseInt(0);
+		if ( data == undefined ) return;
 
-		if ( typeof(sort_type) != 'undefined')
-			this.sort_type = sort_type;
-		else
-			sort_type = this.sort_type;
+		var border_id = ( typeof data.border_id !== 'undefined' )? data.border_id : create_border( get_lang( 'Server Results' ), false, 1 );
+		if ( !border_id ) return;
 
-		numBox++;
+		var ID                         = border_id.replace( 'search_', '' );
+		var content_search             = Element( 'content_id_search_'+ID );
 
- 		if( Data['data'] )
-			var border_id = create_border(get_lang("Server Results"), "search_" + numBox,1);
-		
-		if( Data['data_gears'])
-			var border_id = create_border(get_lang("Local Results"), "search_local_msg" + numBox,1);
-			
-		if (!border_id)
-            return;
+		currentTab                     = data.border_id = border_id;
+		openTab.content_id[currentTab] = content_search;
+		openTab.type[currentTab]       = 1;
 
-        currentTab = border_id;
-        openTab.content_id[currentTab] = Element('content_id_search_' + numBox);
-        openTab.type[currentTab] = 1;
-                                   
-		var table = document.createElement("TABLE");
-			table.id    = "table_resultsearch_" + numBox;
-			table.frame = "void";
-			table.rules = "rows";
-			table.cellPadding	= "0";
-			table.cellSpacing	= "0";
-			table.className		= "table_box";
+		$(content_search).empty().data( data );
 
-		var tbody		= document.createElement("TBODY");
-			tbody.id	= "tbody_box_" + numBox;
+		var table = document.createElement( 'TABLE' );
+			table.id          = 'table_resultsearch_'+ID;
+			table.frame       = "void";
+			table.rules       = "rows";
+			table.cellPadding = "0";
+			table.cellSpacing = "0";
+			table.className   = "table_box";
 
-		for( var i=0; i < data.length; i++)
+		var tbody    = document.createElement("TBODY");
+			tbody.id = "tbody_box_" + ID;
+
+		for( var i=0; i < data['data'].length; i++)
 		{
 			var tr = document.createElement("TR");
 
 			if( typeof(preferences.line_height) != 'undefined' )
 				tr.style.padding = preferences.line_height+'px 0';
 				
-			var aux = data[i];
+			var aux = data['data'][i];
 			var mailbox = aux.boxname; 
 			var uid_msg = aux.uid; 
 			var subject = aux.subject; 
@@ -430,13 +289,13 @@
 				proxy_mensagens.get_msg(this.parentNode.id,url_encode(this.parentNode.getAttribute('name')),show_msg);
 			};
 			
-            for(var j=0 ; j <= 10 ; j++)
+			for(var j=0 ; j <= 10 ; j++)
 			{
 				var td = document.createElement("TD");
 				if (j == 0)
 				{
 					td.style.width = "1%";
-					var td1 = '<input type="checkbox" id="search_' + numBox + '_check_box_message_'+uid_msg+'"></input>';
+					var td1 = '<input type="checkbox" id="search_' + ID + '_check_box_message_'+uid_msg+'"></input>';
 					
 				}
 				if (j == 1)
@@ -493,10 +352,10 @@
 					td.style.fontWeight = "bold";
 					
 					var td1  = get_lang(td1).substr(get_lang(td1).length-1) == "*"?td1:get_lang(td1);
-                    if ((tmp = translatedFolders.get(td1)))
-                    {
-                        td1 = tmp;
-                    }
+					if ((tmp = translatedFolders.get(td1)))
+					{
+						td1 = tmp;
+					}
 
 					if( proxy_mensagens.is_local_folder(td1))
 					{
@@ -512,7 +371,7 @@
 					td.style.width = "20%";
 					td.onclick = _onclick;
 					td.setAttribute("NoWrap","true");
-                                        td.style.overflow = "hidden";
+					td.style.overflow = "hidden";
 					var td1  =  '<div style="width:100%;overflow:hidden">'+aux.from+"</div>";
 				}
 				
@@ -528,9 +387,9 @@
 					td.style.width = "35%";
 					td.onclick = _onclick;
 					td.setAttribute("NoWrap","true");
-                    td.style.overflow = "hidden";
+					td.style.overflow = "hidden";
 
-                    var td1  = aux.subject;
+					var td1  = aux.subject;
 				}
 				
 				if( j == 8 )
@@ -546,14 +405,14 @@
 					else
 					{
 						var dt	= new Date( aux.udate * 1000 );
-	                    var td1	 = dt.getDate() + "/";
-	                    
-	                    if( !( dt.getMonth() + 1 ).toString().match(/\d{2}/) )
-	                    	td1 += "0"+( dt.getMonth() + 1 ) + "/";
-	                    else
-	                    	td1 += ( dt.getMonth() + 1 ) + "/";
-	                    
-	                    td1 += dt.getFullYear();
+						var td1	 = dt.getDate() + "/";
+
+						if( !( dt.getMonth() + 1 ).toString().match(/\d{2}/) )
+							td1 += "0"+( dt.getMonth() + 1 ) + "/";
+						else
+							td1 += ( dt.getMonth() + 1 ) + "/";
+
+						td1 += dt.getFullYear();
 					}
 				}
 
@@ -581,24 +440,23 @@
 
 			$(tr).on("mousedown", function(e)
 			{ 
-	    		if (typeof e.preventDefault != 'undefined')
+				if (typeof e.preventDefault != 'undefined')
 					e.preventDefault();
 				else
 					e.onselectstart = new Function("return false;");
 
-			    _dragArea.makeDraggedMsg( $(this) , e );
+				_dragArea.makeDraggedMsg( $(this) , e );
 			});
 
-            tbody.appendChild(tr);
+			tbody.appendChild(tr);
 		}
 		
 		global_search++; //Tabs from search must not have the same id on its tr's
 		
 		table.appendChild(tbody);
 
-		var content_search =  Element('content_id_search_' + numBox);
 		var div_scroll_result = document.createElement("DIV");
-			div_scroll_result.id = "divScrollMain_"+numBox;
+			div_scroll_result.id = "divScrollMain_"+ID;
 			div_scroll_result.style.overflow = "auto";
 	
 		if(is_ie)
@@ -642,13 +500,14 @@
 		{
 			return "<b>" + Text + "</b><img src='templates/"+template+"/images/arrow_ascendant.gif'>";
 		}
-		
+
+		var sort_type = data.params.sort_type;
 		// Ordernar Pasta
 		if ( sort_type == 'SORTBOX')
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element1.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTBOX_REVERSE'); };
+				td_element1.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTBOX_REVERSE' ); };
 				td_element1.innerHTML	= "<b>"+get_lang("Folder")+"</b><img src='templates/"+template+"/images/arrow_descendant.gif'>";
 			}
 			else
@@ -658,9 +517,9 @@
 		}
 		else
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element1.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTBOX'); };
+				td_element1.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTBOX'); };
 			}
 			else
 			{
@@ -676,9 +535,9 @@
 
 		if (sort_type == 'SORTWHO')
 		{
-			if(Data['data'])
+			if(data['data'])
 			{
-				td_element2.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTWHO_REVERSE'); };
+				td_element2.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTWHO_REVERSE'); };
 				td_element2.innerHTML	= "<b>"+get_lang("who")+"</b><img src='templates/"+template+"/images/arrow_descendant.gif'>";
 			}
 			else
@@ -688,9 +547,9 @@
 		}
 		else
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element2.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTWHO'); };
+				td_element2.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTWHO'); };
 			}
 			else
 			{
@@ -706,9 +565,9 @@
 		
 		if (sort_type == 'SORTSUBJECT')
 		{
-			if( Data['data'])
+			if( data['data'])
 			{
-				td_element3.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTSUBJECT_REVERSE'); };
+				td_element3.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTSUBJECT_REVERSE'); };
 				td_element3.innerHTML	= "<b>"+get_lang("subject")+"</b><img src='templates/"+template+"/images/arrow_descendant.gif'>";				
 			}
 			else
@@ -718,9 +577,9 @@
 		}
 		else
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element3.onclick		= function(){ EsearchE.searchFor( border_id, 'SORTSUBJECT'); };
+				td_element3.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTSUBJECT'); };
 			}
 			else
 			{
@@ -729,16 +588,16 @@
 			td_element3.innerHTML	= ( sort_type == 'SORTSUBJECT_REVERSE' ) ? arrow_ascendant(get_lang("subject")) : get_lang("subject");
 		}
 		
-		// Ordernar Data
+		// Ordernar data
 		td_element4 = document.createElement("TD");
 		td_element4.setAttribute("width", "12%");
 		td_element4.align = "center";
 		
 		if ( sort_type == 'SORTDATE' )
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element4.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTDATE_REVERSE'); };
+				td_element4.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTDATE_REVERSE'); };
 				td_element4.innerHTML	= "<b>"+get_lang("Date")+"</b><img src='templates/"+template+"/images/arrow_descendant.gif'>";
 			}
 			else
@@ -748,9 +607,9 @@
 		}
 		else
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element4.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTDATE'); };
+				td_element4.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTDATE'); };
 			}
 			else
 			{
@@ -766,9 +625,9 @@
 		
 		if ( sort_type == 'SORTSIZE' )
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{
-				td_element5.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTSIZE_REVERSE'); };
+				td_element5.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTSIZE_REVERSE'); };
 				td_element5.innerHTML	= "<b>"+get_lang("size")+"</b><img src='templates/"+template+"/images/arrow_descendant.gif'>";				
 			}
 			else
@@ -778,9 +637,9 @@
 		}
 		else
 		{
-			if( Data['data'] )
+			if( data['data'] )
 			{	
-				td_element5.onclick		= function(){ EsearchE.searchFor(border_id, 'SORTSIZE'); };
+				td_element5.onclick		= function(){ EsearchE.searchChange( content_search, 'SORTSIZE'); };
 			}
 			else
 			{
@@ -798,16 +657,6 @@
 		tbody_element.appendChild(tr_element);
 		table_element.appendChild(tbody_element);
 
-		if( parseInt( Data['gears_num_msgs'] ) > 0 )
-		{
-			var _div_gears = document.createElement("div");
-				_div_gears.onclick = function(){ EsearchE.viewLocalMessage(); };
-				_div_gears.setAttribute("style", "cursor: pointer; background: none repeat scroll 0% 0% rgb(255, 238, 187); color: red; line-height: 2em; font-size: 1.2em; text-align: center;");
-				_div_gears.innerHTML = get_lang("The search has% 1 messages stored locally. Want to see them ? Click here.", Data['gears_num_msgs']);
-
-			content_search.appendChild(_div_gears);		
-		}		
-
 		content_search.appendChild(table_element);
 
 		/*end of "put header"*/
@@ -821,10 +670,46 @@
 			div_scroll_result.appendChild(table);
 			content_search.appendChild(div_scroll_result);
 		}
-		
+
 		resizeWindow();
 
-		EsearchE.show_paging( Data['num_msgs'] );
+		EsearchE.show_paging( content_search );
+	}
+
+	searchE.prototype.show_paging = function( content_search )
+	{
+		var data = $( content_search ).data();
+		var span_pg = Element('span_paging'+data.border_id);
+		if ( span_pg == null ) {
+			span_pg    = document.createElement('span');
+			span_pg.id = 'span_paging'+data.border_id;
+		}
+		span_pg.innerHTML = '';
+		
+		if ( data.num_msgs > preferences.max_email_per_page )
+		{
+			var p = data.params.page;
+			$add_link = function( page ) {
+				var cur = ( p == page );
+				var label = cur? $('<span>') : $('<a>');
+				label.html( ( page + 1 )+'&nbsp;' );
+				if ( cur ) label.addClass( 'pg_selected' );
+				else label.off( 'click' ).on( 'click', function(e) {
+					$(e.currentTarget).off( 'click' ).parent().find('a').removeClass( 'pg_selected' );
+					EsearchE.searchChange( content_search, undefined, page );
+				} )
+				span_pg.appendChild( label.get(0) );
+			};
+			var last = Math.floor( data.num_msgs / preferences.max_email_per_page );
+			var tam  = 2;
+			$add_link( 0 );
+			if ( p > tam ) span_pg.appendChild( $('<span>').html( '..&nbsp;' ).get(0) );
+			for ( var i = Math.max( p - tam, 1 ); i <= Math.min( p + tam, last - 1 ); i++ ) $add_link( i );
+			if ( p < ( last - tam ) ) span_pg.appendChild( $('<span>').html( '..&nbsp;' ).get(0) );
+			if ( last > 0 ) $add_link( last );
+
+			Element("div_menu_c3").appendChild(span_pg);
+		}
 	}
 
 	searchE.prototype.open_msg = function(mailbox, uid_msg, subject)
@@ -925,25 +810,25 @@
 		var fields = "##";
 			// Verifica se os campos estão preenchidos;
 			if(trim(Element("txt_ass").value) != ""){
-				fields += "SUBJECT " +  "<=>" +url_encode(Element("txt_ass").value) + "##";
+				fields += "SUBJECT " +  "<=>" +Element("txt_ass").value+ "##";
 			}
 			if(trim(Element("txt_body").value) != ""){
-				fields += "BODY " + "<=>" + url_encode(Element("txt_body").value) + "##";
+				fields += "BODY " + "<=>" +Element("txt_body").value+ "##";
 			}
 			if(trim(Element("txt_de").value) != ""){
-				fields += "FROM " + "<=>" + url_encode(Element("txt_de").value) + "##";
+				fields += "FROM " + "<=>" +Element("txt_de").value+ "##";
 			}
 			if(trim(Element("txt_para").value) != ""){
-				fields += "TO " + "<=>" + url_encode(Element("txt_para").value) + "##";
+				fields += "TO " + "<=>" +Element("txt_para").value+ "##";
 			}
 			if(trim(Element("txt_cc").value) != ""){
-				fields += "CC " + "<=>" + url_encode(Element("txt_cc").value) + "##";
+				fields += "CC " + "<=>" +Element("txt_cc").value+ "##";
 			}
             if (trim(Element("since_date").value) != "")
             {
                 if (validate_date(Element("since_date").value))
                 {
-                    fields += "SINCE " + "<=>" + url_encode(Element("since_date").value) + "##";
+                    fields += "SINCE " + "<=>" +Element("since_date").value+ "##";
                 }
                 else
                 {
@@ -956,7 +841,7 @@
             {
                 if (validate_date(Element("before_date").value))
                 {
-                    fields += "BEFORE " + "<=>" + url_encode(Element("before_date").value) + "##";
+                    fields += "BEFORE " + "<=>" +Element("before_date").value+ "##";
                 }
                 else
                     {
@@ -969,7 +854,7 @@
             {
                 if (validate_date(Element("on_date").value))
                 {
-                    fields += "ON " + "<=>" + url_encode(Element("on_date").value) + "##";
+                    fields += "ON " + "<=>" +Element("on_date").value+ "##";
                 }
                 else
                 {
@@ -1027,7 +912,7 @@
 
             if ( value )
             {
-				fields = "##ALL " +  "<=>" +url_encode(value) + "##";
+				fields = "##ALL " +  "<=>" +value+ "##";
 			}
 
 		if(fields == "##")
@@ -1083,56 +968,12 @@
 				}
 			}
 		}
-		
-		var handler = function( data )
-		{
-        	var allMsg 	= [3];
-        	var count  	= ( data['num_msgs'] ) ?  data['num_msgs'] : "0";
-			var tmp		= [];
 
-			// Gears - local
-			if ( local_folders.length > 0 ){
-				tmp = expresso_local_messages.search( local_folders, fields );
-			}
-            if( data['num_msgs'] )
-            {
-            	allMsg['data'] 		= data['data'];
-            	allMsg['num_msgs']	= data['num_msgs'];
-            } 
-
-        	if( tmp.length > 0 )	
-            {
-        		allMsg['gears_num_msgs'] = tmp.length ;
-            }
-            
-        	if( ( data['num_msgs'] ) == 0 )
-        	{
-                alert( get_lang("None result was found.") );
-        	}
-            else
-            {
-            	if( (tmp.length > 0) && (!data['num_msgs']) )
-            	{
-            		EsearchE.folders = local_folders; 
-            		EsearchE.viewLocalMessage();
-            	}
-            	else
-            	{
-            		write_msg( count + " " + get_lang("results found") );
-            		EsearchE.mount_result( allMsg, 'SORTDATE' );
-            	}
-            }
-		}
-
-		this.condition	= nm_box;
-		this.page		= 0;
-		var args		= "$this.imap_functions.search_msg";
-		var params		= "condition=" + nm_box+ "&page=0"+ "&sort_type=SORTDATE";
-		
 		if( expresso_offline )
 			handler('none');
-		else
-			cExecute( args, handler, params);
+		else {
+			EsearchE.searchChange( nm_box.join() )
+		}
 	}
 	// clean;
 	searchE.prototype.func_clean = function()

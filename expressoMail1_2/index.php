@@ -235,14 +235,14 @@ $GLOBALS['phpgw']->js->add( 'txt' , '
 	// a href emails
 	parent.find("a").first().first().html("<img align=\'top\' src=\'templates/default/images/search.gif\'>");
 	parent.find("a").first().bind("click", function(){ search_emails( parent.find("input").val() ); });
-	parent.find("a").first().attr("title", "{lang_Open_Search_Window}");
-	parent.find("a").first().attr("alt", "{lang_Open_Search_Window}");
+	parent.find("a").first().attr("title", "'.lang( 'Open search window' ).'");
+	parent.find("a").first().attr("alt", "'.lang( 'Open Search Window' ).'");
 
 	// a href users;
 	parent.find("a").first().next().html("<img align=\'top\' src=\'templates/default/images/users.gif\'>");
 	parent.find("a").first().next().bind("click",function(){ emQuickSearch( parent.find("input").val(), \'null\', \'null\'); });
-	parent.find("a").first().next().attr("title", "{lang_search_user}");
-	parent.find("a").first().next().attr("alt", "{lang_search_user}");
+	parent.find("a").first().next().attr("title", "'.lang( 'search user' ).'");
+	parent.find("a").first().next().attr("alt", "'.lang( 'search user' ).'");
 
 	parent.find("a").children(\'a\').each(function(){
 		$(this).css({\'padding\':\'1 8px\',\'width\':\'16px\',\'height\':\'16px\'});

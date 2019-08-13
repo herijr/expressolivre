@@ -20,6 +20,9 @@
 	define('PHPGW_SERVER_ROOT','{SERVER_ROOT}');
 	define('PHPGW_INCLUDE_ROOT','{INCLUDE_ROOT}');
 
+	// Assure that the correct encondig will be used (e.g string functions)
+	setlocale( LC_CTYPE, 'pt_BR.utf-8', 'pt_BR.iso-8859-1', 'pt_BR' );
+
 	/* Setup settings */
 	$GLOBALS['phpgw_info']['server']['header_admin_user'] = '{HEADER_ADMIN_USER}';
 	$GLOBALS['phpgw_info']['server']['header_admin_password'] = '{HEADER_ADMIN_PASSWORD}';
