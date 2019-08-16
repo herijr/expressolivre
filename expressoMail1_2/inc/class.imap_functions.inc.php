@@ -873,54 +873,35 @@ class imap_functions
 		return $return;
 	}
 
-	function get_msg_sample($msg_number)
+	function get_msg_sample( $msg_number, $folder )
 	{
 
-		$return = "";
-		if( (!isset($this->prefs['preview_msg_subject']) || ($this->prefs['preview_msg_subject'] != "1")) &&  
-			(!isset($this->prefs['preview_msg_tip']    ) || ($this->prefs['preview_msg_tip']     != "1")) ) 
-		{ 
-			$return['body'] = ""; 
-			return $return; 
-		} 
+		if (
+			( !isset( $this->prefs['preview_msg_subject'] ) || ( $this->prefs['preview_msg_subject'] != '1' ) ) &&
+			( !isset( $this->prefs['preview_msg_tip']     ) || ( $this->prefs['preview_msg_tip']     != '1' ) )
+		) return array( 'body' => '' );
 
-		include_once("class.message_components.inc.php");
-		$msg = new message_components($this->mbox);
-		$msg->fetch_structure($msg_number);
+		include_once 'class.message_reader.inc.php';
+		$mail_reader = new MessageReader();
+		$this->open_mbox( $folder );
+		$mail_reader->setMessage( $this->mbox, $folder, $msg_number );
+		$msg_body = $mail_reader->getBody( 'plain' );
 
-		if ( !( isset( $msg->structure[$msg_number]->parts ) && $msg->structure[$msg_number]->parts ) )
-		{
-			$content = '';
-			if (strtolower($msg->structure[$msg_number]->subtype) == "plain" || strtolower($msg->structure[$msg_number]->subtype) == "html")
-			{
-				$content = $this->decodeBody(imap_body($this->mbox, $msg_number, FT_UID|FT_PEEK), $msg->encoding[$msg_number][0], $msg->charset[$msg_number][0]);
-			}
-		}
-		else
-		{
-			foreach($msg->pid[$msg_number] as $values => $msg_part)
-			{
-
-				$file_type = strtolower($msg->file_type[$msg_number][$values]);
-				if($file_type == "text/plain" || $file_type == "text/html") {
-					$content = $this->decodeBody(imap_fetchbody($this->mbox, $msg_number, $msg_part, FT_UID|FT_PEEK), $msg->encoding[$msg_number][$values], $msg->charset[$msg_number][$values]);
-					break;
-				}
-			}
-		}
+		$content = isset( $msg_body->body_alternative )? $msg_body->body_alternative : $msg_body->body;
+		if ( $msg_body->type === 'html' ) {
 		
 		// Remove data URI scheme (RFC 2397)
 		$content = preg_replace( '/data:[^, \'\"]*,([^ \'\"]*)/', '', $content );
 		
 		$content = $this->replace_special_characters($content);
-		$tags_replace = array("<br>","<br/>","<br />");
-		$content = str_replace($tags_replace," ", $content);
+			$content = str_replace( array( '<br>', '<br/>', '<br />' ), ' ', $content );
 		$content = strip_tags($content);
-		$content = str_replace(array("{","}","&nbsp;"), " ", $content);
-		$content = trim($content);
-		$content = html_entity_decode(substr($content,0,300));
-		$content != "" ? $return['body'] = " - " . $content: $return['body'] = "";
-		return $return;
+			$content = str_replace( array( '{', '}', '&nbsp;' ), ' ', $content );
+			$content = html_entity_decode( $content );
+		}
+		$content = trim( mb_substr( trim( $content ), 0, 300 ) );
+
+		return array( 'body' => (empty( $content )? '' : ' - ' ).$content );
 	}
 
 	function vCalImport ( $vcalendar ){
@@ -2244,13 +2225,13 @@ class imap_functions
 		return $num_msgs;
 	}
 
-	function folder_exists($folder){
-		$mbox =  $this->open_mbox();
-		$serverString = "{".$this->imap_server.":".$this->imap_port.$this->imap_options."}";		
-		$list = imap_getmailboxes($mbox,$serverString, $folder);
-		$return = is_array($list);		
-		$this->close_mbox($mbox);
-		return $return;
+	public function folder_exists( $folder )
+	{
+		return is_array( imap_getmailboxes(
+			$this->open_mbox(),
+			'{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}',
+			$this->_toMaibox( $folder )
+		) );
 	}
 
 	function add_recipients_cert($full_address)

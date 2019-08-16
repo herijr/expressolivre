@@ -20,9 +20,9 @@ class DelFolderResource extends MailAdapter {
 		{
 			$params = array();
 			
-			$params['del_past'] = $folder_id = mb_convert_encoding($this->getParam('folderID'), "UTF-8","ISO-8859-1");
+			$params['del_past'] = $folder_id = $this->getParam('folderID');
 
-			if(!$this->getImap()->folder_exists(mb_convert_encoding($folder_id, "UTF7-IMAP","UTF-8")))
+			if(!$this->getImap()->folder_exists( $folder_id ))
 				Errors::runException("MAIL_INVALID_FOLDER");
 
 			$default_folders = array_keys($this->defaultFolders);

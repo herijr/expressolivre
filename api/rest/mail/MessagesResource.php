@@ -46,8 +46,7 @@ class MessagesResource extends MailAdapter {
 
 					foreach ($imap_folders as $i => $imap_folder) {
 						if(is_int($i)) {
-							$folder = mb_convert_encoding($imap_folder['folder_id'],'UTF8','ISO-8859-1');
-							$folder = mb_convert_encoding($folder, 'UTF7-IMAP','UTF-8');
+							$folder = $imap_folder['folder_id'];
 							$condition[] = "$folder##ALL <=>".$this->getParam('search')."##";
 						}
 					}
@@ -66,11 +65,11 @@ class MessagesResource extends MailAdapter {
 						foreach($imap_msgs['data'] as $imap_msg) {
 							$msg = array();
 							$msg['msgID'] = $imap_msg['uid'];
-							$msg['folderID'] = mb_convert_encoding($imap_msg['boxname'],'UTF-8','ISO-8859-1');
+							$msg['folderID'] = $imap_msg['boxname'];
 							$msg['msgDate']	= $imap_msg['udate']." 00:00";
-							$msg['msgSubject'] = mb_convert_encoding($imap_msg['subject'],"UTF8", "ISO_8859-1");
+							$msg['msgSubject'] = $imap_msg['subject'];
 							$msg['msgSize'] = $imap_msg['size'];
-							$msg['msgFrom']	= array('fullName' => mb_convert_encoding($imap_msg['from'],"UTF8", "ISO_8859-1"), 'mailAddress' => "");							
+							$msg['msgFrom']	= array('fullName' => $imap_msg['from'], 'mailAddress' => "");							
 							$msg['msgFlagged']	= strpos($imap_msg['flag'],"F") !== false ? "1" : "0";
 							$msg['msgSeen']		= strpos($imap_msg['flag'],"U") !== false ? "0" : "1";
 							$msg['msgHasAttachments'] = strpos($imap_msg['flag'],"T") !== false ? "1" : "0";							
@@ -112,7 +111,7 @@ class MessagesResource extends MailAdapter {
 					return $this->getResponse();
 				}
 
-				$folderID = mb_convert_encoding($this->getParam('folderID'), 'UTF-8','ISO-8859-1');
+				$folderID = $this->getParam('folderID');
 
 				foreach($imap_msgs as $i => $imap_msg) {
 					if(!is_int($i)) {
@@ -124,18 +123,18 @@ class MessagesResource extends MailAdapter {
 					$msg['folderID'] = $folderID;
 
 					$msg['msgDate']	= gmdate('d/m/Y H:i', $imap_msg['timestamp']);
-					$msg['msgFrom']['fullName'] = mb_convert_encoding($imap_msg['from']['name'],"UTF8", "ISO_8859-1");
-					$msg['msgFrom']['mailAddress'] = mb_convert_encoding($imap_msg['from']['email'],"UTF8", "ISO_8859-1");
+					$msg['msgFrom']['fullName'] = $imap_msg['from']['name'];
+					$msg['msgFrom']['mailAddress'] = $imap_msg['from']['email'];
 					$msg['msgTo'] = array();
 					if($this->getExpressoVersion() != "2.2") {
 						foreach($imap_msg['to'] as $to){
-							$msg['msgTo'][] = array('fullName' => mb_convert_encoding($to['name'],"UTF8", "ISO_8859-1"), 'mailAddress' => $to['email']);
+							$msg['msgTo'][] = array('fullName' => $to['name'], 'mailAddress' => $to['email']);
 						}
 					}else{
-						$msg['msgTo'][] = array('fullName' => mb_convert_encoding($to['name'],"UTF8", "ISO_8859-1"), 'mailAddress' => $imap_msg['to']['email']);
+						$msg['msgTo'][] = array('fullName' => $to['name'], 'mailAddress' => $imap_msg['to']['email']);
 					}
 					$msg['msgReplyTo'][0] = $this->formatMailObject($imap_msg['reply_toaddress']);
-					$msg['msgSubject']  = mb_convert_encoding($imap_msg['subject'],"UTF8", "ISO_8859-1");
+					$msg['msgSubject']  = $imap_msg['subject'];
 	
 					if($this->getExpressoVersion() != "2.2") {
 						$msg['msgHasAttachments'] = $imap_msg['attachment'] ? "1" : "0";
@@ -159,11 +158,9 @@ class MessagesResource extends MailAdapter {
 						$msg['msgBodyResume'] =  base64_decode($msg['msgBodyResume']);
 					}
 
-					$msg['msgBodyResume'] = substr($msg['msgBodyResume'], 2);
-					$msg['msgBodyResume'] = str_replace("\r\n", "", $msg['msgBodyResume']);
-					$msg['msgBodyResume'] = str_replace(chr(160)," ", $msg['msgBodyResume']);
-					$msg['msgBodyResume'] = preg_replace('/\s\s+/', '', $msg['msgBodyResume']);
-					$msg['msgBodyResume'] = mb_convert_encoding($msg['msgBodyResume'],"UTF8", "ISO_8859-1");
+					$msg['msgBodyResume'] = mb_substr( $msg['msgBodyResume'], 2 );
+					$msg['msgBodyResume'] = str_replace( array( "\r\n", "\n" ), ' ', $msg['msgBodyResume'] );
+					$msg['msgBodyResume'] = trim( preg_replace( '/\s+/', ' ', $msg['msgBodyResume'] ) );
 
 					$all_msgs[] = $msg;
 				}

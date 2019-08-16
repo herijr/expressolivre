@@ -12,7 +12,7 @@ class MailAdapter extends ExpressoAdapter {
 		if(preg_match('/[[:alnum:]\._\-]+@[[:alnum:]_\-\.]+/',$str, $matches1) &&
 			preg_match('/[[:alnum:]\._\-\ ]+/',$str, $matches2)){            		            
 			return array(					            
-            		'fullName' 	  => mb_convert_encoding(str_replace($matches1[0],'', $str), "UTF8", "ISO_8859-1"),
+					'fullName' 	  => str_replace($matches1[0],'', $str),
 					'mailAddress' => $matches1[0]
 					);
         }
@@ -202,12 +202,12 @@ class MailAdapter extends ExpressoAdapter {
 		//$msg['msgDate']	 =  $info_msg['fulldate'];
 		$msg['msgDate']  =  $info_msg['msg_day']." ".$info_msg['msg_hour'];
 		if($info_msg['from']) {
-			$msg['msgFrom']['fullName'] 	= mb_convert_encoding($info_msg['from']['name'],"UTF8", "ISO_8859-1");
-			$msg['msgFrom']['mailAddress'] 	= mb_convert_encoding($info_msg['from']['email'],"UTF8", "ISO_8859-1");
+			$msg['msgFrom']['fullName'] 	= $info_msg['from']['name'];
+			$msg['msgFrom']['mailAddress'] 	= $info_msg['from']['email'];
 		}
 		if($info_msg['sender'] != null){
 			$msg['msgSender']['fullName'] 	= $info_msg['sender']['name'];
-			$msg['msgSender']['mailAddress']= mb_convert_encoding($info_msg['sender']['email'],"UTF8", "ISO_8859-1");
+			$msg['msgSender']['mailAddress']= $info_msg['sender']['email'];
 		}		
 		if($info_msg['toaddress2'] != null){
 			$toaddresses = explode(",",$info_msg['toaddress2']);
@@ -234,7 +234,7 @@ class MailAdapter extends ExpressoAdapter {
 		if($info_msg['reply_toaddress'] != null) {
 			$msg['msgReplyTo'][0] = $this->formatMailObject($info_msg['reply_toaddress']);
 		}						
-		$msg['msgSubject']  = ($info_msg['subject'] ? mb_convert_encoding($info_msg['subject'],"UTF8", "ISO_8859-1") : "");		
+		$msg['msgSubject']  = ($info_msg['subject'] ? $info_msg['subject'] : "");		
 		$msg['msgHasAttachments'] = "0";
 
 		if(count($info_msg['attachments']) > 0) {
@@ -243,7 +243,7 @@ class MailAdapter extends ExpressoAdapter {
 				$msg['msgAttachments'][] = array (
 					'attachmentID'			=> "".$attachment->section,
 					'attachmentIndex'		=> "".$i,
-					'attachmentName' 		=> "".mb_convert_encoding( $attachment->filename ,"UTF8", "ISO_8859-1"),
+					'attachmentName' 		=> "".$attachment->filename,
 					'attachmentSize'		=> "".$attachment->size,
 					'attachmentEncoding'	=> $attachment->encoding,
 					'attachamentType'		=> $attachment->type
@@ -257,7 +257,7 @@ class MailAdapter extends ExpressoAdapter {
 		$msg['msgDraft']	= $info_msg['Draft'] == "X" ? "1" : "0";
 		$msg['msgSeen'] 	= $info_msg['Unseen'] == "U" ? "0" : "1";				
 		$msg['msgSize'] 	= $info_msg['Size'];
-		$msg['msgBody']		= ($info_msg['body'] ? mb_convert_encoding($info_msg['body'],"UTF8", "ISO_8859-1") : "");
+		$msg['msgBody']		= ($info_msg['body'] ? $info_msg['body'] : "");
 
 		if( isset($info_msg['hash_vcalendar']) ){
 			$msg['msgHashVcalendar'] = $info_msg['hash_vcalendar'];

@@ -22,7 +22,6 @@ class AddFolderResource extends MailAdapter {
 			$parent_id = $this->getParam('parentFolderID');
 			$parent_id = empty($parent_id) ? 'INBOX' : $parent_id;
 			$new_name  = $this->getParam('folderName');
-			$new_name = mb_convert_encoding($new_name, "UTF-8", "ISO-8859-1");
 
 			$all_folders = $this->getImap()->get_folders_list();
 			if(!$all_folders){

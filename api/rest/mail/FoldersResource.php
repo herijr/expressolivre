@@ -19,7 +19,7 @@ class FoldersResource extends MailAdapter {
 
 		if ($this->isLoggedIn()) {
 			
-			$search = $this->getParam('search') ? mb_convert_encoding($this->getParam('search'),"ISO-8859-1", "UTF-8") : null;
+			$search = $this->getParam('search') ? $this->getParam('search') : null;
 
 			$folders = $this->getImap()->get_folders_list( array( 'onload' => true ) );
 
@@ -28,12 +28,12 @@ class FoldersResource extends MailAdapter {
 			foreach ($folders as $key => $value) {
 				if (is_int($key)) {
 
-					$folderName = mb_convert_encoding($value['folder_name'], "UTF-8", "ISO-8859-1");
+					$folderName = $value['folder_name'];
 					$folderName = (strtoupper($folderName) === "INBOX" ? $this->getImap()->functions->getLang("Inbox") : $folderName);
-					$folderParentID = mb_convert_encoding($value['folder_parent'], 'UTF-8', 'ISO-8859-1');
+					$folderParentID = $value['folder_parent'];
 					$folderHasChildren = $value['folder_hasChildren'];
 
-					$folderID = mb_convert_encoding($value['folder_id'], 'UTF-8', 'ISO-8859-1');
+					$folderID = $value['folder_id'];
 					$folderID = trim($folderID);
 
 					$folderType = (substr($value['folder_id'], 0, 4) == "user" ? "6" : "5");

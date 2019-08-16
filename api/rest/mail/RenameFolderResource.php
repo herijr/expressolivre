@@ -19,10 +19,10 @@ class RenameFolderResource extends MailAdapter {
 
 		if($this-> isLoggedIn())
 		{
-			$old_id  = mb_convert_encoding($this->getParam('folderID'), "UTF-8", "ISO-8859-1");
-			$new_name = mb_convert_encoding($this->getParam('folderName'), "UTF-8", "ISO-8859-1");
+			$old_id  = $this->getParam('folderID');
+			$new_name = $this->getParam('folderName');
 
-			if(!$this->getImap()->folder_exists(mb_convert_encoding($old_id, "UTF7-IMAP", "UTF-8")))
+			if(!$this->getImap()->folder_exists( $old_id ))
 				Errors::runException("MAIL_INVALID_OLD_FOLDER");
  
 			$default_folders = array_keys($this->defaultFolders);

@@ -18,7 +18,7 @@ class ExpressoAdapter extends Resource {
 	private $method_params = array();
 	private $method_isMobile = false;
 
-	function __construct($id){
+	public function __construct($id){
 		
 		if (!isset($GLOBALS['phpgw_info'])) {
 			
@@ -45,7 +45,7 @@ class ExpressoAdapter extends Resource {
 	public function setResource($module,$route,$description,$method_types) {
 		$this->method_module        = $module;
 		$this->method_route 		= $route;
-		$this->method_description 	= utf8_encode( $description );
+		$this->method_description 	= $this->utf8enc( $description );
 		$this->method_types 		= $method_types;
 	}
 
@@ -73,7 +73,7 @@ class ExpressoAdapter extends Resource {
 			  "type" => $type, 
 			  "obrigatory" => $obrigatory_string, 
 			  "default_value" => $default_value, 
-			  "description" => utf8_encode( $description ),
+			  "description" => $this->utf8enc( $description ),
 			  "field_type" => $field_type );
 		$this->method_params[$paramName] = $param;
 		return $param;
@@ -135,7 +135,7 @@ class ExpressoAdapter extends Resource {
 	}
 	
 	public function getParam($param){
-		return is_string($this->params->$param)? mb_convert_encoding($this->params->$param, "ISO_8859-1", "UTF8") : $this->params->$param;
+		return is_string($this->params->$param)? $this->utf8enc( $this->params->$param ) : $this->params->$param;
 	}
 	
 	public function setError($error) {
@@ -195,7 +195,7 @@ class ExpressoAdapter extends Resource {
 		}
 		
 		
-		$response->body = json_encode($body);
+		$response->body = json_encode( $this->utf8enc( $body ), JSON_PARTIAL_OUTPUT_ON_ERROR );
 		
 		return $response;
 	}
@@ -327,4 +327,18 @@ class ExpressoAdapter extends Resource {
 		} 
 	}
 				
+	private function utf8enc( $data ) {
+		if ( !is_array( $data ) ) return $this->sconv( $data );
+		$result = array();
+		foreach ( $data as $k => $v ) $result[$this->sconv($k)] = is_array($v) ? $this->utf8enc($v) : $this->sconv($v);
+		return $result;
+	}
+
+	private function sconv( $obj ) {
+		return ( is_string( $obj ) && ( !$this->isUTF8( $obj ) ) )? ( utf8_encode($obj) ) : $obj;
+	}
+
+	private function isUTF8( $str ) {
+		return ( iconv( 'UTF-8', 'UTF-8//IGNORE', $str ) == $str );
+	}
 }

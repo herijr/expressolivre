@@ -16,8 +16,7 @@ function getResourcesExpresso(s_callback) {
 		beforeSend: function () {
 
 		},
-		success: function (response) {
-			var obj = jQuery.parseJSON(response);
+		success: function (obj) {
 
 			if (obj.error) {
 				$("#error").html("<font style='font-weight:bold'>Error code : </font> " +
@@ -179,8 +178,7 @@ function selectResource(resourceName) {
 									divSend.html("<pre class='prettyprint' style='border:0px;'>id=" + idResource + "&amp;params=" + JSON.stringify(obj) + "</pre>");
 								}
 							},
-							success: function (response) {
-								var obj = jQuery.parseJSON(response);
+							success: function (obj) {
 
 								if (obj.error) {
 
