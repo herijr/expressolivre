@@ -33,7 +33,7 @@
 		var lang_save 	= get_lang('Save');
 		var lang_cancel = get_lang('Cancel');
 		
-		//função lang
+		//funcao lang
 		fields = new Array(get_lang('Nickname')+":", get_lang('First Name')+":", get_lang('Last Name')+":", 'E-mail:');
 		for (i=0; i<fields.length; i++) {
 			el.innerHTML += '<span id="ccQuickAddCT' + i + '" style="position: absolute; top: ' +  (fieldsTop+i*fieldsSpace) + 'px; left: 5px; width: 100px; text-align: right; border: 0px solid #999;">' + fields[i] + '</span>';
@@ -134,7 +134,7 @@
 		}
 		if(!validateEmail(email)){
 			//alert(get_lang("The email address %1 is not valid, please use a valid address.",email));
-			//alert("O endereço de e-mail %1 não é válido, por favor use uma e-mail válidoooo.",email);
+			//alert("O endereco de e-mail %1 nao e valido, por favor use uma e-mail validoooo.",email);
 			alert(get_lang("QuickAddInvalidMail",email));
 			return false;
 		}

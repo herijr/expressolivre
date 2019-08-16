@@ -58,6 +58,6 @@
 
 	$GLOBALS['phpgw']->template->parse('out','expressoMail_prefs',True);
 	$GLOBALS['phpgw']->template->p('out');
-	// Com o Módulo do IM habilitado, ocorre um erro no IE
+	// Com o Modulo do IM habilitado, ocorre um erro no IE
 	//$GLOBALS['phpgw']->common->phpgw_footer();
 ?>

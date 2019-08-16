@@ -1,5 +1,5 @@
 /**************************************************************************\
- Início 
+ Inicio 
 \**************************************************************************/
 	function searchE()
 	{
@@ -808,7 +808,7 @@
 	searchE.prototype.func_search = function(value)
 	{
 		var fields = "##";
-			// Verifica se os campos estão preenchidos;
+			// Verifica se os campos estao preenchidos;
 			if(trim(Element("txt_ass").value) != ""){
 				fields += "SUBJECT " +  "<=>" +Element("txt_ass").value+ "##";
 			}

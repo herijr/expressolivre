@@ -274,8 +274,8 @@
 	}
 
 	/*
-	 * Corrige bug 65, solução: desabilitar radio3 e field6 e desmarcar radio3 (ação de rejeição)
-	 * quando a caixa de seleção para manter o e-mail na caixa de entrada do usuário for selecionada
+	 * Corrige bug 65, solucao: desabilitar radio3 e field6 e desmarcar radio3 (acao de rejeicao)
+	 * quando a caixa de selecao para manter o e-mail na caixa de entrada do usuario for selecionada
 	 */
 	cfilter.prototype.disable_radio =  function()
 	{
@@ -788,7 +788,7 @@ cfilter.prototype.new_rule = function(email){
 			}
 		}
 		
-		// Fora do Escritório
+		// Fora do Escritorio
 		if(_this.out_officeR.length > 0)
 		{
 				var aux = _this.out_officeR.split("&&");				

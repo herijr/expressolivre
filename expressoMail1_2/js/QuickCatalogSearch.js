@@ -496,7 +496,7 @@
 			var arr 	= new Array(max_result);
 
 			for(i = 0; data.groups && i < data.groups.length; i++) {
-				// Maneiras diferentes de se montar uma tag OPTION, pois no IE o objeto Option é muito lento.
+				// Maneiras diferentes de se montar uma tag OPTION, pois no IE o objeto Option e muito lento.
 				if(is_ie)
 					arr[i] = '<option value="'+'&quot;'+data.groups[i].name+'&quot; &lt;'+data.groups[i].email+'&gt;">'+data.groups[i].name+' ('+data.groups[i].email+')'+'</option>';
 				else
@@ -520,7 +520,7 @@
 				//verifica se email eh null ou nao;
 				var email = data.users[i].email ? data.users[i].email : "";
 
-				// Maneiras diferentes de se montar uma tag OPTION, pois no IE o objeto Option é muito lento.
+				// Maneiras diferentes de se montar uma tag OPTION, pois no IE o objeto Option e muito lento.
 				if(is_ie)
 					arr[i] = '<option value="'+'&quot;'+data.users[i].name+'&quot; &lt;'+email+'&gt;">'+data.users[i].name+' ('+email+')'+department+'</option>';
 				else {

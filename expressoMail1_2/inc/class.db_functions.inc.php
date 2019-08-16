@@ -324,7 +324,7 @@ class db_functions
 	
 	function get_dynamic_contacts()
 	{				
-		// Pesquisa os emails e ultima inserção nos contatos dinamicos.
+		// Pesquisa os emails e ultima insercao nos contatos dinamicos.
  		if(!$this->db->select('phpgw_expressomail_contacts','data',
 						  'id_owner ='.$this -> user_id,
 						  __LINE__,__FILE__))

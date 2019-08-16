@@ -1,5 +1,5 @@
 /**************************************************************************\
- InÌcio 
+ Inicio 
 \**************************************************************************/
 connector.loadScript('TreeS');
 
@@ -67,13 +67,11 @@ var ttreeBox = new function()
 	
 	this.verify = function( exp )
 	{
-		// IE does not understand regExp!!!
-		if ( is_ie ) var reTipo = /^[a-z0-9 \-_+=]*$/i;
-		else eval('var reTipo = /^[a-z0-9 \-_+=·ÈÌÛ˙‡ËÏÚ˘‚ÍÙ„ı√’¡…Õ”⁄¿»Ã“Ÿ¬ ‘Á«¸Ò]*$/i');
-		return reTipo.test( exp );
+		// All chars printable except . and / less equal then \u00FF are valid
+		return /^[\u0020-\u002d\u0030-\u007e\u00a1-\u00ac\u00ae-\u00ff]+$/.test( exp );
 	}
 	
-	// FunÁ„o para verificar o nome da caixa;
+	// Funcao para verificar o nome da caixa;
 	this.verify_names = function( name_folder )
 	{
 		var arr_nm_folder = new Array( 'INBOX', trashfolder, draftsfolder, sentfolder, spamfolder );
@@ -109,7 +107,7 @@ var ttreeBox = new function()
 					
 					if ( button.indexOf( 'local_' ) != -1  || button.toUpperCase() == 'INBOX' ) {
 						alert( get_lang( 'cannot create folder. try other folder name' ) );
-						//N„o posso criar pastas contendo a string local_
+						//Nao posso criar pastas contendo a string local_
 						return false;
 					}
 					
@@ -140,7 +138,7 @@ var ttreeBox = new function()
 					var button1 = prompt( get_lang( 'Enter a name for the box'), '' );
 					if ( button1.indexOf( 'local_' ) != -1 || button1.toUpperCase() == 'INBOX' ) {
 						alert( get_lang( 'cannot create folder. try other folder name' ) );
-						//N„o posso criar pastas contendo a string local_
+						//Nao posso criar pastas contendo a string local_
 						return false;
 					}
 					
@@ -264,7 +262,7 @@ var ttreeBox = new function()
 		return true;
 	}
 	
-	// FunÁ„o para deletar a pasta;
+	// Funcao para deletar a pasta;
 	this.del = function()
 	{
 		var folder_name = ttree.FOLDER;

@@ -71,7 +71,7 @@ function init(){
 			    preferences.use_local_messages=0;
 		    }
 		}
-		if (preferences.use_local_messages==1) { //O I.E 7 estava se atrapalhando caso esses loads fossem feitos após as chamadas ajax. Antes não apresentou problemas...
+		if (preferences.use_local_messages==1) { //O I.E 7 estava se atrapalhando caso esses loads fossem feitos apos as chamadas ajax. Antes nao apresentou problemas...
 			connector.loadScript('mail_sync');
 			if (is_ie)
 				connector.loadScript('TreeShow');
@@ -94,7 +94,7 @@ function init(){
 		{
 			$('#divAppboxHeader').html(title_app_menu);
 
-			//Quando a esta marcada a opcao ocultar pastas( preferences.hide_folder ), o titulo ExpressoMail é apagado;
+			//Quando a esta marcada a opcao ocultar pastas( preferences.hide_folder ), o titulo ExpressoMail e apagado;
 			$("#main_title").html('');
 		}
 		
@@ -103,20 +103,20 @@ function init(){
 
 		ConstructMenuTools();
 		
-		if ( (preferences.use_local_messages==1) && (expresso_local_messages.is_offline_installed()) )  //Precisa ser feito após a renderização da caixa de emails
+		if ( (preferences.use_local_messages==1) && (expresso_local_messages.is_offline_installed()) )  //Precisa ser feito apos a renderizacao da caixa de emails
 			check_mail_in_queue();
 		
 		// Insere a applet de criptografia
 		if (preferences.use_signature_digital_cripto == '1'){
 			loadApplet();
 		}
-		// Fim da inserção da applet
+		// Fim da insercao da applet
 
 		// Inicia Messenger
 		setTimeout( function(){ init_messenger(); }, 1000 );
 	}
 
-	// Versão
+	// Versao
 	Element('divAppboxHeader').innerHTML = title_app;
 
 	// Get cyrus delimiter
@@ -140,7 +140,7 @@ function init_offline(){
 		'<tr>' +
 		'<td style="padding-left:17px" width=33% id="content_quota" align=left></td>' +
 		'<td width=33% height=16px align=center nowrap><font face=Verdana, Arial, Helvetica, sans-serif color=#000066 size=2>' +
-		'<b>ExpressoMail Offline</b><font size=1><b> - Versão 1.0</b></font></td>' +
+		'<b>ExpressoMail Offline</b><font size=1><b> - Versao 1.0</b></font></td>' +
 		'<td width=33% id="div_menu_c3" align=right></td>' +
 		'</tr></table>';
 
@@ -258,7 +258,7 @@ function init_messenger()
 
 /**
  * Carrega a applet java no objeto search_div
- * @author Mário César Kolling <mario.kolling@serpro.gov.br>
+ * @author Mario Cesar Kolling <mario.kolling@serpro.gov.br>
  */
 
 function loadApplet(){
@@ -326,7 +326,7 @@ function disable_field(field,condition) {
 	eval(comando);
 }
 /*
-	função que remove todos os anexos...
+	funcao que remove todos os anexos...
 */
 function remove_all_attachments(folder,msg_num) {
 
@@ -390,11 +390,11 @@ function show_msg(msg_info){
 		// Abrindo um e-mail criptografado
 		// Verifica se existe o objeto applet
 		if (!Element('cert_applet')){
-			// se não existir, mostra mensagem de erro.
+			// se nao existir, mostra mensagem de erro.
 			write_msg(get_lang('The preference "%1" isn\'t enabled.', get_lang('Enable digitally sign/cipher the message?')));
 		} else {
 			// se existir prepara os dados para serem enviados e chama a
-			// operação na applet
+			// operacao na applet
 
 			connector.showProgressBar();
 
@@ -1264,7 +1264,7 @@ function new_message(type, border_ID)
 			openTab.toPreserve[new_border_ID] = true;
 			openTab.imapUid[new_border_ID] = parseInt(border_ID.substr(0,border_ID.indexOf("_")));
 			document.getElementById('font_border_id_'+new_border_ID).innerHTML = data.subject;
-			title = "Edição: "+data.subject;
+			title = "Edicao: "+data.subject;
 			
 			data.to = Element("to_values_" + border_ID).value;
 			if( data.to != get_lang("without destination") ) {
@@ -1439,12 +1439,12 @@ function buildAttachments( $obj, editable, selected )
 }
 
 /**
- * Método chamado pela applet para retornar o resultado da assinatura/decifragem do e-mail.
+ * Metodo chamado pela applet para retornar o resultado da assinatura/decifragem do e-mail.
  * para posterior envio ao servidor.
- * @author Mário César Kolling <mario.kolling@serpro.gov.br>, Bruno Vieira da Costa <bruno.vieira-costa@serpro.gov.br>
+ * @author Mario Cesar Kolling <mario.kolling@serpro.gov.br>, Bruno Vieira da Costa <bruno.vieira-costa@serpro.gov.br>
  * @param smime O e-mail decifrado/assinado
- * @param ID O ID do e-mail, para saber em que aba esse e-mail será mostrado.
- * @param operation A operação que foi realizada pela applet (assinatura ou decifragem)
+ * @param ID O ID do e-mail, para saber em que aba esse e-mail sera mostrado.
+ * @param operation A operacao que foi realizada pela applet (assinatura ou decifragem)
  */
 function appletReturn(smime, ID, operation, folder){
 
@@ -1475,10 +1475,10 @@ function appletReturn(smime, ID, operation, folder){
 	}else
 	{
 		ID_tmp = ID;
-		// Lê a variável e chama a nova função cExecuteForm
+		// Le a variavel e chama a nova funcao cExecuteForm
 		// Processa e envia para o servidor web
 		// Faz o request do connector novamente. Talvez implementar no connector
-		// para manter coerência.
+		// para manter coerencia.
 
 		var handler_send_smime = function(data){
 			send_message_return(data, this.ID_tmp); // this is a hack to escape quotation form connector bug
@@ -1490,10 +1490,10 @@ function appletReturn(smime, ID, operation, folder){
 		textArea.name = "smime";
 		textArea.value += smime;
 
-		// Lê a variável e chama a nova função cExecuteForm
+		// Le a variavel e chama a nova funcao cExecuteForm
 		// Processa e envia para o servidor web
 		// Faz o request do connector novamente. Talvez implementar no connector
-		// para manter coerência.
+		// para manter coerencia.
 		if (is_ie){
 			var i = 0;
 			while (document.forms(i).name != "form_message_"+ID){i++}
@@ -1568,9 +1568,9 @@ function send_message( ID, folder, folder_name )
 		.val($('#textplain_rt_checkbox_'+ID).is(':checked')? 'plain' : 'html')
 	);
 
-	// Evita que e-mails assinados sejam enviados quando o usuário tenta enviar um e-mail
-	// não assinado (desmarcou a opção) após tentar enviar um e-mail assinado que não passou
-	// no teste de validação.
+	// Evita que e-mails assinados sejam enviados quando o usuario tenta enviar um e-mail
+	// nao assinado (desmarcou a opcao) apos tentar enviar um e-mail assinado que nao passou
+	// no teste de validacao.
 	var checkSign = document.getElementById('return_digital_'+ID);
 	if ( checkSign && !checkSign.checked ) {
 		var smime = Element('smime');
@@ -1589,7 +1589,7 @@ function send_message( ID, folder, folder_name )
 			write_msg(get_lang("message without receiver."));
 			return;
 		}else if(invalidEmail[0] == true){
-			write_msg("Os endereços de destinatário a seguir estão incorretos: "+invalidEmail[1]);
+			write_msg("Os enderecos de destinatario a seguir estao incorretos: "+invalidEmail[1]);
 			return;
 		}
 
@@ -1633,7 +1633,7 @@ function send_message_return(data, ID){
 				operation = 'sign';
 			}
 			else { // crypt
-				//TODO: Colocar mensagem de erro, e finalizar o método.
+				//TODO: Colocar mensagem de erro, e finalizar o metodo.
 				operation = 'nop';
 			}
 		}
@@ -2063,17 +2063,17 @@ function print_msg(msg_folder, msg_number, border_ID){
 			html += ( from ) ? "<tr><td width=7%><font size='2'>" + get_lang('From') + ": </font></td><td><font size='2'>"+from+"</font></td></tr>" : "";
 
 			if( to ){
-				to = (!printListTO) ? 'Os destinatários não estão sendo exibidos para esta impressão' : to;
+				to = (!printListTO) ? 'Os destinatarios nao estao sendo exibidos para esta impressao' : to;
 				html += ( to ) ? "<tr><td width=7%><font size='2'>" + get_lang('To') + ": </font></td><td><font size='2'>"+to+"</font></td></tr>" : "";
 			}
 
 			if (cc) {
-				cc = ( !printListCC ) ? 'Os destinatários não estão sendo exibidos para esta impressão' : cc ;
+				cc = ( !printListCC ) ? 'Os destinatarios nao estao sendo exibidos para esta impressao' : cc ;
 				html += "<tr><td width=7%><font size='2'>" + get_lang('Cc') + ": </font></td><td><font size='2'>"+cc+"</font></td></tr>";
 			}
 			
 			if (cco) {
-				cco = ( !printListCCO ) ? 'Os destinatários não estão sendo exibidos para esta impressão' : cco;
+				cco = ( !printListCCO ) ? 'Os destinatarios nao estao sendo exibidos para esta impressao' : cco;
 				html += "<tr><td width=7%><font size='2'>" + get_lang('Cco') + ": </font></td><td><font size='2'>"+cco+"</font></td></tr>";
 			}
 			
@@ -2429,7 +2429,7 @@ function hack_sent_queue(data,rowid_message) {
 	}
 	else {
 		expresso_local_messages.set_as_sent(rowid_message);
-		if(document.getElementById('_action')) { //Não posso manter esse elemento, pois o connector irá criar outro com o mesmo id para a próxima mensagem.
+		if(document.getElementById('_action')) { //Nao posso manter esse elemento, pois o connector ira criar outro com o mesmo id para a proxima mensagem.
 			el =document.getElementById('_action');
 			father = el.parentNode;
 			father.removeChild(el);

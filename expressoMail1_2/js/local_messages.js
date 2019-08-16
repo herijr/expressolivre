@@ -109,7 +109,7 @@ function addForwardedFile(id_border,file_name,link,divFiles){
 	divFile.id = "divFile_"+id_border+"_"+countDivFiles;
 	divFiles.appendChild(divFile);
 
-	checkbox.checked = true; //Incri�vel, mas no Internet Explorer o checked so funciona efetivamente se o elemente ja estiver renderizado... por isso so aqui eu seleciono ele...
+	checkbox.checked = true; //Incrivel, mas no Internet Explorer o checked so funciona efetivamente se o elemente ja estiver renderizado... por isso so aqui eu seleciono ele...
 	return inputFile;
 }
 
@@ -460,7 +460,7 @@ local_messages.prototype.get_local_mail = function(id_mail) {
 	retorno['body'] = rs.field(4);
 	//Codigo que as imagens embutidas em emails (com multipart/related ou multipart/mixed) sejam corretamente mostradas em emails arquivados. Os links do
 	//tipo "./inc/show_img.php?msg_folder=[folder]&msg_num=[msg_num]&msg_part=[part]"
-	//são substituidos pelos links dos anexos capturados pelo gears.
+	//sao substituidos pelos links dos anexos capturados pelo gears.
 
 	var thumbs= retorno.thumbs;
 	var anexos= retorno.array_attach;
@@ -978,7 +978,7 @@ local_messages.prototype.move_messages = function(new_folder,msgs_number) {
     var rs = this.dbGears.execute("select rowid from folder where folder=? and uid_usuario=?",[new_folder,account_id]);
     var id_folder = rs.field(0);
     rs.close();
-    this.dbGears.execute("update mail set id_folder="+id_folder+" where rowid in ("+msgs_number.toString()+")"); //usando statement não tava funcionando quando tinha mais de um email...
+    this.dbGears.execute("update mail set id_folder="+id_folder+" where rowid in ("+msgs_number.toString()+")"); //usando statement nao tava funcionando quando tinha mais de um email...
     this.finalize();
 }
 
@@ -1211,7 +1211,7 @@ local_messages.prototype.get_src = function(url){
     }
 
     if (!AJAX) {
-	alert('ERRO :(Seu navegador não suporta a aplicação usada neste site');
+	alert('ERRO :(Seu navegador nao suporta a aplicacao usada neste site');
 	return false;
     }
 
@@ -1232,7 +1232,7 @@ local_messages.prototype.get_src = function(url){
 };
 
 //Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Dessarquiva msgs locais pegando o codigo fonte das mesmas e mandando via POST para o servidor
-//para que elas sejam inseridas no imap pela função  imap_functions.unarchive_mail.
+//para que elas sejam inseridas no imap pela funcao  imap_functions.unarchive_mail.
 local_messages.prototype.unarchive_msgs = function (folder,new_folder,msgs_number){
 
     if(!new_folder)
@@ -1719,7 +1719,7 @@ local_messages.prototype.get_form_msg_to_send = function() {
 	    else {
 		var tempNomeArquivo = rs_attach.field(0).split("/");
 		var nomeArquivo = tempNomeArquivo[tempNomeArquivo.length-1];
-		nomeArquivo = nomeArquivo.substring(0,nomeArquivo.length - 4); //Anexos no gears sï¿½o todos com extensï¿½o .php. tenho que tirar a extensï¿½o para ficar o nome real do arquivo.
+		nomeArquivo = nomeArquivo.substring(0,nomeArquivo.length - 4); //Anexos no gears sao todos com extensao .php. tenho que tirar a extensao para ficar o nome real do arquivo.
 		is_local_forward = true;
 		tmp_field = addForwardedFile('queue_' + rs.field(8), nomeArquivo, 'nothing');
 	    }

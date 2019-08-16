@@ -13,7 +13,7 @@ function cColorPalette(){
 	this.buildPalette();
 }
 
-// funçoes
+// funcoes
 cColorPalette.prototype.changeFontColor = function (color){	
 	var mainField = this.editor.contentWindow;
 	mainField.document.execCommand("forecolor", false, color);	

@@ -6,7 +6,7 @@
 		
 	}
 /**
- * Retorna os cabeçalhos das mensagens a serem desenhadas na caixa de email.
+ * Retorna os cabecalhos das mensagens a serem desenhadas na caixa de email.
  */
 	messages_proxy.prototype.messages_list = function(folder,msg_range_begin,emails_per_page,sort_box_type,search_box_type,sort_box_reverse,preview_msg_subject,preview_msg_tip,call_back) {
 		if(this.is_local_folder(folder)) {
@@ -200,7 +200,7 @@
 	messages_proxy.prototype.proxy_move_messages = function (folder, msgs_number, border_ID, new_folder, new_folder_name) {
 		if (! folder || folder == 'null')
 			folder = Element("input_folder_"+msgs_number+"_r") ? Element("input_folder_"+msgs_number+"_r").value : (openTab.imapBox[currentTab] ? openTab.imapBox[currentTab]:get_current_folder());
-		if ((this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) { //Move entre pastas não locais...
+		if ((this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) { //Move entre pastas nao locais...
 			if (folder == new_folder){
 				write_msg(get_lang('The origin folder and the destination folder are the same.'));
 				return;
@@ -234,7 +234,7 @@
 				draw_tree_local_folders();
 			}
 			else {
-                //Por Bruno Costa (bruno.vieira-costa@serpro.gov.br) permite o desarquivamento de menssagens chamando a função unarchive_msgs quando uma msg é movida de uma pasta local para uma pasta remota.
+                //Por Bruno Costa (bruno.vieira-costa@serpro.gov.br) permite o desarquivamento de menssagens chamando a funcao unarchive_msgs quando uma msg e movida de uma pasta local para uma pasta remota.
 
 				expresso_local_messages.unarchive_msgs(folder,new_folder,msgs_number);
                 //write_msg(get_lang("you can't move mails from local to server folders"));
@@ -249,7 +249,7 @@
 		/*
 		
 		
-		if ((this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) { //Move entre pastas não locais...
+		if ((this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) { //Move entre pastas nao locais...
 			if (folder == new_folder){
 				write_msg(get_lang('The origin folder and the destination folder are the same.'));
 				return;
@@ -313,7 +313,7 @@
 
 	messages_proxy.prototype.proxy_export_all_msg = function()
 	{
-		// Usuario não selecionou uma pasta local e esta no começo dos nós
+		// Usuario nao selecionou uma pasta local e esta no comeco dos nos
 		if ( ttree.FOLDER == "local_root" ) return false;
 		ttreeBox.export_all_msg();
 	}

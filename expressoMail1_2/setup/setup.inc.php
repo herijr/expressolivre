@@ -1,6 +1,6 @@
 <?php
 	/**********************************************************************************\
-	* Expresso Administração                 										   *
+	* Expresso Administracao                 										   *
 	* by Joao Alfredo Knopik Junior (joao.alfredo@gmail.com, jakjr@celepar.pr.gov.br)  *
 	* ---------------------------------------------------------------------------------*
 	*  This program is free software; you can redistribute it and/or modify it         *
@@ -15,7 +15,7 @@
 	$setup_info['expressoMail1_2']['app_order'] 	= 2;
 	$setup_info['expressoMail1_2']['enable']    	= 1;
 
-	$setup_info['expressoMail1_2']['author'] = 'João Alfredo Knopik Junior, Nilton Emílio Bührer Neto';
+	$setup_info['expressoMail1_2']['author'] = 'Joao Alfredo Knopik Junior, Nilton Emilio Buhrer Neto';
 
 	$setup_info['expressoMail1_2']['maintainer'] = array(
 		'name'  => 'ExpressoLivre coreteam',

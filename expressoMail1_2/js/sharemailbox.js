@@ -177,7 +177,7 @@ cShareMailbox.prototype.setaclfromuser = function () {
 
 	} else {
 		
-		alert("Selecione antes um usuário!"); 
+		alert("Selecione antes um usuario!"); 
 		
 		return false;
 	}
@@ -389,7 +389,7 @@ cShareMailbox.prototype.optionFinder = function (id) {
 
 	var RegExp_name = new RegExp("\\b" + oText.value, "i");
 
-	//Inclui usuário começando com a pesquisa
+	//Inclui usuario comecando com a pesquisa
 	if (typeof (select_available_users_clone) != "undefined") {
 		for (i = 0; i < select_available_users_clone.length; i++) {
 			if (RegExp_name.test(select_available_users_clone[i].text)) {

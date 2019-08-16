@@ -51,7 +51,7 @@
 		if (is_ie)
 				connector.loadScript('TreeShow');
 		if(this.working) {
-			//Já está sincronizando...
+			//Ja esta sincronizando...
 			return;
 		}
 		
@@ -156,7 +156,7 @@
 		var folder_to_sync = this.folders.pop();
 		folder_to_sync[1] = folder_to_sync[0].toUpperCase()=="INBOX" && !folder_to_sync[3]?"Inbox":folder_to_sync[1];
 		
-		if(folder_to_sync[3]) { //Em caso de arquivamento normal, pode ser que a pasta inbox ainda não tenha sido criada.
+		if(folder_to_sync[3]) { //Em caso de arquivamento normal, pode ser que a pasta inbox ainda nao tenha sido criada.
 			expresso_mail_sync.open_conn()
 			if(folder_to_sync[1]=="Inbox" && !expresso_mail_sync.has_inbox_folder()) {
 				if((!preferences.hide_folders) || (preferences.hide_folders=="0"))
@@ -250,14 +250,14 @@
 				alert('erro ao baixar: '+url);
 				
 				/*if (typeof(msg['array_attach']) == 'object' && (msg['array_attach'] instanceof Array)) {
-					for (var i in msg['array_attach']) { //remove os anexos que já foram baixados para essa mensagem...
+					for (var i in msg['array_attach']) { //remove os anexos que ja foram baixados para essa mensagem...
 						expresso_mail_sync.store.remove(msg['array_attach'][i]['url']);
 					}
 				}*/
-				expresso_mail_sync.syncronize_mails(folder_dest); //Pula para o próximo e-mail.
+				expresso_mail_sync.syncronize_mails(folder_dest); //Pula para o proximo e-mail.
 			}
 			else {
-				expresso_mail_sync.download_attachs(msg, folder_dest);//continua baixando o próximo anexo
+				expresso_mail_sync.download_attachs(msg, folder_dest);//continua baixando o proximo anexo
 			}
 		}
 		expresso_mail_sync.store.capture(attach_to_capt['url'],call_back);
@@ -286,7 +286,7 @@
 			var cc = connector.serialize(msg_info.cc);
 			var size = msg_header.Size;
 	
-			//Zero os campos que foram isolados para não ter informações duplicadas
+			//Zero os campos que foram isolados para nao ter informacoes duplicadas
 			msg_info.from = null;
 			msg_info.subject = null;
 			msg_info.body = null;
@@ -347,7 +347,7 @@
 			this.errors.push(mail_error);
 			
 			if (typeof(msg_info['array_attach'])=='object'&&(msg_info['array_attach'] instanceof Array)) { 
-				for(var i in msg_info['array_attach']) { //remove os anexos que já foram baixados para essa mensagem...
+				for(var i in msg_info['array_attach']) { //remove os anexos que ja foram baixados para essa mensagem...
 					this.store.remove(msg_info['array_attach'][i]['url']);
 				}
 			}

@@ -1,6 +1,6 @@
 <?php
 
-//Conecta com o Servidor e o serviço Sieve;
+//Conecta com o Servidor e o servico Sieve;
 class SieveS{
 		
 	var $host;
@@ -50,7 +50,7 @@ class SieveS{
 		}
 		// Verifica a conexao;
 		if(!$this->socket){
-			return "não conectado";
+			return "nao conectado";
 		}
 		
 		$said = $this->read();
@@ -146,11 +146,11 @@ class SieveS{
 			return $buffer;
 		}
 		
-		//Funções do php
+		//Funcoes do php
 		socket_set_timeout($this->socket,$this->socket_timeout);
 		socket_set_blocking($this->socket,true);
 		
-		//Lê um caracter de cada vez e o adiciona na variavel buffer;
+		//Le um caracter de cada vez e o adiciona na variavel buffer;
 		while ( is_resource( $this -> socket ) && ( ! feof( $this -> socket ) ) )
 		{
 			$char = fread($this->socket,1);
@@ -169,7 +169,7 @@ class SieveS{
 		return $buffer;
 	}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Manipulação dos scripts
+// Manipulacao dos scripts
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 	function listscripts(){
@@ -178,7 +178,7 @@ class SieveS{
 
 		//Verifica a conexao
 		if(!is_resource($this->socket)){ 
-			$this->errstr = "listscripts: sem conexão para o servidor $this->host";
+			$this->errstr = "listscripts: sem conexao para o servidor $this->host";
 			return false;
 		}
 
@@ -246,15 +246,15 @@ class SieveS{
 	//envia para o servidor o nome do script($scriptfile) e seu conteudo($script)
 	function putscript ($scriptfile,$script) {
 		if (!isset($scriptfile)) {
-	            $this->errstr = "Não foi possível enviar o script para o servidor";
+	            $this->errstr = "Nao foi possivel enviar o script para o servidor";
 	            return false;
 	    }
 		if (!isset($script)) {
-	            $this->errstr = "Não foi possível enviar o script para o servidor";
+	            $this->errstr = "Nao foi possivel enviar o script para o servidor";
 	            return false;
 	    }
 		if (!$this->socket) {
-	            $this->errstr = "Sem conexão com o servidor $this->server";
+	            $this->errstr = "Sem conexao com o servidor $this->server";
 	            return false;
 	    }
 	
@@ -275,7 +275,7 @@ class SieveS{
 		    return true;
 		}
 	
-	    $this->errstr = "Não foi possível enviar o $scriptfile: $said";
+	    $this->errstr = "Nao foi possivel enviar o $scriptfile: $said";
 	    return false;
     }
     
@@ -303,14 +303,14 @@ class SieveS{
 	    return false;
     }
 
-    // Deleta o script do serviço sieve;
+    // Deleta o script do servico sieve;
     function deletescript ($scriptName) {
     	if(!isset($scriptName)){
     		$this->errstr = "deletescript: no script file specified";
     		return false;
     	}
     	
-    	// Verifica a conexão;
+    	// Verifica a conexao;
     	if(!$this->socket){
     		$this->errstr = "deletescript : no connection open to $this->server";
     		return false;

@@ -1,6 +1,6 @@
 <?php
 	/**************************************************************************\
-	* Expresso Administração                 										                                 *
+	* Expresso Administracao                 										                                 *
 	* by Joao Alfredo Knopik Junior (joao.alfredo@gmail.com, jakjr@celepar.pr.gov.br)  	 *
 	* -----------------------------------------------------------------------------------------------------*
 	*  This program is free software; you can redistribute it and/or modify it					 *

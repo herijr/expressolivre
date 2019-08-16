@@ -203,20 +203,20 @@ class imap_functions
 		$imap_attachment = new imap_attachment();
 		//if ($this->prefs['use_important_flag'] )
 		//{
-			/*Como eu preciso do atributo Importance para saber se o email é
-			 * importante ou não, uso abaixo a função imap_fetchheader e busco
-			 * o atributo importance nela. Isso faz com que eu acesse o cabeçalho
+			/*Como eu preciso do atributo Importance para saber se o email e
+			 * importante ou nao, uso abaixo a funcao imap_fetchheader e busco
+			 * o atributo importance nela. Isso faz com que eu acesse o cabecalho
 			 * duas vezes e de duas formas diferentes, mas em contrapartida, eu
-			 * não preciso reimplementar o método utilizando o fetchheader.
-			 * Como as mensagens são renderizadas em um número pequeno por vez,
-			 * não parece ter perda considerável de performance.
+			 * nao preciso reimplementar o metodo utilizando o fetchheader.
+			 * Como as mensagens sao renderizadas em um numero pequeno por vez,
+			 * nao parece ter perda consideravel de performance.
 			 */
 
 			$tempHeader = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
 			$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
                 //}
-                // Reimplementado código para identificação dos e-mails assinados e cifrados
-                // no método getMessageType(). Mário César Kolling <mario.kolling@serpro.gov.br>
+                // Reimplementado codigo para identificacao dos e-mails assinados e cifrados
+                // no metodo getMessageType(). Mario Cesar Kolling <mario.kolling@serpro.gov.br>
                 $head_array['ContentType'] = $this->getMessageType($msg_number, $tempHeader);
                 $head_array['Importance'] = $flag==0?"Normal":$importance[1];
 
@@ -263,7 +263,7 @@ class imap_functions
 			$head_array['from']['name'] = $head_array['from']['email'];
 		$to = (isset($header->to) ? $header->to : false);
 		$head_array['to'] = array();
-		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que não possuem o campo "para", vêm com o recipiente preenchido, porém com um recipiente a mais alegando erro de sintaxe.
+		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que nao possuem o campo "para", vem com o recipiente preenchido, porem com um recipiente a mais alegando erro de sintaxe.
 			$head_array['to']['name'] = $head_array['to']['email'] = NULL;
 		}
 		else {
@@ -354,8 +354,8 @@ class imap_functions
 	}
 
 	/**
-	* Função que importa arquivos .eml exportados pelo expresso para a caixa do usuário. Testado apenas
-	* com .emls gerados pelo expresso, e o arquivo pode ser um zip contendo vários emls ou um .eml.
+	* Funcao que importa arquivos .eml exportados pelo expresso para a caixa do usuario. Testado apenas
+	* com .emls gerados pelo expresso, e o arquivo pode ser um zip contendo varios emls ou um .eml.
 	*/
 	function import_msgs( $params )
 	{
@@ -399,9 +399,9 @@ class imap_functions
 	}
 
 	/*
-		Remove os anexos de uma mensagem. A estratégia para isso é criar uma mensagem nova sem os anexos, mantendo apenas
-		a primeira parte do e-mail, que é o texto, sem anexos.
-		O método considera que o email é multpart.
+		Remove os anexos de uma mensagem. A estrategia para isso e criar uma mensagem nova sem os anexos, mantendo apenas
+		a primeira parte do e-mail, que e o texto, sem anexos.
+		O metodo considera que o email e multpart.
 	*/
 	function remove_attachments($params) {
 		include_once("class.message_components.inc.php");
@@ -411,7 +411,7 @@ class imap_functions
 		$header = "";
 
 		$headertemp = explode("\n",imap_fetchheader($this->mbox, imap_msgno($this->mbox, $params["msg_num"])));
-		foreach($headertemp as $head) {//Se eu colocar todo o header do email dá pau no append, então procuro apenas o que interessa.
+		foreach($headertemp as $head) {//Se eu colocar todo o header do email da pau no append, entao procuro apenas o que interessa.
 			$head1 = explode(":",$head);
 			if ( (strtoupper($head1[0]) == "TO") ||
 					(strtoupper($head1[0]) == "FROM") ||
@@ -421,9 +421,9 @@ class imap_functions
 		}
 
 		$msg = new message_components($this->mbox);
-		$msg->fetch_structure($params["msg_num"]);/* O fetchbody tava trazendo o email com problemas na acentuação.
-							     Então uso essa classe para verificar a codificação e o charset,
-							     para que o método decodeBody do expresso possa trazer tudo certinho*/
+		$msg->fetch_structure($params["msg_num"]);/* O fetchbody tava trazendo o email com problemas na acentuacao.
+							     Entao uso essa classe para verificar a codificacao e o charset,
+							     para que o metodo decodeBody do expresso possa trazer tudo certinho*/
 
 		$all_body_type = strtolower($msg->file_type[$params["msg_num"]][0]);
 		$all_body_encoding = $msg->encoding[$params["msg_num"]][0];
@@ -461,7 +461,7 @@ class imap_functions
 								$all_body_encoding, $all_body_charset
 								)
 						)
-						, "\\Seen"); //Append do novo email, só com header e conteúdo sem anexos.			
+						, "\\Seen"); //Append do novo email, so com header e conteudo sem anexos.			
 		}else{	
 			$status = imap_append($this->mbox,
 					"{".$this->imap_server.":".$this->imap_port.$this->imap_options."}".$params["folder"],
@@ -476,7 +476,7 @@ class imap_functions
 								$all_body_encoding, $all_body_charset
 								)
 						)
-						, "\\Seen"); //Append do novo email, só com header e conteúdo sem anexos.
+						, "\\Seen"); //Append do novo email, so com header e conteudo sem anexos.
 		}
 
 		if(!$status)
@@ -546,7 +546,7 @@ class imap_functions
 			//ini_set("display_errors","1");
 			$msg_info = $this->get_info_msg($new_params);
 
-			$this->mbox = $this->open_mbox($params['folder']); //Não sei porque, mas se não abrir de novo a caixa dá erro.
+			$this->mbox = $this->open_mbox($params['folder']); //Nao sei porque, mas se nao abrir de novo a caixa da erro.
 			$msg_info['header'] = $this->get_info_head_msg($msg_number);
 
 			$attach_params["num_msg"] = $msg_number;
@@ -1431,10 +1431,10 @@ class imap_functions
 
 		$body = $this-> replace_links($body);
 
-		//Remoção de tags <span></span> para correção de erro no firefox 
+		//Remocao de tags <span></span> para correcao de erro no firefox 
 		$body = mb_eregi_replace("<span><span>","",$body); 
 		$body = mb_eregi_replace("</span></span>","",$body); 
-		//Correção para compatibilização com Outlook, ao visualizar a mensagem 
+		//Correcao para compatibilizacao com Outlook, ao visualizar a mensagem 
 		$body = mb_ereg_replace('<!--\[','<!-- [',$body); 
 		$body = mb_ereg_replace('&lt;!\[endif\]--&gt;', '<![endif]-->', $body);
 		$body = str_replace("\x00", '', $body);
@@ -1494,7 +1494,7 @@ class imap_functions
 		$body = preg_replace_callback( $pattern, $replace, $body ); 
 		 */ 
 
-		// PHP 5.2.x - Remover assim que possível 
+		// PHP 5.2.x - Remover assim que possivel 
 		$body = preg_replace_callback( $pattern, 
 			create_function( 
 				'$matches', 
@@ -1601,7 +1601,7 @@ class imap_functions
 
                             $this->db = new db_functions();
                             
-                            // TODO: testar se existe um certificado no banco e verificar qual é o mais atual.
+                            // TODO: testar se existe um certificado no banco e verificar qual e o mais atual.
                             if(!$certificado->dados['EXPIRADO'] && !$certificado->dados['REVOGADO'] && count($certificado->erros_ssl) < 1)
                                 $this->db->insert_certificate(strtolower($certificado->dados['EMAIL']), $certificado->cert_assinante, $certificado->dados['SERIALNUMBER'], $certificado->dados['AUTHORITYKEYIDENTIFIER']);
 			}
@@ -1742,13 +1742,13 @@ class imap_functions
 		$i = 0;
 		foreach($msgs_to_exec as $msg_number)
 		{
-			/*A função imap_headerinfo não traz o cabeçalho completo, e sim alguns
-			* atributos do cabeçalho. Como eu preciso do atributo Importance
-			* para saber se o email é importante ou não, uso abaixo a função
+			/*A funcao imap_headerinfo nao traz o cabecalho completo, e sim alguns
+			* atributos do cabecalho. Como eu preciso do atributo Importance
+			* para saber se o email e importante ou nao, uso abaixo a funcao
 			* imap_fetchheader e busco o atributo importance nela para passar
-			* para as funções ajax. Isso faz com que eu acesse o cabeçalho
+			* para as funcoes ajax. Isso faz com que eu acesse o cabecalho
 			* duas vezes e de duas formas diferentes, mas em contrapartida, eu
-			* não preciso reimplementar o método utilizando o fetchheader.
+			* nao preciso reimplementar o metodo utilizando o fetchheader.
 			*/
     
 			$tempHeader = @imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
@@ -1832,11 +1832,11 @@ class imap_functions
 	}
 
 	/**
-	 * Método que faz a verificação do Content-Type do e-mail e verifica se é um e-mail normal,
+	 * Metodo que faz a verificacao do Content-Type do e-mail e verifica se e um e-mail normal,
 	 * assinado ou cifrado.
-	 * @author Mário César Kolling <mario.kolling@serpro.gov.br>
-	 * @param $headers Uma String contendo os Headers do e-mail retornados pela função imap_imap_fetchheader
-	 * @param $msg_number O número da mesagem
+	 * @author Mario Cesar Kolling <mario.kolling@serpro.gov.br>
+	 * @param $headers Uma String contendo os Headers do e-mail retornados pela funcao imap_imap_fetchheader
+	 * @param $msg_number O numero da mesagem
 	 * @return Retorna o tipo da mensagem (normal, signature, cipher).
 	 */
 	function getMessageType( $msg_number, $headers = false )
@@ -1857,11 +1857,11 @@ class imap_functions
 	 /**
      * Metodo que retorna todas as pastas do usuario logado.
      * @param $params array opcional para repassar os argumentos ao metodo.
-     * Se usar $params['noSharedFolders'] = true, ira retornar todas as pastas do usuário logado,
+     * Se usar $params['noSharedFolders'] = true, ira retornar todas as pastas do usuario logado,
      * excluindo as compartilhadas para ele.
-     * Se usar $params['folderType'] = "default" irá retornar somente as pastas defaults
-     * Se usar $params['folderType'] = "personal" irá retornar somente as pastas pessoais
-     * Se usar $params['folderType'] = null irá retornar todas as pastas
+     * Se usar $params['folderType'] = "default" ira retornar somente as pastas defaults
+     * Se usar $params['folderType'] = "personal" ira retornar somente as pastas pessoais
+     * Se usar $params['folderType'] = null ira retornar todas as pastas
      * @return Retorna um array contendo as seguintes informacoes de cada pasta: folder_unseen,
      * folder_id, folder_name, folder_parent e folder_hasChildren.
      */
@@ -2712,7 +2712,7 @@ class imap_functions
 		if ( $smime ) {
 			$error = $this->check_smime( $mail, $smime );
 			if( count( $error ) ) foreach ( $error as $msg ) $mail->SetError( $msg );
-		} else $body = mb_ereg_replace( '<!--\[', '<!-- [', $body ); //Compatibilização com Outlook, ao encaminhar a mensagem
+		} else $body = mb_ereg_replace( '<!--\[', '<!-- [', $body ); //Compatibilizacao com Outlook, ao encaminhar a mensagem
 
 		if ( $signed && !$smime ) {
 			$mail->Mailer          = 'smime';
@@ -4085,7 +4085,7 @@ class imap_functions
 	}
 
 //Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Insere emails no imap a partir do fonte do mesmo. Se o argumento timestamp for passado ele utiliza do script python
-///expressoMail1_2/imap.py para inserir uma msg com o horário correto pois isso não é porssível com a função imap_append do php.
+///expressoMail1_2/imap.py para inserir uma msg com o horario correto pois isso nao e porssivel com a funcao imap_append do php.
 
     function insert_email($source,$folder,$timestamp,$flags){
         $username = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
@@ -4140,12 +4140,12 @@ class imap_functions
 
         if (version_compare(PHP_VERSION, '5.2.0', '>=')){
             if(!$source = base64_decode($source,true))
-                return "error ".$source."Espaços ".$i;
+                return "error ".$source."Espacos ".$i;
 
         }
         else {
             if(!$source = base64_decode($source))
-                return "error ".$source."Espaços ".$i;
+                return "error ".$source."Espacos ".$i;
         }
 
         $insert = $this->insert_email($source,'INBOX'.$this->imap_delimiter.'decifradas');
@@ -4181,7 +4181,7 @@ class imap_functions
     }
 
 //Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Trata fontes de emails enviados via POST para o servidor por um xmlhttprequest, as partes codificados com
-//Base64 os "+" são substituidos por " " no envio e essa função arruma esse efeito.
+//Base64 os "+" sao substituidos por " " no envio e essa funcao arruma esse efeito.
 
     function treat_base64_from_post($source){
             $offset = 0;
@@ -4207,7 +4207,7 @@ class imap_functions
             return $source;
     }
 
-//Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Recebe os fontes dos emails a serem desarquivados, separa e envia cada um para função insert_mail.
+//Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Recebe os fontes dos emails a serem desarquivados, separa e envia cada um para funcao insert_mail.
 
     function unarchive_mail($params)
     {
