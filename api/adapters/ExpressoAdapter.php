@@ -194,8 +194,9 @@ class ExpressoAdapter extends Resource {
 			Errors::runException("E_UNKNOWN_ERROR");			
 		}
 		
-		
-		$response->body = json_encode( $this->utf8enc( $body ), JSON_PARTIAL_OUTPUT_ON_ERROR );
+		$json_opts = 0;
+		$json_opts |= version_compare(PHP_VERSION, '5.5.0', '>=')? JSON_PARTIAL_OUTPUT_ON_ERROR : 0;
+		$response->body = json_encode( $this->utf8enc( $body ), $json_opts );
 		
 		return $response;
 	}

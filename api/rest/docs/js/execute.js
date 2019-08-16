@@ -27,8 +27,7 @@ function getResourcesExpresso(s_callback) {
 
 		},
 		error: function (response) {
-			var obj = JQuery.parseJSON(response);
-
+			console.log(response);
 		}
 	});
 }
@@ -228,8 +227,7 @@ function selectResource(resourceName) {
 									prettyPrint();
 								}
 							},
-							error: function (response) {
-								var obj = JQuery.parseJSON(response);
+							error: function (obj) {
 
 								$("#key_auth_server_expresso").find("span").html("USU&Aacute;RIO N&Atilde;O AUTENTICADO");
 								$("#key_auth_server_expresso").find("input[type=hidden]").val("");
