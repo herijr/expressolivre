@@ -164,7 +164,9 @@ class MessageReader
 			if ( $is_root ) $this->_attachs_root[] = $obj->section;
 			$obj->filename = isset( $params['filename'] )? $params['filename'] : ( isset( $params['name'] )? $params['name'] : false );
 			if ( $obj->filename === false ) {
-				preg_match('/name=["\']?(.*)["\']?/', imap_fetchmime( $this->_mbox, $this->_uid , $obj->section, FT_UID ), $matchs );
+				if (function_exists('imap_fetchmime')) {				
+					preg_match('/name=["\']?(.*)["\']?/', imap_fetchmime( $this->_mbox, $this->_uid , $obj->section, FT_UID ), $matchs );
+				}
 				$obj->filename = isset( $matchs[1] )? $this->_str_decode( $matchs[1] ) : 'attachment.bin';
 			}
 			$obj->filename = $this->_stripWinBadChars( $obj->filename );
