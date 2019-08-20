@@ -287,8 +287,8 @@ class imap_functions
 			if(!$head_array['to']['name'])
 				$head_array['to']['name'] = $head_array['from']['email'];
 		}
-		$head_array['subject'] = ( isset( $header->fetchsubject ) ) ? $this->decode_string($header->fetchsubject) : '';
-
+		$head_array['subject'] = ( isset( $header->fetchsubject ) ) ? trim($this->decode_string($header->fetchsubject)) : '';
+		$head_array['subject'] = ( strstr( $head_array['subject'], ' ' ) === false )? str_replace( '_', ' ', $head_array['subject'] ) : $head_array['subject'];		
 		$head_array['Size'] = $header->Size;
 
 		$head_array['attachment'] = array();
@@ -843,7 +843,8 @@ class imap_functions
 			}
 		}
 		$return['reply_to'] = $this->decode_string($return['reply_to']);
-		$return['subject'] = $this->decode_string($header->subject);
+		$return['subject'] = ( isset( $header->subject ) ) ? trim($this->decode_string($header->subject)) : '';
+		$return['subject'] = ( strstr( $return['subject'], ' ' ) === false )? str_replace( '_', ' ', $return['subject'] ) : $return['subject'];
 		$return['Size'] = $header->Size;
 		$return['reply_toaddress'] = $this->decode_string($header->reply_toaddress);
 

@@ -267,6 +267,7 @@ class ExportEml
 		$header = imap_headerinfo( $this->_getImapStream(), imap_msgno( $this->_getImapStream(), $id ), 80, 255 );
 		// Subject
 		$subject = trim( $this->_str_decode( $header->fetchsubject ) );
+		$subject = ( strstr( $subject, ' ' ) === false )? str_replace( '_', ' ', $subject ) : $subject;
 		$subject = ( strlen( $subject ) == 0 )? lang( 'No Subject' ) : $subject;
 		$subject = $this->_squeeze( '_', $this->_squeeze( ' ', $subject ) );
 		$subject = $this->_stripWinBadChars( $subject );
