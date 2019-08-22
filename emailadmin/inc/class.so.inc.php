@@ -187,7 +187,7 @@ class so
 		$dbWrkConn = pg_connect("host='".$dtSetWrk['host']."' port='".$dtSetWrk['port']."' dbname='".$dtSetWrk['dbname']."' user='".$dtSetWrk['username']."' password='".$dtSetWrk['password']."'");
 
 		$query = 'SELECT func.funcionario_id, '.
-			'area.sigla, area.descricao, func.funcao, '.
+			'area.sigla, area.descricao, func.funcao, func.titulo, '.
 			'func.apelido, org.sitio FROM funcionario AS func '.
 			'INNER JOIN area AS area ON func.area_id = area.area_id '.
 			'INNER JOIN organizacao as org on func.organizacao_id = org.organizacao_id '.
@@ -249,6 +249,11 @@ class so
 		$data['info'][] = array(
 			'field' => 'jobfunction',
 			'value' => ( !empty($result['funcao']) ? " / ". $result['funcao'] : '' )
+		);
+
+		$data['info'][] = array(
+			'field' => 'jobtitle',
+			'value' => ( !empty($result['titulo']) ? $result['titulo'] : '' )
 		);
 
 		$data['info'][] = array(
