@@ -1451,8 +1451,11 @@ class PHPMailer
      * @return void
      */
     function SetError($msg) {
-        $this->error_count++;
-        $this->ErrorInfo = $msg;
+        
+        if( !$this->SaveMessageAsDraft ){
+            $this->error_count++;
+            $this->ErrorInfo = $msg;
+        }
     }
 
     /**

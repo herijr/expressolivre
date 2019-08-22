@@ -1921,10 +1921,10 @@ function draw_message( info_msg, ID )
 			var delim = img_tag.toLowerCase().match( /src=\\?(['"])?/i );
 			delim = ( delim && delim[1] )? delim[1] : ' ';
 
-			img_tag = img_tag.replace( new RegExp( jQuery.ui.autocomplete.escapeRegex( '\\'+delim ), 'g' ), '§' ).replace( /\\/g, '' );
+			img_tag = img_tag.replace( new RegExp( jQuery.ui.autocomplete.escapeRegex( '\\'+delim ), 'g' ), '\u2620' ).replace( /\\/g, '' );
 
 			var img_src = img_tag.match( new RegExp( 'src=['+delim+']?([^'+delim+']*)', 'i' ) );
-			img_src = ( img_src && img_src[1] )? img_src[1].replace( /§/g, delim ) : false;
+			img_src = ( img_src && img_src[1] )? img_src[1].replace( /\u2620/g, delim ) : false;
 			if ( !img_src ) return get_lang( 'unknown' );
 
 			if ( img_src.search( /^.\/inc\/show_img\.php/ ) == 0 ) return false;
@@ -2381,6 +2381,7 @@ function draw_new_message(border_ID){
 	input_to.id = "to_"+ID;
 	input_to.name = "input_to";
 	input_to.setAttribute("tabIndex","1");
+	input_to.setAttribute("placeholder", get_lang('without destination'));
 	input_to.style.width = "100%";
 	input_to.setAttribute("wrap","soft");
 	input_to.onfocus = function(){clearTimeout(parseInt(setTimeOutLayer));search_contacts('onfocus', this.id);};
@@ -2479,6 +2480,7 @@ function draw_new_message(border_ID){
 	input_cc.id = "cc_"+ID;
 	input_cc.name = "input_cc";
 	input_cc.setAttribute("tabIndex","1");
+	input_cc.setAttribute("placeholder", get_lang('without destination'));
 	input_cc.style.width = "100%";
 	input_cc.onfocus = function(){clearTimeout(parseInt(setTimeOutLayer));search_contacts('onfocus',this.id);};
 	input_cc.onblur = function(){setTimeOutLayer=setTimeout('search_contacts("lostfocus","'+this.id+'")',100);};
@@ -2561,6 +2563,7 @@ function draw_new_message(border_ID){
 	input_cco.id = "cco_"+ID;
 	input_cco.name = "input_cco";
 	input_cco.setAttribute("tabIndex","1");
+	input_cco.setAttribute("placeholder", get_lang('without destination'));
 	input_cco.style.width = "100%";
 	input_cco.onfocus = function(){clearTimeout(parseInt(setTimeOutLayer));search_contacts('onfocus',this.id);};
 	input_cco.onblur = function(){setTimeOutLayer=setTimeout('search_contacts("lostfocus","'+this.id+'")',100);};

@@ -891,14 +891,14 @@ class imap_functions
 		$content = isset( $msg_body->body_alternative )? $msg_body->body_alternative : $msg_body->body;
 		if ( $msg_body->type === 'html' ) {
 		
-		// Remove data URI scheme (RFC 2397)
-		$content = preg_replace( '/data:[^, \'\"]*,([^ \'\"]*)/', '', $content );
+		    // Remove data URI scheme (RFC 2397)
+		    $content = preg_replace( '/data:[^, \'\"]*,([^ \'\"]*)/', '', $content );
 		
-		$content = $this->replace_special_characters($content);
-			$content = str_replace( array( '<br>', '<br/>', '<br />' ), ' ', $content );
-		$content = strip_tags($content);
-			$content = str_replace( array( '{', '}', '&nbsp;' ), ' ', $content );
-			$content = html_entity_decode( $content );
+		    $content = $this->replace_special_characters($content);
+		    $content = str_replace( array( '<br>', '<br/>', '<br />' ), ' ', $content );
+		    $content = strip_tags($content);
+		    $content = str_replace( array( '{', '}', '&nbsp;' ), ' ', $content );
+		    $content = html_entity_decode( $content );
 		}
 		$content = trim( mb_substr( trim( $content ), 0, 300 ) );
 
@@ -2243,12 +2243,11 @@ class imap_functions
 		{
 			if ($val->mailbox == "INVALID_ADDRESS")
 				continue;
+				
 			if ($val->mailbox == "UNEXPECTED_DATA_AFTER_ADDRESS")
 				continue;
-			if (empty($val->personal))
-				$result .= $val->mailbox."@".$val->host . ",";
-			else
-				$result .= $val->mailbox."@".$val->host . ",";
+			
+			$result .= $val->mailbox."@".$val->host . ",";
 		}
 
 		return substr($result,0,-1);
@@ -2258,40 +2257,54 @@ class imap_functions
 	{
 		//remove a comma if is given two unexpected commas
 		$full_address = preg_replace("/, ?,/",",",$full_address);
-		$parse_address = imap_rfc822_parse_adrlist($full_address, "");
-		foreach ($parse_address as $val)
-		{
-			if ($val->mailbox == "INVALID_ADDRESS")
-				continue;
+	
+		if( $mail->SaveMessageAsDraft ){
+			
+			if( $recipient_type === "to" ){ $mail->AddAddress($full_address); }
 
-			if (empty($val->personal))
+			if( $recipient_type === "cc" ){ $mail->AddCC($full_address); }
+
+			if( $recipient_type === "cco" ){ $mail->AddBCC($full_address); }
+
+		} else {
+
+			$parse_address = imap_rfc822_parse_adrlist($full_address, "");
+			
+			foreach ($parse_address as $key => $val)
 			{
-				switch($recipient_type)
-				{
-					case "to":
-						$mail->AddAddress($val->mailbox."@".$val->host);
-						break;
-					case "cc":
-						$mail->AddCC($val->mailbox."@".$val->host);
-						break;
-					case "cco":
-						$mail->AddBCC($val->mailbox."@".$val->host);
-						break;
+				if( preg_match('(UNEXPECTED_DATA_AFTER_ADDRESS|SYNTAX-ERROR)', $val->mailbox ) ){
+					
+					$mail->SetError( $parse_address[$key-1]->mailbox );
+					
+					return false;
 				}
-			}
-			else
-			{
-				switch($recipient_type)
+				
+				if( preg_match('(UNEXPECTED_DATA_AFTER_ADDRESS|SYNTAX-ERROR)', $val->host ) ){
+					
+					$mail->SetError( $parse_address[$key-1]->host );
+					
+					return false;
+				}
+
+				if( !empty($val->mailbox) && !empty($val->host))
 				{
-					case "to":
-						$mail->AddAddress($val->mailbox."@".$val->host, $val->personal);
-						break;
-					case "cc":
-						$mail->AddCC($val->mailbox."@".$val->host, $val->personal);
-						break;
-					case "cco":
-						$mail->AddBCC($val->mailbox."@".$val->host, $val->personal);
-						break;
+					switch($recipient_type)
+					{
+						case "to":
+							$mail->AddAddress($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
+							break;
+						case "cc":
+							$mail->AddCC($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
+							break;
+						case "cco":
+							$mail->AddBCC($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
+							break;
+					}
+				} else {
+					
+					$mail->SetError( $val->mailbox );
+					
+					return false;
 				}
 			}
 		}
@@ -2588,8 +2601,12 @@ class imap_functions
 		if ( !$this->has_permission_to_send( $params ) ) return lang("The server denied your request to send a mail, you cannot use this mail address.");
 		if ( ( $msg = $this->check_Attachments( $params ) ) !== true ) return $msg;
 
-		$mail = $this->compose_msg( $params );
+		$mail = $this->compose_msg( $params, false );
 		
+		if( isset($mail->error_count) && $mail->error_count > 0 ){
+			return array( 'success' => false, 'error' => $mail->ErrorInfo );	
+		}
+
 		$signed = isset($params['input_return_digital'])? $params['input_return_digital'] : false;
 
 		if ( !( $sent = $mail->Send() ) ) $this->parse_error( $mail->ErrorInfo );
@@ -2616,14 +2633,16 @@ class imap_functions
 
 		$msg_uid     = ( isset( $params['msg_id'                 ] ) && $params['msg_id'                       ] > 0      )? $params['msg_id'] : false;
 
-		$mail        = $this->compose_msg( $params );
+		$mail        = $this->compose_msg( $params, true );
+		
 		$mail_reader = new MessageReader();
 
 		$folder      = $this->_toUTF8( $mail->SaveMessageInFolder, 'UTF7-IMAP' );
 		$this->open_mbox( $folder );
 
-		if ( !imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, $mail->CreateHeader(). $mail->CreateBody(), '\Seen \Draft' ) )
+		if ( !imap_append( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, $mail->CreateHeader(). $mail->CreateBody(), '\Seen \Draft' ) ){
 			return array( 'status' => false, 'error' => imap_last_error() );
+		}
 
 		$sa_uidnext  = imap_status( $this->mbox, '{'.$this->imap_server.':'.$this->imap_port.'}'.$mail->SaveMessageInFolder, SA_UIDNEXT );
 		$mail_reader->setMessage( $this->mbox, $folder, ( $sa_uidnext->uidnext-1 ) );
@@ -2676,7 +2695,7 @@ class imap_functions
 		return round( pow( 1024, $base - floor( $base ) ), $precision ).$sufx[floor( $base )];
 	}
 
-	protected function compose_msg( $params )
+	protected function compose_msg( $params, $saveMessageAsDraft = false )
 	{
 		include_once 'class.phpmailer.php';
 		include_once 'class.message_reader.inc.php';
@@ -2720,9 +2739,34 @@ class imap_functions
 			$mail->SignedBody      = true;
 		} else $mail->IsSMTP();
 
-		if ( $toaddress      ) $this->add_recipients( 'to',  implode( ',', $db->getAddrs( explode( ',', $toaddress  ) ) ), $mail );
-		if ( $ccaddress      ) $this->add_recipients( 'cc',  implode( ',', $db->getAddrs( explode( ',', $ccaddress  ) ) ), $mail );
-		if ( $ccoaddress     ) $this->add_recipients( 'cco', implode( ',', $db->getAddrs( explode( ',', $ccoaddress ) ) ), $mail );
+		// Save message as draft
+		$mail->SaveMessageAsDraft = ( $saveMessageAsDraft ) ? true : false ;
+		
+		// To,CC and CCo empty
+		if( !$toaddress && (!$ccaddress && !$ccoaddress)){
+			$mail->SetError(lang('message without receiver'));
+		}
+		
+		// Email(s) To
+		if ( $toaddress){
+			if( !$this->add_recipients( 'to',  implode( ',', $db->getAddrs( explode( ',', $toaddress  ) ) ), $mail )){
+				$mail->SetError( lang("Error") . " : " . lang("The address %1 in the To field was not recognized. Verify that all addresses are correct.", $mail->ErrorInfo ) );
+			}
+		}
+		
+		// Email(s) CC
+		if ( $ccaddress){
+			if( !$this->add_recipients( 'cc',  implode( ',', $db->getAddrs( explode( ',', $ccaddress  ) ) ), $mail )){
+				$mail->SetError( lang("Error") . " : " . lang("The address %1 in the CC field was not recognized. Verify that all addresses are correct.", $mail->ErrorInfo ) );
+			}
+		}
+		
+		// Email(s) CCO
+		if($ccoaddress){
+			if( !$this->add_recipients( 'cco', implode( ',', $db->getAddrs( explode( ',', $ccoaddress ) ) ), $mail )) {
+				$mail->SetError( lang("Error") . " : " . lang("The address %1 in the CCo field was not recognized. Verify that all addresses are correct.", $mail->ErrorInfo ) );
+			}
+		}
 
 		if ( ( $encrypt && $signed && $smime ) || ( $encrypt && !$signed ) ) {
 			$error = $this->check_smime( $mail, $db );
@@ -2756,7 +2800,6 @@ class imap_functions
 			$folder = preg_replace( '#INBOX/#i', 'INBOX'.$this->imap_delimiter, $folder );
 			$folder = preg_replace( '#INBOX.#i', 'INBOX'.$this->imap_delimiter, $folder );
 			$mail->SaveMessageInFolder = $this->_toMaibox( $folder );
-			if ( strtoupper( $folder ) === 'INBOX'.$this->imap_delimiter.'DRAFTS' ) $mail->SaveMessageAsDraft = true;
 		}
 
 		if ( $is_html ) $this->buildEmbeddedImages( $mail, $mail_reader );

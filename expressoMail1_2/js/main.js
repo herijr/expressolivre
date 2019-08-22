@@ -1580,126 +1580,105 @@ function send_message( ID, folder, folder_name )
 		}
 	}
 
-	if (expresso_offline) {
-		stringEmail = Element("to_"+ID).value;
-		stringEmail += Element("cco_"+ID).value =='' ? "":", "+Element("cco_"+ID).value;
-		stringEmail += Element("cc_"+ID).value =='' ? "":", "+Element("cc_"+ID).value;
-		var invalidEmail = searchEmail(stringEmail);
-		if(Element("to_"+ID).value=="" && Element("cco_"+ID).value=="" && Element("cc_"+ID).value=="") {
-			write_msg(get_lang("message without receiver."));
-			return;
-		}else if(invalidEmail[0] == true){
-			write_msg("Os enderecos de destinatario a seguir estao incorretos: "+invalidEmail[1]);
-			return;
-		}
-
-		sucess = expresso_local_messages.send_to_queue(form);
-		var data_return = new Array();
-		data_return.success = sucess;
-		send_message_return( data, ID );
-		return;
-	}
-
 	Ajax( '$this.imap_functions.send_mail', form, function( data ) {
 		return send_message_return( data, ID );
 	} );
 }
 
-function send_message_return(data, ID){
+function send_message_return( data, ID ){
+
 	watch_changes_in_msg(ID);
 
-	var sign = false;
-	var crypt = false;
-	if ((preferences.use_assinar_criptografar != '0') && (preferences.use_signature_digital_cripto != '0')){
-		var checkSign = document.getElementById('return_digital_'+ID)
-		if (checkSign.checked){
-			sign = true;
-		}
+	connector = new cConnector();
 
-		var checkCript = document.getElementById('return_cripto_'+ID);
-		if (checkCript.checked){
-			crypt = true;
-		}
-	}
+	connector.showProgressBar();
 
-	if (typeof(data) == 'object' && !data.success)
-	{
-		connector = new  cConnector();
-		connector.showProgressBar();
+	if( typeof(data) == 'object' ){
 
-		if (sign || crypt){
-			var operation = '';
-			if (sign){
-				operation = 'sign';
+		if( data.hasOwnProperty('success') && data.success ){
+
+			var msg_number_replied = $('#msg_reply_from_'+ID);
+
+			var msg_number_forwarded = $('#msg_forward_from_'+ID);
+	
+			if (msg_number_replied.length > 0) {
+				proxy_mensagens.proxy_set_message_flag( msg_number_replied.val(), 'answered');
+
 			}
-			else { // crypt
-				//TODO: Colocar mensagem de erro, e finalizar o metodo.
-				operation = 'nop';
+
+			if (msg_number_forwarded.length > 0) {
+				proxy_mensagens.proxy_set_message_flag( msg_number_forwarded.val(), 'forwarded');
 			}
-		}
 
-		if (data.body){
-			Element('cert_applet').doButtonClickAction(operation, ID, data.body);
-		}
-		else {
-			alert(data.error);
-		}
+			if (wfolders.getAlertMsg()) {
 
-		return;
-	}
-	if(data && data.success == true ){
-		// if send ok, set a flag as answered or forwarded
-		var msg_number_replied = Element('msg_reply_from_'+ID);
-		var msg_number_forwarded = Element('msg_forward_from_'+ID);
-
-		if (msg_number_replied){
-			proxy_mensagens.proxy_set_message_flag(msg_number_replied.value, 'answered');
-		}
-		else if (msg_number_forwarded){
-			proxy_mensagens.proxy_set_message_flag(msg_number_forwarded.value, 'forwarded');
-		}
-		if(expresso_offline){
-			write_msg(get_lang('Your message was sent to queue'));
-			delete_border(ID,'true');
-			return;
-		}else{
-			if( wfolders.getAlertMsg() )
-			{
 				write_msg(get_lang('Your message was sent and save.'));
-				wfolders.setAlertMsg( false );
-				if ( data.refresh_folders ) ttreeBox.update_folder();
-			}
-			else {
+
+				wfolders.setAlertMsg(false);
+
+				if ( data.hasOwnProperty('refresh_folders')) { ttreeBox.update_folder(); }
+
+			} else {
 				write_msg(get_lang('Your message was sent.'));
 			}
-		}
-		// If new dynamic contacts were added, update the autocomplete ....
-		if(data.new_contacts){
-			var ar_contacts = data.new_contacts.split(',;');
-			for(var j in ar_contacts){
-				// If the dynamic contact don't exist, update the autocomplete....
-				if((contacts+",").indexOf(ar_contacts[j]+",") == -1)
-					contacts += "," + ar_contacts[j];
+
+			// If new dynamic contacts were added, update the autocomplete ....
+			if (data.hasOwnProperty('new_contacts')) {
+				var ar_contacts = data.new_contacts.split(',;');
+				for (var j in ar_contacts) {
+					// If the dynamic contact don't exist, update the autocomplete....
+					if ((contacts + ",").indexOf(ar_contacts[j] + ",") == -1) { contacts += "," + ar_contacts[j]; }
+				}
+			}
+
+			if ((!openTab.toPreserve[ID]) && (openTab.imapUid[ID] != 0)){
+				cExecute("$this.imap_functions.delete_msgs&folder=" + openTab.imapBox[ID] + "&msgs_number=" + openTab.imapUid[ID], function (data) { return });
+			}
+
+			delete_border( ID, 'true' ); // Becarefull: email saved automatically should be deleted. delete_border erase information about openTab
+
+		} else {
+
+			if (data.hasOwnProperty('body')) {
+
+				var crypt = false;
+				var sign = false;
+
+				if ((preferences.use_assinar_criptografar != '0') && (preferences.use_signature_digital_cripto != '0')) {
+
+					sign = ($("#return_digital_" + ID).length > 0 && $("#return_digital" + ID).prop("checked")) ? true : false;
+
+					crypt = ($("#return_cripto_" + ID).length > 0 && $("#return_cripto_" + ID).prop("checked")) ? true : false;
+				}
+
+				var operation = (sign || crypt) ? ((sign) ? 'sign' : 'nop') : '';
+
+				$('#cert_applet')[0].doButtonClickAction(operation, ID, data.body);
+			}
+
+			if (data.hasOwnProperty('error')) {
+				write_msg(data.error);
 			}
 		}
-		if ((! openTab.toPreserve[ID]) && (openTab.imapUid[ID] != 0))
-			cExecute ("$this.imap_functions.delete_msgs&folder="+openTab.imapBox[ID]+"&msgs_number="+openTab.imapUid[ID],function(data){ return });
-		delete_border(ID,'true'); // Becarefull: email saved automatically should be deleted. delete_border erase information about openTab
- 	}
-	else{
-		if(data == 'Post-Content-Length')
-			write_msg(get_lang('The size of this message has exceeded  the limit (%1B).',Element('upload_max_filesize').value));
-		else if(data)
+	} else {
+		if (data == 'Post-Content-Length') {
+			write_msg(get_lang('The size of this message has exceeded  the limit (%1B).', $('#upload_max_filesize').val()));
+		} else if (data) {
 			write_msg(data);
-		else
+		} else {
 			write_msg(get_lang("Connection failed with %1 Server. Try later.", "Web"));
-		
-		var save_link = Element("save_message_options_"+ID);
-		save_link.onclick = function onclick(event) { openTab.toPreserve[ID] = true; save_msg(ID); } ;
-		save_link.className = 'message_options';
+		}
 	}
-	if(!expresso_offline)
-		connector.hideProgressBar();
+
+	if( $("#save_message_options_"+ID).length > 0 ){
+		
+		$("#save_message_options_"+ID).on('click', function(){
+			openTab.toPreserve[ID] = true; 
+			save_msg(ID);
+		});
+	}
+	
+	connector.hideProgressBar();
 }
 
 function save_msg( ID )

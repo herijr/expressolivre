@@ -762,3 +762,6 @@ Missing a temporary folder	expressoMail1_2	pt-br	Faltando uma pasta temporária
 Failed to write file to disk	expressoMail1_2	pt-br	Falha ao gravar o arquivo no disco
 A PHP extension stopped the file upload	expressoMail1_2	pt-br	O upload o arquivo foi interrompido por um componente do servidor.
 An unknown error occurred	expressoMail1_2	pt-br	Ocorreu um erro desconhecido
+The address %1 in the To field was not recognized. Verify that all addresses are correct.	expressoMail1_2	pt-br	O endereço %1 no campo "Para" não foi reconhecido. Verifique se todos os endereços estão corretos.
+The address %1 in the CC field was not recognized. Verify that all addresses are correct.	expressoMail1_2	pt-br	O endereço %1 no campo "CC" não foi reconhecido. Verifique se todos os endereços estão corretos.
+The address %1 in the CCo field was not recognized. Verify that all addresses are correct.	expressoMail1_2	pt-br	O endereço %1 no campo "CCo" não foi reconhecido. Verifique se todos os endereços estão corretos.
