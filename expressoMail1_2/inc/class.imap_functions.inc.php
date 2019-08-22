@@ -2258,56 +2258,46 @@ class imap_functions
 		//remove a comma if is given two unexpected commas
 		$full_address = preg_replace("/, ?,/",",",$full_address);
 	
-		if( $mail->SaveMessageAsDraft ){
-			
-			if( $recipient_type === "to" ){ $mail->AddAddress($full_address); }
-
-			if( $recipient_type === "cc" ){ $mail->AddCC($full_address); }
-
-			if( $recipient_type === "cco" ){ $mail->AddBCC($full_address); }
-
-		} else {
-
-			$parse_address = imap_rfc822_parse_adrlist($full_address, "");
-			
-			foreach ($parse_address as $key => $val)
-			{
-				if( preg_match('(UNEXPECTED_DATA_AFTER_ADDRESS|SYNTAX-ERROR)', $val->mailbox ) ){
-					
-					$mail->SetError( $parse_address[$key-1]->mailbox );
-					
-					return false;
-				}
+		$parse_address = imap_rfc822_parse_adrlist($full_address, "");
+		
+		foreach ($parse_address as $key => $val)
+		{
+			if( !$mail->SaveMessageAsDraft && preg_match('(UNEXPECTED_DATA_AFTER_ADDRESS|SYNTAX-ERROR)', $val->mailbox ) ){
 				
-				if( preg_match('(UNEXPECTED_DATA_AFTER_ADDRESS|SYNTAX-ERROR)', $val->host ) ){
-					
-					$mail->SetError( $parse_address[$key-1]->host );
-					
-					return false;
-				}
+				$mail->SetError( $parse_address[$key-1]->mailbox );
+				
+				return false;
+			}
+			
+			if( !$mail->SaveMessageAsDraft && preg_match('(UNEXPECTED_DATA_AFTER_ADDRESS|SYNTAX-ERROR)', $val->host ) ){
+				
+				$mail->SetError( $parse_address[$key-1]->host );
+				
+				return false;
+			}
 
-				if( !empty($val->mailbox) && !empty($val->host))
+			if( !empty($val->mailbox) && !empty($val->host))
+			{
+				switch($recipient_type)
 				{
-					switch($recipient_type)
-					{
-						case "to":
-							$mail->AddAddress($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
-							break;
-						case "cc":
-							$mail->AddCC($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
-							break;
-						case "cco":
-							$mail->AddBCC($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
-							break;
-					}
-				} else {
-					
-					$mail->SetError( $val->mailbox );
-					
-					return false;
+					case "to":
+						$mail->AddAddress($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
+						break;
+					case "cc":
+						$mail->AddCC($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
+						break;
+					case "cco":
+						$mail->AddBCC($val->mailbox."@".$val->host, ( empty($val->personal) ? "" : $val->personal));
+						break;
 				}
+			} else if ( !$mail->SaveMessageAsDraft ) {
+				
+				$mail->SetError( $val->mailbox );
+				
+				return false;
 			}
 		}
+
 		return true;
 	}
 

@@ -1218,14 +1218,17 @@ class PHPMailer
 
 	private function HeaderLine( $name, $value, $isField = false )
 	{
+        $int_encoding = mb_internal_encoding();
+        mb_internal_encoding("UTF-8");
 		$name  = preg_replace( '/[^\x21-\x7E:]/','', trim( $name ) );
 		$name  = $isField? $this->SPW.$name.'="' : ucfirst( $name ).': ';
 		$eof   = $isField? '"' : '';
-		$value = $this->_str_decode( $value );
+        $value = $this->_str_decode( $value );
 		if ( mb_detect_encoding( $value, 'ASCII', true ) ) return rtrim( chunk_split( $name.$value.$eof, 76, $this->LE.$this->SPW ), $this->SPW );
 		$B = mb_encode_mimeheader( $value, 'UTF-8', 'B', $this->LE, strlen( $name ) );
 		$Q = mb_encode_mimeheader( $value, 'UTF-8', 'Q', $this->LE, strlen( $name ) );
-		return $name.( ( strlen( $B ) < strlen( $Q ) )? $B : $Q ).$eof.$this->LE;
+        mb_internal_encoding($int_encoding);
+        return $name.( ( strlen( $B ) < strlen( $Q ) )? $B : $Q ).$eof.$this->LE;
 	}
 
 	private function _str_decode( $str, $charset = false )
@@ -1241,7 +1244,9 @@ class PHPMailer
 
 	private function AddrAppend( $name, $addrs )
 	{
-		if ( count( $addrs ) === 0 ) return '';
+        if ( count( $addrs ) === 0 ) return '';
+        $int_encoding = mb_internal_encoding();
+        mb_internal_encoding("UTF-8");
 		$str = ucfirst( preg_replace( '/[^\x21-\x7E:]/','', trim( $name ) ) ).': ';
 		$skip_first = true;
 		foreach ( $addrs as $addr ) {
@@ -1256,7 +1261,8 @@ class PHPMailer
 				$str .= $this->_str_split( ' ', $str );
 			}
 			$str .= $this->_str_split( $email, $str );
-		}
+        }
+        mb_internal_encoding($int_encoding);
 		return $str.$this->LE;
 		
 	}
