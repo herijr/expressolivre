@@ -83,13 +83,18 @@ class MessageReader
 		);
 	}
 
-	public function getBody()
+	public function peekBody()
+	{
+		return $this->getBody(FT_PEEK);
+	}
+	
+	public function getBody( $flag = false )
 	{
 		$is_html = count( $this->_content_html )? true : false;
 		$obj     = (object)array( 'type' => $is_html? 'html' : 'plain' );
-		$plain   = implode( PHP_EOL, array_map( array( $this, '_fetchBody' ), $this->_content_plain ) );
-		$obj->body = $is_html? ( ( count( $this->_content_html ) === 1 )? $this->_fetchBody( $this->_content_html[0] ) :
-			'<div>'.implode( '</div><div>', array_map( array( $this, '_fetchBody' ), $this->_content_html ) ).'</div>' ) :
+		$plain   = implode( PHP_EOL, array_map( array( $this, '_fetchBody' ), $this->_content_plain, array_fill( 0, count( $this->_content_plain ), $flag ) ) );
+		$obj->body = $is_html? ( ( count( $this->_content_html ) === 1 )? $this->_fetchBody( $this->_content_html[0], $flag ) :
+			'<div>'.implode( '</div><div>', array_map( array( $this, '_fetchBody' ), $this->_content_html, array_fill( 0, count( $this->_content_html ), $flag ) ) ).'</div>' ) :
 				$plain;
 		if ( $is_html ) {
 			$obj->body = $this->_replaceCID( $obj->body );
@@ -206,10 +211,10 @@ class MessageReader
 		return preg_replace( '/[<>:"|?*\/\\\]/', '-', preg_replace( '/[\x00-\x1F\x7F]/u', '', $filename ) );
 	}
 
-	private function _fetchBody( $section )
+	private function _fetchBody( $section, $flag = false )
 	{
 		$sec = $this->_sections[$section];
-		$body = ( $section === '0' )? imap_body( $this->_mbox, $this->_uid, FT_UID ) : imap_fetchbody( $this->_mbox, $this->_uid, $sec->section, FT_UID );
+		$body = ( $section === '0' )? imap_body( $this->_mbox, $this->_uid, FT_UID|$flag ) : imap_fetchbody( $this->_mbox, $this->_uid, $sec->section, FT_UID|$flag );
 		$body = $this->_decodeBody( $body, $sec->encoding, $sec->params->charset );
 		if ( $sec->type === 'text/calendar' ) $body = $this->_decodeBody( $body, 'calendar' );
 		return $body;

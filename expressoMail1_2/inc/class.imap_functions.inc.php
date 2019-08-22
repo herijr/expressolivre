@@ -886,7 +886,7 @@ class imap_functions
 		$mail_reader = new MessageReader();
 		$this->open_mbox( $folder );
 		$mail_reader->setMessage( $this->mbox, $folder, $msg_number );
-		$msg_body = $mail_reader->getBody( 'plain' );
+		$msg_body = $mail_reader->peekBody();
 
 		$content = isset( $msg_body->body_alternative )? $msg_body->body_alternative : $msg_body->body;
 		if ( $msg_body->type === 'html' ) {
