@@ -4309,7 +4309,14 @@ class imap_functions
 
 	private function _str_decode( $str, $charset = false )
 	{
+		$int_encoding = mb_internal_encoding();
+		
+		mb_internal_encoding("UTF-8");
+
 		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+
+		mb_internal_encoding($int_encoding);
+
 		return $this->_toUTF8( $str, $charset );
 	}
 
