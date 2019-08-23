@@ -92,10 +92,13 @@ class MessageReader
 	{
 		$is_html = count( $this->_content_html )? true : false;
 		$obj     = (object)array( 'type' => $is_html? 'html' : 'plain' );
-		$plain   = implode( PHP_EOL, array_map( array( $this, '_fetchBody' ), $this->_content_plain, array_fill( 0, count( $this->_content_plain ), $flag ) ) );
-		$obj->body = $is_html? ( ( count( $this->_content_html ) === 1 )? $this->_fetchBody( $this->_content_html[0], $flag ) :
-			'<div>'.implode( '</div><div>', array_map( array( $this, '_fetchBody' ), $this->_content_html, array_fill( 0, count( $this->_content_html ), $flag ) ) ).'</div>' ) :
-				$plain;
+		$plain   = ( count( $this->_content_plain ) === 0 )? '' : implode( PHP_EOL, array_map( array( $this, '_fetchBody' ), $this->_content_plain, array_fill( 0, count( $this->_content_plain ), $flag ) ) );
+		$obj->body = ( !$is_html )? $plain :
+			( ( count( $this->_content_html ) === 0 )? '' :
+				( ( count( $this->_content_html ) === 1 )? $this->_fetchBody( $this->_content_html[0], $flag ) :
+					'<div>'.implode( '</div><div>', array_map( array( $this, '_fetchBody' ), $this->_content_html, array_fill( 0, count( $this->_content_html ), $flag ) ) ).'</div>'
+				)
+			);
 		if ( $is_html ) {
 			$obj->body = $this->_replaceCID( $obj->body );
 			if( !empty( $plain ) ) $obj->body_alternative = $plain;
