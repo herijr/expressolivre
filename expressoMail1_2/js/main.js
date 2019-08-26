@@ -2569,8 +2569,50 @@ function Download( action, data, callback )
 
 function Ajax( action, data, callback, method )
 {
+	var buildBar =  function(){
+
+		var divBuildBar= $('#divProgressBar');
+
+		if( divBuildBar.length == 0 ){
+
+			divBuildBar = $("<div>")
+			.attr('id','divProgressBar')
+			.css('visibility','hidden')
+			.css('width','103px')
+			.css("background","#cc4444")
+			.css("position","fixed")
+			.css("top", "0px")
+			.css("right","0px")
+			.css("text-align", "center")
+			.html('&nbsp;&nbsp;<font face="Verdana" size="2" color="WHITE">'+$('#txt_loading').val()+'...</font>&nbsp;');
+			
+			document.body.appendChild( $(divBuildBar)[0] );			
+		}
+
+		return divBuildBar;
+	};
+
+	var showProgressBar = function(){
+		
+		var div = buildBar();
+		
+		$(div).css('visibility','hidden');
+		
+		$(div).css('visibility','visible');
+	};
+
+	var hideProgressBar = function(){
+		
+		var div = buildBar();
+		
+		$(div).css('visibility','hidden');		
+	}
+
 	if ( !( typeof action === 'string' && action.trim() !== '' ) ) return false;
 	if ( !( typeof method === 'string' && method === 'GET' ) ) method = 'POST';
+
+	showProgressBar();
+	
 	var opts = {
 		method      : method,
 		type        : method,
@@ -2578,6 +2620,7 @@ function Ajax( action, data, callback, method )
 		dataType    : 'json',
 		cache       : false
 	};
+	
 	if ( typeof data !== 'undefined' ) {
 		if ( data.nodeType === Node.ELEMENT_NODE || data.__proto__ === jQuery.fn ) {
 			var serializeForm = function( $obj ) {
@@ -2615,5 +2658,6 @@ function Ajax( action, data, callback, method )
 	};
 	return $.ajax( opts ).done( function( data, textStatus, jqXHR ) {
 		if ( typeof callback === 'function' ) callback( f_count( data ), textStatus, jqXHR );
-	} ).fail(function() { write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) ); });
+		hideProgressBar();
+	} ).fail(function() { hideProgressBar(); write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) ); });
 }
