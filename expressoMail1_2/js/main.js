@@ -1510,6 +1510,8 @@ function appletReturn(smime, ID, operation, folder){
 
 function send_message( ID, folder, folder_name )
 {
+	$('#send_button_'+ID).attr('disabled','disabled');
+
 	//limpa autosave_timer[ID]; havia conflito quando uma mensagem ia ser enviada e nesse exato momento o autosave
 	//entrava em execucao (a aba de edicao da mensagem continuava aberta e a mensagem exibida era a de que a mensagem foi
 	//salva na pasta Rascunhos e nao que tinha sido enviada, como deveria);
@@ -1589,9 +1591,7 @@ function send_message_return( data, ID ){
 
 	watch_changes_in_msg(ID);
 
-	connector = new cConnector();
-
-	connector.showProgressBar();
+	$('#send_button_'+ID).attr('disabled',null);
 
 	if( typeof(data) == 'object' ){
 
@@ -1677,8 +1677,6 @@ function send_message_return( data, ID ){
 			save_msg(ID);
 		});
 	}
-	
-	connector.hideProgressBar();
 }
 
 function save_msg( ID )
