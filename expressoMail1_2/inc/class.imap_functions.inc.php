@@ -255,38 +255,10 @@ class imap_functions
 			$head_array['smalldate'] = gmdate("d/m/Y",$msgTimestamp);
                 }
 
-		$from = $header->from;
-		$head_array['from'] = array();
-		$head_array['from']['name'] = ( isset( $from[0]->personal ) ) ? $this->decode_string($from[0]->personal) : NULL;
-		$head_array['from']['email'] = $this->decode_string($from[0]->mailbox) . "@" . $from[0]->host;
-		if(!$head_array['from']['name'])
-			$head_array['from']['name'] = $head_array['from']['email'];
-		$to = (isset($header->to) ? $header->to : false);
-		$head_array['to'] = array();
-		if( isset($to[1]) && isset( $to[1]->host ) && $to[1]->host == ".SYNTAX-ERROR.") { //E-mails que nao possuem o campo "para", vem com o recipiente preenchido, porem com um recipiente a mais alegando erro de sintaxe.
-			$head_array['to']['name'] = $head_array['to']['email'] = NULL;
-		}
-		else {
-			$tmp = ( isset( $to[0]->personal ) ) ? imap_mime_header_decode($to[0]->personal) : NULL;
-			$head_array['to']['name'] = ( isset( $tmp[0]->text ) ) ? $this->decode_string($tmp[0]->text) : NULL;
-			$head_array['to']['email'] = ( isset( $to[0]->mailbox ) ) ? ( $this->decode_string($to[0]->mailbox) . "@" . ( ( isset( $to[0]->host ) ) ? $to[0]->host : '' ) ) : NULL;
-			if(!$head_array['to']['name'])
-				$head_array['to']['name'] = $head_array['to']['email'];
-		}
-		$cc = isset($header->cc)? $header->cc : false;
-		$cco = isset($header->bcc)? $header->bcc : false;
-		if ( ($cc) && (!$head_array['to']['name']) ){
-			$head_array['to']['name'] = ( isset( $cc[0]->personal ) ) ? $this->decode_string($cc[0]->personal) : NULL;
-			$head_array['to']['email'] = $this->decode_string($cc[0]->mailbox) . "@" . $cc[0]->host;
-			if(!$head_array['to']['name'])
-				$head_array['to']['name'] = $head_array['from']['email'];
-		}
-		else if ( ($cco) && (!$head_array['to']['name']) ){
-			$head_array['to']['name'] = ( isset( $cco[0]->personal ) ) ? $this->decode_string($cco[0]->personal) : NULL;
-			$head_array['to']['email'] = $this->decode_string($cco[0]->mailbox) . "@" . $cco[0]->host;
-			if(!$head_array['to']['name'])
-				$head_array['to']['name'] = $head_array['from']['email'];
-		}
+		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? reset( $header->from ) : false );
+		$head_array['to']      = (array)$this->mk_addr( isset( $header->to ) && is_array( $header->to ) && !( isset( $header->to[1]->host ) && $header->to[1]->host === '.SYNTAX-ERROR.' )? reset( $header->to   ) : false );
+		if ( empty( $head_array['to']['email'] ) && isset( $header->cc  ) && is_array( $header->cc  ) ) $head_array['to'] = (array)$this->mk_addr( $header->cc  );
+		if ( empty( $head_array['to']['email'] ) && isset( $header->bcc ) && is_array( $header->ccc ) ) $head_array['to'] = (array)$this->mk_addr( $header->bcc );
 		$head_array['subject'] = ( isset( $header->fetchsubject ) ) ? trim($this->decode_string($header->fetchsubject)) : '';
 		$head_array['subject'] = ( strstr( $head_array['subject'], ' ' ) === false )? str_replace( '_', ' ', $head_array['subject'] ) : $head_array['subject'];		
 		$head_array['Size'] = $header->Size;
@@ -691,162 +663,22 @@ class imap_functions
 			$return['smalldate'] = gmdate("d/m/Y",$msgTimestamp);
 		}
 
-		$from = $header->from;
-		$return['from'] = array();
-		$return['from']['name'] = isset($from[0]->personal)? $this->decode_string($from[0]->personal) : '';
-		$return['from']['email'] = $this->decode_string($from[0]->mailbox . "@" . $from[0]->host);
-		if ($return['from']['name'])
-		{
-			if (substr($return['from']['name'], 0, 1) == '"')
-				$return['from']['full'] = $return['from']['name'] . ' ' . '&lt;' . $return['from']['email'] . '&gt;';
-			else
-				$return['from']['full'] = '"' . $return['from']['name'] . '" ' . '&lt;' . $return['from']['email'] . '&gt;';
-		}
-		else
-			$return['from']['full'] = $return['from']['email'];
+		$return['from']     = (array)$this->mk_addr( isset( $header->from     ) && is_array( $header->from     )? reset( $header->from     ) : false );
+		$return['sender']   = (array)$this->mk_addr( isset( $header->sender   ) && is_array( $header->sender   )? reset( $header->sender   ) : false );
+		$return['reply_to'] = (array)$this->mk_addr( isset( $header->reply_to ) && is_array( $header->reply_to )? reset( $header->reply_to ) : false );
 
+		if ( $return['from']['full']  === $return['sender']['full']    ) unset( $return['sender']   );
+		if ( $return['from']['email'] === $return['reply_to']['email'] ) unset( $return['reply_to'] );
+		else $return['reply_to'] = $return['reply_to']['full'];
 		// Sender attribute
-		$sender = $header->sender;
-		$return['sender'] = array();
-		$return['sender']['name'] = isset($sender[0]->personal)? $this->decode_string($sender[0]->personal) : '';
-		$return['sender']['email'] = $this->decode_string($sender[0]->mailbox . "@" . $sender[0]->host);
-		if ($return['sender']['name'])
-		{
-			if (substr($return['sender']['name'], 0, 1) == '"')
-				$return['sender']['full'] = $return['sender']['name'] . ' ' . '&lt;' . $return['sender']['email'] . '&gt;';
-			else
-				$return['sender']['full'] = '"' . $return['sender']['name'] . '" ' . '&lt;' . $return['sender']['email'] . '&gt;';
-		}
-		else
-			$return['sender']['full'] = $return['sender']['email'];
+		$return['toaddress2']      = $this->mk_addr_list( isset( $header->to  )? $header->to  : false );
+		$return['cc']              = $this->mk_addr_list( isset( $header->cc  )? $header->cc  : false );
+		$return['bcc']             = $this->mk_addr_list( isset( $header->bcc )? $header->bcc : false );
+		$return['reply_toaddress'] = $header->reply_toaddress;
+		$return['Size']            = $header->Size;
 
-		if($return['from']['full'] == $return['sender']['full'])
-			$return['sender'] = null;
-		$to = (isset($header->to) ? $header->to : false );
-		$return['toaddress2'] = "";
-		if (!empty($to))
-		{
-			foreach ($to as $tmp)
-			{
-				if (!empty($tmp->personal))
-				{
-					$personal_tmp = imap_mime_header_decode($tmp->personal);
-					$return['toaddress2'] .= '"' . $personal_tmp[0]->text . '"';
-					$return['toaddress2'] .= " ";
-					$return['toaddress2'] .= "&lt;";
-					if ($tmp->host != 'unspecified-domain')
-						$return['toaddress2'] .= $tmp->mailbox . "@" . $tmp->host;
-					else
-						$return['toaddress2'] .= $tmp->mailbox;
-					$return['toaddress2'] .= "&gt;";
-					$return['toaddress2'] .= ", ";
-				}
-				else
-				{
-					if ($tmp->host != 'unspecified-domain')
-						$return['toaddress2'] .= $tmp->mailbox . "@" . $tmp->host;
-					else
-						$return['toaddress2'] .= $tmp->mailbox;
-					$return['toaddress2'] .= ", ";
-				}
-			}
-			$return['toaddress2'] = $this->del_last_two_caracters($return['toaddress2']);
-		}
-
-		$cc = isset($header->cc)? $header->cc : false;
-		$return['cc'] = "";
-		if (!empty($cc))
-		{
-			foreach ($cc as $tmp_cc)
-			{
-				if (!empty($tmp_cc->personal))
-				{
-					$personal_tmp_cc = imap_mime_header_decode($tmp_cc->personal);
-					$return['cc'] .= '"' . $personal_tmp_cc[0]->text . '"';
-					$return['cc'] .= " ";
-					$return['cc'] .= "&lt;";
-					$return['cc'] .= $tmp_cc->mailbox . "@" . $tmp_cc->host;
-					$return['cc'] .= "&gt;";
-					$return['cc'] .= ", ";
-				}
-				else
-				{
-					$return['cc'] .= $tmp_cc->mailbox . "@" . $tmp_cc->host;
-					$return['cc'] .= ", ";
-				}
-			}
-			$return['cc'] = $this->del_last_two_caracters($return['cc']);
-		}
-		else
-		{
-			$return['cc'] = "";
-		}
-
-		##
-		# @AUTHOR Rodrigo Souza dos Santos
-		# @DATE 2008/09/12
-		# @BRIEF Adding the BCC field.
-		##
-		$bcc = isset($header->bcc)? $header->bcc : false;
-		$return['bcc'] = "";
-		if (!empty($bcc))
-		{
-			foreach ($bcc as $tmp_bcc)
-			{
-				if (!empty($tmp_bcc->personal))
-				{
-					$personal_tmp_bcc = imap_mime_header_decode($tmp_bcc->personal);
-					$return['bcc'] .= '"' . $personal_tmp_bcc[0]->text . '"';
-					$return['bcc'] .= " ";
-					$return['bcc'] .= "&lt;";
-					$return['bcc'] .= $tmp_bcc->mailbox . "@" . $tmp_bcc->host;
-					$return['bcc'] .= "&gt;";
-					$return['bcc'] .= ", ";
-				}
-				else
-				{
-					$return['bcc'] .= $tmp_bcc->mailbox . "@" . $tmp_bcc->host;
-					$return['bcc'] .= ", ";
-				}
-			}
-			$return['bcc'] = $this->del_last_two_caracters($return['bcc']);
-		}
-		else
-		{
-			$return['bcc'] = "";
-		}
-
-		$reply_to = $header->reply_to;
-		$return['reply_to'] = "";
-		if (is_object($reply_to[0]))
-		{
-			if ($return['from']['email'] != ($reply_to[0]->mailbox."@".$reply_to[0]->host))
-			{
-				if (!empty($reply_to[0]->personal))
-				{
-					$personal_reply_to = imap_mime_header_decode($tmp_reply_to->personal);
-					if(!empty($personal_reply_to[0]->text)) {
-						$return['reply_to'] .= '"' . $personal_reply_to[0]->text . '"';
-						$return['reply_to'] .= " ";
-						$return['reply_to'] .= "&lt;";
-						$return['reply_to'] .= $reply_to[0]->mailbox . "@" . $reply_to[0]->host;
-						$return['reply_to'] .= "&gt;";
-					}
-					else {
-						$return['reply_to'] .= $reply_to[0]->mailbox . "@" . $reply_to[0]->host;
-					}
-				}
-				else
-				{
-					$return['reply_to'] .= $reply_to[0]->mailbox . "@" . $reply_to[0]->host;
-				}
-			}
-		}
-		$return['reply_to'] = $this->decode_string($return['reply_to']);
-		$return['subject'] = ( isset( $header->subject ) ) ? trim($this->decode_string($header->subject)) : '';
-		$return['subject'] = ( strstr( $return['subject'], ' ' ) === false )? str_replace( '_', ' ', $return['subject'] ) : $return['subject'];
-		$return['Size'] = $header->Size;
-		$return['reply_toaddress'] = $this->decode_string($header->reply_toaddress);
+		$return['subject'] = ( isset( $header->subject ) )? trim( $header->subject ) : '';
+		$return['subject'] = ( strstr( $return['subject'], ' ' ) === false )? trim( str_replace( '_', ' ', $return['subject'] ) ) : $return['subject'];
 
 		//All this is to help in local messages
 		//$return['timestamp'] = $header->udate;
@@ -872,6 +704,34 @@ class imap_functions
 		$return['attachs'] = $return['attachments'];
 		ksort( $return );
 		return $return;
+	}
+
+	function mk_addr( $addr )
+	{
+		$personal = $this->decode_personal( $addr );
+		$email    = $this->decode_email( $addr );
+		$full     = ( empty( $personal ) )? $email : '"'.$personal.'" <'.$email.'>';
+		return (object) array( 'name' => $personal, 'email' => $email, 'full' => $full );
+	}
+
+	function mk_addr_list( $addrs )
+	{
+		if ( !is_array( $addrs ) ) return '';
+		return implode( ', ', array_filter( array_map( function( $addr ) {
+			$addr = $this->mk_addr( $addr );
+			return $addr->full;
+		}, $addrs ) ) );
+	}
+
+	function decode_personal( $addr )
+	{
+		$pers = ( isset( $addr->personal ) && !empty( $addr->personal ) )? trim( $this->_str_decode( $addr->personal ) ) : '';
+		return trim( ( strstr( $pers, ' ' ) === false )? trim( str_replace( '_', ' ', $pers ) ) : $pers, ' \t\n\r\0\x0B\'\"' );
+	}
+
+	function decode_email( $addr )
+	{
+		return ( isset( $addr->mailbox )? trim( $addr->mailbox ) : '' ).( ( isset( $addr->host ) && trim( strtolower( $addr->host ) ) !== 'unspecified-domain' )? '@'.trim( $addr->host ): '' );
 	}
 
 	function get_msg_sample( $msg_number, $folder )
@@ -1756,7 +1616,7 @@ class imap_functions
 			$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
 			$result[$i]['Importance'] = $flag==0?"Normal":$importance[1];
 
-			$msg_sample = $this->get_msg_sample($msg_number);
+			$msg_sample = $this->get_msg_sample( $msg_number, $folder );
 			$result[$i]['msg_sample'] = $msg_sample;
 
 			$header = $this->get_header($msg_number);
