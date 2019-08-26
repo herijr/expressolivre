@@ -23,6 +23,7 @@ class MessageReader
 		ENCOTHER            => 'other',
 	);
 
+
 	private $_uid               = false;
 	private $_mbox              = false;
 	private $_folder            = false;
@@ -32,7 +33,6 @@ class MessageReader
 	private $_content_plain     = array();
 	private $_content_html      = array();
 	private $_attachs           = array();
-	private $_attachs_root      = array();
 
 	private function _clear()
 	{
@@ -45,7 +45,6 @@ class MessageReader
 		$this->_content_plain   = array();
 		$this->_content_html    = array();
 		$this->_attachs         = array();
-		$this->_attachs_root    = array();
 	}
 
 	public function __construct()
@@ -85,9 +84,9 @@ class MessageReader
 
 	public function peekBody()
 	{
-		return $this->getBody(FT_PEEK);
+		return $this->getBody( FT_PEEK );
 	}
-	
+
 	public function getBody( $flag = false )
 	{
 		$is_html = count( $this->_content_html )? true : false;
@@ -106,11 +105,11 @@ class MessageReader
 		return $obj;
 	}
 
-	public function getAttachInfo( $section = false, $deep = false )
+	public function getAttachInfo( $section = false )
 	{
 		if ( $section !== false ) return $this->_sections[$section];
 		$result = array();
-		foreach ( $this->{$deep?'_attachs':'_attachs_root'} as $section ) $result[] = $this->_sections[$section];
+		foreach ( $this->_attachs as $section ) $result[] = $this->_sections[$section];
 		return $result;
 	}
 
@@ -146,11 +145,11 @@ class MessageReader
 
 	private function _readSection( $node, $prefix = '' )
 	{
-		$is_root   = ( strpos( $prefix, '.' ) === false );
+		$read_deep = true;
 		$obj       = (object)array();
 
 		$obj->type = strtolower( $this->getPartType( $node->type ).( $node->ifsubtype? '/'.$node->subtype : '' ) );
-		if ( $is_root && preg_match( '/^(?:x-|)pkcs7-mime$/', strtolower( $node->subtype ) ) ) $this->_isCripted = true;
+		if ( strpos( $prefix, '.' ) === false && preg_match( '/^(?:x-|)pkcs7-mime$/', strtolower( $node->subtype ) ) ) $this->_isCripted = true;
 		if ( $node->ifid ) $obj->cid= trim( $node->id, '<>' );
 		if ( isset( $node->lines ) ) $obj->lines = $node->lines;
 		if ( isset( $node->bytes ) ) {
@@ -168,8 +167,8 @@ class MessageReader
 
 		// ATTACHMENTS
 		if ( ( $node->ifdisposition && strtolower( $node->disposition ) === 'attachment' ) || $params['filename'] || $params['name'] ) {
+			$read_deep = false;
 			$this->_attachs[] = $obj->section;
-			if ( $is_root ) $this->_attachs_root[] = $obj->section;
 			$obj->filename = isset( $params['filename'] )? $params['filename'] : ( isset( $params['name'] )? $params['name'] : false );
 			if ( $obj->filename === false ) {
 				if (function_exists('imap_fetchmime')) {				
@@ -185,7 +184,7 @@ class MessageReader
 
 		$this->_sections[$obj->section] = $obj;
 
-		if ( isset( $node->parts ) ) foreach ( $node->parts as $i => $part ) $this->_readSection( $part, $prefix.($prefix?'.':'').($i+1) );
+		if ( $read_deep && isset( $node->parts ) ) foreach ( $node->parts as $i => $part ) $this->_readSection( $part, $prefix.($prefix?'.':'').($i+1) );
 	}
 
 	private function _attr_decode( $attr, $value )
@@ -197,6 +196,7 @@ class MessageReader
 		}
 		return array( strtolower( $attr ) => $this->_str_decode( $value ) );
 	}
+
 
 	private function _str_decode( $str, $charset = false )
 	{
@@ -246,7 +246,7 @@ class MessageReader
 	{
 		$thumbs_array = array();
 		$i = 0;
-		foreach ( $this->_attachs_root as $section ) {
+		foreach ( $this->_attachs as $section ) {
 			$section = $this->_sections[$section];
 			if ( !preg_match( '#^image/(p?jpeg|gif|png)$#', $section->type ) ) continue;
 			if ( $section->encoding !== 'base64' ) continue;

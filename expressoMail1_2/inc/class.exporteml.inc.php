@@ -113,7 +113,7 @@ class ExportEml
 
 		include_once 'class.message_reader.inc.php';
 		$mail_reader = new MessageReader();
-		$info        = $mail_reader->setMessage( $this->_getImapStream(), $params['folder'], $params['msg_number'] )->getAttachInfo( false, true );
+		$info        = $mail_reader->setMessage( $this->_getImapStream(), $params['folder'], $params['msg_number'] )->getAttachInfo();
 
 		if ( $params['section'] === '*' ) {
 
