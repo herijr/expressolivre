@@ -3001,8 +3001,7 @@ class imap_functions
 		$return["msgs_to_set"] = $msgs_to_set;
 		$return["flag"] = $flag;
 
-		if(!$this->mbox && !is_resource($this->mbox))
-			$this->mbox = $this->open_mbox($folder);
+		$this->mbox = $this->open_mbox($folder);
 
 		if ($flag == "unseen")
 			$return["status"] = imap_clearflag_full($this->mbox, $msgs_to_set, "\\Seen", ST_UID);
