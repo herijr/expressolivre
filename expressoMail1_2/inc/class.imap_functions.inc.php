@@ -717,8 +717,11 @@ class imap_functions
 	function mk_addr_list( $addrs )
 	{
 		if ( !is_array( $addrs ) ) return '';
-		return implode( ', ', array_filter( array_map( function( $addr ) {
-			$addr = $this->mk_addr( $addr );
+
+		$objClass = $this;
+
+		return implode( ', ', array_filter( array_map( function( $addr ) use($objClass) {
+			$addr = $objClass->mk_addr( $addr );
 			return $addr->full;
 		}, $addrs ) ) );
 	}
