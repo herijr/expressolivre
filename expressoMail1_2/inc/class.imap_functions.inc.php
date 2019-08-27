@@ -197,41 +197,32 @@ class imap_functions
 
 	function get_info_head_msg($msg_number)
 	{
-		$head_array = array();
 		include_once("class.imap_attachment.inc.php");
-
+		
+		$head_array = array();
+		
 		$imap_attachment = new imap_attachment();
-		//if ($this->prefs['use_important_flag'] )
-		//{
-			/*Como eu preciso do atributo Importance para saber se o email e
-			 * importante ou nao, uso abaixo a funcao imap_fetchheader e busco
-			 * o atributo importance nela. Isso faz com que eu acesse o cabecalho
-			 * duas vezes e de duas formas diferentes, mas em contrapartida, eu
-			 * nao preciso reimplementar o metodo utilizando o fetchheader.
-			 * Como as mensagens sao renderizadas em um numero pequeno por vez,
-			 * nao parece ter perda consideravel de performance.
-			 */
 
-			$tempHeader = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
-			$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
-                //}
-                // Reimplementado codigo para identificacao dos e-mails assinados e cifrados
-                // no metodo getMessageType(). Mario Cesar Kolling <mario.kolling@serpro.gov.br>
-                $head_array['ContentType'] = $this->getMessageType($msg_number, $tempHeader);
-                $head_array['Importance'] = $flag==0?"Normal":$importance[1];
+		$tempHeader = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
+		$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
+		$head_array['ContentType'] = $this->getMessageType($msg_number, $tempHeader);
+		$head_array['Importance'] = $flag==0?"Normal":$importance[1];
 
 		$header = $this->get_header($msg_number);
+		
 		if (!is_object($header))
 			return false;
+		
 		$head_array['Recent'] = $header->Recent;
 		$head_array['Unseen'] = $header->Unseen;
+		
 		if($header->Answered =='A' && $header->Draft == 'X'){
 			$head_array['Forwarded'] = 'F';
-		}
-		else {
+		} else {
 			$head_array['Answered']	= $header->Answered;
 			$head_array['Draft']	= $header->Draft;
 		}
+
 		$head_array['Deleted'] = $header->Deleted;
 		$head_array['Flagged'] = $header->Flagged;
 		$head_array['msg_number'] = $msg_number;
@@ -242,23 +233,16 @@ class imap_functions
 		$head_array['timestamp'] = $msgTimestamp;
 		
 		$date_msg = gmdate("d/m/Y",$msgTimestamp);
-//		if (date("d/m/Y") == $date_msg)
-//			$return['udate'] = $header->udate;
-//		else
 
-		if (date("d/m/Y") == $date_msg) //no dia
-		{
-			$head_array['smalldate'] = gmdate("H:i",$msgTimestamp);
-                }
-                else
-                {
-			$head_array['smalldate'] = gmdate("d/m/Y",$msgTimestamp);
-                }
+		$head_array['smalldate'] = (date("d/m/Y") == $date_msg) ? gmdate("H:i",$msgTimestamp) : gmdate("d/m/Y",$msgTimestamp);
 
 		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? reset( $header->from ) : false );
 		$head_array['to']      = (array)$this->mk_addr( isset( $header->to ) && is_array( $header->to ) && !( isset( $header->to[1]->host ) && $header->to[1]->host === '.SYNTAX-ERROR.' )? reset( $header->to   ) : false );
-		if ( empty( $head_array['to']['email'] ) && isset( $header->cc  ) && is_array( $header->cc  ) ) $head_array['to'] = (array)$this->mk_addr( $header->cc  );
-		if ( empty( $head_array['to']['email'] ) && isset( $header->bcc ) && is_array( $header->ccc ) ) $head_array['to'] = (array)$this->mk_addr( $header->bcc );
+
+		if ( empty( $head_array['to']['email'] ) && isset( $header->cc  ) && is_array( $header->cc  ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->cc ) );
+		if ( empty( $head_array['to']['email'] ) && isset( $header->bcc ) && is_array( $header->bcc ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->bcc ) );
+		if ( empty( $head_array['to']['email'] ) ) $head_array['to']['name'] = $head_array['to']['email'] = null;
+
 		$head_array['subject'] = ( isset( $header->fetchsubject ) ) ? trim($this->decode_string($header->fetchsubject)) : '';
 		$head_array['subject'] = ( strstr( $head_array['subject'], ' ' ) === false )? str_replace( '_', ' ', $head_array['subject'] ) : $head_array['subject'];		
 		$head_array['Size'] = $header->Size;
@@ -711,7 +695,7 @@ class imap_functions
 		$personal = $this->decode_personal( $addr );
 		$email    = $this->decode_email( $addr );
 		$full     = ( empty( $personal ) )? $email : '"'.$personal.'" <'.$email.'>';
-		return (object) array( 'name' => $personal, 'email' => $email, 'full' => $full );
+		return (object) array( 'name' => empty( $personal )? $email : $personal, 'email' => $email, 'full' => $full );
 	}
 
 	function mk_addr_list( $addrs )
