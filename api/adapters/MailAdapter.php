@@ -128,8 +128,6 @@ class MailAdapter extends ExpressoAdapter {
 	
 	protected function spamMessage( $folderID, $msgsID, $spam )
 	{
-		$this->getImap();
-
 		$msgArray =  array();
 
 		if( strrpos( $msgsID, "," ) !== FALSE ) 
@@ -150,7 +148,7 @@ class MailAdapter extends ExpressoAdapter {
 
 		$params['spam'] = ( $spam === "1"  ? "true" : "false" );
 
-		$_result = $this->imap()->spam( $params );
+		$_result = $this->getImap()->spam( $params );
 
 		if( isset($_result['status']) && $_result['status'] )
 		{

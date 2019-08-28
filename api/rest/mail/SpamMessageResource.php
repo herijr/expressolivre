@@ -22,14 +22,14 @@ class SpamMessageResource extends MailAdapter {
 		if( $this-> isLoggedIn() ) 
 		{					
 			$folderID 	= trim($this->getParam('folderID'));
-			$msgsID		= trim($this->getParam('msgID'));
+			$msgID		= trim($this->getParam('msgID'));
 			$spam		= trim($this->getParam('spam'));
 
 			if( ( $folderID !== "" && $msgID !== "" ) && $spam !== "" )
 			{	
 				if( $spam === "1" || $spam === "2" )
 				{
-					$_result = $this->spamMessage( $folderID, $msgsID, $spam );
+					$_result = $this->spamMessage( $folderID, $msgID, $spam );
 				}
 			}	
 		}
