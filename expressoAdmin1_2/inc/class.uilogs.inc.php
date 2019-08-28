@@ -36,7 +36,8 @@ class uilogs
 		if ( !( isset( $GLOBALS['phpgw']->js ) && is_object( $GLOBALS['phpgw']->js ) ) ) $GLOBALS['phpgw']->js = CreateObject( 'phpgwapi.javascript' );
 		
 		$GLOBALS['phpgw']->css->validate_file( 'expressoAdmin1_2/templates/default/css/custom.css' );
-		$GLOBALS['phpgw']->js->add( 'src', './prototype/plugins/jquery/jquery-latest.min.js' );
+		$GLOBALS['phpgw']->js->add( 'file', './prototype/plugins/jquery/jquery-latest.min.js', 'utf-8' );
+		$GLOBALS['phpgw']->js->add( 'file', './prototype/plugins/jquery/jquery-migrate.min.js', 'utf-8' );		
 		$GLOBALS['phpgw_info']['flags']['app_header'] = $GLOBALS['phpgw_info']['apps']['expressoAdmin1_2']['title'].' - '.lang( 'Logs' );
 		$GLOBALS['phpgw']->common->phpgw_header();
 		
