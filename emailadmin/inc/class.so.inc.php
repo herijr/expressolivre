@@ -248,12 +248,21 @@ class so
 
 		$data['info'][] = array(
 			'field' => 'jobfunction',
-			'value' => ( !empty($result['funcao']) ? " / ". $result['funcao'] : '' )
+			'value' => ( !empty($result['funcao']) ? $result['funcao'] : '' )
 		);
 
 		$data['info'][] = array(
 			'field' => 'jobtitle',
 			'value' => ( !empty($result['titulo']) ? $result['titulo'] : '' )
+		);
+
+		$workplace = !empty($result['sigla']) ? $result['sigla'] : '';
+		$workplace .= !empty($result['descricao']) ? " - " . $result['descricao'] : '';
+		$workplace .= !empty($result['funcao']) ? " / " . $result['funcao'] : '';
+
+		$data['info'][] = array(
+			'field' => 'employeeworkplace',
+			'value' => ( $workplace )
 		);
 
 		$data['info'][] = array(
