@@ -3141,14 +3141,15 @@ class imap_functions
 	}
 
 	function send_notification($params){
+		
 		include("../header.inc.php");
+		
 		require_once("class.phpmailer.php");
+		
 		$mail = new PHPMailer();
 
 		$toaddress = $params['notificationto'];
-
-		$subject = lang("Read receipt: %1",$params['subject']);
-		$body = lang("Your message: %1",$params['subject']) . '<br>';
+		$body  = lang("Your message: %1",$this->_toUTF8( $params['subject'] )) . '<br>';
 		$body .= lang("Received in: %1",date("d/m/Y H:i",$params['date'])) . '<br>';
 		$body .= lang("Has been read by: %1 &lt; %2 &gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));
 		$mail->SMTPDebug = false;
@@ -3158,16 +3159,12 @@ class imap_functions
 		$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];
 		$mail->FromName = $this->fullNameUser;
 		$mail->AddAddress($toaddress);
-		$mail->Subject = $this->htmlspecialchars_decode($subject);
-
+		$mail->Subject = $this->_toUTF8( lang("Read receipt: %1", "" ) ) . $this->_toUTF8( $params['subject'] );
 		$mail->IsHTML(true);
+		$mail->CharSet = mb_detect_encoding( $body, 'UTF-8, ISO-8859-1' );
 		$mail->Body = $body;
 
-		if(!$mail->Send()){
-   			return $mail->ErrorInfo;
-		}
-		else
-   			return true;
+		return ( (!$mail->Send()) ? $mail->ErrorInfo : true );
 	}
 
 	function search($params)

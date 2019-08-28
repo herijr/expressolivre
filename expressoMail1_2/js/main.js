@@ -422,28 +422,25 @@ function show_msg(msg_info){
 
 	if (msg_info.status == 'false'){
 		eval(msg_info.command_to_exec);
-	}
-	else{
+	} else {
+		
 		var ID = msg_info.original_ID ? msg_info.original_ID : msg_info.msg_number;
 		var id_msg_read = ID+"_r";
 
-		if (preferences.use_shortcuts == '1'){
-			shortcutExpresso.selectMsg( ID , false );
-		}
+		if (preferences.use_shortcuts == '1'){ shortcutExpresso.selectMsg( ID , false ); }
 		// Call function to draw message
 		// If needed, delete old border
-		if (openTab.type[currentTab] == 2 || openTab.type[currentTab] == 3)
-			delete_border(currentTab,'false');
-
+		if (openTab.type[currentTab] == 2 || openTab.type[currentTab] == 3){ delete_border(currentTab,'false'); }
 
 		if(Element("border_id_" + id_msg_read)) {
 			alternate_border(id_msg_read);
 			resizeWindow(); 
-		}
-		else {
+		} else {
+
 			var border_id = create_border(msg_info.subject, id_msg_read, 2 , msg_info.msg_folder );
-			if(border_id)
-			{
+		
+			if(border_id) {
+				
 				draw_message(msg_info,border_id);
 				var unseen_sort = document.getElementById('span_flag_UNSEEN').getAttribute('onclick');
 				unseen_sort = unseen_sort.toString();
@@ -453,22 +450,22 @@ function show_msg(msg_info){
 					sort_box_type = null;
 					sort_box('UNSEEN', sort_type);
 				}
-			}
-			else
+			} else {
 				return;
+			}
 		}
 
 		var domains = "";
 		if ((msg_info.DispositionNotificationTo) && (!msg_is_read(ID) || (msg_info.Recent == 'N')))
 		{
-			if (preferences.notification_domains != undefined && preferences.notification_domains != "")
+			if(preferences.notification_domains != undefined && preferences.notification_domains != "")
 			{
 				domains = preferences.notification_domains.split(',');
 			}
 			else
 			{
 				var confNotification = true;
-			 }
+			}
 			for (var i = 0; i < domains.length; i++)
 				if (msg_info.DispositionNotificationTo.match(domains[i]+">"))
 				{
@@ -478,8 +475,14 @@ function show_msg(msg_info){
 				if (confNotification == undefined)
 					var confNotification = confirm(get_lang("The sender:\n%1\nwaits your notification of reading. Do you want to confirm this?",msg_info.DispositionNotificationTo), "");
 
-			if (confNotification)
-				cExecute ("$this.imap_functions.send_notification&notificationto="+msg_info.DispositionNotificationTo+"&date="+msg_info.udate+"&subject="+url_encode(msg_info.subject), handler_sendNotification);
+			if ( confNotification ){
+				Ajax( '$this.imap_functions.send_notification', {
+					'notificationto' : msg_info.DispositionNotificationTo,
+					'date' : msg_info.udate,
+					'subject' : msg_info.subject
+				}, handler_sendNotification );
+			}
+
 		}
 		//Change msg class to read.
 		if (!msg_is_read(ID))
