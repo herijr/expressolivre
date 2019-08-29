@@ -713,7 +713,7 @@ class imap_functions
 	function decode_personal( $addr )
 	{
 		$pers = ( isset( $addr->personal ) && !empty( $addr->personal ) )? trim( $this->_str_decode( $addr->personal ) ) : '';
-		return trim( ( strstr( $pers, ' ' ) === false )? trim( str_replace( '_', ' ', $pers ) ) : $pers, ' \t\n\r\0\x0B\'\"' );
+		return trim( ( strstr( $pers, ' ' ) === false )? trim( str_replace( '_', ' ', $pers ) ) : $pers, " \t\n\r\0\x0B\'\"" );
 	}
 
 	function decode_email( $addr )
