@@ -40,10 +40,16 @@ class AddEventResource extends CalendarAdapter {
 			$eventID 	 						= $this->getParam('eventID');
 			$eventCategoryID					= $this->getParam('eventCategoryID');
 			$eventType 	 						= $this->getParam('eventType');
-			$eventName							= $this->getParam('eventName');
 			
-			$eventDescription 					= $this->getParam('eventDescription');
-			$eventLocation 						= $this->getParam('eventLocation');
+			$eventName	= $this->getParam('eventName');
+			$eventName	= mb_convert_encoding( $eventName ,"ISO-8859-1", mb_detect_encoding($eventName, 'UTF-8, ISO-8859-1', true ));
+			
+			$eventDescription	= $this->getParam('eventDescription');
+			$eventDescription	= mb_convert_encoding( $eventDescription ,"ISO-8859-1", mb_detect_encoding($eventDescription, 'UTF-8, ISO-8859-1', true ));
+
+			$eventLocation	= $this->getParam('eventLocation');
+			$eventLocation	= mb_convert_encoding( $eventLocation ,"ISO-8859-1", mb_detect_encoding($eventLocation, 'UTF-8, ISO-8859-1', true ));
+			
 			$eventPriority 						= $this->getParam('eventPriority');
 			$eventOwnerIsParticipant 			= $this->getParam('eventOwnerIsParticipant');
 			$eventParticipants		 			= $this->getParam('eventParticipants');
