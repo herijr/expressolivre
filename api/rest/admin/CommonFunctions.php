@@ -4,7 +4,7 @@ class CommonFunctions
 {
 	public function convertChar($param)
 	{
-		$param = mb_convert_encoding( $param ,"UTF8", "ISO_8859-1" );
+		$param = mb_convert_encoding( $param ,"UTF-8", "ISO-8859-1" );
 
 		$array1 = array( "á", "à", "â", "ã", "ä", "é", "è", "ê", "ë", "í", "ì", "î", "ï", "ó", "ò", "ô", "õ", "ö", "ú", "ù", "û", "ü", "ç"
 		, "Á", "À", "Â", "Ã", "Ä", "É", "È", "Ê", "Ë", "Í", "Ì", "Î", "Ï", "Ó", "Ò", "Ô", "Õ", "Ö", "Ú", "Ù", "Û", "Ü", "Ç" );

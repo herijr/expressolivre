@@ -63,7 +63,8 @@ class UpdateUserResource extends AdminAdapter
 				$cpfUser		= trim($this->getParam('accountCpf'));
 				$rgUser			= trim($this->getParam('accountRg'));
 				$rgUF			= trim($this->getParam('accountRgUf'));
-				$description	= $common->convertChar(trim($this->getParam('accountDescription')));
+				$description	= $this->getParam('accountDescription');
+				$description	= mb_convert_encoding( $description ,"ISO-8859-1", mb_detect_encoding($description, 'UTF-8, ISO-8859-1', true ) );
 				$mailQuota		= trim($this->getParam('accountMailQuota'));
 				$birthDate		= $common->mascaraBirthDate($this->getParam('accountBirthDate'));
 				$st				= $this->getParam('accountSt');
