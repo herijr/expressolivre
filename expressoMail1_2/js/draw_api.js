@@ -3267,42 +3267,48 @@ function draw_search_box(){
 	table.appendChild(tbody);
 	content_id_0.appendChild(table);
 }
-	var idx_cc = 0;
+
+var idx_cc = 0;
+
 function draw_plugin_cc(ID, addrs)
 {
 	connector.loadScript("ccQuickAdd");
+
 	if ( typeof addrs.full !== 'undefined' ) addrs = addrs.full;
 
-	var array_addrs = '';
-	var array_name 	= '';
+	var array_addrs = "";
+	var array_name 	= "";
 	var cc_data = new Array();
+	
 	if(typeof(addrs.name) != 'undefined') {
-		array_name 	= LTrim(addrs.name).split(" ");
+		array_name 	= $.trim(addrs.name).split(" ");
 		array_addrs = new Array(addrs.email);
-	}
-	else {
+	} else {
 		array_addrs = (typeof addrs == 'object' ? addrs.toString().split("\" ") : addrs.split("\" "));
-		array_name 	= LTrim(array_addrs[0]).replace('"','').split(" ");
+		array_name 	= $.trim(array_addrs[0]).replace('"','').split(" ");
 	}
 
 	var _split = array_name[0].split('@');
 	cc_data[0] = _split[0];
 	cc_data[1] = _split[0];
-	cc_data[2] = '';
+	cc_data[2] = "";
 
-	for (i=1; i < array_name.length; i++)
+	for (i=1; i < array_name.length; i++){
 		cc_data[2] += array_name[i] + " ";
+	}
 
-
-	if(array_addrs.length > 1)
-		cc_data[3] = array_addrs[1] ? array_addrs[1].replace("&lt;",'').replace("&gt;",'') : '';
-	else
+	if( array_addrs.length > 1){
+		cc_data[3] = array_addrs[1] ? array_addrs[1] : "";
+		cc_data[3] = cc_data[3].replace("\<","&lt;").replace("\>","&gt;");
+		cc_data[3] = cc_data[3].replace("&lt;","").replace("&gt;","");
+	} else {
 		cc_data[3] = array_addrs[0];
+	}
 
 	var sm_envelope_img1 = '<img style="cursor:'+ (is_ie ? 'hand' : 'pointer') +'" title="' + get_lang("Add Contact") +
 	'" onclick="ccQuickAddOne.showList(\''+cc_data+'\')" src="./templates/'+template+'/images/user_card.png">';
 	var to_addybook_add = "<SPAN id='insert_plugin_"+idx_cc+"_"+ID+"'>";
-	to_addybook_add += addrs;
+	to_addybook_add += addrs.replace("\<","&lt;").replace("\>","&gt;");
 	to_addybook_add +=  sm_envelope_img1;
 	idx_cc++;
 	to_addybook_add += "</SPAN>";
