@@ -90,28 +90,24 @@ class CatalogAdapter extends ExpressoAdapter {
 		}
 		return false;
 	}
-
 	
-	protected function getUserLdapPhoto($contactID) {		
-		$ldap_context = $_SESSION['phpgw_info']['expressomail']['ldap_server']['dn'];
-		$justthese = array("dn", 'jpegPhoto','givenName', 'sn');
-		$this->getLdapCatalog()->ldapConnect(true);
-		$ds = $this->getLdapCatalog()->ds;		
-		
+	protected function getUserLdapPhoto($contactID) {
+		$filter="(&(phpgwAccountType=u)(uidNumber=".$contactID."))";
+		$ldap_context = $GLOBALS['phpgw_info']['server']['ldap_context'];
+		$justthese = array('jpegPhoto'); 
+		$this->getLdapCatalog()->ldapConnect();
+		$ds = $this->getLdapCatalog()->ds;
 		if ($ds){
-			$resource = @ldap_read($ds, $contactID, "phpgwaccounttype=u");
-			$n_entries = @ldap_count_entries($ds, $resource);
-
-			if ( $n_entries == 1) {			
-				$first_entry = ldap_first_entry($ds, $resource);
-				$obj = ldap_get_attributes($ds, $first_entry);
-				
-				if($obj['jpegPhoto']){
-					return ldap_get_values_len( $ds, $first_entry, "jpegPhoto");
+			$sr = @ldap_search($ds, $ldap_context, $filter, $justthese);
+			if ($sr) {
+				$entry = ldap_first_entry($ds, $sr);
+				if($entry) {
+					$photo = @ldap_get_values_len($ds, $entry, "jpegphoto");
+					return $photo[0];
 				}
-			}								
+			}
 		}
-		return false;
+		return false;				
 	}	
 	
 	protected function getGlobalContacts($search, $uidNumber){

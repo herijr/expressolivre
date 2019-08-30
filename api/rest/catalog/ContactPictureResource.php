@@ -50,7 +50,7 @@ class ContactPictureResource extends CatalogAdapter {
 				$photo = $this->getUserLdapPhoto(urldecode($contactID));
 				$contact[] = array(
 						'contactID'		=> $contactID,
-						'contactImagePicture'	=> ($photo != null ? base64_encode($photo[0]) : "")
+						'contactImagePicture'	=> ( $photo ? base64_encode($photo) : '' )
 				);
 	
 			}
