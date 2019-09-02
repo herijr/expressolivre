@@ -1650,7 +1650,9 @@ class imap_functions
 				$result[$i]['to']['name'] =  $cc[0]->personal;
 				$result[$i]['to']['email'] = $cc[0]->mailbox . "@" . $cc[0]->host;
 			}
-			$result[$i]['subject'] = $this->decode_string($header->fetchsubject);
+			
+			$result[$i]['subject'] = ( isset( $header->fetchsubject ) ) ? trim($this->decode_string($header->fetchsubject)) : '';
+			$result[$i]['subject'] = ( strstr( $result[$i]['subject'], ' ' ) === false )? str_replace( '_', ' ', $result[$i]['subject'] ) : $result[$i]['subject'];					
 
 			$result[$i]['Size'] = $header->Size;
 			$result[$i]['reply_toaddress'] = $this->decode_string($header->reply_toaddress);
