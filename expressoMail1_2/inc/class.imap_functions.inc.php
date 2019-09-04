@@ -694,6 +694,7 @@ class imap_functions
 	{
 		$personal = $this->decode_personal( $addr );
 		$email    = $this->decode_email( $addr );
+		$email    = preg_replace( "/[[:space:]]/", "", $email );
 		$full     = ( empty( $personal ) )? $email : '"'.$personal.'" <'.$email.'>';
 		return (object) array( 'name' => empty( $personal )? $email : $personal, 'email' => $email, 'full' => $full );
 	}
