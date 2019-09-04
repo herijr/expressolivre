@@ -254,7 +254,7 @@ class MessageReader
 			$thumbs_array[] = '<a '.
 				'onMouseDown="save_image(event,this,\''.$this->_folder.'\',\''.$this->_uid.'\',\''.$section->section.'\')" '.
 				'href="#'.$url.'" '.
-				'onClick="window.open(\'/inc/show_img.php?msg_num='.$this->_uid.'&msg_folder='.$this->_folder.'&msg_part='.$section->section.'\',\'mywindow\',\'width=700,height=600,scrollbars=yes\');" '.
+				'onClick="window.open(\'/expressoMail1_2/inc/show_img.php?msg_num='.$this->_uid.'&msg_folder='.$this->_folder.'&msg_part='.$section->section.'\',\'mywindow\',\'width=700,height=600,scrollbars=yes\');" '.
 			'>'.
 				'<img id="'.$url.'" style="border:2px solid #fde7bc;padding:5px" title="'.$this->getLang( 'Click here do view (+)' ).'" '.
 					'src="./inc/show_img.php?msg_num='.$this->_uid.'&msg_folder='.$this->_folder.'&msg_part='.$section->section.'&thumb=true&file_type=jpeg">'.
