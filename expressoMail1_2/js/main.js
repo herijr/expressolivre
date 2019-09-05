@@ -1418,6 +1418,15 @@ function buildAttachments( $obj, editable, selected )
 		}
 	}
 
+	// Resize div attachments
+	if( $($obj).find("div.common").height() > 150 ){
+
+		$($obj).find("div.common")
+			.css("height","100px")
+			.css("overflow", "auto")
+			.css("padding","6px 0px 8px 1px");
+	}
+
 	if ( !editable ) {
 		if ( msg.attachs.length > 1 ) {
 			if ( parseInt( preferences.remove_attachments_function ) )
