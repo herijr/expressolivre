@@ -200,7 +200,7 @@ class MessageReader
 
 	private function _str_decode( $str, $charset = false )
 	{
-		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/i', $str ) ) $str = mb_decode_mimeheader( $str );
 		return $this->_toUTF8( $str, $charset );
 	}
 	
@@ -211,7 +211,7 @@ class MessageReader
 
 	private function _stripWinBadChars( $filename )
 	{
-		return preg_replace( '/[<>:"|?*\/\\\]/', '-', preg_replace( '/[\x00-\x1F\x7F]/u', '', $filename ) );
+		return preg_replace( '/[<>:"|?*\/\\\]/', '-', preg_replace( '/[\x00-\x1F\x7F]/u', '', $this->_str_decode( $filename ) ) );
 	}
 
 	private function _fetchBody( $section, $flag = false )

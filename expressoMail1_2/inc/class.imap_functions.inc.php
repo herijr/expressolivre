@@ -551,7 +551,7 @@ class imap_functions
 		if ( $mail_reader->isCripted() ) {
 			$return['source']       = $header_src."\r\n\r\n".imap_body( $this->mbox, $msg_number, FT_UID | FT_PEEK );
 			$return['body']         = '';
-			
+
 		} else {
 			
 			$body_struct            = $mail_reader->getBody();
@@ -592,9 +592,7 @@ class imap_functions
 
 		if($header->Answered =='A' && $header->Draft == 'X'){
 			$return['Forwarded'] = 'F';
-		}
-
-		else {
+		} else {
 			$return['Answered']	= $header->Answered;
 			$return['Draft']	= $header->Draft;
 		}
@@ -606,11 +604,8 @@ class imap_functions
 		$msgTimestamp = $header->udate + $offset;
 
 		$date_msg = gmdate("d/m/Y",$msgTimestamp);
-//		if (date("d/m/Y") == $date_msg)
-//			$return['udate'] = $header->udate;
-//		else
-		$return['udate'] = $header->udate;
 
+		$return['udate'] = $header->udate;
 		$return['msg_day'] = $date_msg;
 		$return['msg_hour'] = gmdate("H:i",$msgTimestamp);
 
@@ -661,7 +656,7 @@ class imap_functions
 		$return['reply_toaddress'] = $header->reply_toaddress;
 		$return['Size']            = $header->Size;
 
-		$return['subject'] = ( isset( $header->subject ) )? trim( $header->subject ) : '';
+		$return['subject'] = ( isset( $header->subject ) )? trim($this->decode_string($header->fetchsubject)) : '';
 		$return['subject'] = ( strstr( $return['subject'], ' ' ) === false )? trim( str_replace( '_', ' ', $return['subject'] ) ) : $return['subject'];
 
 		//All this is to help in local messages
