@@ -4103,46 +4103,6 @@ class imap_functions
         return $insert;
     }
     
-    function get_quota_folders(){ 
-
-	    // Additional Imap Class for not-implemented functions into PHP-IMAP extension. 
-	    include_once("class.imapfp.inc.php");            
-	    $imapfp = new imapfp(); 
-
-	    if(!$imapfp->open($this->imap_server,$this->imap_port)) 
-		    return $imapfp->get_error();             
-	    if (!$imapfp->login( $this->username,$this->password )) 
-		    return $imapfp->get_error(); 
-
-	    $response_array = $imapfp->get_mailboxes_size(); 
-	    if ($imapfp->error) 
-		    return $imapfp->get_error(); 
-
-	    $data = array(); 
-	    $quota_root = $this->get_quota(array('folder_id' => "INBOX")); 
-	    $data["quota_root"] = $quota_root; 
-
-	    foreach ($response_array as $idx=>$line) { 
-		    $line2 = str_replace('"', "", $line); 
-		    $line2 = str_replace(" /vendor/cmu/cyrus-imapd/size (value.shared ",";",str_replace("* ANNOTATION ","",$line2)); 
-		    list($folder,$size) = explode(";",$line2); 
-		    $quota_used = str_replace(")","",$size); 
-		    $quotaPercent = ( intval($quota_used) > 0 ) ? (($quota_used / 1024) / $data["quota_root"]["quota_limit"])*100 : 0 ; 
-
-				$folder = $this->_toUTF8( $folder, 'UTF7-IMAP' ); 
-
-		    if(!preg_match('/user\\'.$this->imap_delimiter.$this->username.'\\'.$this->imap_delimiter.'/i',$folder)){ 
-			    $folder = $this->functions->getLang("Inbox"); 
-		    } else {
-		      $folder = preg_replace('/user\\'.$this->imap_delimiter.$this->username.'\\'.$this->imap_delimiter.'/i','', $folder); 
-		    }
-
-		    $data[$folder] = array("quota_percent" => sprintf("%.1f",round($quotaPercent,1)), "quota_used" => $quota_used); 
-	    } 
-	    $imapfp->close(); 
-	    return $data; 
-	}
-
 	public function __destruct()
 	{
 		$this->close_mbox( $this->mbox );
