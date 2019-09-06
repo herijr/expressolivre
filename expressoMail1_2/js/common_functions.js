@@ -273,13 +273,9 @@ window.onbeforeunload = function()
 
 function unloadMess()
 {
-    if (typeof BordersArray == 'undefined')
-    	return; // We're not on expressoMail
-	if (typeof(expresso_mail_sync) != "undefined" && expresso_mail_sync.working) {
-		var mess = get_lang("You're about archiving your e-mails from server. Do you really want to stop this action?");
-		return mess;
-	}
-	else {
+	if (typeof BordersArray == 'undefined'){
+		return; // We're not on expressoMail
+	} else {
 		var mess = get_lang("Your message has not been sent and will be discarted.");
 		for (var i = 0; i < BordersArray.length; i++) {
 			var body = Element('body_' + BordersArray[i].sequence);
@@ -705,22 +701,19 @@ function filterbox(){
 
 function sharebox()
 {
-	var handler_imap_getacl = function(data)
-	{
-                var options = '';
-		for (var x in data)
-		{
-			options += "<option value='"+data[x].uid+"'>"+data[x].cn+"</option>";
-		}
+	Ajax( '$this.imap_functions.getacl' , undefined, function(data){
+
 		connector.loadScript("sharemailbox");
-		if (typeof(sharemailbox) == 'undefined')
+
+		if( typeof(sharemailbox) == 'undefined' )
 		{
 			setTimeout('sharebox()',500);
+
 			return false;
 		}
-		sharemailbox.makeWindow(options);
-	}
-	cExecute ("$this.imap_functions.getacl", handler_imap_getacl);
+
+		sharemailbox.makeWindow( data );
+	});
 }
 
 function open_rss(param){
@@ -736,7 +729,6 @@ function open_rss(param){
 
 function editrss()
 {
-
     connector.loadScript("news_edit");
 
     if (typeof(news_edit) == 'undefined')
@@ -745,7 +737,6 @@ function editrss()
             return false;
     }
     news_edit.makeWindow();
-        
 }
 
 
@@ -1017,24 +1008,18 @@ function exist_className(obj, className){
 
 function select_all_messages(select)
 {
-	var main = Element("tbody_box");
-	var main_list = main.childNodes;
-	var len_main_list = main_list.length;
+	var listEmails = $("#tbody_box")[0].childNodes;
 
-	if (select)
-	{
-		for (i=0; i<len_main_list; i++)
+	if( listEmails.length > 1 ){
+		for( i = 0; i < listEmails.length; i++ )
 		{
-			Element("check_box_message_"+main_list[i].id).checked = true;
-			add_className(Element(main_list[i].id), 'selected_msg');
-		}
-	}
-	else
-	{
-		for (i=0; i<len_main_list; i++)
-		{
-			Element("check_box_message_"+main_list[i].id).checked = false;
-			remove_className(Element(main_list[i].id), 'selected_msg');
+			if (select) {
+				$("#check_box_message_"+listEmails[i].id).attr('checked',true);
+				add_className($("#"+listEmails[i].id)[0], 'selected_msg');
+			} else {
+				$("#check_box_message_"+listEmails[i].id).attr('checked',false);
+				remove_className( $("#"+listEmails[i].id)[0], 'selected_msg');
+			}
 		}
 	}
 }

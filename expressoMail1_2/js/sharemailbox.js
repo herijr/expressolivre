@@ -62,7 +62,7 @@ cShareMailbox.prototype.setCheckBox = function( attribute, value ){
 
 cShareMailbox.prototype.getaclfromuser = function(user){
 	
-	var getAclFromUser = function(data){
+	Ajax( "$this.imap_functions.getaclfromuser", { 'user' : user }, function(data){
 
 		var aclUser = ($.trim(data[user]) == "false" ? false : $.trim(data[user]));
 
@@ -124,9 +124,7 @@ cShareMailbox.prototype.getaclfromuser = function(user){
 				$("#em_input_saveAcl").prop('disabled', false);
 			}
 		}
-	}
-
-	cExecute("$this.imap_functions.getaclfromuser&user=" + user, getAclFromUser );
+	});
 }
 
 cShareMailbox.prototype.setaclfromuser = function () {
@@ -173,18 +171,24 @@ cShareMailbox.prototype.setaclfromuser = function () {
 
 		var setAclFromUser = function(data){ return true; };
 
-		cExecute("$this.imap_functions.setaclfromuser&user=" + user + "&acl=" + acl, setAclFromUser);
+		Ajax( "$this.imap_functions.setaclfromuser", { "user" : user, "acl" : acl }, setAclFromUser );
 
 	} else {
-		
-		alert("Selecione antes um usuario!"); 
-		
+		alert( get_lang('select a user')); 
 		return false;
 	}
 }
 
-cShareMailbox.prototype.makeWindow = function (options) {
+cShareMailbox.prototype.makeWindow = function( data ){
+
 	_this = this;
+
+	var options = '';
+
+	$.each( data, function( key, value ){
+
+		options += "<option value='"+data[key].uid+"'>"+data[key].cn+"</option>";
+	});
 
 	var el = $("<div>").css({
 		'visibility': 'hidden',
@@ -452,10 +456,10 @@ cShareMailbox.prototype.remove_user = function () {
 
 	var removeUser = function( data ){ return true; };
 
-	cExecute("$this.imap_functions.setaclfromuser&user=" + user + "&acl=none", removeUser );
+	Ajax("$this.imap_functions.setaclfromuser", { 'user' : user , 'acl' : 'none' }, removeUser );
 }
-
 
 /* Build the Object */
 var sharemailbox;
+
 sharemailbox = new cShareMailbox();

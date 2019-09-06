@@ -284,16 +284,13 @@ function draw_tree_folders(folders){
 	}
 	if (folder_create != "") {
 		if (confirm(get_lang("There are folders with invalid format. If you want to fix now, click on button OK."))) {
-			var handler_correct_folders = function (data) {
-				//Timeout to release HTTPRequest , loadScript and update tree folders.
+			Ajax( "$this.imap_functions.create_extra_mailbox", { 'nw_folders' : folder_create }, function(data){
 				if (data) {
 					write_msg(get_lang('The folders were fixed with success.'));
 					setTimeout("connector.loadScript('TreeShow');ttreeBox.update_folder();", 500);
 				}
-			}
-			cExecute("$this.imap_functions.create_extra_mailbox", handler_correct_folders, "nw_folders=" + folder_create);
-		}
-		else {
+			});
+		} else {
 			write_msg(get_lang('Warning: The folders with invalid format will be unavailable.'));
 		}
 	}
@@ -3044,7 +3041,7 @@ function build_quota( data )
 }
 
 function update_quota(folder_id){
-	cExecute ("$this.imap_functions.get_quota&folder_id="+folder_id,build_quota);
+	Ajax( "$this.imap_functions.get_quota", { 'folder_id' : folder_id } , build_quota );
 }
 
 function draw_search(headers_msgs){
@@ -3312,15 +3309,9 @@ function draw_footer_box(num_msgs){
 		'<span class="message_options_trash"><span ' + change_font_color + ' title="'+get_lang("Delete")+'" class="message_options" onclick=proxy_mensagens.delete_msgs(\'null\',\'selected\',\'null\')>'+get_lang("Delete")+'</span></span>'+
 		'<span class="message_options_move"><span ' + change_font_color + ' title="'+get_lang("Move")+'" class="message_options" onclick=wfolders.makeWindow(\"\",\"move_to\")>'+get_lang("Move")+'</span></span>'+
    		((expresso_offline)?" ":'<span class="message_options_print"><span ' + change_font_color + ' title="'+get_lang("Print")+'" class="message_options" onclick=print_all()>'+get_lang("Print")+'</span></span>')+
-//		'<span class="message_options_print"><span ' + change_font_color + ' title="'+get_lang("Print")+'" class="message_options" onclick=print_all()>'+get_lang("Print")+'</span></span>'+
 		((expresso_offline)?" ":'<span class="message_options_export"><span ' + change_font_color + ' title="'+get_lang("Export")+'" class="message_options" onclick="proxy_mensagens.export_all_messages()">'+get_lang("Export")+'</span></span>') +
 		((expresso_offline)?" ":'<span class="message_options_import"><span ' + change_font_color + ' title="'+get_lang("Import")+'" class="message_options" onclick="import_window()">'+get_lang("Import")+'</span></span>');
-	if(preferences.use_local_messages==1 && !expresso_offline)
-		if(proxy_mensagens.is_local_folder(current_folder))
-			span_options.innerHTML += '&nbsp; <span title="'+get_lang("Unarchive")+'" class="message_options" onclick="expresso_local_messages.unarchive_msgs(\''+folder+'\',null)">'+get_lang("Unarchive")+'</span>';
-		else
-			span_options.innerHTML += '&nbsp; <span title="'+get_lang("Archive")+'" class="message_options" onclick="archive_msgs(\''+folder+'\',null)">'+get_lang("Archive")+'</span>';
-	
+
 	span_options.innerHTML += '<span id="mark_as_spam" '+change_font_color+' title="'+get_lang( 'Mark as Spam' )+'" class="message_options" onclick="mark_as_spam( true );" style="display: none; background: url(\'../phpgwapi/templates/default/images/foldertree_sent.png\') no-repeat left center; padding: 0 6px 1px 17px;">'+get_lang( 'Mark as Spam' )+'</span>';
 	span_options.innerHTML += '<span id="mark_as_not_spam" '+change_font_color+' title="'+get_lang( 'Not Spam' )+'" class="message_options" onclick="mark_as_spam( false );" style="display: none; background: url(\'../phpgwapi/templates/default/images/foldertree_sent.png\') no-repeat left center; padding: 0 6px 1px 17px;">'+get_lang( 'Not Spam' )+'</span>';
 	

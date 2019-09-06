@@ -225,56 +225,9 @@
 		else 
 			if ((!this.is_local_folder(folder)) && (!this.is_local_folder(new_folder))) { //Move entre pastas locais...
 				move_msgs(folder, msgs_number, border_ID, new_folder, new_folder_name);
-			}
-			else if ((!this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) {
-				if(msgs_number=='selected')
-					archive_msgs(folder,new_folder);
-				else
-					archive_msgs(folder,new_folder,msgs_number);
+			} else if ((!this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) {
 				draw_tree_local_folders();
 			}
-			else {
-                //Por Bruno Costa (bruno.vieira-costa@serpro.gov.br) permite o desarquivamento de menssagens chamando a funcao unarchive_msgs quando uma msg e movida de uma pasta local para uma pasta remota.
-
-				expresso_local_messages.unarchive_msgs(folder,new_folder,msgs_number);
-                //write_msg(get_lang("you can't move mails from local to server folders"));
-			}
-		
-		
-	}
-	
-	messages_proxy.prototype.proxy_move_search_messages = function(border_id, new_folder, new_folder_name) {
-		
-		
-		/*
-		
-		
-		if ((this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) { //Move entre pastas nao locais...
-			if (folder == new_folder){
-				write_msg(get_lang('The origin folder and the destination folder are the same.'));
-				return;
-			}
-			if(msgs_number=='selected')
-				msgs_number = get_selected_messages();
-			if (new_folder == 'local_root')
-				alert(get_lang("Select a folder!"));
-			if (parseInt(msgs_number) > 0 || msgs_number.length > 0) {
-				expresso_local_messages.move_messages(new_folder.substr(6), msgs_number);
-				this.aux_interface_remove_mails(msgs_number, new_folder_name, border_ID);
-			}
-			else 
-				write_msg(get_lang('No selected message.'));
-		}
-		else 
-			if ((!this.is_local_folder(folder)) && (!this.is_local_folder(new_folder))) { //Move entre pastas locais...
-				move_msgs(folder, msgs_number, border_ID, new_folder, new_folder_name);
-			}
-			else if ((!this.is_local_folder(folder)) && (this.is_local_folder(new_folder))) {
-				archive_msgs(folder,new_folder);
-			}
-			else {
-				write_msg(get_lang("you can't move mails from local to server folders"));
-			}*/
 	}
 	
 	messages_proxy.prototype.aux_interface_remove_mails = function(msgs_number,new_folder_name,border_ID,previous_msg) {

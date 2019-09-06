@@ -1231,65 +1231,6 @@ local_messages.prototype.get_src = function(url){
     return AJAX.responseText;
 };
 
-//Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Dessarquiva msgs locais pegando o codigo fonte das mesmas e mandando via POST para o servidor
-//para que elas sejam inseridas no imap pela funcao  imap_functions.unarchive_mail.
-local_messages.prototype.unarchive_msgs = function (folder,new_folder,msgs_number){
-
-    if(!new_folder)
-	new_folder='INBOX';
-    this.init_local_messages();
-    // alert(folder+new_folder+msgs_number);
-    var handler_unarchive = function(data)
-    {
-		if(data.error == '')
-		    write_msg(get_lang('All messages are successfully unarchived'));
-		else
-		    alert(data.error);
-    }
-
-	if(currentTab.toString().indexOf("_r") != -1){
-            msgs_number = currentTab.toString().substr(0,currentTab.toString().indexOf("_r"));
-    }
-	
-    if(msgs_number =='selected' || !msgs_number)
-    {
-		msgs_number = get_selected_messages()
-		if (!msgs_number){
-		    write_msg(get_lang('No selected message.'));
-		    return;
-		}
-		var rs = this.dbGears.execute("select mail,timestamp from mail where rowid in ("+msgs_number+")");
-		var source="";
-		var flags="";
-                var timestamp="";
-		
-		while(rs.isValidRow()) {
-			mail=connector.unserialize(rs.field(0));
-			mail.msg_source?source_tmp = escape(mail.msg_source):source_tmp = escape(this.get_src(mail.url_export_file));
-			flags+="#@#@#@"+mail["Answered"]+":"+mail["Draft"]+":"+mail["Flagged"]+":"+mail["Unseen"];
-                        source+="#@#@#@"+source_tmp;
-			timestamp+="#@#@#@"+rs.field(1);
-			rs.next();
-		}
-		rs.close();
-		this.finalize();
-    }
-    else
-    {
-		var rs = this.dbGears.execute("select mail,timestamp from mail where rowid="+msgs_number);
-		mail=connector.unserialize(rs.field(0));
-		var source ="";
-
-		mail.msg_source?source = mail.msg_source:source = this.get_src(mail.url_export_file);
-		flags = mail["Answered"]+":"+mail["Draft"]+":"+mail["Flagged"]+":"+mail["Unseen"];
-		timestamp=rs.field(1);
-		rs.close();
-		this.finalize();
-    }
-    params="&folder="+new_folder+"&source="+source+"&timestamp="+timestamp+"&flags="+flags;
-    cExecute ("$this.imap_functions.unarchive_mail&", handler_unarchive, params);
-}
-
 local_messages.prototype.get_msg_date = function (original_id, is_local){
 
     this.init_local_messages();

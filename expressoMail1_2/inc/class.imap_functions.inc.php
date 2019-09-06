@@ -18,7 +18,6 @@ class imap_functions
 		'get_info_msgs'					=> True,
 		'get_folders_list'				=> True,
 		'import_msgs'					=> True,
-		'msgs_to_archive'				=> True
 	);
 
 	var $ldap;
@@ -450,36 +449,6 @@ class imap_functions
 
 		return $return;
 
-	}
-	
-	function msgs_to_archive($params) {
-		
-		$folder = $params['folder'];
-		$all_ids = $this-> get_msgs($folder, 'SORTARRIVAL', false, 0,-1,-1);
-
-		$messages_not_to_copy = explode(",",$params['mails']);
-		$ids = array();
-		
-		$cont = 0;
-		
-		foreach($all_ids as $each_id=>$value) {
-			if(!in_array($each_id,$messages_not_to_copy)) {
-				array_push($ids,$each_id);
-				$cont++;
-			}
-			if($cont>=100)
-				break;
-		}
-
-		if (empty($ids))
-			return array();
-
-		$params = array("folder"=>$folder,"msgs_number"=>implode(",",$ids));
-		
-		
-		return $this->get_info_msgs($params);
-		
-		
 	}
 
 	/**
@@ -4082,27 +4051,6 @@ class imap_functions
             return $source;
     }
 
-//Por Bruno Costa(bruno.vieira-costa@serpro.gov.br - Recebe os fontes dos emails a serem desarquivados, separa e envia cada um para funcao insert_mail.
-
-    function unarchive_mail($params)
-    {
-        $dest_folder = $params['folder'];
-        $sources = explode("#@#@#@",$params['source']);
-        $timestamps = explode("#@#@#@",$params['timestamp']);
-        $flags = explode("#@#@#@",$params['flags']);
-
-        foreach($sources as $index=>$src)
-        {
-            if($src!="")
-            {
-		$source = $this->treat_base64_from_post($src);
-		$insert = $this->insert_email($source,$dest_folder,$timestamps[$index],$flags[$index]);
-            }
-	}
-        
-        return $insert;
-    }
-    
 	public function __destruct()
 	{
 		$this->close_mbox( $this->mbox );

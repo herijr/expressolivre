@@ -71,13 +71,6 @@ function init(){
 			    preferences.use_local_messages=0;
 		    }
 		}
-		if (preferences.use_local_messages==1) { //O I.E 7 estava se atrapalhando caso esses loads fossem feitos apos as chamadas ajax. Antes nao apresentou problemas...
-			connector.loadScript('mail_sync');
-			if (is_ie)
-				connector.loadScript('TreeShow');
-			setTimeout('auto_archiving()', 30000);
-			
-		}
 
 		Ajax( '$this.imap_functions.get_range_msgs2', {
 			'folder'          : 'INBOX',
@@ -102,10 +95,7 @@ function init(){
 			write_msg(get_lang("Attention, you are in out of office mode."), true);
 
 		ConstructMenuTools();
-		
-		if ( (preferences.use_local_messages==1) && (expresso_local_messages.is_offline_installed()) )  //Precisa ser feito apos a renderizacao da caixa de emails
-			check_mail_in_queue();
-		
+	
 		// Insere a applet de criptografia
 		if (preferences.use_signature_digital_cripto == '1'){
 			loadApplet();
@@ -330,22 +320,21 @@ function disable_field(field,condition) {
 */
 function remove_all_attachments(folder,msg_num) {
 
-	var call_back = function(data) {
-		if(!data.status) {
-			alert(data.msg);
-		}
-		else {
-			msg_to_delete = Element(msg_num);
-			change_tr_properties(msg_to_delete, data.msg_no);
-			msg_to_delete.childNodes[1].innerHTML = "";
-			write_msg(get_lang("Attachments removed"));
-			delete_border(msg_num+'_r','false'); //close email tab
-		}
-	};
-	if (confirm(get_lang("delete all attachments confirmation")))
-		cExecute ("$this.imap_functions.remove_attachments&folder="
-				+folder+"&msg_num="+msg_num, call_back);
+	if (confirm(get_lang("delete all attachments confirmation"))){
+		Ajax( "$this.imap_functions.remove_attachments", { 'folder' : folder , 'msg_num' : msg_num }, function(data) {
+			if(!data.status) {
+				alert(data.msg);
+			} else {
+				msg_to_delete = Element(msg_num);
+				change_tr_properties(msg_to_delete, data.msg_no);
+				msg_to_delete.childNodes[1].innerHTML = "";
+				write_msg(get_lang("Attachments removed"));
+				delete_border(msg_num+'_r','false'); //close email tab
+			}
+		});
+	}
 }
+
 function watch_changes_in_msg( id )
 {
 	if ( document.getElementById('border_id_'+id) )
@@ -499,11 +488,6 @@ function show_msg(msg_info){
 function auto_refresh(){
 	refresh(preferences.alert_new_msg);
 	setTimeout('auto_refresh()', time_refresh);
-}
-
-function auto_archiving() {
-	expresso_mail_sync.start_sync();
-	setTimeout('auto_archiving()',600000);
 }
 
 function refresh(alert_new_msg){
@@ -681,50 +665,40 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 			return false;
 		}
 
-		Element('chk_box_select_all_messages').checked = false;
+		$("#chk_box_select_all_messages").attr('checked', false );
 
-		if (currentTab){
-			mail_msg = Element("tbody_box_"+currentTab);
-		}else{
-			mail_msg = Element("tbody_box");
-		}
-
-		if ( preferences.use_shortcuts == '1') {
-			//Last msg is selected
-			if (mail_msg && exist_className(mail_msg.childNodes[mail_msg.childNodes.length-1], 'selected_shortcut_msg') ) {
-				shortcutExpresso.selectMsg( false, 'up' );	
-			}
-			else {
-				shortcutExpresso.selectMsg( false, 'up' );
-			}
-		}
+		if ( preferences.use_shortcuts == '1') { shortcutExpresso.selectMsg( false, 'up' ); }
 
 		if (show_success_msg) {
-			if (data.msgs_number.length == 1)
+			if (data.msgs_number.length == 1){
 				write_msg(get_lang("The message was deleted."));
-			else
+			} else { 
 				write_msg(get_lang("The messages were deleted."));
+			}
 		}
+
 		if (openTab.type[currentTab] > 1){
 			var msg_to_delete = Element(msgs_number);
 			if (parseInt(preferences.delete_and_show_previous_message) && msg_to_delete) {
 				if (msg_to_delete.previousSibling){
- 					var previous_msg = msg_to_delete.previousSibling.id;
- 					Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': previous_msg, 'msg_folder': current_folder }, show_msg );
- 				} 
-				else
+					var previous_msg = msg_to_delete.previousSibling.id;
+					Ajax( '$this.imap_functions.get_info_msg', { 'msg_number': previous_msg, 'msg_folder': current_folder }, show_msg );
+				} else {
 					delete_border(currentTab,'false');
-			}
-			else
-				delete_border(currentTab,'false');
-		}
-		for (var i=0; i<data.msgs_number.length; i++){
-				var msg_to_delete = Element(data.msgs_number[i]);
-				if (msg_to_delete){
-						removeAll(msg_to_delete.id);
 				}
+			} else {
+				delete_border(currentTab,'false');
+			}
 		}
-		Element('tot_m').innerHTML = parseInt(Element('tot_m').innerHTML) - data.msgs_number.length;
+
+		if( $.isArray(data.msgs_number) ){
+			$.each( data.msgs_number, function(key, value){
+				removeAll( $("#" + value).attr('id') );
+			});
+		}
+
+		$("#tot_m").html( parseInt($("#tot_m").html()) - data.msgs_number.length );
+		
 		refresh();
 	}
 
@@ -733,12 +707,18 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 	}
 	
 	if( msgs_number.length > 0 || parseInt(msgs_number) > 0 ){
-		cExecute ("$this.imap_functions.delete_msgs&folder="+folder+"&msgs_number="+msgs_number+"&border_ID="+border_ID+"&sort_box_type="+sort_box_type+"&search_box_type="+search_box_type+"&sort_box_reverse="+sort_box_reverse, handler_delete_msgs);
+		Ajax( "$this.imap_functions.delete_msgs", {
+			'folder': folder,
+			'msgs_number' : msgs_number,
+			'border_ID' : border_ID,
+			'sort_box_type' : sort_box_type,
+			'search_box_type' : search_box_type,
+			'sort_box_reverse' : sort_box_reverse
+		}, handler_delete_msgs );
 	}else{
 		write_msg(get_lang('No selected message.'));
 	}
 }
-
 
 function move_search_msgs(border_id, new_folder, new_folder_name){
 	var selected_messages = '';
@@ -974,30 +954,6 @@ function move_msgs2(folder, msgs_number, border_ID, new_folder, new_folder_name,
 
 function move_msgs(folder, msgs_number, border_ID, new_folder, new_folder_name) {
 	move_msgs2(folder, msgs_number, border_ID, new_folder, new_folder_name,true);
-}
-
-function archive_msgs(folder,folder_dest,id_msgs) {
-	if(proxy_mensagens.is_local_folder(folder)) {
-		write_msg(get_lang("You cant archive local mails"));
-		return;
-	}
-
-	if(currentTab.toString().indexOf("_r") != -1){
-            id_msgs = currentTab.toString().substr(0,currentTab.toString().indexOf("_r"));
-        }
-
-	if(!id_msgs)
-		id_msgs = get_selected_messages();
-
-	if(folder_dest=='local_root' || folder_dest==null) //Caso seja o primeiro arquivamento...
-		folder_dest = 'local_Inbox';
-
-	if (parseInt(id_msgs) > 0 || id_msgs.length > 0)
-		expresso_mail_sync.archive_msgs(folder,folder_dest,id_msgs);
-		//cExecute("$this.imap_functions.get_info_msgs&folder=" + folder + "&msgs_number=" + id_msgs , handler_arquivar_mensagens);
-	else
-		write_msg(get_lang('No selected message.'));
-
 }
 
 function get_selected_messages()
@@ -1466,35 +1422,32 @@ function appletReturn(smime, ID, operation, folder){
 		return;
 	}
 
-	if(operation=='decript')
+	if( $.trim(operation) === 'decript' )
 	{
-		var handler = function(data){
+		Ajax( "$this.imap_functions.show_decript",{
+			'source' : smime,
+			'ID' : ID,
+			'folder' : folder
+		}, function(data){
 
 			if(data.msg_day == '')
 			{
 				header=expresso_local_messages.get_msg_date(data.original_ID, proxy_mensagens.is_local_folder(get_current_folder()));
-
 				data.fulldate=header.fulldate;
 				data.smalldate=header.smalldate;
 				data.msg_day = header.msg_day;
 				data.msg_hour = header.msg_hour;
-
 			}
-			this.show_msg(data);
-		}
-		para="&source="+smime+"&ID="+ID+"&folder="+folder;
-		cExecute ("$this.imap_functions.show_decript&", handler, para);
-	}else
-	{
+			
+			show_msg(data);
+		});
+
+	} else {
 		ID_tmp = ID;
 		// Le a variavel e chama a nova funcao cExecuteForm
 		// Processa e envia para o servidor web
 		// Faz o request do connector novamente. Talvez implementar no connector
 		// para manter coerencia.
-
-		var handler_send_smime = function(data){
-			send_message_return(data, this.ID_tmp); // this is a hack to escape quotation form connector bug
-		};
 
 		var textArea = document.createElement("TEXTAREA");
 		textArea.style.display='none';
@@ -1510,13 +1463,15 @@ function appletReturn(smime, ID, operation, folder){
 			var i = 0;
 			while (document.forms(i).name != "form_message_"+ID){i++}
 			form = document.forms(i);
-		}
-		else
+		} else {
 			form = document.forms["form_message_"+ID];
+		}
 
 		form.appendChild(textArea);
 
-		cExecuteForm ("$this.imap_functions.send_mail", form, handler_send_smime, ID);
+		Ajax( "$this.imap_functions.send_mail", form, function(data){
+			send_message_return(data, this.ID_tmp); // this is a hack to escape quotation form connector bug
+		});
 	}
 }
 
@@ -1615,7 +1570,6 @@ function send_message_return( data, ID ){
 	
 			if (msg_number_replied.length > 0) {
 				proxy_mensagens.proxy_set_message_flag( msg_number_replied.val(), 'answered');
-
 			}
 
 			if (msg_number_forwarded.length > 0) {
@@ -1644,7 +1598,11 @@ function send_message_return( data, ID ){
 			}
 
 			if ((!openTab.toPreserve[ID]) && (openTab.imapUid[ID] != 0)){
-				cExecute("$this.imap_functions.delete_msgs&folder=" + openTab.imapBox[ID] + "&msgs_number=" + openTab.imapUid[ID], function (data) { return });
+				Ajax( '$this.imap_functions.delete_msgs',
+				{ 
+					'folder' : openTab.imapBox[ID],
+					'msgs_number' : openTab.imapUid[ID]
+				}, function(data){ return; });
 			}
 
 			delete_border( ID, 'true' ); // Becarefull: email saved automatically should be deleted. delete_border erase information about openTab
@@ -1827,7 +1785,7 @@ function save_as_msg(border_id, folder_id, folder_name){
 	// hack to avoid form connector bug,  escapes quotation. Please see #179
 	tmp_border_id=border_id;
 	tmp_folder_name=folder_name;
-	var handler_save_msg = function(data){ return_saveas(data,this.tmp_border_id,this.tmp_folder_name); }
+
 	var textArea = document.createElement("TEXTAREA");
 	textArea.style.display='none';
 	textArea.name = "body";
@@ -1845,13 +1803,16 @@ function save_as_msg(border_id, folder_id, folder_name){
 		var i = 0;
 		while (document.forms(i).name != "form_message_"+border_id){i++}
 		form = document.forms(i);
-	}
-	else
+	} else {
 		form = document.forms["form_message_"+border_id];
+	}
+	
 	form.appendChild(textArea);
 	form.appendChild(input_folder);
 
-	cExecuteForm ("$this.imap_functions.save_msg", form, handler_save_msg,border_id);
+	Ajax( "$this.imap_functions.save_msg", form, function(data){
+		return_saveas( data , tmp_border_id, tmp_folder_name );
+	});
 }
 
 function return_saveas(data,border_id,folder_name)
@@ -1869,104 +1830,124 @@ function return_saveas(data,border_id,folder_name)
 
 // Get checked messages
 function set_messages_flag(flag, msgs_to_set){
-	var handler_set_messages_flag = function (data){
-		if(!verify_session(data))
-			return;
-		var msgs_to_set = data.msgs_to_set.split(",");
-
-		if(!data.status) {
-			write_msg(data.msg);
-			Element('chk_box_select_all_messages').checked = false;
-			for (var i = 0; i < msgs_to_set.length; i++) {
-				Element("check_box_message_" + msgs_to_set[i]).checked = false;
-				remove_className(Element(msgs_to_set[i]), 'selected_msg');
-			}
-			if(!data.msgs_unflageds)
-				return;
-			else
-				msgs_to_set = data.msgs_unflageds.split(",");
-		}
-
-		for (var i=0; i<msgs_to_set.length; i++){
-			if(Element("check_box_message_" + msgs_to_set[i])){
-				switch(data.flag){
-					case "unseen":
-						set_msg_as_unread(msgs_to_set[i]);
-						Element("check_box_message_" + msgs_to_set[i]).checked = false;
-						break;
-					case "seen":
-						set_msg_as_read(msgs_to_set[i], false);
-						Element("check_box_message_" + msgs_to_set[i]).checked = false;
-						break;
-					case "flagged":
-						set_msg_as_flagged(msgs_to_set[i]);
-						document.getElementById("check_box_message_" + msgs_to_set[i]).checked = false;
-						break;
-					case "unflagged":
-						set_msg_as_unflagged(msgs_to_set[i]);
-						Element("check_box_message_" + msgs_to_set[i]).checked = false;
-						break;
-				}
-			}
-		}
-		Element('chk_box_select_all_messages').checked = false;
-	}
 
 	var folder = get_current_folder();
-	if (msgs_to_set == 'get_selected_messages')
-		var msgs_to_set = this.get_selected_messages();
-	else
-		folder = Element("input_folder_"+msgs_to_set+"_r").value;
 
-	if (msgs_to_set)
-		cExecute ("$this.imap_functions.set_messages_flag&folder="+folder+"&msgs_to_set="+msgs_to_set+"&flag="+flag, handler_set_messages_flag);
-	else
+	if( msgs_to_set == 'get_selected_messages'){
+		var msgs_to_set = this.get_selected_messages();
+	} else {
+		folder = $("#input_folder_"+msgs_to_set+"_r").val();
+	}
+
+	if (msgs_to_set){
+
+		Ajax( '$this.imap_functions.set_messages_flag', { 
+			'folder' : folder,
+			'msgs_to_set' : msgs_to_set,
+			'flag' : flag
+			}, 
+			function(data){
+				if(!verify_session(data)) return;
+
+				var msgs_to_set = data.msgs_to_set.split(",");
+		
+				if(!data.status) {
+					write_msg(data.msg);
+					
+					$("#chk_box_select_all_messages").attr("checked", false);
+		
+					for (var i = 0; i < msgs_to_set.length; i++) {
+						Element("check_box_message_" + msgs_to_set[i]).checked = false;
+						remove_className(Element(msgs_to_set[i]), 'selected_msg');
+					}
+					if(!data.msgs_unflageds)
+						return;
+					else
+						msgs_to_set = data.msgs_unflageds.split(",");
+				}
+	
+				for (var i=0; i<msgs_to_set.length; i++){
+					if(Element("check_box_message_" + msgs_to_set[i])){
+						switch(data.flag){
+							case "unseen":
+								set_msg_as_unread(msgs_to_set[i]);
+								Element("check_box_message_" + msgs_to_set[i]).checked = false;
+								break;
+							case "seen":
+								set_msg_as_read(msgs_to_set[i], false);
+								Element("check_box_message_" + msgs_to_set[i]).checked = false;
+								break;
+							case "flagged":
+								set_msg_as_flagged(msgs_to_set[i]);
+								document.getElementById("check_box_message_" + msgs_to_set[i]).checked = false;
+								break;
+							case "unflagged":
+								set_msg_as_unflagged(msgs_to_set[i]);
+								Element("check_box_message_" + msgs_to_set[i]).checked = false;
+								break;
+						}
+					}
+				}
+		
+				$("#chk_box_select_all_messages").attr("checked", false);
+		});
+	} else {
 		write_msg(get_lang('No selected message.'));
+	}
 }
 
 // By message number
 function set_message_flag(msg_number, flag, func_after_flag_change){
-	var msg_number_folder = Element("new_input_folder_"+msg_number+"_r"); //Mensagens respondidas/encaminhadas
-	if(!msg_number_folder)
-		var msg_number_folder = Element("input_folder_"+msg_number+"_r"); //Mensagens abertas
 	
-	var handler_set_messages_flag = function (data){
-		if(!verify_session(data))
-			return;
-		if(!data.status) {
-			write_msg(get_lang("this message cant be marked as normal"));
-			return;
-		}
-		else if(func_after_flag_change) {
-			func_after_flag_change(true);
-		}
-		if (data.status && Element("td_message_answered_"+msg_number)) {
-			
-			switch(flag){
-				case "unseen":
-					set_msg_as_unread(msg_number);
-					break;
-				case "seen":
-					set_msg_as_read(msg_number);
-					break;
-				case "flagged":
-					set_msg_as_flagged(msg_number);
-					break;
-				case "unflagged":
-					set_msg_as_unflagged(msg_number);
-					break;
-				case "answered":
-					Element("td_message_answered_"+msg_number).innerHTML = '<img src=templates/'+template+'/images/answered.gif title=Respondida>';
-					break;
-				case "forwarded":
-					Element("td_message_answered_"+msg_number).innerHTML = '<img src=templates/'+template+'/images/forwarded.gif title=Encaminhada>';
-					break;
-			}				
-		} else {
-			refresh();
-		}
+	var msg_number_folder = $("#new_input_folder_"+msg_number+"_r")[0]; //Mensagens respondidas/encaminhadas
+	
+	if (!msg_number_folder) {
+		var msg_number_folder = $("#input_folder_"+msg_number+"_r")[0]; //Mensagens abertas
 	}
-	cExecute ("$this.imap_functions.set_messages_flag&folder="+( msg_number_folder ?  msg_number_folder.value : get_current_folder() )+"&msgs_to_set="+msg_number+"&flag="+flag, handler_set_messages_flag);
+	
+	Ajax( '$this.imap_functions.set_messages_flag', 
+		{
+			'folder' : ( msg_number_folder ?  msg_number_folder.value : get_current_folder() ),
+			'msgs_to_set' : msg_number,
+			'flag' : flag
+		},
+		function(data){
+			if(!verify_session(data)) return;
+		
+			if(!data.status) {
+				write_msg(get_lang("this message cant be marked as normal"));
+				return;
+			} else if( func_after_flag_change ) {
+				func_after_flag_change(true);
+			}
+	
+			if (data.status && Element("td_message_answered_"+msg_number)) {
+				
+				switch(flag){
+					case "unseen":
+						set_msg_as_unread(msg_number);
+						break;
+					case "seen":
+						set_msg_as_read(msg_number);
+						break;
+					case "flagged":
+						set_msg_as_flagged(msg_number);
+						break;
+					case "unflagged":
+						set_msg_as_unflagged(msg_number);
+						break;
+					case "answered":
+						Element("td_message_answered_"+msg_number).innerHTML = '<img src=templates/'+template+'/images/answered.gif title=Respondida>';
+						break;
+					case "forwarded":
+						Element("td_message_answered_"+msg_number).innerHTML = '<img src=templates/'+template+'/images/forwarded.gif title=Encaminhada>';
+						break;
+				}				
+			} else {
+				refresh();
+			}
+		}
+	);
 }
 
 function print_all(){
@@ -2330,36 +2311,21 @@ function import_msgs(wfolders_tree){
 function return_import_msgs(data, wfolders_tree){
 	if(data && data.error){
 		write_msg(data.error);
-	}
-	else{
-		if(data == 'Post-Content-Length')
+	} else{
+		if(data == 'Post-Content-Length'){
 			write_msg(get_lang('The size of this message has exceeded  the limit (%1B).', preferences.max_attachment_size ? preferences.max_attachment_size : Element('upload_max_filesize').value));
-		else {	/*
-			* @author Rommel Cysne (rommel.cysne@serpro.gov.br)
-			* @date 2009/05/15
-			* Foi colocado um teste para verificar se a pasta selecionada, passada como parametro,
-			* eh uma pasta local (qualquer uma)
-			*/
-			var er = /^local_/;
-			if ( er.test(wfolders_tree._selected.id) )
-			{
-				archive_msgs('INBOX/Lixeira/tmpMoveToLocal',wfolders_tree._selected.id,data);
-				cExecute('$this.imap_functions.delete_mailbox',function(){},'del_past=INBOX/Lixeira/tmpMoveToLocal');
-			}
-						 else{
-				write_msg(get_lang(data));
+		} else {
+			write_msg(get_lang(data));
 				
-				if(openTab.imapBox[0] == wfolders_tree._selected.id)
-				{
-					openTab.imapBox[0] = '';
-					change_folder(wfolders_tree._selected.id, wfolders_tree._selected.caption);
-				} else{
-					refresh();
-				}
+			if(openTab.imapBox[0] == wfolders_tree._selected.id)
+			{
+				openTab.imapBox[0] = '';
+				change_folder(wfolders_tree._selected.id, wfolders_tree._selected.caption);
+			} else{
+				refresh();
 			}
+		}
 	}
-	}
-
 }
 
 function select_import_folder(dialogImport)
@@ -2393,6 +2359,7 @@ function select_import_folder(dialogImport)
 	else
 		wfolders.makeWindow('null','import');
 }
+
 function import_calendar(hash_vcalendar){
 	if(confirm(get_lang("Do you confirm this import to your Calendar?"))){
 		$.ajax({
@@ -2410,70 +2377,6 @@ function import_calendar(hash_vcalendar){
 		});
 	}
 }
-function hack_sent_queue(data,rowid_message) {
-
-	if (data.success != true) {
-		queue_send_errors = true;
-		expresso_local_messages.set_problem_on_sent(rowid_message,data);
-	}
-	else {
-		expresso_local_messages.set_as_sent(rowid_message);
-		if(document.getElementById('_action')) { //Nao posso manter esse elemento, pois o connector ira criar outro com o mesmo id para a proxima mensagem.
-			el =document.getElementById('_action');
-			father = el.parentNode;
-			father.removeChild(el);
-		}
-		send_mail_from_queue(false);
-	}
-}
-
-function send_mail_from_queue(first_pass) {
-	if(first_pass)
-		modal('send_queue');
-	var num_msgs = expresso_local_messages.get_num_msgs_to_send();
-	if (num_msgs <= 0) {
-		close_lightbox();
-		return;
-	}
-	document.getElementById('text_send_queue').innerHTML = get_lang('Number of messages to send:')+' '+num_msgs;
-	var handler_send_queue_message = function(data,rowid_message) {
-		hack_sent_queue(data,this.ID_tmp);
-	}
-	var msg_to_send = expresso_local_messages.get_form_msg_to_send();
-	if(!is_ie)
-		ID_tmp = msg_to_send.rowid.value;
-	else {//I.E kills me of shame...
-		for (var i=0;i<msg_to_send.length;i++) {
-			if(msg_to_send.elements[i].name=='rowid') {
-				ID_tmp = msg_to_send.elements[i].value;
-				break;
-			}
-		}
-	}
-	expresso_local_messages.set_as_sent(ID_tmp);
-	cExecuteForm("$this.imap_functions.send_mail", msg_to_send, handler_send_queue_message,"queue_"+ID_tmp);
-	send_mail_from_queue(false);
-}
-
-function check_mail_in_queue() {
-	var num_msgs = expresso_local_messages.get_num_msgs_to_send();
-	if(num_msgs>0) {
-		control = confirm(get_lang('You have messages to send. Want you to send them now?'));
-		if(control) {
-			send_mail_from_queue(true);
-		}
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-function force_check_queue() {
-	if(!check_mail_in_queue()) {
-		write_msg(get_lang("No messages to send"));
-	}
-}
 
 function searchEmail(emailString){
 		var arrayInvalidEmails = new  Array();
@@ -2482,7 +2385,7 @@ function searchEmail(emailString){
 		var arrayEmailsFull = new Array();
 		arrayEmailsFull = emailString.split(',');
 		var er_Email =  new RegExp("<(.*?)>"); 
-                // TODO Use validateEmail of common functions !
+    	// TODO Use validateEmail of common functions !
 		var er_ValidaEmail = new RegExp("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$");
 
 		for (i=0; i < arrayEmailsFull.length; i++){

@@ -13,14 +13,6 @@ function ConstructMenuTools()
     		"i05": {"name": get_lang("Share mailbox"), "icon": "mail-usersfolders", callback: sharebox },
     		"i06": {"name": get_lang("Empty trash"), "icon": "mail-trash", callback: function(key, opt){ clean_folder( 'trash' ); }}
     	};
-
-    	if( preferences.use_local_messages == 1 )
-    	{
-    		if(expresso_local_messages.is_offline_installed())
-    		{
-    			menuToolsItems["i07"] = { "name": get_lang("Send from queue"), "icon": "queue", callback: force_check_queue };
-    		}
-    	}
     }
     else
     {
