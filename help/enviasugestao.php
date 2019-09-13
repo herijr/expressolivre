@@ -26,6 +26,12 @@ if ( $_POST ) {
 	$params['input_cc']      = $GLOBALS['phpgw_info']['server']['sugestoes_email_bcc'];
 	$params['input_subject'] = lang( 'Suggestions' );
 	$params['body']          = $_POST['body'];
+	
+	// Aditional information in sugestion message content, refers to environment
+	$params['body'] 		.= "\n\n\n";
+	$params['body'] 		.= "User Agent: " . $GLOBALS['_SERVER']['HTTP_USER_AGENT'] . "\n";
+	$params['body'] 		.= "Server URL: " . $GLOBALS['_SERVER']['HTTP_REFERER'] . "\n";
+
 	$params['type']          = 'plain';
 
 	$GLOBALS['phpgw']->preferences->read_repository();
