@@ -37,7 +37,7 @@ A read confirmation was sent.	expressoMail1_2	pt-br	Uma confirmação de leitura f
 Read receipt: %1	expressoMail1_2	pt-br	Confirmação de leitura: %1
 Your message: %1	expressoMail1_2	pt-br	Sua mensagem: %1
 Received in: %1	expressoMail1_2	pt-br	Recebida em: %1
-Has been read by: %1 &lt; %2 &gt; at %3	expressoMail1_2	pt-br	Foi lida por: %1 &lt; %2 &gt; em %3
+Has been read by: %1 &lt;%2&gt; at %3	expressoMail1_2	pt-br	Foi lida por: %1 &lt;%2&gt; em %3
 At %1, %2 hours, %3 wrote:	expressoMail1_2	pt-br	Em %1 às %2 horas, %3 escreveu:
 At least one message have the same origin	expressoMail1_2	pt-br	Pelo menos uma das mensagens está sendo movida para a mesma pasta
 at least, one of selected mails is already archived, expresso tried to archive the others, check them later	expressoMail1_2	pt-br	Pelo menos uma das mensagens selecionadas já foi arquivada anteriormente, o expresso tentou arquivar as outras, verifique-as mais tarde.
