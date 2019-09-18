@@ -3118,13 +3118,40 @@ class imap_functions
 		$toaddress = $params['notificationto'];
 		$body  = lang("Your message: %1",$this->_toUTF8( $params['subject'] )) . '<br>';
 		$body .= lang("Received in: %1",date("d/m/Y H:i",$params['date'])) . '<br>';
-		$body .= lang("Has been read by: %1 &lt; %2 &gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));
+
+		if ( !empty( $params['toaddress2'] ) ) {
+
+			$resultParse = imap_rfc822_parse_adrlist( $params['toaddress2'] );
+
+			$params['toaddress2name'] = $resultParse[0]['personal'];
+			$params['toaddress2mail'] = $resultParse[0]['mailbox'] . '@' . $resultParse[0]['host'];
+		}
+
+		if ( !isset($params['toaddress2mail']) && empty( $params['toaddress2mail'] ) ) {
+
+			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));
+		} else {
+
+			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $params['toaddress2name'] , $params['toaddress2mail'], date("d/m/Y H:i"));
+		}
+		
+		
 		$mail->SMTPDebug = false;
 		$mail->IsSMTP();
 		$mail->Host = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpServer'];
 		$mail->Port = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpPort'];
-		$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];
-		$mail->FromName = $this->fullNameUser;
+		
+		
+		if ( !isset($params['toaddress2mail']) && empty( $params['toaddress2mail'] ) ) {
+
+			$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];	
+			$mail->FromName = $this->fullNameUser;
+		} else {
+
+			$mail->From = $params['toaddress2mail'];
+			$mail->FromName = $params['toaddress2name'];
+		}
+		
 		$mail->AddAddress($toaddress);
 		$mail->Subject = $this->_toUTF8( lang("Read receipt: %1", "" ) ) . $this->_toUTF8( $params['subject'] );
 		$mail->IsHTML(true);

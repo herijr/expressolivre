@@ -455,20 +455,26 @@ function show_msg(msg_info){
 			{
 				var confNotification = true;
 			}
-			for (var i = 0; i < domains.length; i++)
+			
+			for (var i = 0; i < domains.length; i++) {
 				if (msg_info.DispositionNotificationTo.match(domains[i]+">"))
 				{
 					var confNotification = true;
 					break;
 				}
-				if (confNotification == undefined)
-					var confNotification = confirm(get_lang("The sender:\n%1\nwaits your notification of reading. Do you want to confirm this?",msg_info.DispositionNotificationTo), "");
+			}
+
+			if (confNotification == undefined) {
+				var confNotification = confirm(get_lang("The sender:\n%1\nwaits your notification of reading. Do you want to confirm this?",msg_info.DispositionNotificationTo), "");
+			}
 
 			if ( confNotification ){
+
 				Ajax( '$this.imap_functions.send_notification', {
 					'notificationto' : msg_info.DispositionNotificationTo,
 					'date' : msg_info.udate,
-					'subject' : msg_info.subject
+					'subject' : msg_info.subject,
+					'toaddress2' : msg_info.toaddress2
 				}, handler_sendNotification );
 			}
 
