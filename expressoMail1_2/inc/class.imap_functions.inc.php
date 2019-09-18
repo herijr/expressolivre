@@ -3121,10 +3121,10 @@ class imap_functions
 
 		if ( !empty( $params['toaddress2'] ) ) {
 
-			$resultParse = imap_rfc822_parse_adrlist( $params['toaddress2'] );
+			$resultParse = imap_rfc822_parse_adrlist( $params['toaddress2'], null );
 
-			$params['toaddress2name'] = $resultParse[0]['personal'];
-			$params['toaddress2mail'] = $resultParse[0]['mailbox'] . '@' . $resultParse[0]['host'];
+			$params['toaddress2name'] = $resultParse[0]->personal;
+			$params['toaddress2mail'] = $resultParse[0]->mailbox . '@' . $resultParse[0]->host;
 		}
 
 		if ( !isset($params['toaddress2mail']) && empty( $params['toaddress2mail'] ) ) {
