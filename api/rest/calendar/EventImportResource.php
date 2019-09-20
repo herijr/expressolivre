@@ -21,7 +21,7 @@ class EventImportResource extends CatalogAdapter
 	{
 		$response = new Response($request);
 
-		$return = json_encode(array("result" => "false"));
+		$return = json_encode(array("result" => false ));
 
 		if (isset($_GET['event'])) {
 
@@ -151,7 +151,7 @@ class EventImportResource extends CatalogAdapter
 					);
 
 					if ($updateCalIinvite) {
-						$return = json_encode(array("result" => "true"));
+						$return = json_encode(array("result" => true ));
 					}
 				}
 			}

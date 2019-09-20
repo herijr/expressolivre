@@ -2370,12 +2370,12 @@ function select_import_folder(dialogImport)
 function import_calendar(hash_vcalendar){
 	if(confirm(get_lang("Do you confirm this import to your Calendar?"))){
 		$.ajax({
-				type    : "GET",
-				url     : "/api/rest/vcalendar/import?event="+hash_vcalendar,
-				success : function( data )
+				type     : "GET",
+				url      : "/api/rest/vcalendar/import?event="+hash_vcalendar,
+				dataType : "json",
+				success  : function( data )
 				{
-					var _data = $.parseJSON( data );
-					if( eval( _data.result ) ){
+					if( data.result == true ){
 						write_msg(get_lang("The event was imported successfully."));
 					} else {
 						write_msg(get_lang("The event was not imported."));
