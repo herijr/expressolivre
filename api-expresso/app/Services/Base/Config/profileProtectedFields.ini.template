@@ -1,3 +1,0 @@
-[protected-fields]
-user = expresso-admin
-fields = corporative_information_cpf, corporative_information_rg, corporative_information_rguf 
