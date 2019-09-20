@@ -1,0 +1,27 @@
+<h2 class="right-side">Tratamento de Erros</h2>
+<div id="page_content">
+<p>
+Quando algum m&eacute;todo retornar um erro, a API retornar&aacute; um JSON com o c&oacute;digo do erro, e a mensagem em ingl&ecirc;s. O c&oacute;digo de erro &eacute; necess&aacute;rio caso a aplica&ccedil;&atilde;o cliente queira utilizar um idioma diferente da API.
+</p>
+<p>Exemplo de Retorno:</p>
+
+<pre class='prettyprint'>
+{
+	"id" : "1"
+	"error" : 
+	{
+		"code" : "500"
+		"message" : "HTTP Unknown error"
+	}
+}</pre>
+
+<br>
+<h3>Tabela de Erros Teste</h3>
+
+<table class="table_blue">
+<thead><th>Codigo do Erro</th><th>Chave</th><th>Mensagem de Erro</th></thead>
+<% for(var i in possible_errors){ %>
+	<tr><td><b><%=(possible_errors[i].code)%></b></td><td><i><%=(possible_errors[i].key)%></i></td><td><i><%=(possible_errors[i].message)%></i></td></tr>
+<% } %>
+</table>
+</div>

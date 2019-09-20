@@ -1,0 +1,68 @@
+<h2 class="right-side">Sobre a API</h2>
+<div id="page_content">
+	<p>
+		Esta API fornece recursos para comunica&ccedil;&atilde;o com sistemas e aplicativos externos. foi desenvolvida utilizando o padr&atilde;o rest 
+		e implementando o retorno dos dados ao consumidor utilizando o protocolo json-rpc de acordo com a especifica&ccedil;&atilde;o da vers&atilde;o 2.0. 
+		A api cont&eacute;m diversas funcionalidades e para cada uma delas &eacute; definido um recurso que pode receber par&acirc;metros obrigat&oacute;rios 
+		ou opcionais para o seu funcionamento. Atrav&eacute;s desta documenta&ccedil;&atilde;o &eacute; poss&iacute;vel interagir com a api do expresso, 
+		e testar o envio e recebimento de dados.
+	</p>
+
+	<p>
+		Importante: sinta-se &agrave; vontade para desenvolver e realizar testes com a api do expresso, por&eacute;m informe aos administradores do expresso 
+		quando sua aplica&ccedil;&atilde;o estiver rodando em produ&ccedil;&atilde;o, facilitando avis&aacute;-lo quando uma atualiza&ccedil;&atilde;o relevante 
+		for realizada na api.
+	</p>
+	
+	<h3>COMO FUNCIONA A API</h3>
+	<p>
+		Para acessar um recurso da api, sua aplica&ccedil;&atilde;o cliente dever&aacute; realizar uma requisi&ccedil;&atilde;o http 
+		pelos m&eacute;todos (get,post,put ou delete) para a url_da_api + nome_do_recurso, passando os par&acirc;metros definidos nesta 
+		documenta&ccedil;&atilde;o. Cada recurso possui um conjunto de par&acirc;metros (obrigatorios e/ou opicionais) que s&atilde;o necess&aacute;rios 
+		para atender as requisi&ccedil;&otilde;es enviadas ao servidor do expresso. 
+	</p>
+	
+	<p>
+		A maioria dos recursos necessita de autentica&ccedil;&atilde;o para funcionar. a autentica&ccedil;&atilde;o &eacute; feita atrav&eacute;s do recurso login, 
+		passando-se como par&acirc;metros o usu&aacute;rio e a senha. O login retornar&aacute; uma chave de acesso (auth) que dever&aacute; ser enviada como 
+		par&acirc;metro na chamada para os outros recursos.
+	</p>
+
+	<p>
+		Exemplo: 
+		<br>
+		<img src='./images/exemplo_api.png'>
+	</p>
+	<h3>AMBIENTE EXPRESSO</h3>
+	<br>
+		Est&atilde;o dispon&iacute;veis os seguintes ambientes Expresso, cada qual com a sua api espec&iacute;fica:
+	<br><br>
+	<table style='width: 100%;' class="table_blue">
+		<thead>
+			<th>Ambientes Expresso - API</th>
+		</thead>
+		<% for(var i in apis_expresso ){ %>
+			<tr>
+				<td>
+					<%= apis_expresso[i] %>
+				</td>
+			</tr>
+		<% } %>
+	</table>
+	<br><br>
+	<h3>RECURSOS DISPON&Iacute;VEIS</h3>
+	<div>
+		<br/>
+		<p>
+			Atualmente os seguintes recursos est&atilde;o disponibilizados:
+		</p>
+		<table style='width: 100%;' class="table_blue">
+		<thead>
+			<th>Recurso</th><th>Descri&ccedil;&atilde;o</th>
+		</thead>
+		<% for(var i in resources){ %>
+			<tr><td><%=(resources[i].rest)%></td><td><i><%=resources[i].description%></i></td></tr>
+		<% } %>
+		</table>
+	</div>
+</div>

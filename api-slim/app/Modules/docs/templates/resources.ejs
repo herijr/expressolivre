@@ -1,0 +1,86 @@
+<% for(var i in resources){ %>
+	<h2 class="right-side"><button onclick="execute.ajax('<%=resources[i].id%>')" class="btn btn-primary" style=" float: right; z-index: 2001; margin: 10px 20px 10px 10px;">Executar</button><%=(resources[i].rest)%></h2>
+
+	<div id="page_content">
+	<% if (resources[i].mobile == true) { %><div class="mobile"></div><%} %>
+	<div id="sub_<%=resources[i].id%>">
+
+		<% for( var j= 0; j <= 0; j++ ){ 
+		%>
+			<!-- Form de envio -->
+			<!--<h3><%=resources[i].method[j]%></h3> -->
+			<div>
+				<h4><%=resources[i].description%></h4>
+					
+					<% if ( resources[i].params.length != 0){ %>
+
+						<table class="parameters">
+							<thead>
+								<tr>
+									<th>Par&acirc;metro</th>
+									<th>Valor</th>
+									<th>Tipo</th>
+									<th style="text-align: center;">Obrigat&oacute;rio</th>
+									<th>Descri&ccedil;&atilde;o</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% for( var l in resources[i].params ){ %>
+									<tr>
+										<td><%=l%></td>
+										<td>
+											<% console.log(resources[i].params[l]) %>
+											<input type="<%=resources[i].params[l]['field_type']%>" <%=resources[i].params[l]['enabled']%> value="<%=resources[i].params[l]['default_value']%>" id="<%=resources[i].id%>_<%=l%>">
+										</td>
+										<td><%=resources[i].params[l]['type']%></td>
+										<% if(resources[i].params[l]['obrigatory'] == '1') { %>
+											<td align="center"><div class="obrigatory"></div></td>
+										<% } else { %>
+											<td align="center">&nbsp;</td>
+										<% } %>
+										<td><%=resources[i].params[l]['description']%></td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
+					<% } else { %>
+
+						<div style="margin-bottom:10px;">
+							<span>Este m&eacute;todo n&atilde;o necessita de par&acirc;metros adicionais</span>	
+						</div>
+
+					<% } %>
+				
+				
+
+				<div id="tabs" style="display:none; margin-top:20px;">
+					<ul>
+						<li><a href="#return_<%=resources[i].id%>">Resposta</a></li>
+						<li><a href="#param_<%=resources[i].id%>">Parametros Enviados</a></li>
+						<li><a href="#json_<%=resources[i].id%>">Json</a></li>
+					</ul>
+					<div id="return_<%=resources[i].id%>">
+
+					</div>
+					<div id="param_<%=resources[i].id%>">
+
+					</div>
+					<div id="json_<%=resources[i].id%>">
+					
+					</div>
+				</div>
+
+			
+				<!-- Resposta de Erro -->
+				<div id="error_<%=resources[i].id%>" style="display:none; margin-top:10px;">
+					<h3>Erros</h3>
+					<div>
+						Erros encontrados
+					</div>
+				</div>
+
+			</div>
+		<% } %>
+	</div>
+	</div>
+<% } %>

@@ -1,0 +1,16 @@
+<h2 class="left-side">Documenta&ccedil;&atilde;o da API</h2>
+<ul style='margin-top: 50px;'>
+<li class="normal" onClick="loadPage('pagina1');">Sobre a API</li>
+<li class="normal" onClick="loadPage('pagina2');">Exemplos de Uso</li>
+<li class="normal" onClick="loadPage('pagina3');">Tratamento de Erros</li>
+<li class="normal" onClick="loadPage('pagina4');">Links Relacionados</li>
+<% var lastResource = ''; %>
+<% for(var i in resources){ %>
+	<% if (lastResource != resources[i].module) { %>
+		<li class="title"><%=resources[i].module%></li>
+	<% } %>
+	
+	<li class="normal" onClick="selectResource('<%=(resources[i].rest)%>');"><% if (resources[i].mobile == true) { %><div class="mobile_small"></div><%} %><div style='float: left;'><%=(resources[i].rest)%></div></li>
+	<% lastResource = resources[i].module; %>
+<% } %>
+</ul>

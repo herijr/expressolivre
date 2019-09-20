@@ -1,0 +1,12 @@
+[default]
+groups_user = 1000
+imapDelimiter = "/"
+minimumSizeLogin = 4
+ldap_context = domain.com
+context = "ou=example,dc=domain,dc=com"
+passwd_expired = 0
+changepassword = 1
+phpgwaccountstatus = 1
+accountstatus = 1
+mailquota = 20
+groupFormat = normal
