@@ -505,7 +505,7 @@ Shared Account	expressoAdmin1_2	pt-br	Conta Compartilhada
 create shared account	expressoAdmin1_2	pt-br	Criar conta compartilhada
 You do not have access to clean an inbox	expressoAdmin1_2	pt-br	Você não tem permissão para limpar está caixa postal
 It was not possible clean the inbox	expressoAdmin1_2	pt-br	Não foi possível limpar a caixa postal
-You do not have access to clean an user inbox	expressoAdmin1_2	pt-br	Você não tem acesso para limpar a caixa de entrda do usuário
+You do not have access to clean an user inbox	expressoAdmin1_2	pt-br	Você não tem acesso para limpar a caixa de entrada do usuário
 You do not have right to empty an shared account inbox	expressoAdmin1_2	pt-br	Você não tem permissão para limpar a caixa da conta compartilhada
 Add owner	expressoAdmin1_2	pt-br	Adicionar dono
 Add shared accounts	expressoAdmin1_2	pt-br	Cria Contas Compartilhadas
