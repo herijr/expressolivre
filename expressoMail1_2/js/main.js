@@ -447,28 +447,29 @@ function show_msg(msg_info){
 		var domains = "";
 		if ((msg_info.DispositionNotificationTo) && (!msg_is_read(ID) || (msg_info.Recent == 'N')))
 		{
+			var sendReadNotification = false;
+			
 			if(preferences.notification_domains != undefined && preferences.notification_domains != "")
 			{
 				domains = preferences.notification_domains.split(',');
-			}
-			else
-			{
-				var confNotification = true;
-			}
-			
-			for (var i = 0; i < domains.length; i++) {
-				if (msg_info.DispositionNotificationTo.match(domains[i]+">"))
-				{
-					var confNotification = true;
-					break;
+
+				for (var i = 0; i < domains.length; i++) {
+					if (msg_info.DispositionNotificationTo.match(domains[i]+">"))
+					{
+						sendReadNotification = true;
+						break;
+					}
 				}
 			}
 
-			if (confNotification == undefined) {
-				var confNotification = confirm(get_lang("The sender:\n%1\nwaits your notification of reading. Do you want to confirm this?",msg_info.DispositionNotificationTo), "");
-			}
+			if ( !sendReadNotification ) {
 
-			if ( confNotification ){
+				var emailReplace = msg_info.DispositionNotificationTo;
+				
+				sendReadNotification = confirm( get_lang("The sender:\n%1\nwaits your notification of reading. Do you want to confirm this?", emailReplace.replace(/\+(.*?)\@/g, "@") ), "");
+			}
+			
+			if ( sendReadNotification ){
 
 				Ajax( '$this.imap_functions.send_notification', {
 					'notificationto' : msg_info.DispositionNotificationTo,

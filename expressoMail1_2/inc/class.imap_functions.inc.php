@@ -546,10 +546,10 @@ class imap_functions
 		$flag = preg_match('/importance *: *(.*)\r/i', $header_src, $importance);
 		$return['Importance'] = ($flag == 0) ? "Normal" : $importance[1];
 
-		$pattern = '/^[ \t]*Disposition-Notification-To:[ ]*<?[[:alnum:]\._-]+@[[:alnum:]_-]+[\.[:alnum:]]+>?/sm';
+		$pattern = '/^[ \t]*Disposition-Notification-To:[ ].*<?[[:alnum:]\._-]+@[[:alnum:]_-]+[\.[:alnum:]]+>?/sm';
 		if (preg_match($pattern, $header_src, $fields))
 		{
-			if(preg_match('/[[:alnum:]\._\-]+@[[:alnum:]_\-\.]+/',$fields[0], $matches)){ 
+			if(preg_match('/[[:alnum:]\._\-\+]+@[[:alnum:]_\-\.]+/',$fields[0], $matches)){ 
 				$return['DispositionNotificationTo'] = "<".$matches[0].">"; 
 			} 
 		}
