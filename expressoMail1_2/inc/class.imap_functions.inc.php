@@ -3621,7 +3621,7 @@ class imap_functions
 		if($header->from[0]->personal != "")
 			$from = $header->from[0]->personal;
 		$ret_msg['from'] 	= $this->decode_string($from); 
-		$ret_msg['subject']	= $subject; 
+		$ret_msg['subject']	= ( strstr( $subject, ' ' ) === false )? str_replace( '_', ' ', $subject ) : $subject;
 		$ret_msg['udate'] 	= gmdate("d/m/Y",$header->udate + $this->functions->CalculateDateOffset()); 
 		$ret_msg['size'] 	= $header->Size; 
 		$ret_msg['flag'] 	= $flag; 
