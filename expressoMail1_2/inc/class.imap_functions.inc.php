@@ -235,7 +235,7 @@ class imap_functions
 
 		$head_array['smalldate'] = (date("d/m/Y") == $date_msg) ? gmdate("H:i",$msgTimestamp) : gmdate("d/m/Y",$msgTimestamp);
 
-		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? reset( $header->from ) : false );
+		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? end( $header->from ) : false );
 		$head_array['to']      = (array)$this->mk_addr( isset( $header->to ) && is_array( $header->to ) && !( isset( $header->to[1]->host ) && $header->to[1]->host === '.SYNTAX-ERROR.' )? reset( $header->to   ) : false );
 
 		if ( empty( $head_array['to']['email'] ) && isset( $header->cc  ) && is_array( $header->cc  ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->cc ) );
@@ -611,9 +611,9 @@ class imap_functions
 			$return['smalldate'] = gmdate("d/m/Y",$msgTimestamp);
 		}
 
-		$return['from']     = (array)$this->mk_addr( isset( $header->from     ) && is_array( $header->from     )? reset( $header->from     ) : false );
-		$return['sender']   = (array)$this->mk_addr( isset( $header->sender   ) && is_array( $header->sender   )? reset( $header->sender   ) : false );
-		$return['reply_to'] = (array)$this->mk_addr( isset( $header->reply_to ) && is_array( $header->reply_to )? reset( $header->reply_to ) : false );
+		$return['from']     = (array)$this->mk_addr( isset( $header->from     ) && is_array( $header->from     )? end( $header->from     ) : false );
+		$return['sender']   = (array)$this->mk_addr( isset( $header->sender   ) && is_array( $header->sender   )? end( $header->sender   ) : false );
+		$return['reply_to'] = (array)$this->mk_addr( isset( $header->reply_to ) && is_array( $header->reply_to )? end( $header->reply_to ) : false );
 
 		if ( $return['from']['full']  === $return['sender']['full']    ) unset( $return['sender']   );
 		if ( $return['from']['email'] === $return['reply_to']['email'] ) unset( $return['reply_to'] );
