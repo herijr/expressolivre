@@ -1656,5 +1656,56 @@ class wf_orgchart
 	{
 		return $this->getAreaCurrentAdministrativeResponsibleID($this->getEmployeeAreaID($employeeID, $areaStatusID));
 	}
+
+	/**
+	 * Lista todos os colaboradores da(s) area(s) na hierarquia abaixo do gestor.
+	 *
+	 * Este método irá listar os UIDNUMBER.
+	 * @param int $user_id O UIDNUMBER do Gestor.
+	 * @return array contendo os uidnumber de todos os usuários abaixo do gestor 
+	 * - funcionario_id
+	 * @access public
+	 */
+	function getEmployeeByManager($user_id){
+
+		//$orgchart = Factory::getInstance('wf_orgchart');
+		// Recupera área do usuário corrente
+		$current_employee = $this->getEmployee($user_id);
+		$area_id = $current_employee['area_id'];
+		$generic   = new Generic();
+
+		// Captura todos usuários da área (e sub-areas) do funcionário
+		$sub_areas = $generic->recuperaSubAreasRecursivamente($area_id);
+
+		
+		if(is_array($sub_areas) && count($sub_areas)){
+			$func_ids = array();
+			foreach($sub_areas AS $v){
+				$func_ids = array_merge($this->getEmployeesAreaID($v), $func_ids);
+			}
+		}
+		else{
+			$func_ids = $this->getEmployeesAreaID($area_id);
+		}
+
+		if(is_array($func_ids))
+		{
+		
+			$ldap = Factory::getInstance('wf_ldap');
+			foreach($func_ids as $elem)
+			{
+				
+				$executores[] = $elem['funcionario_id'];
+
+			}
+		}
+		
+		// Ordena array de funcionários (uidnumbers)
+		asort($executores);
+
+		return $executores;
+	}
+
+	
 }
 ?>
