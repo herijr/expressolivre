@@ -10,6 +10,10 @@
 /api/config/profileProtectedFields.ini
 /api/old_versions/*/config/profileCreateUser.ini
 /api/old_versions/*/config/profileHomeServer.ini
+/api-slim/app/Config/DB.php
+/api-slim/app/Config/profileCreateUser.ini
+/api-slim/app/Config/profileHomeServer.ini
+/api-slim/app/Config/profileProtectedFields.ini
 /header.inc.php
 /security/crls/*.crl
 /security/classes/*.crt
