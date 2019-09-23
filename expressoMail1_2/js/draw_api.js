@@ -2344,11 +2344,11 @@ function draw_new_message(border_ID){
         }
 	td_replyto.appendChild(input_replyto);
 
-        var img_search = document.createElement("IMG");
+    var img_search = document.createElement("IMG");
 	img_search.src = "./templates/"+template+"/images/search.gif";
 	img_search.onclick = function () {emQuickSearch(document.getElementById('replyto_'+ID).value, 'replyto', ID)}
 	img_search.title = get_lang('Search') + " | " + get_lang('Use F9 Key as shortcut.');
-        var span_search = document.createElement("SPAN");
+    var span_search = document.createElement("SPAN");
 	span_search.innerHTML = get_lang('Search');
 
         var td1_2_img_search = document.createElement("TD");
@@ -2526,6 +2526,7 @@ function draw_new_message(border_ID){
 	td_cc.appendChild(input_cc);
 	var img_search = document.createElement("IMG");
 	img_search.src = "./templates/"+template+"/images/search.gif";
+	img_search.style.margin = '4px';
 	img_search.onclick = function () {emQuickSearch(document.getElementById('cc_'+ID).value, 'cc', ID)}
 	img_search.title = get_lang('Search') + " | " + get_lang('Use F9 Key as shortcut.');
 	var span_search = document.createElement("SPAN");
@@ -2610,6 +2611,7 @@ function draw_new_message(border_ID){
 	td_cco.appendChild(input_cco);
 	var img_search = document.createElement("IMG");
 	img_search.src = "./templates/"+template+"/images/search.gif";
+	img_search.style.margin = '4px';
 	img_search.title = get_lang('Search') + " | " + get_lang('Use F9 Key as shortcut.');
 	img_search.onclick = function () {emQuickSearch(document.getElementById('cco_'+ID).value, 'cco', ID);};
 	var span_search = document.createElement("SPAN");
