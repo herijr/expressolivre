@@ -154,53 +154,6 @@ function draw_tree_folders(folders){
 			tree_folders.add(nn, folders[i].folder_parent);
 		}
 
-		var handlerChannel = function (data) {
-
-			if (data == null || typeof (data) == 'string') {
-				return false;
-			}
-
-			var nodeParent = document.getElementById('content_folders');
-			var treeRss = new dFTree({ name: 'treeRss' });
-			var root_rss = new dNode({ id: 'news_root', caption: get_lang("News") });
-
-			treeRss.add(root_rss, 'anything');
-
-			for (i = 0; i < data.length; i++) {
-				var nodeNews = new dNode(
-					{
-						id: "NEWS/" + data[i].name,
-						caption: data[i].name,
-						onClick: "open_rss('" + data[i].rss_url + "')",
-						plusSign: 0
-					});
-				treeRss.add(nodeNews, "news_root");
-			}
-
-			treeRss.draw(nodeParent);
-
-			with (document.getElementById('lnews_roottreeRss')) {
-				style.backgroundImage = "url(templates/" + template + "/images/menu/rss.png)";
-				style.marginLeft = "2px";
-			}
-
-			if (nodeParent.firstChild.id != ("dftree_" + treeRss.name)) {
-				var _folder = Element(nodeParent.firstChild.id);
-				var _rssNews = Element("dftree_" + treeRss.name);
-
-				nodeParent.insertBefore(_rssNews, _folder);
-			}
-
-		}
-       
-       if( eval(enabledReadRSS ) == true )
-       {	
-    	   setTimeout(function()
-    	   {
-    	     cExecute('$this.rss.getChannels',handlerChannel);
-    	   }, 2000);
-       }
-
 		tree_folders.draw(Element('content_folders'));
 
 		n_root.changeState();

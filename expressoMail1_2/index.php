@@ -174,9 +174,6 @@ $GLOBALS['phpgw']->js->add( 'txt' , 'var sharedFolders_min_num_characters = "'.(
 $GLOBALS['phpgw']->js->add( 'txt' , 'var sharedFolders_users_auto_search = "'.( isset($current_config['expressoMail_users_auto_search'] )? $current_config['expressoMail_users_auto_search'] : 'true' ).'";' );
 // End Search Users characteres shared folders.
 
-// Begin Enabled Read RSS
-$GLOBALS['phpgw']->js->add( 'txt' , 'var enabledReadRSS  = "'.( isset($current_config['expressoMail_enabled_read_rss'] )? $current_config['expressoMail_enabled_read_rss'] : 'false' ).'";' );
-
 $GLOBALS['phpgw']->js->add( 'txt' , 'var special_folders = new Array(4);
     special_folders["'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'].'"] = \'Trash\';
     special_folders["'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'].'"] = \'Drafts\';

@@ -66,7 +66,6 @@ Calling extension: 	expressoMail1_2	pt-br	Chamando Ramal:
 Call to Comercial Number	expressoMail1_2	pt-br	Discar para Telefone Comercial
 Call to Mobile Number	expressoMail1_2	pt-br	Discar para Telefone Celular
 cancel	expressoMail1_2	pt-br	Cancelar
-Can not access this RSS	expressoMail1_2	pt-br	Não é possível acessar este RSS
 cannot create folder. try other folder name	expressoMail1_2	pt-br	Erro ao criar a pasta. Certifique-se de que não tentou criá-la com um nome que contém a palavra \"local_\" ou que possui algum caractere especial.
 cannot rename folder. try other folder name	expressoMail1_2	pt-br	Impossível renomear pasta, tente outro nome.
 Caracter "#" is not allowed!	expressoMail1_2	pt-br	Caracter "#" não é permitido!
@@ -107,7 +106,6 @@ day(s)	expressoMail1_2	pt-br	dia(s)
 Dear user,\nthis is your first time in the ExpressoMail, your preferences must be saved.\nPlease, choose your preferences and click on the button Save.	expressoMail1_2	pt-br	Caro usuário, \ncomo esta é a primeira vez que você esta acessando o ExpressoMail, suas preferências devem ser salvas.\n Favor escolher suas preferências e clicar no botão Salvar.
 Define some criterion to the fields Sender, To and Subject with more than 3 characters!	expressoMail1_2	pt-br	Defina algum critério para os campos Remetente, Para, Assunto e Tamanho da mensagem com mais de 3 caracteres!
 Enter a numerical value to the message size!	expressoMail1_2	pt-br	Informe um valor numérico para o tamanho da mensagem!
-Enter the URL of RSS service	expressoMail1_2	pt-br	Digite a URL do serviço RSS
 Define some search parameters!	expressoMail1_2	pt-br	Defina alguns parâmetros para a busca!
 Define the boxes to search!	expressoMail1_2	pt-br	Defina as pastas para a busca!
 delete all attachments confirmation	expressoMail1_2	pt-br	ATENÇÃO: Após a confirmação dessa mensagem, TODOS os anexos da mesma serão apagados. Tenha certeza de que possui uma cópia dos arquivos importantes. Deseja confirmar a operação?
@@ -161,7 +159,6 @@ Enable	expressoMail1_2	pt-br	Habilitar
 Enabled groups	common	pt-br	Grupos Habilitados
 Enable Quick Reply	expressoMail1_2	pt-br	Responder rápido (com histórico e ao remetente)
 Enable this option if you want to read the next message everytime you delete a message	expressoMail1_2	pt-br	Habilite esta opção se você quiser ler a mensagem seguinte sempre que você apagar uma mensagem
-Enable RSS reader	expressoMail1_2	pt-br	Habilitar leitor de RSS
 Enable messages	admin	pt-br	Habilitar mensagem
 Enabling this options you will be able to store messages in your local computer	expressoMail1_2	pt-br	Ao ativar esta opção você será capaz de armazenar mensagens no seu computador local
 End of archive messages	expressoMail1_2	pt-br	Fim do arquivamento de mensagens
@@ -169,7 +166,6 @@ English	expressoMail1_2	pt-br	Inglês
 Enter a name for the box	expressoMail1_2	pt-br	Entre com um nome para a pasta:
 Enter the name of the new folder:	expressoMail1_2	pt-br	Insira o nome da nova pasta: 
 Enter with link URL:	expressoMail1_2	pt-br	Entre com a URL do link:
-Enter the URL of the RSS service	expressoMail1_2	pt-br	Digite a URL do serviço RSS
 Erase Folder	expressoMail1_2	pt-br	Apagar Pasta
 Erase the message	expressoMail1_2	pt-br	Apague a mensagem
 error:21071065:PKCS7 routines:func(113):reason(101)	expressoMail1_2	pt-br	Mensagem com provável violação de conteúdo.
@@ -309,7 +305,6 @@ Link	expressoMail1_2	pt-br	Link
 List All	expressoMail1_2	pt-br	Listar Tudo
 List Catalog	expressoMail1_2	pt-br	Listar Catálogo
 List	expressoMail1_2	pt-br	Listar
-List of registered RSS	expressoMail1_2	pt-br	Lista dos RSS cadastrados
 list of the filters	expressoMail1_2	pt-br	Lista de filtros
 Loading	expressoMail1_2	pt-br	Carregando
 local folders	expressoMail1_2	pt-br	Pastas locais
@@ -466,8 +461,6 @@ Rich Text	expressoMail1_2	pt-br	Texto Rico
 Rows	expressoMail1_2	pt-br	Linhas
 Rule	expressoMail1_2	pt-br	Regra
 Running	expressoMail1_2	pt-br	Em execução
-RSS Reader	common	pt-br	Leitor de RSS
-RSS Manager	expressoMail1_2	pt-br	Gerenciador de RSS
 Saturday	expressoMail1_2	pt-br	Sábado
 Save as Draft	expressoMail1_2	pt-br	Salvar como Rascunho
 Save as	expressoMail1_2	pt-br	Salvar como
