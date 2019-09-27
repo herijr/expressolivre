@@ -69,7 +69,7 @@ class MessagesResource extends MailAdapter {
 							$msg['msgDate']	= $imap_msg['udate']." 00:00";
 							$msg['msgSubject'] = $imap_msg['subject'];
 							$msg['msgSize'] = $imap_msg['size'];
-							$msg['msgFrom']	= array('fullName' => $imap_msg['from'], 'mailAddress' => "");							
+							$msg['msgFrom']	= array('fullName' => $imap_msg['from'], 'mailAddress' => $imap_msg['fromaddress']);							
 							$msg['msgFlagged']	= strpos($imap_msg['flag'],"F") !== false ? "1" : "0";
 							$msg['msgSeen']		= strpos($imap_msg['flag'],"U") !== false ? "0" : "1";
 							$msg['msgHasAttachments'] = strpos($imap_msg['flag'],"T") !== false ? "1" : "0";							
@@ -84,11 +84,8 @@ class MessagesResource extends MailAdapter {
 					}
 
 				}
-				else{
-					// TODO: Implementar a pesquisa de mensagens para verso 2.4
-				}
-			}
-			else{
+
+			} else {
 				$max_email_per_page = intval($this->getParam('resultsPerPage') ? $this->getParam('resultsPerPage') :
 					$this->getImap()->prefs['max_email_per_page']);
 	

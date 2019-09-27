@@ -3428,176 +3428,146 @@ class imap_functions
 
 	}
 
-	function search_msg( $params = false )
+	function search_msg($params = false)
 	{
 		$mbox_stream = "";
 		$retorno = array();
-		
-		if(strpos($params['condition'],"#")===false)
-		{ //local messages
-			$search=false;
+
+		if (strpos($params['condition'], "#") === false) { //local messages
+			$search = false;
+		} else {
+			$search = explode(",", $params['condition']);
 		}
-		else
-		{
-			$search = explode(",",$params['condition']);
-		}
-		
+
 		$params['page'] = $params['page'] * 1;
 
-	    if( is_array($search) )
-	    {
+		if (is_array($search)) {
 			$search = array_unique($search); // Remove duplicated folders
 			$search_criteria = '';
-			$search_result_number = $_SESSION['phpgw_info']['user']['preferences']['expressoMail']['search_result_number'];
-			foreach($search as $tmp)
-			{
-				$tmp1 = explode("##",$tmp);
+			foreach ($search as $tmp) {
+				$tmp1 = explode("##", $tmp);
 				$sum = 0;
-				$folder = $this->_toUTF8( $tmp1[0] );
+				$folder = $this->_toUTF8($tmp1[0]);
 				unset($filter);
-				foreach($tmp1 as $index => $criteria)
-				{
-					if ($index != 0 && strlen($criteria) != 0)
-					{
-						$filter_array = explode("<=>",$criteria);
-						if ( !isset( $filter ) ) $filter = '';
-						$filter .= " ".$filter_array[0];
-						if (strlen($filter_array[1]) != 0)
-						{
-							if ( trim($filter_array[0]) != 'BEFORE' &&
-								 trim($filter_array[0]) != 'SINCE' &&
-								 trim($filter_array[0]) != 'ON')
-							{
-							    $filter .= '"'.$filter_array[1].'"';
-							}else if(trim($filter_array[0]) == 'BEFORE' ){
-			                                    $filter .= '"'.$this->make_search_date($filter_array[1],true).'"';
-							}else{
-								$filter .= '"'.$this->make_search_date($filter_array[1]).'"';
+				foreach ($tmp1 as $index => $criteria) {
+					if ($index != 0 && strlen($criteria) != 0) {
+						$filter_array = explode("<=>", $criteria);
+						if (!isset($filter)) $filter = '';
+						$filter .= " " . $filter_array[0];
+						if (strlen($filter_array[1]) != 0) {
+							if (
+								trim($filter_array[0]) != 'BEFORE' &&
+								trim($filter_array[0]) != 'SINCE' &&
+								trim($filter_array[0]) != 'ON'
+							) {
+								$filter .= '"' . $filter_array[1] . '"';
+							} else if (trim($filter_array[0]) == 'BEFORE') {
+								$filter .= '"' . $this->make_search_date($filter_array[1], true) . '"';
+							} else {
+								$filter .= '"' . $this->make_search_date($filter_array[1]) . '"';
 							}
 						}
 					}
 				}
-				
-				$mailbox = $this->_toMaibox( $folder );
+
+				$mailbox = $this->_toMaibox($folder);
 				$filter = $this->remove_accents($filter);
 
 				//Este bloco tem a finalidade de transformar o login (quando numerico) das pastas compartilhadas em common name
-				if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'] && substr($mailbox,0,4) == 'user')
-				{
-					$folder_name = explode($this->imap_delimiter,$mailbox);
+				if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['uid2cn'] && substr($mailbox, 0, 4) == 'user') {
+					$folder_name = explode($this->imap_delimiter, $mailbox);
 					$this->ldap = new ldap_functions();
-					
-					if ($cn = $this->ldap->uid2cn($folder_name[1]))
-					{
+
+					if ($cn = $this->ldap->uid2cn($folder_name[1])) {
 						$folder_name[1] = $cn;
 					}
-					$mailbox = implode($this->imap_delimiter,$folder_name);
+					$mailbox = implode($this->imap_delimiter, $folder_name);
 				}
-				
-				$mbox_stream = $this->open_mbox( $folder );
-				
-				if (preg_match("/^.?\bALL\b/", $filter))
-				{ 
+
+				$mbox_stream = $this->open_mbox($folder);
+
+				if (preg_match("/^.?\bALL\b/", $filter)) {
 					// Quick Search, note: this ALL isn't the same ALL from imap_search
-					$all_criterias = array ("TO","SUBJECT","FROM","CC");
-					    
-					foreach($all_criterias as $criteria_fixed)
-					{
-						$_filter = $criteria_fixed . substr($filter,4);
-						
+					$all_criterias = array("TO", "SUBJECT", "FROM", "CC");
+
+					foreach ($all_criterias as $criteria_fixed) {
+						$_filter = $criteria_fixed . substr($filter, 4);
+
 						$search_criteria = imap_search($mbox_stream, $_filter, SE_UID);
-						
-						if(is_array($search_criteria))
-						{
-							foreach($search_criteria as $new_search)
-							{
-								$elem = $this->get_msg_detail($new_search,$mailbox,$mbox_stream); 
+
+						if (is_array($search_criteria)) {
+							foreach ($search_criteria as $new_search) {
+								$elem = $this->get_msg_detail($new_search, $mailbox, $mbox_stream);
 								$elem['boxname'] = $folder;
 								$elem['uid'] = $new_search;
 								/* compare dates in ordering */
-								$elem['udatecomp'] = substr ($elem['udate'], -4) ."-". substr ($elem['udate'], 3, 2) ."-". substr ($elem['udate'], 0, 2);
-								$retorno[] = $elem; 
+								$elem['udatecomp'] = substr($elem['udate'], -4) . "-" . substr($elem['udate'], 3, 2) . "-" . substr($elem['udate'], 0, 2);
+								$retorno[] = $elem;
 							}
 						}
 					}
-				}				
-				else {
-                	$search_criteria = imap_search($mbox_stream, $filter, SE_UID);
-					if($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_important_flag'])
-					{
-                    	if((!strpos($filter,"FLAGGED") === false) || (!strpos($filter,"UNFLAGGED") === false))
-						{
-                    		$num_msgs = imap_num_msg($mbox_stream);
+				} else {
+					$search_criteria = imap_search($mbox_stream, $filter, SE_UID);
+					if ($_SESSION['phpgw_info']['user']['preferences']['expressoMail']['use_important_flag']) {
+						if ((!strpos($filter, "FLAGGED") === false) || (!strpos($filter, "UNFLAGGED") === false)) {
+							$num_msgs = imap_num_msg($mbox_stream);
 							$flagged_msgs = array();
-							for ($i=$num_msgs; $i>0; $i--)
-							{
-								$iuid = @imap_uid($this->mbox,$i);
-								$header = $this->get_header($iuid);								
-								if(trim($header->Flagged))
-								{
+							for ($i = $num_msgs; $i > 0; $i--) {
+								$iuid = @imap_uid($this->mbox, $i);
+								$header = $this->get_header($iuid);
+								if (trim($header->Flagged)) {
 									$flagged_msgs[$i] = $iuid;
 								}
 							}
-							if((count($flagged_msgs) >0) && (strpos($filter,"UNFLAGGED") === false))
-							{
-								$arry_diff = is_array($search_criteria) ? array_diff($flagged_msgs,$search_criteria):$flagged_msgs;
-								foreach($arry_diff as $msg)
-								{
+							if ((count($flagged_msgs) > 0) && (strpos($filter, "UNFLAGGED") === false)) {
+								$arry_diff = is_array($search_criteria) ? array_diff($flagged_msgs, $search_criteria) : $flagged_msgs;
+								foreach ($arry_diff as $msg) {
 									$search_criteria[] = $msg;
 								}
+							} else if ((count($flagged_msgs) > 0) && (is_array($search_criteria)) && (!strpos($filter, "UNFLAGGED") === false)) {
+								$search_criteria = array_diff($search_criteria, $flagged_msgs);
 							}
-							else if((count($flagged_msgs) >0) && (is_array($search_criteria)) && (!strpos($filter,"UNFLAGGED") === false))
-							{
-								$search_criteria = array_diff($search_criteria,$flagged_msgs);
-							}
-                    	}
+						}
 					}
-                    if( is_array( $search_criteria) )
-					{
-						foreach($search_criteria as $new_search)
-						{
-							$elem = $this->get_msg_detail($new_search,$mailbox,$mbox_stream); 
+					if (is_array($search_criteria)) {
+						foreach ($search_criteria as $new_search) {
+							$elem = $this->get_msg_detail($new_search, $mailbox, $mbox_stream);
 							$elem['boxname'] = $folder;
 							$elem['uid'] = $new_search;
 							/* compare dates in ordering */
-							$elem['udatecomp'] = substr ($elem['udate'], -4) ."-". substr ($elem['udate'], 3, 2) ."-". substr ($elem['udate'], 0, 2);
+							$elem['udatecomp'] = substr($elem['udate'], -4) . "-" . substr($elem['udate'], 3, 2) . "-" . substr($elem['udate'], 0, 2);
 							$retorno[] = $elem;
 						}
 					}
-                }
+				}
 			}
 		}
-		
-		if($mbox_stream)
-		{
+
+		if ($mbox_stream) {
 			$this->close_mbox($mbox_stream);
-	    }
-	    
-	    $num_msgs = count($retorno);
+		}
 
-	    /* Comparison functions, descendent is ascendent with parms inverted */
-	    function SORTDATE($a, $b){ return ($a['udatecomp'] < $b['udatecomp']); }
-	    function SORTDATE_REVERSE($b, $a) { return SORTDATE($a,$b); }
+		$num_msgs = count($retorno);
 
-	    function SORTWHO($a, $b) { return (strtoupper($a['from']) > strtoupper($b['from'])); }
-	    function SORTWHO_REVERSE($b, $a) { return SORTWHO($a,$b); }
+		/* Comparison functions, descendent is ascendent with parms inverted */
+		function SORTDATE($a, $b){ return ($a['udatecomp'] < $b['udatecomp']); }
+		function SORTDATE_REVERSE($b, $a){ return SORTDATE($a, $b); }
+		function SORTWHO($a, $b){ return (strtoupper($a['from']) > strtoupper($b['from'])); }
+		function SORTWHO_REVERSE($b, $a){ return SORTWHO($a, $b); }
+		function SORTSUBJECT($a, $b){ return (strtoupper($a['subject']) > strtoupper($b['subject'])); }
+		function SORTSUBJECT_REVERSE($b, $a){ return SORTSUBJECT($a, $b); }
+		function SORTBOX($a, $b){ return ($a['boxname'] > $b['boxname']);}
+		function SORTBOX_REVERSE($b, $a){ return SORTBOX($a, $b);}
+		function SORTSIZE($a, $b){ return ($a['size'] > $b['size']); }
+		function SORTSIZE_REVERSE($b, $a){ return SORTSIZE($a, $b); }
 
-	    function SORTSUBJECT($a, $b) { return (strtoupper($a['subject']) > strtoupper($b['subject'])); }
-	    function SORTSUBJECT_REVERSE($b, $a) { return SORTSUBJECT($a,$b); }
-
-	    function SORTBOX($a, $b) { return ($a['boxname'] > $b['boxname']); }
-	    function SORTBOX_REVERSE($b, $a) { return SORTBOX($a,$b); }
-
-	    function SORTSIZE($a, $b) { return ($a['size'] > $b['size']); }
-	    function SORTSIZE_REVERSE($b, $a) { return SORTSIZE($a,$b); }
-
-	    usort( $retorno, $params['sort_type']);
-	    $pageret = array_slice( $retorno, $params['page'] * $this->prefs['max_email_per_page'], $this->prefs['max_email_per_page']);
+		usort($retorno, $params['sort_type']);
+		$pageret = array_slice($retorno, $params['page'] * $this->prefs['max_email_per_page'], $this->prefs['max_email_per_page']);
 
 		$arrayRetorno['num_msgs'] = $num_msgs;
 		$arrayRetorno['data']     = $pageret;
 
-		return $pageret? $arrayRetorno : 'none';
+		return $pageret ? $arrayRetorno : 'none';
 	}
 
 	function get_msg_detail($uid_msg,$name_box, $mbox_stream )
@@ -3620,7 +3590,8 @@ class imap_functions
 		$from = $header->from[0]->mailbox;
 		if($header->from[0]->personal != "")
 			$from = $header->from[0]->personal;
-		$ret_msg['from'] 	= $this->decode_string($from); 
+		$ret_msg['from'] 	= $this->decode_string($from);
+		$ret_msg['fromaddress'] = $header->fromaddress; 
 		$ret_msg['subject']	= ( strstr( $subject, ' ' ) === false )? str_replace( '_', ' ', $subject ) : $subject;
 		$ret_msg['udate'] 	= gmdate("d/m/Y",$header->udate + $this->functions->CalculateDateOffset()); 
 		$ret_msg['size'] 	= $header->Size; 
