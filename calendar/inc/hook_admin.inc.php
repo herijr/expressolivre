@@ -17,7 +17,6 @@
 		'Site Configuration' => $GLOBALS['phpgw']->link('/index.php','menuaction=admin.uiconfig.index&appname=' . $appname),
 		'Custom fields and sorting' => $GLOBALS['phpgw']->link('/index.php','menuaction=calendar.uicustom_fields.index'),
 		'Calendar Holiday Management' => $GLOBALS['phpgw']->link('/index.php','menuaction=calendar.uiholiday.admin'),
-		'Import CSV-File' => $GLOBALS['phpgw']->link('/calendar/csv_import.php'),
 		'Global Categories' => $GLOBALS['phpgw']->link('/index.php','menuaction=admin.uicategories.index&appname=calendar'),
 		'Grant Access by Group' => $GLOBALS['phpgw']->link('/index.php','menuaction=calendar.uigroup_access.index')
 	);
