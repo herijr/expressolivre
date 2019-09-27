@@ -727,13 +727,15 @@ function delete_msgs(folder, msgs_number, border_ID, show_success_msg,archive)
 	}
 }
 
-function move_search_msgs(border_id, new_folder, new_folder_name){
+function move_search_msgs(border_id, new_folder, new_folder_name)
+{
 	var selected_messages = '';
-	var temp_msg;
-	var main_list = Element("tbody_box_"+currentTab.substr(7)).childNodes;
-	for (j = 0; j < main_list.length; j++)	{
+	
+	var main_list = Element("tbody_box_" + currentTab.substr(7)).childNodes;
+	
+	for (j = 0; j < main_list.length; j++) {
 		var check_box = main_list[j].firstChild.firstChild;
-		if(check_box && check_box.checked) {
+		if (check_box && check_box.checked) {
 			if (proxy_mensagens.is_local_folder(main_list[j].getAttribute('name'))) {
 				alert(get_lang("You cant manipulate local messages on search"));
 				return;
@@ -741,78 +743,78 @@ function move_search_msgs(border_id, new_folder, new_folder_name){
 			selected_messages += main_list[j].id + ',';
 		}
 	}
-	selected_messages = selected_messages.substring(0,(selected_messages.length-1));
-	var handler_move_search_msgs = function(data){
-		if(!data || !data.msgs_number)
-			return;
-		else if(data.deleted) {
-			if (data.msgs_number.length == 1)
-				write_msg(get_lang("The message was deleted."));
-			else
-				write_msg(get_lang("The messages were deleted."));
-		}
-		else{
-			if (data.msgs_number.length == 1)
-				write_msg(get_lang("The message was moved to folder ") + lang_folder(data.new_folder_name));
-			else
-				write_msg(get_lang("The messages were moved to folder ") + lang_folder(data.new_folder_name));
-		}
+	
+	selected_messages = selected_messages.substring(0, (selected_messages.length - 1));
 
-		selected_messages = selected_messages.split(",");
-		for (i = 0; i < selected_messages.length; i++){
-			removeAll(selected_messages[i]);
-		}
-		// Update Box BgColor
-		var box = Element("tbody_box_"+currentTab.substr(7)).childNodes;
-		if(main_list.length > 1){
-			updateBoxBgColor(box);
-		}
-		connector.purgeCache();
-	}
-
-	if (selected_messages){
+	if (selected_messages) {
 		var selected_param = "";
-		if (selected_messages.indexOf(',') != -1)
-		{
+		if (selected_messages.indexOf(',') != -1) {
 			selected_msg_array = selected_messages.split(",");
-			for (i = 0; i < selected_msg_array.length; i++){
+			for (i = 0; i < selected_msg_array.length; i++) {
 				var tr = Element(selected_msg_array[i]);
-				if (tr.getAttribute('name') == new_folder)
-				{
+				if (tr.getAttribute('name') == new_folder) {
 					write_msg(get_lang('At least one message have the same origin'));
 					return false;
 				}
-				trfolder = (tr.getAttribute('name') == null?get_current_folder():tr.getAttribute('name'));
-					selected_param += ','+trfolder+';'+tr.id.replace(/_[a-zA-Z0-9]+/,"");
+				trfolder = (tr.getAttribute('name') == null ? get_current_folder() : tr.getAttribute('name'));
+				selected_param += ',' + trfolder + ';' + tr.id.replace(/_[a-zA-Z0-9]+/, "");
 			}
-		}
-		else
-		{
-			var tr=Element(selected_messages);
-			if (tr.getAttribute('name') == new_folder)
-			{
+		} else {
+			var tr = Element(selected_messages);
+			if (tr.getAttribute('name') == new_folder) {
 				write_msg(get_lang('The origin folder and the destination folder are the same.'));
 				return false;
 			}
-			trfolder = (tr.getAttribute('name') == null?get_current_folder():tr.getAttribute('name'));
-			selected_param=trfolder+';'+tr.id.replace(/_[a-zA-Z0-9]+/,"");
-		}
-		var params = "";
-		if (!new_folder && parseInt(preferences.save_deleted_msg)){
-			new_folder = 'INBOX'+cyrus_delimiter+trashfolder;
-			new_folder_name = trashfolder;
-			params = "&delete=true";
+			trfolder = (tr.getAttribute('name') == null ? get_current_folder() : tr.getAttribute('name'));
+			selected_param = trfolder + ';' + tr.id.replace(/_[a-zA-Z0-9]+/, "");
 		}
 
-		params += "&selected_messages="+url_encode(selected_param);
-		if(new_folder) {
-			params += "&new_folder="+url_encode(new_folder);
-			params += "&new_folder_name="+url_encode(new_folder_name);
+		var params = {};
+
+		if (!new_folder && parseInt(preferences.save_deleted_msg)) {
+			new_folder = 'INBOX' + cyrus_delimiter + trashfolder;
+			new_folder_name = trashfolder;
+			params.delete = 'true';
 		}
-		cExecute ("$this.imap_functions.move_search_messages", handler_move_search_msgs, params);
-	}
-	else
+
+		params.selected_messages = url_encode(selected_param);
+
+		if (new_folder) {
+			params.new_folder = url_encode(new_folder);
+			params.new_folder_name = url_encode(new_folder_name);
+
+		}
+
+		Ajax('this.imap_functions.move_search_messages', params, function (data) {
+			if (!data || !data.msgs_number)
+				return;
+			else if (data.deleted) {
+				if (data.msgs_number.length == 1)
+					write_msg(get_lang("The message was deleted."));
+				else
+					write_msg(get_lang("The messages were deleted."));
+			}
+			else {
+				if (data.msgs_number.length == 1)
+					write_msg(get_lang("The message was moved to folder ") + lang_folder(data.new_folder_name));
+				else
+					write_msg(get_lang("The messages were moved to folder ") + lang_folder(data.new_folder_name));
+			}
+
+			selected_messages = selected_messages.split(",");
+			for (i = 0; i < selected_messages.length; i++) {
+				removeAll(selected_messages[i]);
+			}
+			// Update Box BgColor
+			var box = Element("tbody_box_" + currentTab.substr(7)).childNodes;
+			if (main_list.length > 1) {
+				updateBoxBgColor(box);
+			}
+			connector.purgeCache();
+		});
+	} else {
 		write_msg(get_lang('No selected message.'));
+	}
 }
 
 function move_msgs2(folder, msgs_number, border_ID, new_folder, new_folder_name, show_success_msg) {
