@@ -10,7 +10,7 @@
 \**************************************************************************/
 
 /**
- * Provê objetos de multipropósito do Workflow
+ * Provï¿½ objetos de multipropï¿½sito do Workflow
  * @author Sidnei Augusto Drovetto Jr. - drovetto@gmail.com
  * @version 1.0
  * @package Workflow
@@ -35,8 +35,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Monta o ambiente requerido pelos métodos (somente se for necessário)
-	 * @param bool $requireGalaxia Indica que os métodos da engine Galaxia são necessários
+	 * Monta o ambiente requerido pelos mï¿½todos (somente se for necessï¿½rio)
+	 * @param bool $requireGalaxia Indica que os mï¿½todos da engine Galaxia sï¿½o necessï¿½rios
 	 * @return void
 	 * @access public
 	 */
@@ -59,8 +59,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Retorna uma conexão com o banco de dados do Galaxia (normalmente associado ao banco de dados do Expresso (eGroupWare))
-	 * @return object O objeto de acesso a banco de dados, já conectado
+	 * Retorna uma conexï¿½o com o banco de dados do Galaxia (normalmente associado ao banco de dados do Expresso (eGroupWare))
+	 * @return object O objeto de acesso a banco de dados, jï¿½ conectado
 	 * @access public
 	 */
 	function &getDBGalaxia()
@@ -111,8 +111,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Retorna uma conexão com o banco de dados do Expresso (eGroupWare)
-	 * @return object O objeto de acesso a banco de dados, já conectado
+	 * Retorna uma conexï¿½o com o banco de dados do Expresso (eGroupWare)
+	 * @return object O objeto de acesso a banco de dados, jï¿½ conectado
 	 * @access public
 	 */
 	function &getDBExpresso()
@@ -157,8 +157,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Retorna uma conexão com o banco de dados do Workflow
-	 * @return object O objeto de acesso a banco de dados, já conectado
+	 * Retorna uma conexï¿½o com o banco de dados do Workflow
+	 * @return object O objeto de acesso a banco de dados, jï¿½ conectado
 	 * @access public
 	 */
 	function &getDBWorkflow()
@@ -199,7 +199,7 @@ class WorkflowObjects
 
 	/**
 	 * Retorna um recurso de LDAP
-	 * @param bool $useCCParams Indica se deve usar os parâmetros do Contact Center
+	 * @param bool $useCCParams Indica se deve usar os parï¿½metros do Contact Center
 	 * @return resource O recurso LDAP
 	 * @access public
 	 */
@@ -266,7 +266,7 @@ class WorkflowObjects
 	
 	/**
 	 * Retorna um recurso de LDAP
-	 * @param bool $useCCParams Indica se deve usar os parâmetros do Contact Center
+	 * @param bool $useCCParams Indica se deve usar os parï¿½metros do Contact Center
 	 * @return resource O recurso LDAP
 	 * @access public
 	 */
@@ -284,7 +284,7 @@ class WorkflowObjects
 		
 		// Get third config level: database
 		$path = Factory::getInstance('WorkflowObjects')->getDBExpresso()->Link_ID->query( $sql, array( 'workflow', 'basedir' ) )->fetchRow();
-		$path = ( $path !== false )? $path['config_value'] : '/home/expressolivre/workflow';
+		$path = ( $path !== false ) ? $path['config_value'] : $GLOBALS['phpgw_info']['server']['files_dir'];
 		
 		// Check wildcard
 		if ( strpos( $path, '%u' ) !== false ) {
