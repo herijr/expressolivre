@@ -7,6 +7,7 @@ $app->container->set('LoginResource', function(){ return new App\Modules\Core\Lo
 $app->container->set('LogoutResource', function(){ return new App\Modules\Core\LogoutResource(); });
 $app->container->set('UserApiResource', function(){ return new App\Modules\Core\UserApiResource(); });
 $app->container->set('ExpressoVersionResource', function(){ return new App\Modules\Core\ExpressoVersionResource(); });
+$app->container->set('ExpressoBannerResource', function(){ return new App\Modules\Core\ExpressoBannerResource(); });
 
 // Core
 $app->post('/Login',function() use($app){
@@ -27,4 +28,9 @@ $app->post('/UserApi', function() use($app){
 $app->map('/ExpressoVersion', function() use($app){
     $params = $app->Request->getParams( $app->request );
     $app->Response->write( $app, $app->ExpressoVersionResource->any( $params )); 
+})->via('GET','POST');
+
+$app->map('/ExpressoBanner', function() use($app){
+    $params = $app->Request->getParams( $app->request );
+    $app->Response->write( $app, $app->ExpressoBannerResource->any( $params )); 
 })->via('GET','POST');

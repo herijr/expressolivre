@@ -1,21 +1,17 @@
 <?php
 
+namespace App\Modules\Core;
+
+use App\Adapters\ExpressoAdapter;
+
 class ExpressoBannerResource extends ExpressoAdapter {
 
-	public function setDocumentation() {
-
-		$this->setResource("Expresso","ExpressoBanner","Retorna as imagens da tela de login do Expresso.",array("POST","GET"));
-		$this->setIsMobile(true);
-
+	public function get() {
+		
+		return $this->post();
 	}
 
-	public function get($request) {
-		return $this->post($request);
-	}
-
-	public function post($request){
-		// to Receive POST Params (use $this->params)
- 		parent::post($request);
+	public function post(){
 
 		$base_dir  		= '../../phpgwapi/templates/news/';
 		$img_dir   		= 'src_images/';
@@ -72,10 +68,7 @@ class ExpressoBannerResource extends ExpressoAdapter {
 
 		$result = ( count($files) > 0 ? $files : "null" );
 
- 		$this->setResult($result);
-
-		//to Send Response (JSON RPC format)
-		return $this->getResponse();
+		return $result;
 	}
 
 	private function getProfileServer($client)
