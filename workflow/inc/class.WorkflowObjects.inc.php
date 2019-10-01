@@ -10,7 +10,7 @@
 \**************************************************************************/
 
 /**
- * Prov� objetos de multiprop�sito do Workflow
+ * Prove objetos de multiproposito do Workflow
  * @author Sidnei Augusto Drovetto Jr. - drovetto@gmail.com
  * @version 1.0
  * @package Workflow
@@ -35,8 +35,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Monta o ambiente requerido pelos m�todos (somente se for necess�rio)
-	 * @param bool $requireGalaxia Indica que os m�todos da engine Galaxia s�o necess�rios
+	 * Monta o ambiente requerido pelos metodos (somente se for necessario)
+	 * @param bool $requireGalaxia Indica que os metodos da engine Galaxia sao necessarios
 	 * @return void
 	 * @access public
 	 */
@@ -59,8 +59,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Retorna uma conex�o com o banco de dados do Galaxia (normalmente associado ao banco de dados do Expresso (eGroupWare))
-	 * @return object O objeto de acesso a banco de dados, j� conectado
+	 * Retorna uma conexao com o banco de dados do Galaxia (normalmente associado ao banco de dados do Expresso (eGroupWare))
+	 * @return object O objeto de acesso a banco de dados, ja conectado
 	 * @access public
 	 */
 	function &getDBGalaxia()
@@ -111,8 +111,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Retorna uma conex�o com o banco de dados do Expresso (eGroupWare)
-	 * @return object O objeto de acesso a banco de dados, j� conectado
+	 * Retorna uma conexao com o banco de dados do Expresso (eGroupWare)
+	 * @return object O objeto de acesso a banco de dados, ja conectado
 	 * @access public
 	 */
 	function &getDBExpresso()
@@ -157,8 +157,8 @@ class WorkflowObjects
 	}
 
 	/**
-	 * Retorna uma conex�o com o banco de dados do Workflow
-	 * @return object O objeto de acesso a banco de dados, j� conectado
+	 * Retorna uma conexao com o banco de dados do Workflow
+	 * @return object O objeto de acesso a banco de dados, ja conectado
 	 * @access public
 	 */
 	function &getDBWorkflow()
@@ -199,7 +199,7 @@ class WorkflowObjects
 
 	/**
 	 * Retorna um recurso de LDAP
-	 * @param bool $useCCParams Indica se deve usar os par�metros do Contact Center
+	 * @param bool $useCCParams Indica se deve usar os parametros do Contact Center
 	 * @return resource O recurso LDAP
 	 * @access public
 	 */
@@ -266,7 +266,7 @@ class WorkflowObjects
 	
 	/**
 	 * Retorna um recurso de LDAP
-	 * @param bool $useCCParams Indica se deve usar os par�metros do Contact Center
+	 * @param bool $useCCParams Indica se deve usar os parametros do Contact Center
 	 * @return resource O recurso LDAP
 	 * @access public
 	 */
