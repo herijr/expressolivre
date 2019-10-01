@@ -13,17 +13,20 @@
 
 class bogroup_access
 {
-	final function __construct(){
+	public final function __construct()
+	{
 		// Including ExpressoMail Classes
-		if(file_exists("../expressoMail1_2/inc/class.db_functions.inc.php"))
+		if (file_exists("../expressoMail1_2/inc/class.db_functions.inc.php")) {
 			include_once("../expressoMail1_2/inc/class.db_functions.inc.php");
-		if(file_exists("../expressoMail1_2/inc/class.ldap_functions.inc.php"))
+		}
+		if (file_exists("../expressoMail1_2/inc/class.ldap_functions.inc.php")) {
 			include_once("../expressoMail1_2/inc/class.ldap_functions.inc.php");
+		}
 	}
 
 	public final function search_user($params){			
 		$objLdap = new ldap_functions();
-		$objLdap -> ldapRootConnect();
+		$objLdap->ldapConnect();
 		$ldap = $objLdap -> ds;		
 		$search = $params['search'];
 		$accounttype = $params['type'];

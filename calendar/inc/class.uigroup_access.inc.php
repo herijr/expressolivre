@@ -118,8 +118,8 @@ class uigroup_access
 		$data = array();
 		if($grants) {		
 			foreach($grants as $key => $acl) {				
-				$GLOBALS['phpgw']->accounts->get_account_name($acl['userID'], &$lid, &$fuser, &$luser);
-				$GLOBALS['phpgw']->accounts->get_account_name($acl['groupID'], &$lid, &$groupname, &$lname);			
+				$GLOBALS['phpgw']->accounts->get_account_name($acl['userID'], $lid, $fuser, $luser);
+				$GLOBALS['phpgw']->accounts->get_account_name($acl['groupID'], $lid, $groupname, $lname);
 				$rights = $acl['rights'] & PHPGW_ACL_READ ? "L" : "";
 				$rights.= $acl['rights'] & PHPGW_ACL_ADD ? "A" : "";
 				$rights.= $acl['rights'] & PHPGW_ACL_EDIT ? "E" : "";
