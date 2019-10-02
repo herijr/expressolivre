@@ -292,8 +292,8 @@ class AdminAdapter extends ExpressoAdapter
 		
 		if( file_exists( API_DIRECTORY.'/../config/profileHomeServer.ini') )
 		{
-			$profileHomeServer = $this->readProfile('profileHomeServer.ini');
-
+			$profileHomeServer = $this->readProfile('profileHomeServer.ini','home.server');
+			
 			if( is_array($profileHomeServer) )
 			{
 				foreach( $profileHomeServer as $key => $value )
