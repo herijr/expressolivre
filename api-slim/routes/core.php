@@ -31,6 +31,5 @@ $app->map('/ExpressoVersion', function() use($app){
 })->via('GET','POST');
 
 $app->map('/ExpressoBanner', function() use($app){
-    $params = $app->Request->getParams( $app->request );
-    $app->Response->write( $app, $app->ExpressoBannerResource->any( $params )); 
+    $app->Response->write( $app, $app->ExpressoBannerResource->req()); 
 })->via('GET','POST');

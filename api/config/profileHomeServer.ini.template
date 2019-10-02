@@ -11,3 +11,9 @@ BASE_URL = http://localhost/api/rest
 
 [misc.config]
 USE_SLASH = 1
+
+[client.server]
+CLIENT1 = http://expressovm1.com.br
+CLIENT2 = http://expressovm2.com.br
+CLIENTN = http://expressovm3.com.br
+DEFAULT = http://localhost

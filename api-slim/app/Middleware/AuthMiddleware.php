@@ -21,7 +21,6 @@ class AuthMiddleware extends \Slim\Middleware
             '/UserApi',
             '/ExpressoVersion',
             '/ExpressoBanner',
-            '/teste',
             '/vcalendar/import',
         );
     }
