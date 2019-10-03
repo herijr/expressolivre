@@ -1248,23 +1248,37 @@ class PHPMailer
         $int_encoding = mb_internal_encoding();
         mb_internal_encoding("UTF-8");
 		$str = ucfirst( preg_replace( '/[^\x21-\x7E:]/','', trim( $name ) ) ).': ';
-		$skip_first = true;
+        $ctrl = count($addrs);
 		foreach ( $addrs as $addr ) {
-			if ( $skip_first ) $skip_first = false;
-			else $str .= $this->_str_split( ', ', $str );
-			$label  = $this->_str_decode( $addr[1] );
-			$email  = empty( $label )? trim( $addr[0] ) : '<'.trim( $addr[0] ).'>';
-			if ( !empty( $label ) ) {
+            
+            $label  = $this->_str_decode( $addr[1] );
+            $email  = empty( $label )? trim( $addr[0] ) : '<'.trim( $addr[0] ).'>';
+            
+            if ( !empty( $label ) ) {
 				$B = mb_encode_mimeheader( $label, 'UTF-8', 'B', $this->LE, $this->_str_indent( $str ) );
 				$Q = mb_encode_mimeheader( $label, 'UTF-8', 'Q', $this->LE, $this->_str_indent( $str ) );
-				$str .= ( strlen( $B ) < strlen( $Q ) )? $B : $Q;
-				$str .= $this->_str_split( ' ', $str );
-			}
-			$str .= $this->_str_split( $email, $str );
+				$label = ( strlen( $B ) < strlen( $Q ) )? $B : $Q;
+                $label .= $this->_str_split( ' ', $label );
+                
+                $str .= $label;
+            }
+
+            $strlenLabel = mb_strlen($label);
+            $strlenEmail = mb_strlen($email);
+
+            $sig = ( $ctrl-- > 1 ) ? ',' : '';
+
+            if ( ( $strlenLabel+$strlenEmail ) > 76 ) {
+
+                $str .= $this->LE . $this->SPW . $email . $sig . $this->LE . $this->SPW ;
+            } else {
+
+                $str .= $this->_str_split( $email, $str ) . $sig . $this->LE . $this->SPW ;
+            }
         }
+        
         mb_internal_encoding($int_encoding);
 		return $str.$this->LE;
-		
 	}
 
 	private function _str_split( $str, &$buffer )
