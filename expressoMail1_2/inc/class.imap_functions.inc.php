@@ -202,13 +202,13 @@ class imap_functions
 		
 		$imap_attachment = new imap_attachment();
 
+		$header = $this->get_header($msg_number);
+
 		$tempHeader = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
 		$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
 		$head_array['ContentType'] = $this->getMessageType($msg_number, $tempHeader);
 		$head_array['Importance'] = $flag==0?"Normal":$importance[1];
 
-		$header = $this->get_header($msg_number);
-		
 		if (!is_object($header))
 			return false;
 		
