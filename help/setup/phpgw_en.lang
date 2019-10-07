@@ -1,6 +1,9 @@
-%1 manual page(s) added or updated	manual	en	%1 manual page(s) added or updated
-download	manual	en	download
-install or update the manual-pages	admin	en	install or update the manual-pages
+%1 manual page(s) added or updated	help	en	%1 manual page(s) added or updated
+download	help	en	Download
+html_description	help	en	Your message has been sent to the Expresso Administrator, and will be answered at your email.<br><br>Thanks for helping us improve this tool.<br><br><div align=right><b>Expresso Development and <br> Maintenance Team.</b></div>
+install or update the manual-pages	admin	en	Install or update the manual-pages
 manual	common	en	Manual / Help
-page(s) %1 not found !!!	manual	en	Page(s) %1 not found !!!
-starting import from %1, this might take several minutes (specialy if you start it the first time) ...	manual	en	Starting import from %1, this might take several minutes (specialy if you start it the first time) ...
+Online User Manual Application	common	en	Online User Manual Application
+page(s) %1 not found !!!	help	en	Page(s) %1 not found !!!
+starting import from %1, this might take several minutes (specialy if you start it the first time) ...	help	en	Starting import from %1, this might take several minutes (specialy if you start it the first time)...
+Your suggestion was sent successfully.	help	en	Your suggestion was sent successfully.

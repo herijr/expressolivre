@@ -1,5 +1,6 @@
 00 (disable)	admin	pt-br	00 (desabilitado)
 13 (ntp)	admin	pt-br	13 (ntp)
+%1	common	pt-br	%1
 %1egroupware%2 is a multi-user, web-based groupware suite written in %3php%4.	common	pt-br	%1eGroupWare%2 é uma suíte de colaboração multi-usuário escrita em %3PHP%4.
 %1 email addresses inserted	common	pt-br	%1 endereço(s) de email(s) inseridos
 %1 is not executable by the webserver !!!	common	pt-br	%1 não é executável pelo servidor web !!!
@@ -13,6 +14,7 @@ about this editor	htmlarea	pt-br	Sobre o Editor
 access	common	pt-br	Acesso
 access not permitted	common	pt-br	Acesso não permitido
 access type	common	pt-br	Tipo de acesso
+Access without Digital Certificate	common	pt-br	Acesso sem Certificado Digital
 account has been created	common	pt-br	A conta foi criada
 account has been deleted	common	pt-br	A conta foi removida
 account has been updated	common	pt-br	A conta foi atualizada
@@ -21,16 +23,18 @@ account preferences	common	pt-br	Preferências da conta
 acl	common	pt-br	ACL
 action	common	pt-br	Ação
 active	common	pt-br	Ativo
+Active Directory	common	pt-br	Active Directory
 add %1 category for	common	pt-br	Adicionar categoria %1 para
 add category	common	pt-br	Adicionar categoria
-Add Participants	common	pt-br	Adicionar Participantes
 add	common	pt-br	Adicionar
+Add Participants	common	pt-br	Adicionar Participantes
 addressbook	common	pt-br	Catálogo de Endereços
 addressbook preferences	common	pt-br	Preferências para o catálogo de endereços
 add sub	common	pt-br	Adicionar sub-tarefa
 admin	common	pt-br	Administrador
 administration	common	pt-br	Administração
 afghanistan	common	pt-br	AFEGANISTÃO
+agree term	common	pt-br	Termo de aceite
 albania	common	pt-br	ALBANIA
 algeria	common	pt-br	ALGERIA
 all	common	pt-br	Todos
@@ -40,6 +44,7 @@ american samoa	common	pt-br	SAMOA AMERICANA
 andorra	common	pt-br	ANDORRA
 angola	common	pt-br	ANGOLA
 anguilla	common	pt-br	ANGUILLA
+An important error has occured with your login, please contact your system administrator	common	pt-br	Um erro importante ocorreu com seu login, por favor contate seu administrador
 antarctica	common	pt-br	ANTARTICA
 antigua and barbuda	common	pt-br	ANTIGUA E BARBUDA
 apply	common	pt-br	Aplicar
@@ -93,6 +98,7 @@ cameroon	common	pt-br	CAMARÕES
 canada	common	pt-br	CANADÁ
 cancel	common	pt-br	Cancelar
 cape verde	common	pt-br	CABO VERDE
+Catalog is out of service, you will not able to do some operations	common	pt-br	O serviço de catálogo está em manutenção, você não poderá realizar algumas operações
 categories	common	pt-br	Categorias
 categories for	common	pt-br	categorias para
 category %1 has been added !	common	pt-br	Categoria %1 foi adicionada !
@@ -104,7 +110,12 @@ central african republic	common	pt-br	REPÚBLICA CENTRO AFRICANA
 chad	common	pt-br	CHADE
 change	common	pt-br	Alterar
 charset	common	pt-br	iso-8859-1
+checking code	common	pt-br	Código de verificação
+checking code expired	common	pt-br	Código de verificação expirou
+checking code invalid	common	pt-br	Código de verificação inválido
+checking code not found	common	pt-br	Código de verificação não encontrado
 check installation	common	pt-br	Verificar Instalação
+cheking code Expresso: %1	common	pt-br	Código de verificação Expresso: %1
 chile	common	pt-br	CHILE
 china	common	pt-br	CHINA
 choose the category	common	pt-br	Escolha a categoria
@@ -124,11 +135,13 @@ colombia	common	pt-br	COLÔMBIA
 comoros	common	pt-br	COMOROS
 company	common	pt-br	Empresa
 company directory	common	pt-br	Diretório da compania
-Connection failed with %1 Server. Try later.	common	pt-br	Ocorreu uma falha de comunicação com o servidor de %1. Tente mais tarde.
 config password	common	pt-br	Senha de configuração
 config username	common	pt-br	Usuário de configuração
+confirm deny receiving any sms in this phone?	common	pt-br	Confirma recusar receber qualquer SMS neste telefone?
+confirm send new checking code?\n\nall received code previously will be invalidated	common	pt-br	Confirma o envio de um novo código?\n\nTodos os códigos enviados anteriormente serão invalidados
 congo	common	pt-br	CONGO
 congo, the democratic republic of the	common	pt-br	REPÚBLICA DEMOCRÁTICA DO CONGO
+Connection failed with %1 Server. Try later.	common	pt-br	Ocorreu uma falha de comunicação com o servidor de %1. Tente mais tarde.
 cook islands	common	pt-br	ILHAS COOK
 copy	common	pt-br	Copiar
 copy selection	htmlarea	pt-br	Copiar Seleção
@@ -173,6 +186,8 @@ domestic	common	pt-br	Doméstico
 dominica	common	pt-br	DOMINICA
 dominican republic	common	pt-br	REPÚBLICA DOMINICANA
 done	common	pt-br	Pronto
+Do you agree with the terms?	common	pt-br	Você concorda com os termos dispostos acima?
+Do you agree with the terms?	common	pt-br	Você concorda com os termos dispostos acima?
 do you also want to delete all subcategories ?	common	pt-br	Deseja remover também todas subcategorias ?
 drag to move	jscalendar	pt-br	Arraste para mover
 east timor	common	pt-br	TIMOR LESTE
@@ -194,7 +209,7 @@ enabled	common	pt-br	Habilitado
 end date	common	pt-br	Data do término
 end time	common	pt-br	Hora do término
 enlarge editor	htmlarea	pt-br	Maximizar Editor
-enter the location of egroupware's url.<br>example: http://www.domain.com/egroupware &nbsp; or &nbsp; /egroupware<br><b>no trailing slash</b>	admin	pt-br	Informe a localização da Extranet em um URL .<br>Exemplo: http://www.seudomínio.com.br/extranet &nbsp; ou &nbsp; /extranet<br><b>Não finalize com uma BARRA</b>
+enter the location of egroupware's url.<br>example: http://www.domain.com/egroupware &nbsp; or &nbsp; /egroupware<br><b>no trailing slash</b>	admin	pt-br	Informe a localização da Extranet como URL .<br>Exemplo: http://www.seudomínio.com.br/extranet &nbsp; ou &nbsp; /extranet<br><b>Não finalize com uma BARRA</b>
 entry has been deleted sucessfully	common	pt-br	Entrada removida com sucesso
 entry updated sucessfully	common	pt-br	Entrada atualizada com sucesso
 equatorial guinea	common	pt-br	GUINÉ EQUATORIAL
@@ -202,16 +217,15 @@ eritrea	common	pt-br	ERITREA
 error	common	pt-br	Erro
 error creating %1 %2 directory	common	pt-br	Erro criando diretório %1 %2
 error deleting %1 %2 directory	common	pt-br	Erro removendo diretório %1 %2
-error renaming %1 %2 directory	common	pt-br	Erro renomeando diretório %1 %2
 Error in access. Please, alert the Administrator.	common	pt-br	Ocorreu um erro. Avise o Administrador.
+error renaming %1 %2 directory	common	pt-br	Erro renomeando diretório %1 %2
 estonia	common	pt-br	ESTONIA
 ethiopia	common	pt-br	ETIÓPIA
 exact	common	pt-br	exato(a)
 exit	common	pt-br	Sair
-ExpressoLivre is unavailable at this moment. Code %1<br>Please, try later.	common	pt-br	ExpressoLivre indisponível no momento. Código %1<br>Tente mais tarde.
-Catalog is out of service, you will not able to do some operations	common	pt-br	O serviço de catálogo está em manutenção, você não poderá realizar algumas operações
 Expand Menu	common	pt-br	Expandir Menu
 expires	common	pt-br	Expira
+ExpressoLivre is unavailable at this moment. Code %1<br>Please, try later.	common	pt-br	ExpressoLivre indisponível no momento. Código %1<br>Tente mais tarde.
 External Applications	common	pt-br	Aplicações Externas
 falkland islands (malvinas)	common	pt-br	ILHAS FALKLAND (MALVINAS)
 faroe islands	common	pt-br	ILHAS FAROE
@@ -236,6 +250,7 @@ french southern territories	common	pt-br	FRENCH SOUTHERN TERRITORIES
 friday	common	pt-br	Sexta
 ftp	common	pt-br	FTP
 fullname	common	pt-br	Nome completo
+Full path	common	pt-br	Caminho completo
 gabon	common	pt-br	GABÃO
 gambia	common	pt-br	GAMBIA
 general menu	common	pt-br	Menu Geral
@@ -273,6 +288,7 @@ header password	common	pt-br	Senha do administrador
 header username	common	pt-br	Usuario principal
 heard island and mcdonald islands	common	pt-br	HEARD ISLAND AND MCDONALD ISLANDS
 Help	common	pt-br	Ajuda
+help	common	pt-br	ajuda
 help using editor	htmlarea	pt-br	Editor utilizando o ajuda
 Hide header and toolbar	common	pt-br	Esconder cabeçalho e barra de ferramentas
 high	common	pt-br	Alto
@@ -280,25 +296,28 @@ highest	common	pt-br	Mais alto
 - hold mouse button on any of the above buttons for faster selection.	jscalendar	pt-br	- Segure mouse clicado e use o comando seta acima para avançar mais rápido
 holy see (vatican city state)	common	pt-br	VATICANO
 home	common	pt-br	Página Inicial
-home email	common	pt-br	E-mail residencial
+home email	common	pt-br	E-mail pessoal
 honduras	common	pt-br	HONDURAS
 hong kong	common	pt-br	HONG KONG
 horizontal rule	htmlarea	pt-br	Régua horizontal
 how many icons should be shown in the navbar (top of the page). additional icons go into a kind of pulldown menu, callable by the icon on the far right side of the navbar.	common	pt-br	Quantos ícones devem ser mostrados na barra de navegação (ao topo da página). Ícones adicionais serão colocados em um recurso adicional em forma de menú suspenso à direita da barra de navegação.
 hungary	common	pt-br	HUNGRIA
 iceland	common	pt-br	ISLÂNDIA
+i consent to receive SMS	common	pt-br	Autorizo receber SMS
 increase indent	htmlarea	pt-br	Aumentar recúo
 india	common	pt-br	INDIA
 indonesia	common	pt-br	INDONESIA
 info log	common	pt-br	Info Log
 insert all %1 addresses of the %2 contacts in %3	common	pt-br	Inserir todos %1 endereços para %2 contatos em %3
 insert image	htmlarea	pt-br	Inserir imagem
+insert received code	common	pt-br	Inserir código recebido
 insert table	htmlarea	pt-br	Inserir tabela
 insert web link	htmlarea	pt-br	Inserir Link para Internet
 international	common	pt-br	Internacional
 Invalid code	common	pt-br	C&oacute;digo inv&aacute;lido
 invalid ip address	common	pt-br	Endereço IP inválido
 invalid password	common	pt-br	Senha inválida
+invalid phone number	common	pt-br	Número de celular inválido
 iran, islamic republic of	common	pt-br	IRÃ
 iraq	common	pt-br	IRAQUE
 ireland	common	pt-br	IRLANDA
@@ -339,12 +358,14 @@ liberia	common	pt-br	LIBERIA
 libyan arab jamahiriya	common	pt-br	LÍBIA
 license	common	pt-br	Licença
 liechtenstein	common	pt-br	LIECHTENSTEIN
+Link to use digital certificate	common	pt-br	Link para acesso usando Certificado Digital
 list	common	pt-br	Lista
 list members	common	pt-br	Listar membros
 lithuania	common	pt-br	LITUÂNIA
 local	common	pt-br	Local
 login	common	pt-br	Conectar
 loginid	common	pt-br	ID Login
+Logon with my digital certificate	common	pt-br	Utilizar o meu Certificado para logar.
 logout	common	pt-br	Desconectar
 low	common	pt-br	Baixo
 lowest	common	pt-br	Mais baixo
@@ -376,6 +397,8 @@ menu	common	pt-br	Menu
 message	common	pt-br	Mensagem
 mexico	common	pt-br	MÉXICO
 micronesia, federated states of	common	pt-br	MICRONESIA
+mobile checked	common	pt-br	Celular verificado
+mobile not checked	common	pt-br	Celular não verificado
 moldova, republic of	common	pt-br	MOLDÁVIA
 monaco	common	pt-br	MÔNACO
 monday	common	pt-br	Segunda
@@ -417,9 +440,9 @@ northern mariana islands	common	pt-br	NORTHERN MARIANA ISLANDS
 norway	common	pt-br	NORUEGA
 no subject	common	pt-br	Sem assunto
 not assigned	common	pt-br	Não atribuído
-notices	common	pt-br	Avisos
 note	common	pt-br	Nota
 notes	common	pt-br	Notas
+notices	common	pt-br	Avisos
 notify window	common	pt-br	Janela de notificação
 november	common	pt-br	Novembro
 october	common	pt-br	Outubro
@@ -430,6 +453,7 @@ only private	common	pt-br	Apenas particular
 only yours	common	pt-br	somente as suas
 on mouse over	common	pt-br	Passar o mouse
 on *nix systems please type: %1	common	pt-br	Sobre sistemas *nix tipo: %1
+Oops! You caught us in the middle of system maintainance.<br/> Please, come back in a few minutes.	login	pt-br	Opa! Você nos pegou no meio de manutenção do sistema. Por favor, volte daqui alguns minutos
 open notify window	common	pt-br	Abrir janela de notificação
 open popup window	common	pt-br	Abrir janela
 - or click and drag for faster selection.	jscalendar	pt-br	- ou Clique e araste para uma seleção rápida.
@@ -440,7 +464,6 @@ original	common	pt-br	Original
 other	common	pt-br	Outro
 overview	common	pt-br	Visão geral
 owner	common	pt-br	Dono
-Oops! You caught us in the middle of system maintainance.<br/> Please, come back in a few minutes.	login	pt-br	Opa! Você nos pegou no meio de manutenção do sistema. Por favor, volte daqui alguns minutos
 page	common	pt-br	Página
 page was generated in %1 seconds	common	pt-br	Página gerada em %1 segundos
 pakistan	common	pt-br	PAQUISTÃO
@@ -461,6 +484,7 @@ pattern for search in addressbook	common	pt-br	Teste padrão para a Busca no Catá
 pattern for search in calendar	common	pt-br	Teste padrão para a Busca no Calendário
 pattern for search in projects	common	pt-br	Teste padrão para a Busca nos Projetos
 permissions to the files/users directory	common	pt-br	Permissões do diretório para os arquivos/usuários
+Per page	common	pt-br	Por página
 personal	common	pt-br	Pessoal
 peru	common	pt-br	PERU
 philippines	common	pt-br	FILIPINAS
@@ -492,6 +516,7 @@ project	common	pt-br	Projeto
 public	common	pt-br	público
 puerto rico	common	pt-br	PORTO RICO
 qatar	common	pt-br	QATAR
+Radius	common	pt-br	Radius
 read	common	pt-br	Leitura
 read this list of methods.	common	pt-br	Leia a lista de métodos.
 redoes your last action	htmlarea	pt-br	Desfazer sua última ação
@@ -532,7 +557,9 @@ selection	common	pt-br	Seleção
 select one	common	pt-br	Selecionar um
 select user	common	pt-br	Selecionar usuário
 select work email address	common	pt-br	Selecionar endereço de e-mail comercial
+send code by sms	common	pt-br	Enviar código por SMS
 send	common	pt-br	Enviar
+send new code by sms	common	pt-br	Enviar novo código por SMS
 Send your critics, doubts or suggestions	common	pt-br	Envie suas críticas, dúvidas ou sugestões
 senegal	common	pt-br	SENEGAL
 september	common	pt-br	Setembro
@@ -540,7 +567,7 @@ server %1 has been added	common	pt-br	Servidor %1 foi incluído
 server name	common	pt-br	Nome do Servidor
 session has been killed	common	pt-br	Sessão foi terminada
 setup	common	pt-br	Configurar
-setup/config admin login	common	pt-br	Administrado de Instalação/Configuração
+setup/config admin login	common	pt-br	Administrador de Instalação/Configuração
 setup main menu	common	pt-br	Menu principal de configurações
 seychelles	common	pt-br	SEYCHELLES
 (shift-)click or drag to change value	jscalendar	pt-br	(Shift-) Clique ou arraste para alterar o valor
@@ -557,6 +584,11 @@ sierra leone	common	pt-br	SERRA LEOA
 singapore	common	pt-br	SINGAPURA
 slovakia	common	pt-br	ESLOVÁQUIA
 slovenia	common	pt-br	ESLOVÊNIA
+sms daily limit reached	common	pt-br	Limite diário de SMS alcançado
+sms disabled	common	pt-br	SMS desabilitado
+sms empty message	common	pt-br	Mensagem SMS vazia
+sms receive denied	common	pt-br	Recebimento de SMS negado
+sms send denied	common	pt-br	Envio de SMS negado
 solomon islands	common	pt-br	ILHAS SOLOMON
 somalia	common	pt-br	SOMALIA
 sorry, there was a problem proccesing your request.	common	pt-br	Desculpe, Houve um problema ao processar seu pedido.
@@ -564,6 +596,7 @@ sorry, your login has expired	login	pt-br	Desculpe, sua conta expirou
 south africa	common	pt-br	ÁFRICA DO SUL
 south georgia and the south sandwich islands	common	pt-br	SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS
 spain	common	pt-br	ESPANHA
+spam headers fields	common	pt-br	Campos usados no SPAM
 sri lanka	common	pt-br	SRI LANKA
 start date	common	pt-br	Data de início
 start time	common	pt-br	Hora de início
@@ -575,7 +608,6 @@ submit	common	pt-br	Enviar
 subscript	htmlarea	pt-br	Sobrescrever
 substitutions and their meanings:	common	pt-br	Substituições e seus efeitos:
 sudan	common	pt-br	SUDÃO
-use	common	pt-br	usar
 Suggestion	common	pt-br	Sugestão
 Suggestions	common	pt-br	Sugestões
 sunday	common	pt-br	Domingo
@@ -613,10 +645,10 @@ toggle first day of week	jscalendar	pt-br	Utilizar como primeiro dia da semana
 toggle html source	htmlarea	pt-br	Utilizar código HTML
 to go back to the msg list, click <a href= %1 >here</a>	common	pt-br	Para voltar para a lista de mensagens, clique <a href="%1">aqui</a>
 togo	common	pt-br	TOGO
-to Search	common	pt-br	Buscar todos
 tokelau	common	pt-br	TOKELAU
 tonga	common	pt-br	TONGA
 too many unsucessful attempts to login: %1 for the user '%2', %3 for the ip %4	common	pt-br	Houve tentativas em excesso de login para o usuário:: %1 para o cliente '%2', %3 a partir do endereço IP %4
+to Search	common	pt-br	Buscar todos
 total	common	pt-br	Total
 trinidad and tobago	common	pt-br	TRINIDAD E TOBAGO
 tuesday	common	pt-br	Terça
@@ -625,6 +657,7 @@ turkey	common	pt-br	TURQUIA
 turkmenistan	common	pt-br	TURCOMENISTÃO
 turks and caicos islands	common	pt-br	ILHAS TURKS E CAICOS
 tuvalu	common	pt-br	TUVALU
+Type the full path to the files of workflow processes	common	pt-br	Digite o caminho completo para os arquivos dos processos de workflow
 uganda	common	pt-br	UGANDA
 ukraine	common	pt-br	UCRÂNIA
 underline	htmlarea	pt-br	Sublinhado
@@ -634,14 +667,17 @@ united kingdom	common	pt-br	INGLATERRA
 united states	common	pt-br	ESTADOS UNIDOS
 united states minor outlying islands	common	pt-br	ILHAS MENORES EEUU
 unknown	common	pt-br	Desconhecido
+unknown option '%1'	common	pt-br	Opção desconhecida '%1'
 update	common	pt-br	Atualizar
 updated	common	pt-br	Atualizado
 url	common	pt-br	URL
+URL for spam	common	pt-br	Endereço do SPAM
 uruguay	common	pt-br	URUGUAI
 use button to search for address	common	pt-br	Utilize o botão para procurar por endereços
 use button to search for calendarevent	common	pt-br	Utilize o botão para procurar por eventos na agenda
 use button to search for	common	pt-br	Utilize o botão para buscar por
 use button to search for project	common	pt-br	Utilize o botão para procurar por projetos
+use	common	pt-br	usar
 user accounts	common	pt-br	Contas do usuário
 user	common	pt-br	Usuário
 user data	common	pt-br	Dados do usuário
@@ -697,38 +733,3 @@ your settings have been updated	common	pt-br	Suas preferências foram atualizadas
 yugoslavia	common	pt-br	IUGOSLÁVIA
 zambia	common	pt-br	ZÂMBIA
 zimbabwe	common	pt-br	ZIMBABUE
-agree term	common	pt-br	Termo de aceite
-Do you agree with the terms?	common	pt-br	Você concorda com os termos dispostos acima?
-An important error has occured with your login, please contact your system administrator	common	pt-br	Um erro importante ocorreu com seu login, por favor contate seu administrador
-Do you agree with the terms?	common	pt-br	Você concorda com os termos dispostos acima?
-Logon with my digital certificate	common	pt-br	Utilizar o meu Certificado para logar.
-Link to use digital certificate	common	pt-br	Link para acesso usando Certificado Digital
-Access without Digital Certificate	common	pt-br	Acesso sem Certificado Digital
-%1	common	pt-br	%1
-sms disabled	common	pt-br	SMS desabilitado
-cheking code Expresso: %1	common	pt-br	Código de verificação Expresso: %1
-mobile checked	common	pt-br	Celular verificado
-mobile not checked	common	pt-br	Celular não verificado
-checking code	common	pt-br	Código de verificação
-send code by sms	common	pt-br	Enviar código por SMS
-send new code by sms	common	pt-br	Enviar novo código por SMS
-i consent to receive SMS	common	pt-br	Autorizo receber SMS
-unknown option '%1'	common	pt-br	Opção desconhecida '%1'
-sms daily limit reached	common	pt-br	Limite diário de SMS alcançado
-checking code invalid	common	pt-br	Código de verificação inválido
-checking code expired	common	pt-br	Código de verificação expirou
-checking code not found	common	pt-br	Código de verificação não encontrado
-sms receive denied	common	pt-br	Recebimento de SMS negado
-invalid phone number	common	pt-br	Número de celular inválido
-sms send denied	common	pt-br	Envio de SMS negado
-sms empty message	common	pt-br	Mensagem SMS vazia
-confirm send new checking code?\n\nall received code previously will be invalidated	common	pt-br	Confirma o envio de um novo código?\n\nTodos os códigos enviados anteriormente serão invalidados
-confirm deny receiving any sms in this phone?	common	pt-br	Confirma recusar receber qualquer SMS neste telefone?
-insert received code	common	pt-br	Inserir código recebido
-Radius	common	pt-br	Radius
-Per page	common	pt-br	Por página
-Type the full path to the files of workflow processes	common	pt-br	Digite o caminho completo para os arquivos dos processos de workflow
-Full path	common	pt-br	Caminho completo
-URL for spam	common	pt-br	Endereço do SPAM
-spam headers fields	common	pt-br	Campos usados no SPAM
-Active Directory	common	pt-br	Active Directory

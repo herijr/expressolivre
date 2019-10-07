@@ -1,18 +1,21 @@
 Add Participants	contactcenter	pt-br	Adicionar Participantes
 Add Relation	contactcenter	pt-br	Adicionar Relação
-Add to catalog 	contactcenter	pt-br	Adicionar ao catálogo
 Address 1	contactcenter	pt-br	Endereço 1
 Address 2	contactcenter	pt-br	Endereço 2
 Addresses	contactcenter	pt-br	Endereços
 Address Other	contactcenter	pt-br	Outro Endereço
+Add to catalog 	contactcenter	pt-br	Adicionar ao catálogo
+Advanced Search	contactcenter	pt-br	Busca Avançada
 Alias	common	pt-br	Apelido
 Alternative	contactcenter	pt-br	Alternativo
-An error has occurred while the exportation.	contactcenter	pt-br	um erro ocorreu durante a exportação
+An error has occurred while the exportation.	contactcenter	pt-br	Um erro ocorreu durante a exportação
 Attributes	contactcenter	pt-br	Atributos
-Available	contactcenter	pt-br	Disponível
-Birthdate	contactcenter	pt-br	Nascimento
 Automatic	contactcenter	pt-br	Automático
+Available	contactcenter	pt-br	Disponível
+availables	contactcenter	pt-br	Usuários disponíveis
+Birthdate	contactcenter	pt-br	Nascimento
 Browse	common	pt-br	Procurar
+Call Extension	contactcenter	pt-br	Efetuar chamada
 Cards View	contactcenter	pt-br	Ver Cartões
 Cards Visualization Preferences	contactcenter	pt-br	Preferências de Visualização de Cartões
 Catalog %1 not showed due to error: Time limit exceeded	contactcenter	pt-br	Catálogo %1 não foi mostrado devido ao erro: Tempo limite excedido
@@ -22,51 +25,46 @@ Cellphone	contactcenter	pt-br	Celular
 Cell Phone	contactcenter	pt-br	Celular
 Choose City	contactcenter	pt-br	Escolher Cidade...
 Choose Country	contactcenter	pt-br	Escolher País...
-Choose 'E-mail' or 'Telephone'	contactcenter	pt-br	Escolha E-Mail ou Telefone
-Choose Email Type...	contactcenter	pt-br	Escolha o tipo do email
+Choose 'E-mail' or 'Telephone'	contactcenter	pt-br	Escolha E-Mail ou Telefone...
+Choose Email Type...	contactcenter	pt-br	Escolha o tipo do email...
+Choose in wich catalog you would like to add...	contactcenter	pt-br	Escolha em qual catálogo deseja adicionar...
 Choose Prefix...	contactcenter	pt-br	Escolher Prefixo...
-Choose Sex ...	contactcenter	pt-br	Escolher Sexo ...
+Choose Sex ...	contactcenter	pt-br	Escolher Sexo...
 Choose State	contactcenter	pt-br	Escolher Estado...
 Choose Suffix...	contactcenter	pt-br	Escolher Sufixo...
-Choose Telephone Type...	contactcenter	pt-br	Escolha o tipo do telefone
-Choose in wich catalog you would like to add...	contactcenter	pt-br	Escolha em qual catálogo deseja adicionar...
-Choose Type of Address	contactcenter	pt-br	Escolher Tipo de Endereço
-Choose Type of Connection	contactcenter	pt-br	Escolher Tipo de Conexão
+Choose Telephone Type...	contactcenter	pt-br	Escolha o tipo do telefone...
+Choose Type of Address	contactcenter	pt-br	Escolher Tipo de Endereço...
+Choose Type of Connection	contactcenter	pt-br	Escolher Tipo de Conexão...
 City	contactcenter	pt-br	Cidade
+Clean	contactcenter	pt-br	Limpar
 Close	contactcenter	pt-br	Fechar
 Comercial	contactcenter	pt-br	Comercial
 Complement	contactcenter	pt-br	Complemento
-Advanced Search	contactcenter	pt-br	Busca Avançada
-Contatc: 	contactcenter	pt-br	Contato: 
- new	contactcenter	pt-br	 novas
- failed	contactcenter	pt-br	 falharam
- were existent	contactcenter	pt-br	 já existiam
-show more info	contactcenter	pt-br	Mais informações
-Clean	contactcenter	pt-br	Limpar
 Confirm Removal of this Contact?	contactcenter	pt-br	Confirmar a exclusão deste Contato?
 Confirm Removal of this Group?	contactcenter	pt-br	Confirmar a exclusão deste Grupo?
 Connection Name	contactcenter	pt-br	Nome da Conexão
 Connections	contactcenter	pt-br	Conexões
 Connection Value	contactcenter	pt-br	Valor da Conexão
 Connector Setup	contactcenter	pt-br	Configuração de Conexão
-contactcenter	common	pt-br	Catálogo de Endereços
 contact center application	common	pt-br	Módulo de Contatos
+contactcenter	common	pt-br	Catálogo de Endereços
 Contact Center	common	pt-br	Catálogo de Endereços
 Contact [Full]	contactcenter	pt-br	Contato [Completo]
-Contact [Shared]	contactcenter	pt-br	Contato [Compartilhado]
 Contact Group List	common	pt-br	Lista de Grupos de Contatos
 Contacting Server...	contactcenter	pt-br	Contactando Servidor...
 Contact [Quick Add]	contactcenter	pt-br	Contato [Adição Rápida]
 Contacts	common	pt-br	Contatos
+Contact [Shared]	contactcenter	pt-br	Contato [Compartilhado]
+Contatc: 	contactcenter	pt-br	Contato: 
 Copy to personal catalog.	contactcenter	pt-br	Copiar para o Catálogo Pessoal
-Couldn't contact server or server response is invalid. Contact Admin.	contactcenter	pt-br	Não foi possível estabelecer conexão com o servidor. Contacte o Administrador do sistema.
-Country	contactcenter	pt-br	País
 Corporate	contactcenter	pt-br	Empresa
-Corporative	contactcenter	pt-br	Corporativo
 Corporative Cellphone	contactcenter	pt-br	Celular Corporativo
 Corporative Cell Phone	contactcenter	pt-br	Celular Corporativo
+Corporative	contactcenter	pt-br	Corporativo
 Corporative Fax	contactcenter	pt-br	Fax Corporativo
 Corporative Pager	contactcenter	pt-br	Pager Corporativo
+Couldn't contact server or server response is invalid. Contact Admin.	contactcenter	pt-br	Não foi possível estabelecer conexão com o servidor. Contacte o Administrador do sistema.
+Country	contactcenter	pt-br	País
 Data to be serialized is of unknown type!	contactcenter	pt-br	Dado a ser serializado é de tipo desconhecido
 Day	contactcenter	pt-br	Dia
 Default	contactcenter	pt-br	Padrão
@@ -88,12 +86,13 @@ Export as Outlook Express (English) CSV.	contactcenter	pt-br	Exportar como Outlo
 Export as Outlook Express (Portuguese) CSV.	contactcenter	pt-br	Exportar como Outlook Express (Português) CSV.
 Export Contacts	contactcenter	pt-br	Exportar Contatos
 Expresso (default)	contactcenter	pt-br	Expresso (padrão)
-Family Names	common	pt-br	Sobrenome
+ failed	contactcenter	pt-br	 falharam
+Family Names	common	pt-br	Sobrenomes
 Fax	contactcenter	pt-br	Fax
 Female	contactcenter	pt-br	Feminino
 field is empty	contactcenter	pt-br	Campo está vazio
-file not found	contactcenter	pt-br	arquivo não encontrado
 file could not be opened	contactcenter	pt-br	o arquivo não pôde ser aberto
+file not found	contactcenter	pt-br	arquivo não encontrado
 Fill the field Full Name	contactcenter	pt-br	Preencha o Nome Completo
 Found %1 Entries	common	pt-br	Encontrado %1 Resultado(s)
 Full Add	contactcenter	pt-br	Adicionar Completo
@@ -124,9 +123,10 @@ Month	contactcenter	pt-br	Mês
 Mozilla Thunderbird	contactcenter	pt-br	Mozilla Thunderbird
 Name is mandatory	contactcenter	pt-br	Nome é obrigatório
 New City	contactcenter	pt-br	Nova Cidade
+ new	contactcenter	pt-br	 novas
 New...	contactcenter	pt-br	Novo...
 New	contactcenter	pt-br	Novo
-New Email	contactcenter	pt-br	Novo Email
+New Email	contactcenter	pt-br	Novo E-mail
 New from same Company	contactcenter	pt-br	Novo da mesma empresa
 New from the same Type	contactcenter	pt-br	Novo do mesmo tipo
 New State	contactcenter	pt-br	Novo Estado
@@ -139,8 +139,10 @@ No Room for Cards! Increase your browser area.	contactcenter	pt-br	Área muito pe
 No shared catalog that has permission to add.	contactcenter	pt-br	Nenhum catálogo compartilhado com permissão de adição.
 No State	contactcenter	pt-br	Nenhum Estado
 No States found for this Country.	contactcenter	pt-br	Nenhum Estado encontrado para este País.
+Not Allowed	contactcenter	pt-br	Acesso negado
 Operation Timed Out.	contactcenter	pt-br	Tempo de operação esgotado.
 Option	contactcenter	pt-br	Opção
+ou	contactcenter	pt-br	Organização:
 Outlook 2000	contactcenter	pt-br	Outlook 2000
 Outlook Express	contactcenter	pt-br	Outlook Express
 Pager	contactcenter	pt-br	Pager
@@ -149,7 +151,6 @@ People	contactcenter	pt-br	Pessoal
 Personal Contacts	common	pt-br	Contatos Pessoais
 Personal Data	contactcenter	pt-br	Dados Pessoais
 Phone	contactcenter	pt-br	Telefone
-Call Extension	contactcenter	pt-br	Efetuar chamada
 PO Box	contactcenter	pt-br	Caixa Postal
 Postal Code	contactcenter	pt-br	CEP
 Prefix	contactcenter	pt-br	Prefixo
@@ -168,6 +169,7 @@ Reset	common	pt-br	Limpar
 Results	contactcenter	pt-br	Resultados
 Search for Catalog Entries	contactcenter	pt-br	Pesquisar por Resultados no Catálogo
 Search for...	common	pt-br	Pesquisar por ...
+search for	contactcenter	pt-br	Buscar por:
 Sector	contactcenter	pt-br	Setor
 Select a valid CSV file to import your contacts	contactcenter	pt-br	Selecione um arquivo CSV válido para importar os seus contatos
 Select E-Mail	contactcenter	pt-br	Selecione o E-mail
@@ -179,7 +181,10 @@ Select the telephone	contactcenter	pt-br	Selecione o Telefone
 Send Mail	common	pt-br	Enviar email
 Server Contacted. Waiting for response...	contactcenter	pt-br	Servidor contactado. Aguardando resposta...
 Sex	contactcenter	pt-br	Sexo
+Shared	contactcenter	pt-br	Compartilhado
+shareds	contactcenter	pt-br	Compartilhados
 Showing found entries	common	pt-br	Mostrando itens encontrados
+show more info	contactcenter	pt-br	Mais informações
 State	contactcenter	pt-br	Estado
 Suffix	contactcenter	pt-br	Sufixo
 Table View	contactcenter	pt-br	Ver Tabela
@@ -193,6 +198,7 @@ Type new city here	contactcenter	pt-br	Digite o nome aqui
 Type new state here	contactcenter	pt-br	Digite o nome aqui
 Type of Address	contactcenter	pt-br	Tipo de Endereço
 Type of Connection	contactcenter	pt-br	Tipo de Conexão
+Unavailable function	contactcenter	pt-br	Função indisponível
 Unavailable or empty Catalog	contactcenter	pt-br	Catálogo vazio ou indisponível
 Updated Successfully!	contactcenter	pt-br	Atualizado com Sucesso!
 Update your browser	contactcenter	pt-br	Atualize seu navegador
@@ -200,13 +206,7 @@ Users List	contactcenter	pt-br	Lista de Usuários
 Value	contactcenter	pt-br	Valor
 Views	contactcenter	pt-br	Visões
 Web Page	contactcenter	pt-br	Página da Web
+ were existent	contactcenter	pt-br	 já existiam
 Work	contactcenter	pt-br	Trabalho
 Year	contactcenter	pt-br	Ano
 You did not add any contact for this group.	contactcenter	pt-br	Você não adicionou nenhum contato para esse grupo.
-ou	contactcenter	pt-br	Organização:
-search for	contactcenter	pt-br	Buscar por:
-availables	contactcenter	pt-br	Usuários disponíveis
-shareds	contactcenter	pt-br	Compartilhados
-Shared	contactcenter	pt-br	Compartilhado
-Not Allowed	contactcenter	pt-br	Acesso negado
-Unavailable function	contactcenter	pt-br	Função indisponível

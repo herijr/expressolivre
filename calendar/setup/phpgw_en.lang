@@ -1,77 +1,93 @@
 %1 %2 in %3	calendar	en	%1 %2 in %3
 %1 matches found	calendar	en	%1 matches found
-%1 records imported	calendar	en	%1 records imported
-%1 records read (not yet imported, you may go back and uncheck test import)	calendar	en	%1 records read (not yet imported, you may go back and uncheck Test Import)
-(for weekly)	calendar	en	(for Weekly)
-(i/v)cal	calendar	en	(i/v)Cal
 1 match found	calendar	en	1 match found
+%1 records imported	calendar	en	%1 records imported
+%1 records read (not yet imported, you may go back and uncheck test import)	calendar	en	%1 records read (not yet imported, you may go back and uncheck test import)
 a	calendar	en	a
 accept	calendar	en	Accept
 accepted	calendar	en	Accepted
+Account DN to be used when browsing LDAP	admin	en	Account DN to be used when browsing LDAP
 action that caused the notify: added, canceled, accepted, rejected, ...	calendar	en	Action that caused the notify: Added, Canceled, Accepted, Rejected, ...
-add a single entry by passing the fields.	calendar	en	Add a single entry by passing the fields.
 add alarm	calendar	en	Add Alarm
+add a single entry by passing the fields.	calendar	en	Add a single entry by passing the fields.
 add contact	calendar	en	Add Contact
-add or update a single entry by passing the fields.	calendar	en	Add or update a single entry by passing the fields.
 added	calendar	en	Added
 Adding event	calendar	en	Adding event
+add or update a single entry by passing the fields.	calendar	en	Add or update a single entry by passing the fields.
+Add Participants	calendar	en	Add Participants
 address book	calendar	en	Address Book
+Add to my expresso	calendar	en	Add to my expresso
+Add User	calendar	en	Add User
+Alarm already added!!!	calendar	en	Alarm already added!!!
 alarm	calendar	en	Alarm
 alarm for %1 at %2 in %3	calendar	en	Alarm for %1 at %2 in %3
+Alarm is older than now!!!	calendar	en	Alarm is older than now!!!
 alarm management	calendar	en	Alarm Management
-alarm-management	calendar	en	Alarm-Management
 alarms	calendar	en	Alarms
 all day	calendar	en	All Day
-all levels	admin	en	All levels
-all levels with not recursive search	admin	en	All levels with not recursive search
-are you sure you want to delete this country ?	calendar	en	Are you sure you want to delete this Country ?
-are you sure you want to delete this holiday ?	calendar	en	Are you sure you want to delete this holiday ?
-are you sure\nyou want to\ndelete these alarms?	calendar	en	Are you sure\nyou want to\ndelete these alarms?
-are you sure\nyou want to\ndelete this entry ?	calendar	en	Are you sure\nyou want to\ndelete this entry ?
-are you sure\nyou want to\ndelete this entry ?\n\nthis will delete\nthis entry for all users.	calendar	en	Are you sure\nyou want to\ndelete this entry ?\n\nThis will delete\nthis entry for all users.
-are you sure\nyou want to\ndelete this single occurence ?\n\nthis will delete\nthis entry for all users.	calendar	en	Are you sure\nyou want to\ndelete this single occurence ?\n\nThis will delete\nthis entry for all users.
+all fields	admin	en	all fields
+All levels	admin	en	All levels
+All levels with not recursive search	admin	en	All levels with not recursive search
+Are you sure want to delete these alarms?	calendar	en	Are you sure want to delete these alarms?
+Are you sure want to delete this Country?	calendar	en	Are you sure want to delete this Country?
+Are you sure want to delete this entry?	calendar	en	Are you sure want to delete this entry?
+Are you sure want to delete this entry?\nThis will delete this entry for all users.	calendar	en	Are you sure want to delete this entry?\nThis will delete this entry for all users.
+Are you sure want to delete this holiday?	calendar	en	Are you sure want to delete this holiday?
+Are you sure want to delete this single occurence?	calendar	en	Are you sure want to delete this single occurence?
+Attributes	calendar	en	Attributes
 Available users and groups	calendar	en	Available users and groups
+Bassed on Webcalendar by Craig Knudsen	common	en	Bassed on Webcalendar by Craig Knudsen
 before the event	calendar	en	before the event
 brief description	calendar	en	Brief Description
 business	calendar	en	Business
+calendar application	common	en	Calendar Application
 calendar	common	en	Calendar
-calendar - [iv]cal importer	calendar	en	Calendar - [iv]Cal Importer
-calendar - add	calendar	en	Calendar - Add
-calendar - edit	calendar	en	Calendar - Edit
 calendar event	calendar	en	Calendar Event
+calendar-fieldname	calendar	en	Calendar Fieldname
 calendar holiday management	admin	en	Calendar Holiday Management
+calendar - [iv]cal importer	calendar	en	Calendar - [iv]Cal Importer
 calendar preferences	calendar	en	Calendar Preferences
 calendar settings	admin	en	Calendar Settings
-calendar-fieldname	calendar	en	Calendar-Fieldname
 canceled	calendar	en	Canceled
+Catalog Name	admin	en	Catalog Name
 change all events for $params['old_owner'] to $params['new_owner'].	calendar	en	Change all events for $params['old_owner'] to $params['new_owner'].
 change status	calendar	en	Change Status
 charset of file	calendar	en	Charset of file
+check for meetings with web conferencing system	calendar	en	Check for meetings with web conferencing system
 click %1here%2 to return to the calendar.	calendar	en	Click %1here%2 to return to the calendar.
+columns	calendar	en	Columns
+concatenate default domain to the mail	admin	en	Concatenate default domain to the mail
 configuration	calendar	en	Configuration
 countries	calendar	en	Countries
 country	calendar	en	Country
 created by	calendar	en	Created by
 csv-fieldname	calendar	en	CSV-Fieldname
 csv-filename	calendar	en	CSV-Filename
-custom fields	calendar	en	Custom Fields
 custom fields and sorting	common	en	Custom fields and sorting
+custom fields	calendar	en	Custom Fields
 daily	calendar	en	Daily
 daily matrix view	calendar	en	Daily Matrix View
 days	calendar	en	days
-days repeated	calendar	en	days repeated
+days repeated	calendar	en	Days repeated
 dayview	calendar	en	Day View
 default appointment length (in minutes)	calendar	en	default appointment length (in minutes)
 default calendar filter	calendar	en	Default calendar filter
 default calendar view	calendar	en	Default calendar view
+Default Domain	admin	en	Default Domain
 default length of newly created events. the length is in minutes, eg. 60 for 1 hour.	calendar	en	Default length of newly created events. The length is in minutes, eg. 60 for 1 hour.
+Default Logon Script	admin	en	Default Logon Script
+Default User Password	admin	en	Default User Password
+Default User Quota	admin	en	Default User Quota
+Default view of your calendar	calendar	en	Default view of your calendar
 defines the size in minutes of the lines in the day view.	calendar	en	Defines the size in minutes of the lines in the day view.
-delete a single entry by passing the id.	calendar	en	Delete a single entry by passing the id.
+Delegate	calendar	en	Delegate
+Delegate event	calendar	en	Delegate event
 delete an entire users calendar.	calendar	en	Delete an entire users calendar.
-delete selected contacts	calendar	en	Delete selected contacts
-delete series	calendar	en	Delete Series
-delete single	calendar	en	Delete Single
+delete a single entry by passing the id.	calendar	en	Delete a single entry by passing the id.
 deleted	calendar	en	Deleted
+delete selected contacts	calendar	en	delete selected contacts
+delete series	calendar	en	Delete series
+delete single	calendar	en	Delete single
 description	calendar	en	Description
 disable	calendar	en	Disable
 disabled	calendar	en	disabled
@@ -79,41 +95,58 @@ display interval in day view	calendar	en	Display interval in Day View
 display mini calendars when printing	calendar	en	Display mini calendars when printing
 display status of events	calendar	en	Display Status of Events
 displays your default calendar view on the startpage (page you get when you enter egroupware or click on the homepage icon)?	calendar	en	Displays your default calendar view on the startpage (page you get when you enter eGroupWare or click on the homepage icon)?
+Disponibility map	calendar	en	Disponibility map
+done	calendar	en	Done
+dont use any plugin	admin	en	Don't use any plugin
+download	calendar	en	Download
+Do you confirm this action?	common	en	Do you confirm this action?
 do you want to be notified about new or changed appointments? you be notified about changes you make yourself.<br>you can limit the notifications to certain changes only. each item includes all the notification listed above it. all modifications include changes of title, description, participants, but no participant responses. if the owner of an event requested any notifcations, he will always get the participant responses like acceptions and rejections too.	calendar	en	Do you want to be notified about new or changed appointments? You be notified about changes you make yourself.<br>You can limit the notifications to certain changes only. Each item includes all the notification listed above it. All modifications include changes of title, description, participants, but no participant responses. If the owner of an event requested any notifcations, he will always get the participant responses like acceptions and rejections too.
 do you want to receive a regulary summary of your appointsments via email?<br>the summary is sent to your standard email-address on the morning of that day or on monday for weekly summarys.<br>it is only sent when you have any appointments on that day or week.	calendar	en	Do you want to receive a regulary summary of your appointsments via email?<br>The summary is sent to your standard email-address on the morning of that day or on Monday for weekly summarys.<br>It is only sent when you have any appointments on that day or week.
+Do you wish enable autosearch?	admin	en	Do you wish enable autosearch?
 do you wish to autoload calendar holidays files dynamically?	admin	en	Do you wish to autoload calendar holidays files dynamically?
-done	calendar	en	Done
-download	calendar	en	Download
+Do you wish to change your participation in this event?	calendar	en	Do you wish to change your participation in this event?
 duration	calendar	en	Duration
+Editing event	calendar	en	Editing event
 edit series	calendar	en	Edit Series
 edit single	calendar	en	Edit Single
 email notification	calendar	en	Email Notification
 email notification for %1	calendar	en	Email Notification for %1
 empty for all	calendar	en	empty for all
+empty prints from the day chosen below to the end of the current month	calendar	en	Empty prints from the day chosen below to the end of the current month
+Enable auto search for calendar shared	preferences	en	Enable auto search for calendar shared
 enable	calendar	en	Enable
 enabled	calendar	en	enabled
+End date	calendar	en	End Date
 end date/time	calendar	en	End Date/Time
-enddate	calendar	en	Enddate
 ends	calendar	en	ends
 enter output filename: ( .vcs appended )	calendar	en	Enter Output Filename: ( .vcs appended )
+event already exists	calendar	en	Event already exists
 event details follow	calendar	en	Event Details Follow
+Event's Participants	calendar	en	Event's Participants
+Event without participants	calendar	en	Event without participants
 exceptions	calendar	en	Exceptions
-export	calendar	en	Export
 export a list of entries in ical format.	calendar	en	Export a list of entries in iCal format.
 export all	calendar	en	Export all
+export	calendar	en	Export
+Expresso external user	calendar	en	Expresso external user
+ExpressoMail Plugin Calendar	admin	en	ExpressoMail Plugin Calendar
 extended	calendar	en	Extended
 extended updates always include the complete event-details. ical's can be imported by certain other calendar-applications.	calendar	en	Extended updates always include the complete event-details. iCal's can be imported by certain other calendar-applications.
+External event from Expresso	calendar	en	External event from Expresso
 external participants	calendar	en	External Participants
-failed sending message to '%1' #%2 subject='%3', sender='%4' !!!	calendar	en	Failed sending message to '%1' #%2 subject='%3', sender='%4' !!!
+failed sending message to '%1' #%2 subject='%3', sender='%4'!!!	calendar	en	Failed sending message to '%1' #%2 subject='%3', sender='%4'!!!
+Failed to delivery	calendar	en	Failed to delivery
 fieldseparator	calendar	en	Fieldseparator
+First level with recursive search	admin	en	First level with recursive search
 firstname of person to notify	calendar	en	Firstname of person to notify
-first level with recursive search	admin	en	First level with recursive search
 format of event updates	calendar	en	Format of event updates
-fr	calendar	en	F
+(for weekly)	calendar	en	(for weekly)
+Fr	calendar	en	Fr
 free/busy	calendar	en	Free/Busy
-freebusy: unknow user '%1', wrong password or not availible to not loged in users !!!	calendar	en	freebusy: Unknow user '%1', wrong password or not availible to not loged in users !!!
+freebusy: unknow user '%1', wrong password or not availible to not loged in users !!!	calendar	en	Freebusy: Unknow user '%1', wrong password or not availible to not loged in users !!!
 frequency	calendar	en	Frequency
 fri	calendar	en	Fri
+Friday	calendar	en	Friday
 full description	calendar	en	Full Description
 fullname of person to notify	calendar	en	Fullname of person to notify
 generate printer-friendly version	calendar	en	Generate printer-friendly version
@@ -121,17 +154,21 @@ global categories	calendar	en	Global Categories
 global public and group public	calendar	en	Global Public and group public
 global public only	calendar	en	Global Public Only
 go!	calendar	en	Go!
+Grant Access by Group	common	en	Grant Access by Group
 grant calendar access	common	en	Grant Calendar Access
+Granted user	common	en	Granted user
 group planner	calendar	en	Group Planner
 group public only	calendar	en	Group Public Only
-here is your requested alarm.	calendar	en	Here is your requested alarm.
-high priority	calendar	en	high priority
+Group to share calendar	common	en	Group to share calendar
+Here is your requested alarm.	calendar	en	Here is your requested alarm.
+Hidden	calendar	en	Hidden
+hide title and description of event when conflicts	calendar	en	Hide title and description of event when conflicts
+high priority	calendar	en	High priority
 holiday	calendar	en	Holiday
 holiday management	calendar	en	Holiday Management
-holiday-management	calendar	en	Holiday-Management
 holidays	calendar	en	Holidays
+Hours Appointment	calendar	en	Hours Appointment
 hours	calendar	en	hours
-i participate	calendar	en	I Participate
 ical / rfc2445	calendar	en	iCal / rfc2445
 if checked holidays falling on a weekend, are taken on the monday after.	calendar	en	If checked holidays falling on a weekend, are taken on the monday after.
 if you dont set a password here, the information is availible to everyone, who knows the url!!!	calendar	en	If you dont set a password here, the information is availible to everyone, who knows the URL!!!
@@ -143,111 +180,146 @@ interval	calendar	en	Interval
 intervals in day view	calendar	en	Intervals in day view
 intervals per day in planner view	calendar	en	Intervals per day in planner view
 invalid entry id.	calendar	en	Invalid entry id.
+i participate	calendar	en	I participate
+It types below the email addresses, if you want to invite other people out of this system	calendar	en	It types below the email addresses, if you want to invite other people out of this system
+It types login of the user to have access public agenda	calendar	en	It types login of the user to have access public agenda
+It types login of the user to have access Public Agenda	calendar	en	It types login of the user to have access Public Agenda
+(i/v)cal	calendar	en	(i/v)cal
 last	calendar	en	last
 lastname of person to notify	calendar	en	Lastname of person to notify
-length shown<br>(emtpy for full length)	calendar	en	Length shown<br>(emtpy for full length)
-length<br>(<= 255)	calendar	en	Length<br>(<= 255)
+Leave my calendar public	calendar	en	Leave my calendar public
+length<br>(<= 255)	calendar	en	length<br>(<= 255)
+length shown<br>(emtpy for full length)	calendar	en	length shown<br>(emtpy for full length)
+lines	calendar	en	Lines
 link	calendar	en	Link
 link to view the event	calendar	en	Link to view the event
 list all categories.	calendar	en	List all categories.
+Loading	calendar	en	Loading
 load [iv]cal	calendar	en	Load [iv]Cal
 location	calendar	en	Location
 location to autoload from	admin	en	Location to autoload from
 make freebusy information availible to not loged in persons?	calendar	en	Make freebusy information availible to not loged in persons?
 matrixview	calendar	en	Matrix View
-minutes	calendar	en	minutes
 Minimum number of characters to start the search for participants	admin	en	Minimum number of characters to start the search for participants
-mo	calendar	en	M
+minutes	calendar	en	minutes
+mo	calendar	en	Mo
 modified	calendar	en	Modified
 modify list of external participants	calendar	en	Modify List of External Participants
 mon	calendar	en	Mon
+Monday	calendar	en	Monday
 month	calendar	en	Month
+monthly (by date)	calendar	en	monthly (by date)
+monthly (by day)	calendar	en	monthly (by day)
 monthly	calendar	en	Monthly
-monthly (by date)	calendar	en	Monthly (by date)
-monthly (by day)	calendar	en	Monthly (by day)
 monthview	calendar	en	Month View
 new entry	calendar	en	New Entry
 new name must not exist and not be empty!!!	calendar	en	New name must not exist and not be empty!!!
+No group was selected	common	en	No group was selected
 no matches found	calendar	en	No matches found
+No permission type was selected	common	en	No permission type was selected
 no response	calendar	en	No Response
+Notice of appointment of external event	calendar	en	Notice of appointment of external event
 notification messages for added events	calendar	en	Notification messages for added events
 notification messages for canceled events	calendar	en	Notification messages for canceled events
 notification messages for modified events	calendar	en	Notification messages for modified events
 notification messages for your alarms	calendar	en	Notification messages for your alarms
 notification messages for your responses	calendar	en	Notification messages for your responses
 notify by sms	calendar	en	Notify by SMS
+No user was selected	common	en	No user was selected
 number of intervals per day in planner view	calendar	en	Number of Intervals per Day in Planner View
 number of months	calendar	en	Number of months
 number of records to read (%1)	calendar	en	Number of records to read (%1)
+number of records to read (<=200)	calendar	en	number of records to read (<=200)
 observance rule	calendar	en	Observance Rule
 occurence	calendar	en	Occurence
-old startdate	calendar	en	Old Startdate
-olddate	calendar	en	OldDate
+olddate	calendar	en	Old Date
+old startdate	calendar	en	Old Start Date
 on %1 %2 %3 your meeting request for %4	calendar	en	On %1 %2 %3 your meeting request for %4
 on all changes	calendar	en	on all changes
 on all modification, but responses	calendar	en	on all modification, but responses
 on any time change too	calendar	en	on any time change too
 on invitation / cancelation only	calendar	en	on invitation / cancelation only
+Only Title	calendar	en	Only Title
 on participant responses too	calendar	en	on participant responses too
 on time change of more than 4 hours too	calendar	en	on time change of more than 4 hours too
 open todo's:	calendar	en	Open To Do Items:
 order	calendar	en	Order
+Organization	calendar	en	Organization
 overlap holiday	calendar	en	overlap holiday
 participant	calendar	en	Participant
 participants	calendar	en	Participants
 participates	calendar	en	Participates
 password for not loged in users to your freebusy information?	calendar	en	Password for not loged in users to your freebusy information?
 people holiday	calendar	en	people holiday
+Permission	common	en	Permission
 permission denied	calendar	en	Permission denied
-planner	calendar	en	Planner
 planner by category	calendar	en	Planner by category
 planner by user	calendar	en	Planner by user
+planner	calendar	en	Planner
 please confirm,accept,reject or examine changes in the corresponding entry in your calendar	calendar	en	Please confirm, accept, reject or examine changes in the corresponding entry in your calendar
+Powerful calendar with meeting request system and ACL security.	calendar	en	Powerful calendar with meeting request system and ACL security.
 preselected group for entering the planner	calendar	en	Preselected group for entering the planner
 print calendars in black & white	calendar	en	Print calendars in black & white
-print the mini calendars	calendar	en	Print the mini calendars
 printer friendly	calendar	en	Printer Friendly
-privat	calendar	en	Privat
+print in	calendar	en	Print in
+print starting in	calendar	en	Print starting in
+print the mini calendars	calendar	en	Print the mini calendars
 private and global public	calendar	en	Private and Global Public
 private and group public	calendar	en	Private and Group Public
+private	calendar	en	Private
 private only	calendar	en	Private Only
-re-edit event	calendar	en	Re-Edit Event
+Problems delegating. Make sure you haven't delegated to a person that was also invited to the meeting	calendar	en	Problems delegating. Make sure you haven't delegated to a person that was also invited to the meeting
+Problems delegating. Make sure you have selected a user to delegate the appointment.	calendar	en	Problems delegating. Make sure you have selected a user to delegate the appointment.
+Public Calendars	calendar	en	Public Calendars
+quantity of days	calendar	en	Quantity of days
 read a list of entries.	calendar	en	Read a list of entries.
 read a single entry by passing the id and fieldlist.	calendar	en	Read a single entry by passing the id and fieldlist.
 read this list of methods.	calendar	en	Read this list of methods.
-receive email updates	calendar	en	Receive email updates
+receive email updates	calendar	en	receive email updates
 receive extra information in event mails	calendar	en	Receive extra information in event mails
 receive summary of appointments	calendar	en	Receive summary of appointments
+Recurrent appointments must have a final date	calendar	en	Recurrent appointments must have a final date
+Recurrent appointments with alarms must have a final date	calendar	en	Recurrent appointments with alarms must have a final date
 recurring event	calendar	en	recurring event
+re-edit event	calendar	en	Re-edit event
 refresh	calendar	en	Refresh
 reinstate	calendar	en	Reinstate
 rejected	calendar	en	Rejected
+Remove User	calendar	en	Remove User
 repeat day	calendar	en	Repeat day
 repeat end date	calendar	en	Repeat End date
+repeating event information	calendar	en	Repeating event information
 repeat type	calendar	en	Repeat type
-repeating event information	calendar	en	Repeating Event Information
 repetition	calendar	en	Repetition
-repetitiondetails (or empty)	calendar	en	Repetitiondetails (or empty)
+repetitiondetails (or empty)	calendar	en	repetition details (or empty)
+Report of hours	calendar	en	Report of hours
+Required field (category) is empty	calendar	en	Required field (category) is empty
+(required for weekly recursivity)	calendar	en	(Required for weekly recursivity)
 reset	calendar	en	Reset
+restrict	calendar	en	Restrict
 rule	calendar	en	Rule
 sa	calendar	en	Sa
 sat	calendar	en	Sat
 scheduling conflict	calendar	en	Scheduling Conflict
 Search for	calendar	en	Search for
+Searching	calendar	en	Searching
 search results	calendar	en	Search Results
+Sector	calendar	en	Sector
 selected contacts (%1)	calendar	en	Selected contacts (%1)
+Select module version expressoMail (if available)	admin	en	Select module version expressoMail (if available)
 Select type tree view	admin	en	Select type tree view
-send updates via email	common	en	Send updates via EMail
 send/receive updates via email	calendar	en	Send/Receive updates via EMail
+send updates via email	common	en	Send updates via email
 set a year only for one-time / non-regular holidays.	calendar	en	Set a Year only for one-time / non-regular holidays.
 set new events to private	calendar	en	Set new events to private
+Shared group	common	en	Shared group
 should invitations you rejected still be shown in your calendar ?<br>you can only accept them later (eg. when your scheduling conflict is removed), if they are still shown in your calendar!	calendar	en	Should invitations you rejected still be shown in your calendar ?<br>You can only accept them later (eg. when your scheduling conflict is removed), if they are still shown in your calendar!
 should new events created as private by default ?	calendar	en	Should new events created as private by default ?
 should not loged in persons be able to see your freebusy information? you can set an extra password, different from your normal password, to protect this informations. the freebusy information is in ical format and only include the times when you are busy. it does not include the event-name, description or locations. the url to your freebusy information is %1.	calendar	en	Should not loged in persons be able to see your freebusy information? You can set an extra password, different from your normal password, to protect this informations. The freebusy information is in iCal format and only include the times when you are busy. It does not include the event-name, description or locations. The URL to your freebusy information is %1.
 should the mini calendars by printed / displayed in the printer friendly views ?	calendar	en	Should the mini calendars by printed / displayed in the printer friendly views ?
 should the printer friendly view be in black & white or in color (as in normal view)?	calendar	en	Should the printer friendly view be in black & white or in color (as in normal view)?
 should the status of the event-participants (accept, reject, ...) be shown in brakets after each participants name ?	calendar	en	Should the status of the event-participants (accept, reject, ...) be shown in brakets after each participants name ?
-show day view on main screen	calendar	en	show day view on main screen
+show day view on main screen	calendar	en	Show day view on main screen
 show default view on main screen	calendar	en	Show default view on main screen
 show high priority events on main screen	calendar	en	Show high priority events on main screen
 show invitations you rejected	calendar	en	Show invitations you rejected
@@ -258,82 +330,118 @@ sorry, this event does not exist	calendar	en	Sorry, this event does not exist
 sorry, this event does not have exceptions defined	calendar	en	Sorry, this event does not have exceptions defined
 sort by	calendar	en	Sort by
 specifies the the number of intervals shown in the planner view.	calendar	en	Specifies the the number of intervals shown in the planner view.
+Start date	calendar	en	Start Date
 start date/time	calendar	en	Start Date/Time
-start- and enddates	calendar	en	Start- and Enddates
-startdate	calendar	en	Startdate
 startrecord	calendar	en	Startrecord
-su	calendar	en	Su
 submit to repository	calendar	en	Submit to Repository
+su	calendar	en	Su
+Summary	calendar	en	Summary
 sun	calendar	en	Sun
-tentative	calendar	en	Tentative
+tentative	calendar	en	Attempt
 test import (show importable records <u>only</u> in browser)	calendar	en	Test Import (show importable records <u>only</u> in browser)
 text	calendar	en	Text
-th	calendar	en	T
-the following conflicts with the suggested time:<ul>%1</ul>	calendar	en	The following conflicts with the suggested time:<ul>%1</ul>
-the user %1 is not participating in this event!	calendar	en	The user %1 is not participating in this event!
+th	calendar	en	Th
+The commitment was accepted successfully!	calendar	en	The commitment was accepted successfully!
+The commitment was rejected successfully!	calendar	en	The commitment was rejected successfully!
+The email addresses must be separated by ','	calendar	en	The email addresses must be separated by ','
+The following commitment had problems for DELIVERING the NOTIFICATION messages.	calendar	en	The following commitment had problems for DELIVERING the NOTIFICATION messages.
+the following conflicts with the suggested time:<ul>%1</ul>	calendar	en	the following conflicts with the suggested time:<ul>%1</ul>
 there was an error trying to connect to your news server.<br>please contact your admin to check the news servername, username or password.	calendar	en	There was an error trying to connect to your news server.<br>Please contact your admin to check the news servername, username or password.
+The sharing was granted.	common	en	The sharing was granted.
+the user %1 is not participating in this event!	calendar	en	The user %1 is not participating in this event!
+This commitment has already been accepted!	calendar	en	This commitment has already been accepted!
+This commitment has already been rejected!	calendar	en	This commitment has already been rejected!
 this day is shown as first day in the week or month view.	calendar	en	This day is shown as first day in the week or month view.
 this defines the end of your dayview. events after this time, are shown below the dayview.	calendar	en	This defines the end of your day view. Events after this time are shown below the day view.
 this defines the start of your dayview. events before this time, are shown above the dayview.<br>this time is also used as a default starttime for new events.	calendar	en	This defines the start of your day view. Events before this time are shown above the day view.<br>This time is also used as a default start time for new events.
 this group that is preselected when you enter the planner. you can change it in the planner anytime you want.	calendar	en	This group that is preselected when you enter the planner. You can change it in the planner anytime you want.
+This is an automatically generated message. To confirm your attendance, please reply to the sender of the message.	calendar	en	This is an automatically generated message. To confirm your attendance, please reply to the sender of the message.
+This is an external event. Even if it added to your expresso its can be changed any time at all	calendar	en	This is an external event. Even if it added to your expresso its can be changed any time at all
 this is mostly caused by a not or wrongly configured smtp server. notify your administrator.	calendar	en	This is mostly caused by a not or wrongly configured SMTP server. Notify your administrator.
 this message is sent for canceled or deleted events.	calendar	en	This message is sent for canceled or deleted events.
 this message is sent for modified or moved events.	calendar	en	This message is sent for modified or moved events.
 this message is sent to every participant of events you own, who has requested notifcations about new events.<br>you can use certain variables which get substituted with the data of the event. the first line is the subject of the email.	calendar	en	This message is sent to every participant of events you own, who has requested notifcations about new events.<br>You can use certain variables which get substituted with the data of the event. The first line is the subject of the email.
 this message is sent when you accept, tentative accept or reject an event.	calendar	en	This message is sent when you accept, tentatively accept, or reject an event.
-this message is sent when you set an alarm for a certain event. include all information you might need.	calendar	en	This message is sent when you set an Alarm for a certain event.  Include all information you might need.
+this message is sent when you set an alarm for a certain event. include all information you might need.	calendar	en	This message is sent when you set an Alarm for a certain event. Include all information you might need.
+This message was sent by server. You must send a message to sender to confirm this event	calendar	en	This message was sent by server. You must send a message to sender to confirm this event
 this month	calendar	en	This Month
+this option allow enable/disable auto search users for calendar share	calendar	en	This option allow enable/disable auto search users for calendar share
+This option allow everybody to view your calendar in readmode.	calendar	en	This option allow everybody to view your calendar in readmode.
+This option enable or disable the meeting description view your calendar in readmode.	calendar	en	This option enable or disable the meeting description view your calendar in readmode.
+This sharing already exist.	common	en	This sharing already exist.
+this user does not exist	calendar	en	This user does not exist
+this user does not possess public agenda	calendar	en	This user does not possess public agenda
 this week	calendar	en	This Week
+This will delete this entry for all users.	calendar	en	This will delete this entry for all users.
 this year	calendar	en	This Year
+Thrusday	calendar	en	Thrusday
 thu	calendar	en	Thu
+Tip: To search in the <b>Global Catalog</b>, type the <b>F9</b> key, like the ExpressoMail.	calendar	en	<b>Tip:</b> To search in the <b>Global Catalog</b>, type the <b>F9</b> key, like the ExpressoMail.
+Title and Description	calendar	en	Title and Description
 title	calendar	en	Title
 title of the event	calendar	en	Title of the event
 title-row	calendar	en	Title-row
-to many might exceed your execution-time-limit	calendar	en	to many might exceed your execution-time-limit
-script with login of the user leaves blank to generate logon	admin	en	Script with login of the user leaves blank to generate logon
-to-firstname	calendar	en	To-Firstname
-to-fullname	calendar	en	To-Fullname
-to-lastname	calendar	en	To-Lastname
+To accept	calendar	en	To accept
 today	calendar	en	Today
+to-firstname	calendar	en	To-firstname
+to-fullname	calendar	en	To-fullname
+to-lastname	calendar	en	To-lastname
+to many might exceed your execution-time-limit	calendar	en	to many might exceed your execution-time-limit
+To reject	calendar	en	To Reject
+to Search	calendar	en	To Search
+To See Commitment	calendar	en	To See Commitment
 translation	calendar	en	Translation
-tu	calendar	en	T
+tu	calendar	en	Te
 tue	calendar	en	Tue
+Tuesday	calendar	en	Tuesday
+Type	calendar	en	Type
+Type more %1 letters.	common	en	Type more %1 letters.
 update a single entry by passing the fields.	calendar	en	Update a single entry by passing the fields.
 updated	calendar	en	Updated
 use end date	calendar	en	Use End date
+User to grant access	common	en	User to grant access
 view this entry	calendar	en	View this entry
-we	calendar	en	W
+web conference	calendar	en	Web Conference
+we	calendar	en	We
 wed	calendar	en	Wed
+Wednesday	calendar	en	Wednesday
 week	calendar	en	Week
 weekday starts on	calendar	en	Weekday starts on
+weekly agenda of events	calendar	en	Weekly agenda of events
 weekly	calendar	en	Weekly
 weekview	calendar	en	Week View
 when creating new events default set to private	calendar	en	When creating new events default set to private
+when user invite other that time conflicts this option hide title and description even if the event is public	calendar	en	When user invite other that time conflicts this option hide title and description even if the event is public
 which events do you want to see when you enter the calendar.	calendar	en	Which events do you want to see when you enter the calendar.
 which of calendar view do you want to see, when you start calendar ?	calendar	en	Which of calendar view do you want to see when you start calendar ?
+workdayends	calendar	en	Work day ends
 work day ends on	calendar	en	Work day ends on
 work day starts on	calendar	en	Work day starts on
-workdayends	calendar	en	workdayends
+x are you sure\nyou want to\ndelete this single occurence ?\n\nthis will delete\nthis entry for all users.	calendar	en	Are you sure\nyou want to\ndelete this single occurence ?\n\nthis will delete\nthis entry for all users.
+x ContactCenter Global Catalogue Setup	admin	en	ContactCenter Global Catalogue Setup
+year	calendar	en	Year
 yearly	calendar	en	Yearly
 yearview	calendar	en	Year View
 you can either set a year or a occurence, not both !!!	calendar	en	You can either set a Year or a Occurence, not both !!!
 you can only set a year or a occurence !!!	calendar	en	You can only set a year or a occurence !!!
 you do not have permission to add alarms to this event !!!	calendar	en	You do not have permission to add alarms to this event !!!
-Alarm is older than now!!!	calendar	en	Alarm is older than now!!!
-Alarm already added!!!	calendar	en	Alarm already added!!!
 you do not have permission to delete this alarm !!!	calendar	en	You do not have permission to delete this alarm !!!
 you do not have permission to enable/disable this alarm !!!	calendar	en	You do not have permission to enable/disable this alarm !!!
 you do not have permission to read this record!	calendar	en	You do not have permission to read this record!
-you have %1 high priority events on your calendar today.	common	en	You have %1 high priority events on your calendar today.
 you have 1 high priority event on your calendar today.	common	en	You have 1 high priority event on your calendar today.
+you have %1 high priority events on your calendar today.	common	en	You have %1 high priority events on your calendar today.
 you have a meeting scheduled for %1	calendar	en	You have a meeting scheduled for %1
+you have not entered a\nbrief description	calendar	en	you have not entered a\nbrief description
+you have not entered a\nvalid time of day.	calendar	en	you have not entered a\nvalid time of day.
 you have not entered a title	calendar	en	You have not entered a title
 you have not entered a valid date	calendar	en	You have not entered a valid date
-you have not entered a valid time of day	calendar	en	You have not entered a valid time of day
+you have not entered a valid time of day	calendar	en	you have not entered a valid time of day
 you have not entered participants	calendar	en	You have not entered participants
+You must choose the days of the week for the appointment to repeat	calendar	en	You must choose the days of the week for the appointment to repeat
 you must enter one or more search keywords	calendar	en	You must enter one or more search keywords
 you must select a [iv]cal. (*.[iv]cs)	calendar	en	You must select a [iv]Cal. (*.[iv]cs)
 you need to set either a day or a occurence !!!	calendar	en	You need to set either a day or a occurence !!!
 your meeting scheduled for %1 has been canceled	calendar	en	Your meeting scheduled for %1 has been canceled
 your meeting that had been scheduled for %1 has been rescheduled to %2	calendar	en	Your meeting that had been scheduled for %1 has been rescheduled to %2
+Your search argument must be longer than 4 characters.	calendar	en	Your search argument must be longer than 4 characters.
 your suggested time of <b> %1 - %2 </b> conflicts with the following existing calendar entries:	calendar	en	Your suggested time of <B> %1 - %2 </B> conflicts with the following existing calendar entries:

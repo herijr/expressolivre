@@ -1,69 +1,123 @@
+Add domain	emailadmin	en	Add domain
+added domain	emailadmin	en	Added domain
+Add new profile Server Express	emailadmin	en	Add new profile Server Express
 add profile	emailadmin	en	Add Profile
 admin dn	emailadmin	en	admin dn
-admin password	emailadmin	en	admin password
-admin passwort	emailadmin	en	admin passwort
-admin username	emailadmin	en	admin username
+admin imap server hostname or ip address	emailadmin	en	Admin imap server hostname or ip address
+admin imap server port	emailadmin	en	Admin imap server port
+Administrator - Add domain	emailadmin	en	Administrator - Add domain
+Administrator - Move domain	emailadmin	en	Administrator - Move domain
+admin password	emailadmin	en	Admin password
+admin username	emailadmin	en	Admin username
 advanced options	emailadmin	en	advanced options
 alternate email address	emailadmin	en	alternate email address
-cyrus imap server	emailadmin	en	Cyrus IMAP Server
+Configuration for the service Cyrus IMAP	emailadmin	en	Configuration for the service Cyrus IMAP
+Configuration for the service IMAP	emailadmin	en	Configuration for the service IMAP
+Configuration for the SMTP service	emailadmin	en	Configuration for the SMTP service
+Core Management MailServer Application	common	en	Core Management MailServer Application
+create spam folder	emailadmin	en	Create spam folder
 cyrus imap server administration	emailadmin	en	Cyrus IMAP server administration
+cyrus imap server	emailadmin	en	Cyrus Imap Server
+cyrus user post spam	emailadmin	en	Cyrus user post spam
 default	emailadmin	en	default
+Default Folders	emailadmin	en	Default folders
+defaultUserQuota	emailadmin	en	Default user quota
+defaultUserSignature	emailadmin	en	Default user signature
+Delete	emailadmin	en	Delete
+Delimiter of the IMAP server folders: (points to the logins, use / as delimiter.)	emailadmin	en	Delimiter of the IMAP server folders: (points to the logins, use / as delimiter.)
 deliver extern	emailadmin	en	deliver extern
-do you really want to delete this profile	emailadmin	en	Do you really want to delete this Profile
-domainname	emailadmin	en	domainname
+Domain	emailadmin	en	Domain
+Domain is already registered	emailadmin	en	Domain is already registered
+domain list	emailadmin	en	Domain list
+domainname	emailadmin	en	domain name
+Domain name	emailadmin	en	Domain name
+Domains assigned	emailadmin	en	Domains assigned
+domains found	emailadmin	en	Found domains
+domain switched profile successfully	emailadmin	en	Domain switched profile successfully
+Domain with more than %1 users	emailadmin	en	Domain with more than %1 users
+Do you really want to delete this Domain	emailadmin	en	Do you really want to delete this Domain
+do you really want to delete this profile	emailadmin	en	Do you really want to delete this profile
+Do you really want to move this Domain	emailadmin	en	Do you really want to move this Domain
+Drafts Folder	emailadmin	en	Drafts folder
+edited domain	emailadmin	en	Edited domain
+Edit	emailadmin	en	Edit
 edit email settings	emailadmin	en	edit email settings
 email account active	emailadmin	en	email account active
 email address	emailadmin	en	email address
-enable cyrus imap server administration	emailadmin	en	enable Cyrus IMAP server administration
-enable sieve	emailadmin	en	enable Sieve
+emailadmin	common	en	E-mail admin
+enable cyrus imap server administration	emailadmin	en	Enable Cyrus IMAP server administration
+enable sieve	emailadmin	en	Enable Sieve
+enter a domain	emailadmin	en	Enter a domain
 enter your default mail domain (from: user@domain)	emailadmin	en	Enter your default mail domain (from: user@domain)
+Error moving domain	emailadmin	en	Error moving domain
+Error same profile	emailadmin	en	Error same profile
 forward also to	emailadmin	en	forward also to
 forward email's to	emailadmin	en	forward email's to
 forward only	emailadmin	en	forward only
 imap admin password	admin	en	IMAP admin password
 imap admin user	admin	en	IMAP admin user
-imap server hostname or ip address	emailadmin	en	IMAP server hostname or ip address
-imap server logintyp	emailadmin	en	IMAP server login type
-imap server port	emailadmin	en	IMAP server port
+imap c-client version < 2001	emailadmin	en	Imap C-Client Version < 2001
 imap/pop3 server name	emailadmin	en	IMAP/POP3 server name
+IMAP server	emailadmin	en	IMAP server
+imap server hostname or ip address	emailadmin	en	IMAP server hostname or ip address
+imap server logintype	emailadmin	en	IMAP server login type
+imap server port	emailadmin	en	IMAP server port
 in mbyte	emailadmin	en	in MByte
-ldap basedn	emailadmin	en	LDAP basedn
-ldap server	emailadmin	en	LDAP server
+Invalid domain	emailadmin	en	Invalid domain
+key	emailadmin	en	key
+ldap basedn	emailadmin	en	LDAP Base DN
 ldap server accounts dn	emailadmin	en	LDAP server accounts DN
 ldap server admin dn	emailadmin	en	LDAP server admin DN
 ldap server admin password	emailadmin	en	LDAP server admin password
+ldap server	emailadmin	en	LDAP server
 ldap server hostname or ip address	emailadmin	en	LDAP server hostname or ip address
 ldap settings	emailadmin	en	LDAP settings
 leave empty for no quota	emailadmin	en	leave empty for no quota
 mail settings	admin	en	Mail settings
+manage domains	emailadmin	en	Manage domains
+manage profile	emailadmin	en	Manage profile
+move domain	emailadmin	en	Move domain
+move	emailadmin	en	Move
 name of organisation	emailadmin	en	Name of organization
 no alternate email address	emailadmin	en	no alternate email address
 no forwarding email address	emailadmin	en	no forwarding email address
-pop3 server hostname or ip address	emailadmin	en	POP3 server hostname or ip address
-pop3 server port	emailadmin	en	POP3 server port
+organizations	emailadmin	en	Organizations
+Other settings	emailadmin	en	Other settings
 postfix with ldap	emailadmin	en	Postfix with LDAP
+previous	emailadmin	en	Previous
+profile	emailadmin	en	Profile
 profile list	emailadmin	en	Profile List
 profile name	emailadmin	en	Profile Name
-qmaildotmode	emailadmin	en	qmaildotmode
-qouta size in mbyte	emailadmin	en	qouta size in MByte
+qmaildotmode	emailadmin	en	dot qmail mode (.qmail)
+qouta size in mbyte	emailadmin	en	quota size in MByte
 quota settings	emailadmin	en	quota settings
 remove	emailadmin	en	remove
+Remove	emailadmin	en	Remove
+save	emailadmin	en	Save
+search domain	emailadmin	en	Search domain
+search	emailadmin	en	Search
 select type of imap/pop3 server	emailadmin	en	Select type of IMAP/POP3 server
 select type of smtp server	emailadmin	en	Select type of SMTP Server
+Sent Folder	emailadmin	en	Sent Folder
+Server SMTP	emailadmin	en	Server SMTP
 sieve server hostname or ip address	emailadmin	en	Sieve server hostname or ip address
 sieve server port	emailadmin	en	Sieve server port
 sieve settings	emailadmin	en	Sieve settings
+smtp-server hostname or ip address	emailadmin	en	SMTP server hostname or ip address
 smtp server name	emailadmin	en	SMTP server name
-smtp-server hostname or ip address	emailadmin	en	SMTP server hostname or IP address
-smtp-server port	emailadmin	en	SMTP server port
+smtp server port	emailadmin	en	SMTP server port
+SMTP Server Standard	emailadmin	en	SMTP server Standard
+Spam Folder	emailadmin	en	Spam Folder
+spam settings	emailadmin	en	Spam Settings
 standard	emailadmin	en	Standard
 standard imap server	emailadmin	en	Standard IMAP server
-standard pop3 server	emailadmin	en	Standard POP3 server
 standard smtp-server	emailadmin	en	Standard SMTP server
-use ldap defaults	emailadmin	en	use LDAP defaults
-use smtp auth	emailadmin	en	Use SMTP auth
+The PROFILE NAME is blank	emailadmin	en	The PROFILE NAME is blank
+This operation will move all mailboxes in the domain	emailadmin	en	This operation will move all mailboxes in the domain
+Trash Folder	emailadmin	en	Trash Folder
+use ldap defaults	emailadmin	en	Use LDAP defaults
+use smtp auth	emailadmin	en	Use SMTP authentication
 use tls authentication	emailadmin	en	Use TLS authentication
 use tls encryption	emailadmin	en	Use TLS encryption
-users can define their own emailaccounts	emailadmin	en	Users can define their own email accounts
-virtual mail manager	emailadmin	en	Virtual MAIL ManaGeR
-IMAP C-Client Version < 2001	emailadmin	en	IMAP C-Client Version < 2001
+value	emailadmin	en	value
+virtual mail manager	emailadmin	en	Virtual mail manager

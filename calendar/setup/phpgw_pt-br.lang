@@ -18,12 +18,10 @@ Add Participants	calendar	pt-br	Adicionar Participantes
 address book	calendar	pt-br	Catálogo de endereços
 Add to my expresso	calendar	pt-br	Adicionar ao meu Expresso
 Add User	calendar	pt-br	Adicionar usuário
-Report of hours	calendar	pt-br	Relatório de horas
 Alarm already added!!!	calendar	pt-br	Este alarme já existe!!!
 alarm	calendar	pt-br	Alarme
 alarm for %1 at %2 in %3	calendar	pt-br	Alarme para %1 em %2 na %3
 Alarm is older than now!!!	calendar	pt-br	Horário inválido!!!
-Required field (category) is empty	calendar	pt-br	Campo obrigatório (categoria) está vazio
 alarm management	calendar	pt-br	Gerenciador de alarmes
 alarms	calendar	pt-br	Alarmes
 all day	calendar	pt-br	Todo o dia
@@ -42,8 +40,8 @@ Bassed on Webcalendar by Craig Knudsen	common	pt-br	Baseado no Webcalendar de Cr
 before the event	calendar	pt-br	antes do evento
 brief description	calendar	pt-br	Breve descrição
 business	calendar	pt-br	Negócios
-calendar	common	pt-br	Calendário
 calendar application	common	pt-br	Módulo Calendário de Compromissos
+calendar	common	pt-br	Calendário
 calendar event	calendar	pt-br	Evento do calendário
 calendar-fieldname	calendar	pt-br	Nome do campo
 calendar holiday management	admin	pt-br	Manutenção de feriados do Calendário
@@ -100,13 +98,13 @@ displays your default calendar view on the startpage (page you get when you ente
 Disponibility map	calendar	pt-br	Mapa de disponibilidade
 done	calendar	pt-br	Voltar
 dont use any plugin	admin	pt-br	Não usar nenhum plugin
-Do you wish enable autosearch?	admin	pt-br	Você deseja habilitar a busca automática?
 download	calendar	pt-br	Baixar
+Do you confirm this action?	common	pt-br	Confirmar exclusão desse item?
 do you want to be notified about new or changed appointments? you be notified about changes you make yourself.<br>you can limit the notifications to certain changes only. each item includes all the notification listed above it. all modifications include changes of title, description, participants, but no participant responses. if the owner of an event requested any notifcations, he will always get the participant responses like acceptions and rejections too.	calendar	pt-br	Deseja ser notificado sobre compromissos novos ou modificados? Você será notificado sobre as mudanças efetuadas por você mesmo.<br> Você pode limitar essa notificções a certas mudanças apenas. Cada item inclui as notificações listadas sobre o mesmo. Todas as modificções incluem mudança de título, descrição, participantes (menos suas respostas). Se o dono de um evento requisitar qualquer notificação, sempre receberá as respostas dos participantes como aceite ou cancelamentos.
 do you want to receive a regulary summary of your appointsments via email?<br>the summary is sent to your standard email-address on the morning of that day or on monday for weekly summarys.<br>it is only sent when you have any appointments on that day or week.	calendar	pt-br	Deseja receber regularmente um resumo de seus compromissos via correio eletrônico?<br>O sumário será enviado para seu endereço eletrônico padrão na manhã de cada dia ou na Segunda-feira para resumos semanais (somente se houverem eventos na semana).<br>
+Do you wish enable autosearch?	admin	pt-br	Você deseja habilitar a busca automática?
 do you wish to autoload calendar holidays files dynamically?	admin	pt-br	Deseja carregar automaticamente arquivos de feriados do Calendário dinâmicamente ?
 Do you wish to change your participation in this event?	calendar	pt-br	Deseja mudar sua participação neste evento?
-Do you confirm this action?	common	pt-br	Confirmar exclusão desse item?
 duration	calendar	pt-br	Duração
 Editing event	calendar	pt-br	Editando evento
 edit series	calendar	pt-br	Editar séries
@@ -114,16 +112,16 @@ edit single	calendar	pt-br	Editar único
 email notification	calendar	pt-br	Notificação via Correio eletrônico
 email notification for %1	calendar	pt-br	Notificação via Correio eletrônico para %1
 empty for all	calendar	pt-br	vazio para todos
-enable	calendar	pt-br	Habilitado
-Hidden	calendar	pt-br	Oculto
-enabled	calendar	pt-br	habilitado
+empty prints from the day chosen below to the end of the current month	calendar	pt-br	Vazio imprime do dia escolhido abaixo até o final do mês corrente.
 Enable auto search for calendar shared	preferences	pt-br	Habilitar busca automática no compartilhamento da agenda
+enable	calendar	pt-br	Habilitado
+enabled	calendar	pt-br	habilitado
 End date	calendar	pt-br	Data de término
 end date/time	calendar	pt-br	Data/Hora de término
 ends	calendar	pt-br	termina
 enter output filename: ( .vcs appended )	calendar	pt-br	Informe o arquivo de destino (inclua a extensão .vcs)
-event details follow	calendar	pt-br	Seguem os detalhes do evento
 event already exists	calendar	pt-br	Esse evento já existe.
+event details follow	calendar	pt-br	Seguem os detalhes do evento
 Event's Participants	calendar	pt-br	Participantes do evento
 Event without participants	calendar	pt-br	Evento sem participantes
 exceptions	calendar	pt-br	Exceções
@@ -149,29 +147,29 @@ freebusy: unknow user '%1', wrong password or not availible to not loged in user
 frequency	calendar	pt-br	Frequência
 fri	calendar	pt-br	Sex
 Friday	calendar	pt-br	Sexta-Feira
-full description	calendar	pt-br	Descrição  Completa
+full description	calendar	pt-br	Descrição Completa
 fullname of person to notify	calendar	pt-br	Nome completo da pessoa a ser notificada
 generate printer-friendly version	calendar	pt-br	Gerar versão para impressão ?
 global categories	calendar	pt-br	Categorias Globias
 global public and group public	calendar	pt-br	Público global e Grupo público
 global public only	calendar	pt-br	Público global somente
 go!	calendar	pt-br	Prossiga!
+Grant Access by Group	common	pt-br	Permitir acesso por Grupo
 grant calendar access	common	pt-br	Permitir acesso ao Calendário
+Granted user	common	pt-br	Usuário liberado
 group planner	calendar	pt-br	Planejamento do grupo
 group public only	calendar	pt-br	Grupo público somente
 Group to share calendar	common	pt-br	Grupo de usuários com agenda compartilhada
-Grant Access by Group	common	pt-br	Permitir acesso por Grupo
-Granted user	common	pt-br	Usuário liberado
 Here is your requested alarm.	calendar	pt-br	Aqui está o alarme solicitado.
-high priority	calendar	pt-br	Alta prioridade
+Hidden	calendar	pt-br	Oculto
 hide title and description of event when conflicts	calendar	pt-br	Esconder título e descrição de eventos quando ocorre conflito de horário
+high priority	calendar	pt-br	Alta prioridade
 holiday	calendar	pt-br	Feriado
 holiday management	calendar	pt-br	Gerenciamento de feriados
 holidays	calendar	pt-br	Feriados
+Hours Appointment	calendar	pt-br	Apontamento de Horas
 hours	calendar	pt-br	horas
 ical / rfc2445	calendar	pt-br	iCal / rfc2445
-Hours Appointment	calendar	pt-br	Apontamento de Horas
-Type	calendar	pt-br	Tipo
 if checked holidays falling on a weekend, are taken on the monday after.	calendar	pt-br	Se os feriados coincidirem com fim o de semana, serão transferidos para a próxima segunda-feira.
 if you dont set a password here, the information is availible to everyone, who knows the url!!!	calendar	pt-br	Caso você não especifique uma senha aqui, a informação estará disponível a todos que soubrer o URL.
 ignore conflict	calendar	pt-br	Ignorar conflito
@@ -202,8 +200,8 @@ location	calendar	pt-br	Localização
 location to autoload from	admin	pt-br	Local de onde carregar automaticamente
 make freebusy information availible to not loged in persons?	calendar	pt-br	Fazer a informação de disponibilidade ficar disponível para usuários não logados?
 matrixview	calendar	pt-br	Visão em matriz
-minutes	calendar	pt-br	minutos
 Minimum number of characters to start the search for participants	admin	pt-br	Número mínimo de caracteres para iniciar a pesquisa de participantes
+minutes	calendar	pt-br	minutos
 mo	calendar	pt-br	Sg
 modified	calendar	pt-br	Modificado
 modify list of external participants	calendar	pt-br	Modificar lista de participantes externos
@@ -216,11 +214,10 @@ monthly	calendar	pt-br	Mensalmente
 monthview	calendar	pt-br	Visão mensal
 new entry	calendar	pt-br	Nova Entrada
 new name must not exist and not be empty!!!	calendar	pt-br	Novo nome deve existir e não estar vazio!!!
-no matches found	calendar	pt-br	Nenhum registro encontrado
-no response	calendar	pt-br	Sem resposta
-No user was selected	common	pt-br	Nenhum usuário foi selecionado
 No group was selected	common	pt-br	Nenhum grupo foi selecionado
+no matches found	calendar	pt-br	Nenhum registro encontrado
 No permission type was selected	common	pt-br	Nenhum tipo de permissão foi selecionado
+no response	calendar	pt-br	Sem resposta
 Notice of appointment of external event	calendar	pt-br	Aviso de agendamento de evento externo
 notification messages for added events	calendar	pt-br	Mensagem para notificação de eventos adicionados
 notification messages for canceled events	calendar	pt-br	Mensagem para notificação de eventos cancelados
@@ -228,6 +225,7 @@ notification messages for modified events	calendar	pt-br	Mensagem para notificaç
 notification messages for your alarms	calendar	pt-br	Mensagem para notificação de seus alarmes
 notification messages for your responses	calendar	pt-br	Mensagem para notificação de suas respostas
 notify by sms	calendar	pt-br	Avisar por SMS
+No user was selected	common	pt-br	Nenhum usuário foi selecionado
 number of intervals per day in planner view	calendar	pt-br	Número de intervalos por Dia na visão planejamento
 number of months	calendar	pt-br	Número de meses
 number of records to read (%1)	calendar	pt-br	Número de registros a serem lidos (%1)
@@ -240,8 +238,8 @@ on %1 %2 %3 your meeting request for %4	calendar	pt-br	Em %1 %2 %3 sua requisiçã
 on all changes	calendar	pt-br	em todas as modificações
 on all modification, but responses	calendar	pt-br	em todas as modificações, menos respostas
 on any time change too	calendar	pt-br	em qualquer alteração de horário também
-Only Title	calendar	pt-br	Somente Título
 on invitation / cancelation only	calendar	pt-br	ao convidar / recusar somente
+Only Title	calendar	pt-br	Somente Título
 on participant responses too	calendar	pt-br	em respostas dos participantes também
 on time change of more than 4 hours too	calendar	pt-br	em mudanças superiores a 4 horas também
 open todo's:	calendar	pt-br	Abrir itens a fazer
@@ -253,8 +251,8 @@ participants	calendar	pt-br	Participantes
 participates	calendar	pt-br	Participa
 password for not loged in users to your freebusy information?	calendar	pt-br	Senha para usuários não logados acessarem informações sobre disponibilidade?
 people holiday	calendar	pt-br	feriado pessoal
-permission denied	calendar	pt-br	Permissão negada
 Permission	common	pt-br	Permissão
+permission denied	calendar	pt-br	Permissão negada
 planner by category	calendar	pt-br	Organizar por categoria
 planner by user	calendar	pt-br	Organizar por usuário
 planner	calendar	pt-br	Planejar
@@ -263,8 +261,9 @@ Powerful calendar with meeting request system and ACL security.	calendar	pt-br	P
 preselected group for entering the planner	calendar	pt-br	Grupo pré-selecionado para entrada no organizador
 print calendars in black & white	calendar	pt-br	Imprimir calendários em preto e branco
 printer friendly	calendar	pt-br	Versão para impressão
-print the mini calendars	calendar	pt-br	Imprimir mini-calendários
 print in	calendar	pt-br	Imprimir em
+print starting in	calendar	pt-br	Imprimir a partir de
+print the mini calendars	calendar	pt-br	Imprimir mini-calendários
 private and global public	calendar	pt-br	Particular e público globalmente
 private and group public	calendar	pt-br	Particular e público ao grupo
 private	calendar	pt-br	Privado
@@ -272,15 +271,16 @@ private only	calendar	pt-br	Restrito somente
 Problems delegating. Make sure you haven't delegated to a person that was also invited to the meeting	calendar	pt-br	Problemas na delegação. Assegure-se de que você não está delegando o evento a uma pessoa que também participa dele.
 Problems delegating. Make sure you have selected a user to delegate the appointment.	calendar	pt-br	Problemas na delegação. Assegure-se que você selecionou um usuário para delegar o evento.
 Public Calendars	calendar	pt-br	Agendas públicas
+quantity of days	calendar	pt-br	Quantidade de dias
 read a list of entries.	calendar	pt-br	Ler a lista de entradas
 read a single entry by passing the id and fieldlist.	calendar	pt-br	Ler uma única entrada informando o ID e a lista de campos
 read this list of methods.	calendar	pt-br	Ler essa lista de métodos
 receive email updates	calendar	pt-br	receber atualizações via correio eletrônico
 receive extra information in event mails	calendar	pt-br	Receber informações extras em mensagens de eventos
 receive summary of appointments	calendar	pt-br	Receber sumário dos compromissos
-recurring event	calendar	pt-br	evento recorrente
 Recurrent appointments must have a final date	calendar	pt-br	Agendamentos recorrentes precisam de data final da repeticao
 Recurrent appointments with alarms must have a final date	calendar	pt-br	Agendamentos recorrentes com alarme definido precisam de data final da repeticao
+recurring event	calendar	pt-br	evento recorrente
 re-edit event	calendar	pt-br	Re-Editar evento
 refresh	calendar	pt-br	Atualizar
 reinstate	calendar	pt-br	Reagendar
@@ -292,6 +292,8 @@ repeating event information	calendar	pt-br	Repetindo informação do evento
 repeat type	calendar	pt-br	Tipo de repetição
 repetition	calendar	pt-br	Repetição
 repetitiondetails (or empty)	calendar	pt-br	detalhes da repetição (ou vazio)
+Report of hours	calendar	pt-br	Relatório de horas
+Required field (category) is empty	calendar	pt-br	Campo obrigatório (categoria) está vazio
 (required for weekly recursivity)	calendar	pt-br	(Necessário para recursividade semanal)
 reset	calendar	pt-br	Limpar
 restrict	calendar	pt-br	Restrito
@@ -342,18 +344,18 @@ th	calendar	pt-br	Qu
 The commitment was accepted successfully!	calendar	pt-br	O compromisso foi aceito com sucesso!
 The commitment was rejected successfully!	calendar	pt-br	O compromisso foi rejeitado com sucesso!
 The email addresses must be separated by ','	calendar	pt-br	Os endereços de email devem estar separados por vírgula. Ex.: fulano@aaa.com.br,beltrano@bbb.com, ciclano@ccc.br
-the following conflicts with the suggested time:<ul>%1</ul>	calendar	pt-br	os seguintes conflitos com o horário sugerido:<ul>%1</ul>
 The following commitment had problems for DELIVERING the NOTIFICATION messages.	calendar	pt-br	O compromisso abaixo teve problemas ao ENTREGAR mensagens de NOTIFICAÇÃO.
+the following conflicts with the suggested time:<ul>%1</ul>	calendar	pt-br	os seguintes conflitos com o horário sugerido:<ul>%1</ul>
 there was an error trying to connect to your news server.<br>please contact your admin to check the news servername, username or password.	calendar	pt-br	Houve um erro tentanto conectar no servidor de notícias.<br>Por favor entre em contato com o administrador para verificar a configuração.
-the user %1 is not participating in this event!	calendar	pt-br	O usuário %1 não está participando desse evento!
 The sharing was granted.	common	pt-br	O compartilhamento do grupo foi liberado com sucesso!
-This sharing already exist.	common	pt-br	Esse compartilhamento já existe.
+the user %1 is not participating in this event!	calendar	pt-br	O usuário %1 não está participando desse evento!
 This commitment has already been accepted!	calendar	pt-br	Esse compromisso já foi aceito!
 This commitment has already been rejected!	calendar	pt-br	Esse compromisso já foi rejeitado!
 this day is shown as first day in the week or month view.	calendar	pt-br	Esse dia será mostrado como primeiro dia da semana na visão semanal e mensal
 this defines the end of your dayview. events after this time, are shown below the dayview.	calendar	pt-br	Isso define o último horário da visão diária. Eventos além desse horário são mostrados abaixo do dia.
 this defines the start of your dayview. events before this time, are shown above the dayview.<br>this time is also used as a default starttime for new events.	calendar	pt-br	Isso define o primeiro horário da visão diária. Eventos antes desse horário são mostrados acima do dia.<br>Esse horário também será o horário inicial para novos eventos.
 this group that is preselected when you enter the planner. you can change it in the planner anytime you want.	calendar	pt-br	Esse grupo é pré-selecionado ao entrar no organizador. Você poderá modificá-lo a qualquer tempo.
+This is an automatically generated message. To confirm your attendance, please reply to the sender of the message.	calendar	pt-br	Esta é uma mensagem gerada automaticamente. Para confirmar o seu comparecimento, responda ao remetente da mensagem.
 This is an external event. Even if it added to your expresso its can be changed any time at all	calendar	pt-br	Este é um evento externo. Mesmo que adicionado ao seu Expresso corre o risco de mudança a qualquer momento.
 this is mostly caused by a not or wrongly configured smtp server. notify your administrator.	calendar	pt-br	Esse erro é comumente causado por um servidor SMTP mal configurado. Notifique seu administrador.
 this message is sent for canceled or deleted events.	calendar	pt-br	Essa mensagem é enviada para enventos cancelados ou apagados.
@@ -361,22 +363,22 @@ this message is sent for modified or moved events.	calendar	pt-br	Essa mensagem 
 this message is sent to every participant of events you own, who has requested notifcations about new events.<br>you can use certain variables which get substituted with the data of the event. the first line is the subject of the email.	calendar	pt-br	Essa mensagem é enviada para cada participante dos eventos que você criou, que pediram informações sobre novos eventos.<br> Você pode usar certas variáveis que subtituirão dados nos seus eventos. A primeira linha é o assunto do email.
 this message is sent when you accept, tentative accept or reject an event.	calendar	pt-br	Essa mensagem é enviada quando você aceita, aceita com possibilidade de mudança ou rejeita um evento.
 this message is sent when you set an alarm for a certain event. include all information you might need.	calendar	pt-br	Essa mensagem é enviada quando você configura um alarme para certo evento. Inclua toda a informação necessária.
-This is an automatically generated message. To confirm your attendance, please reply to the sender of the message.	calendar	pt-br	Esta é uma mensagem gerada automaticamente. Para confirmar o seu comparecimento, responda ao remetente da mensagem.
 This message was sent by server. You must send a message to sender to confirm this event	calendar	pt-br	Isso é uma mensagem automática gerada pelo Expresso. Favor confirmar o compromisso respondendo ao remetente
 this month	calendar	pt-br	Este mês
-This option allow everybody to view your calendar in readmode.	calendar	pt-br	Esta opção permite que todos os usuários do Expresso visualizem sua agenda.
 this option allow enable/disable auto search users for calendar share	calendar	pt-br	Essa opção permite habilitar/desabilitar pesquisa automática de usuários para compartilhamento de calendário.
+This option allow everybody to view your calendar in readmode.	calendar	pt-br	Esta opção permite que todos os usuários do Expresso visualizem sua agenda.
 This option enable or disable the meeting description view your calendar in readmode.	calendar	pt-br	Esta opção esta opção habilita ou desabilita a visualização da descrição da reunião no seu calendário em modo de leitura.
+This sharing already exist.	common	pt-br	Esse compartilhamento já existe.
 this user does not exist	calendar	pt-br	Esse usuário não existe
 this user does not possess public agenda	calendar	pt-br	Este usuário não possui agenda pública
 this week	calendar	pt-br	Esta Semana
 This will delete this entry for all users.	calendar	pt-br	Isso apagará o compromisso de todos os participantes.
 this year	calendar	pt-br	Este ano
-thu	calendar	pt-br	Qui
 Thrusday	calendar	pt-br	Quinta-Feira
+thu	calendar	pt-br	Qui
 Tip: To search in the <b>Global Catalog</b>, type the <b>F9</b> key, like the ExpressoMail.	calendar	pt-br	<b>Dica:</b> Para pesquisar no <b>Catálogo Geral</b> utilize a tecla <b>F9</b>, como no ExpressoMail.
-title	calendar	pt-br	Título
 Title and Description	calendar	pt-br	Título e Descrição
+title	calendar	pt-br	Título
 title of the event	calendar	pt-br	Título do evento
 title-row	calendar	pt-br	Linha-Título
 To accept	calendar	pt-br	Aceitar
@@ -392,14 +394,15 @@ translation	calendar	pt-br	Tradução
 tu	calendar	pt-br	Te
 tue	calendar	pt-br	Ter
 Tuesday	calendar	pt-br	Terça-Feira
+Type	calendar	pt-br	Tipo
 Type more %1 letters.	common	pt-br	Digite mais %1 letras.
 update a single entry by passing the fields.	calendar	pt-br	Atualizar uma única entrada informando o os campos.
 updated	calendar	pt-br	Atualizado
 use end date	calendar	pt-br	Usar data de término
 User to grant access	common	pt-br	Usuário que terá acesso liberado
 view this entry	calendar	pt-br	Visualizar esta entrada
-we	calendar	pt-br	Qu
 web conference	calendar	pt-br	Conferência Web
+we	calendar	pt-br	Qu
 wed	calendar	pt-br	Qua
 Wednesday	calendar	pt-br	Quarta-Feira
 week	calendar	pt-br	Semana
@@ -434,14 +437,11 @@ you have not entered a title	calendar	pt-br	Você não colocou o título
 you have not entered a valid date	calendar	pt-br	Você informou  uma data inválida
 you have not entered a valid time of day	calendar	pt-br	você informou uma hora do dia inválida
 you have not entered participants	calendar	pt-br	Você não informou os participantes
-you must enter one or more search keywords	calendar	pt-br	Você deve digitar uma ou mais palavras chave
 You must choose the days of the week for the appointment to repeat	calendar	pt-br	Você deve informar os dias da semana para repetição do agendamento
+you must enter one or more search keywords	calendar	pt-br	Você deve digitar uma ou mais palavras chave
 you must select a [iv]cal. (*.[iv]cs)	calendar	pt-br	Você deve selecionar um [iv}Calc. (*.[iv]cs)
 you need to set either a day or a occurence !!!	calendar	pt-br	Você deve determinar um dia ou recorrência!!!
 your meeting scheduled for %1 has been canceled	calendar	pt-br	Seu compromisso agendado para %1 foi cancelado
 your meeting that had been scheduled for %1 has been rescheduled to %2	calendar	pt-br	Seu compromisso agendado para %1 foi remarcado para %2
 Your search argument must be longer than 4 characters.	calendar	pt-br	Sua busca deve ser maior do que 4 caracteres.
 your suggested time of <b> %1 - %2 </b> conflicts with the following existing calendar entries:	calendar	pt-br	Horário sugerido: <B> %1 - %2 </B> está em conflito com as seguintes entradas no calendário:
-quantity of days	calendar	pt-br	Quantidade de dias
-print starting in	calendar	pt-br	Imprimir a partir de
-empty prints from the day chosen below to the end of the current month	calendar	pt-br	Vazio imprime do dia escolhido abaixo até o final do mês corrente.

@@ -111,7 +111,7 @@ database successfully converted from '%1' to '%2'	setup	pt-br	Conversão bem suce
 datetime port.<br>if using port 13, please set firewall rules appropriately before submitting this page.<br>(port: 13 / host: 129.6.15.28)	setup	pt-br	Nota ntp <br> se estiver usando a porta 13, por favor configure as regras de acesso do seu firewall corretamente antes de enviar essa página <br> (port 13 / servidor 129.6.15.28)
 db host	setup	pt-br	Site do BD
 db name	setup	pt-br	Nome do BD
-db password	setup	pt-br	Senha  do BD
+db password	setup	pt-br	Senha do BD
 db port	setup	pt-br	Porta do BD
 db root password	setup	pt-br	Senha do super-usuário no banco de dados
 db root username	setup	pt-br	Código do super-usuário no banco de dados
@@ -146,7 +146,7 @@ do you want to manage homedirectory and loginshell attributes?	setup	pt-br	Você 
 edit current configuration	setup	pt-br	Editar configuração atual
 edit your existing header.inc.php	setup	pt-br	Editar o seu arquivo header.inc.php existente
 edit your header.inc.php	setup	pt-br	Editar o seu arquivo header.inc.php
-egroupware administration manual	setup	pt-br	Manual de  Administração do eGroupWare
+egroupware administration manual	setup	pt-br	Manual de Administração do eGroupWare
 Enable Digitally Sign / Encrypt?	setup	pt-br	Habilitar Assinar/Criptografar digitalmente?
 enable for extra debug-messages	setup	pt-br	Habilitar mensagens de depuração extras
 enable ldap version 3	setup	pt-br	Habilitar LDAP versão 3
@@ -210,8 +210,8 @@ import accounts from ldap to the egroupware accounts table (for a new install us
 import has been completed!	setup	pt-br	A importação está completa!
 importing old settings into the new format....	setup	pt-br	Importar configurações antigas no novo formato
 import ldap users/groups	setup	pt-br	Importar usuários/grupos LDAP
-include_path need to contain "." - the current directory	setup	pt-br	Inclua o caminho necessário para conter " " - o diretório atual
-include root (this should be the same as server root)	setup	pt-br	Raiz para Inclusão de arquivos (deve ser o mesmo caminho que a Raiz do Servidor)
+include_path need to contain "." - the current directory	setup	pt-br	Include_path necessita conter "." - o diretório atual
+include root (this should be the same as server root)	setup	pt-br	Include_root (deve ser o mesmo caminho que a Raiz do Servidor)
 insanity	setup	pt-br	Insanidade
 install all	setup	pt-br	Instalar todos
 install applications	setup	pt-br	Instalar Aplicativos
@@ -376,17 +376,17 @@ setup demo accounts in ldap	setup	pt-br	Configurar contas de demonstração no LDA
 setup main menu	setup	pt-br	Configurar o Menu Principal
 setup	setup	pt-br	Configurador
 setup the database	setup	pt-br	Configurar o Banco de Dados
-show 'powered by' logo on	setup	pt-br	Área para exibição 'powered by  eGroupWare'
+show 'powered by' logo on	setup	pt-br	Área para exibição 'powered by eGroupWare'
 some or all of its tables are missing	setup	pt-br	Estão faltando algumas tabelas (ou todas)
-sql encryption type	setup	pt-br	Tipo de criptografia para senhas  SQL(padrão Md5)
+sql encryption type	setup	pt-br	Tipo de criptografia para senhas SQL (padrão Md5)
 start the postmaster	setup	pt-br	Iniciar o postmaster
 status	setup	pt-br	Status
 step %1 - admin account	setup	pt-br	Passo %1 - Conta do administrador
 step %1 - advanced application management	setup	pt-br	Passo %1 - Gerenciamento avançado da aplicação
 step %1 - configuration	setup	pt-br	Passo %1 - Configuração
 step %1 - language management	setup	pt-br	Passo %1 - Gerenciamento da linguagem
-step 1 - simple application management	setup	pt-br	Passo 1 - Configuração inicial das aplicações
 step %1 - simple application management	setup	pt-br	Passo %1 - Gerenciamento simples da aplicação
+step 1 - simple application management	setup	pt-br	Passo 1 - Configuração inicial das aplicações
 step 2 - configuration	setup	pt-br	Passo 2 - Configuração do sistema
 step 3 - language management	setup	pt-br	Passo 3 - Configuração de idiomas
 step 4 - advanced application management	setup	pt-br	Passo 4 - Configuração avançada das aplicações
@@ -428,7 +428,7 @@ translations removed	setup	pt-br	Traduções removidas
 translations upgraded	setup	pt-br	Traduções atualizadas
 true	setup	pt-br	Verdadeiro
 try to configure your php to support one of the above mentioned dbms, or install egroupware by hand.	setup	pt-br	Tente configurar seu PHP para suportar um dos Banco de Dados mencionados acima, ou instale o eGroupWare manualmente
-two weeks	setup	pt-br	2 semanas
+two weeks	setup	pt-br	duas semanas
 uninstall all applications	setup	pt-br	Desinstalar todas aplicações
 uninstalled	setup	pt-br	desinstaladas
 uninstall	setup	pt-br	desinstalar
@@ -492,7 +492,7 @@ you have successfully logged out	setup	pt-br	Você foi desconectado com sucesso.
 *** you have to do the changes manualy in your php.ini (usualy in /etc on linux) in order to get egw fully working !!!	setup	pt-br	Você terá que modificar seu php.ini manualmente (normalmente em /etc) antes que o eGroupWare esteja completamente operacional.
 you must enter a username for the admin	setup	pt-br	Você deve especificar um nome de usuário para o Administrador
 you need to add some domains to your header.inc.php.	setup	pt-br	Você precisa adicionar um domínio no arquivo header.inc.php
-you need to select your current charset!	setup	pt-br	Você  precisa selecionar seu conjunto de carácteres atual
+you need to select your current charset!	setup	pt-br	Você precisa selecionar seu conjunto de carácteres atual
 your applications are current	setup	pt-br	Suas aplicações estão atualizadas
 your database does not exist	setup	pt-br	Sua base de dados não existe
 your database is not working!	setup	pt-br	Seu banco de dados não está funcionando!

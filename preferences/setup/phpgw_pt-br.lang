@@ -1,7 +1,7 @@
 12 hour	preferences	pt-br	12 horas
 %1 hours	preferences	pt-br	%1 horas
-%1 telephone number	common	pt-br	Número de Telefone %1
 %1 - preferences	preferences	pt-br	%1 - Preferências
+%1 telephone number	common	pt-br	Número de Telefone %1
 24 hour	preferences	pt-br	24 horas
 acl grants have been updated	preferences	pt-br	As permissões de acesso (ACL) foram atualizadas
 any listing in phpgw will show you this number of entries or lines per page.<br>to many slow down the page display, to less will cost you the overview.	preferences	pt-br	Todas as listas no eGroupWare utilizarão esta quantidade de linhas para a exibição por página. <br>Linhas demais podem deixar lenta a visualização, poucas linhas adificultam a visualização, teste várias possibilidades.
@@ -15,13 +15,14 @@ change your password	preferences	pt-br	Altere sua senha
 Change your Personal Data	common	pt-br	Altere seus dados pessoais
 change your profile	preferences	pt-br	Altere seu perfil
 change your settings	preferences	pt-br	Altere suas preferências
+Click send code by SMS to validate your cell phone	preferences	pt-br	Clique em enviar código por SMS para validar o seu telefone celular
 Comment	preferences	pt-br	Observação
 Commercial	common	pt-br	Comercial
 country	preferences	pt-br	País
 date format	preferences	pt-br	Formato de data
 default application	preferences	pt-br	Aplicação padrão
-default preferences	preferences	pt-br	Preferências padrões
 default	preferences	pt-br	padrão
+default preferences	preferences	pt-br	Preferências padrões
 delete categories	preferences	pt-br	Apagar Categorias
 description can not exceed 255 characters in length !	preferences	pt-br	A Descrição não deve exceder 255 caracteres!
 Disable the execution a bugfixscript for Internet Explorer 5.5 and higher to show transparency in PNG-images?	preferences	pt-br	Desativar a execução do script de correção de bug para o Internet Explorer 5.5 e superiores para exibir transparências em imagens PNG?
@@ -31,12 +32,14 @@ embedded images are not allowed by the server	common	pt-br	Imagens incorporadas 
 enter your actual password	preferences	pt-br	Digite sua senha atual
 enter your new password	preferences	pt-br	Digite sua nova senha
 error: there was a problem finding the preference file for %1 in %2	preferences	pt-br	Erro: Houve um problema ao tentar encontrar o arquivo de preferencias para %1 em %2
+Expresso Offline	preferences	pt-br	ExpressoMail Offline
 failed to change password.  please contact your administrator.	preferences	pt-br	Não conseguiu trocar sua senha. por favor entre em contato com seu administrador.
+Failed to change password	preferences	pt-br	Falha ao alterar sua senha
 forced preferences	preferences	pt-br	Preferências obrigatórias
 Format of %1 telephone number is invalid.	preferences	pt-br	Formato do número de telefone %1 inválido.
 help off	preferences	pt-br	Desligar ajuda
-hours	preferences	pt-br	horas
 Home	preferences	pt-br	Página Inicial
+hours	preferences	pt-br	horas
 how do you like to display accounts	preferences	pt-br	Como você gostaria que as contas fossem mostradas
 how do you like to select accounts	preferences	pt-br	Como você gostaria de selecionar as contas
 how many hours are you in front or after the timezone of the server.<br>if you are in the same time zone as the server select 0 hours, else select your locale date and time.	preferences	pt-br	Quantas horas você está além ou aquém do fuso-horário do servidor.<br> Se você estiver no mesmo selecione 0, caso contrário, escolha o fuso-horário apropriado.
@@ -55,10 +58,11 @@ no default	preferences	pt-br	Sem padrão
 note: this feature does *not* change your email password. this will need to be done manually.	preferences	pt-br	Nota: Esta função <b>NÃO</b> altera sua senha de email. você deverá fazer isto manualmente.
 note: This feature is *exclusive* for ldap repository.	preferences	pt-br	Nota: Este procedimento é exclusivo para uso em repositórios LDAP.
 Observation	preferences	pt-br	Observação
-This telephone number will apear in searches for your name, and it will be visible for all ExpressoLivre Users	preferences	pt-br	Este número de telefone será exibido em todas as buscas por seu nome, e será visivel por todos os usuários do Expresso Livre
+Please contact your administrator	preferences	pt-br	Entre em contato com seu administrador
 please, select a new theme	preferences	pt-br	Por favor, selecione um novo tema
 popup with search	preferences	pt-br	Janela  instantânea com busca
 Preferences Application	common	pt-br	Módulo de Preferências
+Programed Archiving	preferences	pt-br	Arquivamento programado
 re-enter your password	preferences	pt-br	Digite sua senha novamente
 selectbox	preferences	pt-br	Caixa de seleção
 select different theme	preferences	pt-br	Selecione um tema diferente
@@ -80,6 +84,7 @@ theme (colors/fonts) selection	preferences	pt-br	Seleção de tema (cores/fontes)
 the selectbox shows all available users (can be very slow on big installs with many users). the popup can search users by name or group.	preferences	pt-br	A caixa de seleção mostra todos os usuários disponíveis (poderá causar lentidão em instalações com muitos usuários). Pela janela instantânea, é possível pesquisar usuários por nome ou grupo.
 the two passwords are not the same	preferences	pt-br	As duas senhas não são iguais
 this server is located in the %1 timezone	preferences	pt-br	Este servidor está localizado no fuso horário %1
+This telephone number will apear in searches for your name, and it will be visible for all ExpressoLivre Users	preferences	pt-br	Este número de telefone será exibido em todas as buscas por seu nome, e será visivel por todos os usuários do Expresso Livre
 time format	preferences	pt-br	Formato do horário
 use default	preferences	pt-br	usar o padrão
 users choice	preferences	pt-br	escolha do usuário
@@ -95,11 +100,6 @@ Your old password and your new password are the same. Choose a different new pas
 Your password contains characters not allowed	preferences	pt-br	Sua senha contém caracteres não permitidos
 Your password has expired	preferences	pt-br	Sua senha expirou
 Your password must contain %1 or more letters	preferences	pt-br	Sua senha precisa conter %1 ou mais caracteres
-Your password must contain at least %1 uppercase letters	preferences	pt-br	Sua senha precisa conter pelo menos %1 letra(s) maiúscula(s)
 Your password must contain at least %1 special characters	preferences	pt-br	Sua senha precisa conter pelo menos %1 número(s)
+Your password must contain at least %1 uppercase letters	preferences	pt-br	Sua senha precisa conter pelo menos %1 letra(s) maiúscula(s)
 your preferences	preferences	pt-br	Suas preferências
-Failed to change password	preferences	pt-br	Falha ao alterar sua senha
-Please contact your administrator	preferences	pt-br	Entre em contato com seu administrador
-Expresso Offline	preferences	pt-br	ExpressoMail Offline
-Programed Archiving	preferences	pt-br	Arquivamento programado
-Click send code by SMS to validate your cell phone	preferences	pt-br	Clique em enviar código por SMS para validar o seu telefone celular

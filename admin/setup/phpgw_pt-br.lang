@@ -17,38 +17,40 @@ activate wysiwyg-editor	admin	pt-br	ativar editor WYSIWYG
 active	admin	pt-br	Ativo
 add a category	admin	pt-br	adicionar uma categoria
 add account	admin	pt-br	Adicionar um conta
+Add	admin	pt-br	Adicionar
 add a group	admin	pt-br	adicionar um grupo
-add multiple categories?	admin	pt-br	Tem certeza que deseja adicionar múltiplas categorias?
-add a new account.	admin	pt-br	Adicionar uma conta. nova
+add a new account.	admin	pt-br	Adicionar uma conta nova
 add application	admin	pt-br	Adicionar um aplicativo
 add a subcategory	admin	pt-br	adicionar uma subcategoria
 add a user	admin	pt-br	adicionar um usuário
 add auto-created users to this group ('default' will be attempted if this is empty.)	admin	pt-br	Adicionar usuários criados automaticamente para este grupo (o grupo 'Default' será tentado se este campo estiver vazio.)
+Add file contents to CAs file	admin	pt-br	Adicionar conteudo do arquivo selecionado ao arquivo de ACs
 add global category	admin	pt-br	Adicionar categoria global
 add global category for %1	admin	pt-br	Adicionar categoria global para %1
 add group	admin	pt-br	Adicionar grupo
+add multiple categories?	admin	pt-br	Tem certeza que deseja adicionar múltiplas categorias?
 add new account	admin	pt-br	Adicionar nova conta
 add new application	admin	pt-br	Adicionar nova aplicação
-antivirus command	admin	pt-br	Comando do antivírus
-Max file size	admin	pt-br	Tamanho máximo de arquivo
-quota size	admin	pt-br	Tamanho padrão de quota
 add peer server	admin	pt-br	Adicionar servidor remoto
 add sub-category	admin	pt-br	Adicionar sub-categoria
 admin email addresses (comma-separated) to be notified about the blocking (empty for no notify)	admin	pt-br	Endereços eletrônicos dos administradores (seprados por vírgula) a serem notificados em caso de bloqueio (em branco para não notificar)
 admin email	admin	pt-br	Email do Administrador
 administration	admin	pt-br	Administração
+Administration data of AC\'s and RCL\'s not found	admin	pt-br	Dados para administra&ccedil;&atilde;o das CA\'s e CRL\'s n&atilde;o foram localizados
 admin name	admin	pt-br	Nome do Administrador
 admin options	admin	pt-br	Opções de administração
 admins	admin	pt-br	Administradores
 advanced	admin	pt-br	Avançado
 after how many unsuccessful attempts to login, an account should be blocked (default 3) ?	admin	pt-br	Após quantos erros de conexão, a conta deverá ser bloqueada (padrão 3)?
 after how many unsuccessful attempts to login, an ip should be blocked (default 3) ?	admin	pt-br	Após quantos erros de conexão, um endereço IP deverá ser bloqueado (padrão 3)?
+agree term	admin	pt-br	Termo de aceite
 all fields	admin	pt-br	todos os campos
 allow anonymous access to this app	admin	pt-br	Permitir acesso anônimo a esta aplicação
 all records and account information will be lost!	admin	pt-br	Todos registros e informações de contas serão perdidos!
 all users	admin	pt-br	Todos usuários
 anonymous user	admin	pt-br	Usuário Anônimo
 anonymous user (not shown in list sessions)	admin	pt-br	Usuário Anônimo (não é exibido na lista de sessões)
+antivirus command	admin	pt-br	Comando do antivírus
 appearance	admin	pt-br	Aparência
 application	admin	pt-br	Aplicativo
 application name	admin	pt-br	Nome do Aplicativo
@@ -70,6 +72,8 @@ asyncservices not yet installed or other error (%1) !!!	admin	pt-br	Serviços Ass
 attempt to use correct mimetype for ftp instead of default 'application/octet-stream'	admin	pt-br	Tentar usar mimetype correto para FTP ao invés do padrão 'application/octet-stream'
 authentication / accounts	admin	pt-br	Autenticação / Contas
 auto create account records for authenticated users	admin	pt-br	Automaticamente criar registros de conta para usuários autenticados
+availables	admin	pt-br	Disponíveis
+Back	admin	pt-br	Voltar
 back to the list	admin	pt-br	voltar à lista
 backup administration	admin	pt-br	Administração do Backup
 bi-directional	admin	pt-br	bi-direcional
@@ -78,40 +82,52 @@ block and unblock hosts	admin	pt-br	Bloquear ou Desbloquear um domínio IP
 block/unblock hosts	common	pt-br	Bloq/Desbloquear hosts
 bottom	admin	pt-br	inferior
 calculate next run	admin	pt-br	Calcular próxima execução
+Cancel	admin	pt-br	Cancelar
 cancel testjob!	admin	pt-br	Cancelar trabalhos de teste!
 can change password	admin	pt-br	Permite alterar a senha
-Does CPF field must be completed	admin	pt-br	O campo cpf deve ser preenchido
-Deny user accounts with the same cpf	admin	pt-br	Proibir contas de usuário com o mesmo cpf
+CAs (Certificate Authority)	admin	pt-br	ACs (Autoridades Certificadoras)
+CAs certificates not found	admin	pt-br	Nao foram localizados certificados de ACs
+CASCRLS	admin	pt-br	Informa&ccedil;&otilde;es de ACs e LCRs
 Catalog Name	admin	pt-br	Nome do catálogo
 categories list	admin	pt-br	Lista de Categorias
 category %1 has been saved !	admin	pt-br	Categoria %1 foi salva!
 category list	admin	pt-br	Lista de Categorias
 category name	admin	pt-br	nome da categoria
+Certificate added to	admin	pt-br	Adicionado certificado para
+Certificate not in chain	admin	pt-br	Certificado ausente da cadeia
+Certificates in	admin	pt-br	Certificados em
 change acl rights	admin	pt-br	Mudar direitos da ACL
 change config settings	admin	pt-br	Mudar parâmetros de configuração
 change main screen message	admin	pt-br	Alterar mensagem da tela principal
 check ip address of all sessions	admin	pt-br	Verificar endereço IP de todas sessões
 check items to <b>%1</b> to %2 for %3	admin	pt-br	Marcar itens de <b> %1</b> a %2 para %3
+Choose a file with CAs to add	admin	pt-br	Selecione um arquivo com certificados de ACs para adionar ao arquivo de ACs em uso
 click to select a color	admin	pt-br	Clique para selecionar uma cor
 color	admin	pt-br	Cor
 concatenate default domain to the mail	admin	pt-br	Concatenar domínio default na sugestão do email
-Configurations to get nextID from another DB	admin	pt-br	Configurações para obter nextID de outro BD
-Configuration Service VoIP	admin	pt-br	Configuração Serviço VoIp
 configuration	admin	pt-br	configuração
+Configuration file not found in server.	admin	pt-br	Não foi possível localizar arquivo de configuração no servidor.
+Configuration Service VoIP	admin	pt-br	Configuração Serviço VoIp
+Configurations to get nextID from another DB	admin	pt-br	Configurações para obter nextID de outro BD
 configure access permissions	admin	pt-br	Configurar permissões de acesso
 configure rss exports	admin	pt-br	Configurar exportação RSS
+Confirm RCLs update	admin	pt-br	Confirma atualização das LCRs
 ContactCenter Global Catalogue Setup	admin	pt-br	Instalação do catálogo global do ContactCenter
+Continue	admin	pt-br	Continue
 country selection	admin	pt-br	Seleção de País
 create group	admin	pt-br	Criar Grupo
+Create in	admin	pt-br	Gerada em
+credentials	admin	pt-br	Credenciais
+CRLs use is disable	admin	pt-br	O uso de listas de revogacao de certificados nao esta habilitado
 crontab only (recomended)	admin	pt-br	somente crontab (recomendado)
 data	admin	pt-br	Dados
 day	admin	pt-br	Dia
 day of week<br>(0-6, 0=sun)	admin	pt-br	Dia da Semana <br> (0-6, 0=Dom)
 db host	admin	pt-br	Host do BD
 db name	admin	pt-br	Nome do BD
-db sequence	admin	pt-br	Nome da sequência
 db password	admin	pt-br	Senha
 db port	admin	pt-br	Porta do BD
+db sequence	admin	pt-br	Nome da sequência
 db user	admin	pt-br	Usuário
 default	admin	pt-br	Padrão
 Default Domain	admin	pt-br	Domínio padrão
@@ -147,12 +163,15 @@ deny access to site configuration	admin	pt-br	Negar acesso à configuração do sit
 deny access to user accounts	admin	pt-br	Negar acesso as contas de usuários
 deny all users access to grant other users access to their entries ?	admin	pt-br	Não permitir que usuários concedam acesso à seus registros para outros usuários ?
 deny to site configuration	admin	pt-br	Negar acesso a configuração do servidor
+Deny user accounts with the same cpf	admin	pt-br	Proibir contas de usuário com o mesmo cpf
 description can not exceed 255 characters in length !	admin	pt-br	A descrição não deverá exceder 255 caracteres!
 disable "auto completion" of the login form	admin	pt-br	Desbilitar "auto completar" no formulário de entrada
 disabled	admin	pt-br	Desabilitado
 disabled (not recomended)	admin	pt-br	desabilitar (não recomendado)
 disable wysiwyg-editor	admin	pt-br	desabilitar editor WYSIWYG
 display	admin	pt-br	Visualizar
+Displaying	admin	pt-br	Mostrando
+Does CPF field must be completed	admin	pt-br	O campo cpf deve ser preenchido
 do not delete the category and return back to the list	admin	pt-br	NÃO apague essa categoria e retorne à lista
 do you also want to delete all global subcategories ?	admin	pt-br	Deseja também apagar todas subcategorias globais ?
 do you want to delete all global subcategories ?	admin	pt-br	Deseja apagar todas subcategorias globais ?
@@ -165,9 +184,9 @@ edit group acl's	admin	pt-br	Editar grupo ACL
 edit group	admin	pt-br	Editar Grupo
 edit job status id table	admin	pt-br	Editar tabela de ID de estados de trabalhos
 edit location table	admin	pt-br	Editar tabela de lugares
+Edit login help message	admin	pt-br	Editar Ajuda do Login
 edit login screen message	admin	pt-br	Editar mensagem da tela de conexão
 edit main screen message	admin	pt-br	Editar mensagem da tela inicial
-Edit login help message	admin	pt-br	Editar Ajuda do Login
 edit peer server	admin	pt-br	Editar servidor Parceiro
 edit table format	admin	pt-br	Editar formato de tabela
 edit this category	admin	pt-br	editar esta categoria
@@ -177,12 +196,13 @@ edit user account	admin	pt-br	Editar conta de usuário
 edit user	admin	pt-br	editar usuário
 edit work catagory table	admin	pt-br	Editar tabela de categorias de trabalhos
 Email Voip	admin	pt-br	Email Voip
+Empty to disable revogation test	admin	pt-br	Deixar vazio para nao verificar se certificado esta revogado
 enabled	admin	pt-br	Habilitado
 enable debug-messages	admin	pt-br	Habilitar menssagens de depuração
-enable stylesheet packer ?	admin	pt-br	Deseja usar folha de estilo?
-enable virtual keyboard on login	admin	pt-br	Deseja usar o teclado virtual no login
 enabled - hidden from navbar	admin	pt-br	Habilitado - Escondido da barra de navegação
 enabled - popup window	admin	pt-br	Habilitar Janelas instantâneas
+enable stylesheet packer ?	admin	pt-br	Deseja usar folha de estilo?
+enable virtual keyboard on login	admin	pt-br	Deseja usar o teclado virtual no login
 enter a description for the category	admin	pt-br	digite a descrição dessa categoria
 enter some random text for app_session <br>encryption (requires mcrypt)	admin	pt-br	Digite um texto aleatório para a encriptação de sessão (requer mcrypt)
 enter the background color for the login page	admin	pt-br	Digite a cor de fundo para a página de login
@@ -209,21 +229,36 @@ Enter your VoIP server address	admin	pt-br	Digite o endereço do servidor VoIP
 Enter your VoIP server port	admin	pt-br	Digite a porta do servidor VoIP
 Enter your VoIP server url	admin	pt-br	Digite a url de conexão com seu servidor VoIP
 error: %1 not found or other error !!!	admin	pt-br	Erro: %1 não encrontrado ou outro erro não definido !!!
+Error.	admin	pt-br	Erro.
 error canceling timer, maybe there's none set !!!	admin	pt-br	Erro cancelando timer, possivelmente nenhum estconfigurado !!!
+error log out	admin	pt-br	erro ao encerrar a sessão
 error setting timer, wrong syntax or maybe there's one already running !!!	admin	pt-br	Erro configurando timer, sintaxe errada ou talvez já exista um sendo executado !!!
 exact	admin	pt-br	exato
+Execute RCLs update	admin	pt-br	Executar atualização das LCRs
+Expire	admin	pt-br	Expirar
+Expired on	admin	pt-br	Expirada em
+Expire on	admin	pt-br	Expira em
 expires	admin	pt-br	Expira
 expressoAdmin Setup	admin	pt-br	Configurações do ExpressoAdmin
 ExpressoMail Plugin Calendar	admin	es-es	Calendario Plugin de ExpressoMail
 Extended search configuration	admin	pt-br	Configuração estendida de pesquisa
+Failure on save file (CD03). The requested operation is not concluded	admin	pt-br	Falhou ao salvar arquivo (CD03). Nao foi concluida a operacao solicitada
+Failure on save file (CD04). The requested operation is not concluded	admin	pt-br	Falhou ao salvar arquivo (CD04). Nao foi concluida a operacao solicitada'
 fallback (after each pageview)	admin	pt-br	recuperar (após cada página visualizada)
+File	admin	pt-br	Arquivo
+File not found	admin	pt-br	Arquivo nao localizado
 file space	admin	pt-br	Espaço para arquivos
 file space must be an integer	admin	pt-br	Espaço para arquivos deve ser um número inteiro
+File to execution log of get CRLs	admin	pt-br	Arquivo para conter log de execucao da rotina de obtencao das listas de certificados revogados
+File updated and save	admin	pt-br	Arquivo atualizado e salvo
+File with Certificate Authority(CAs) chains	admin	pt-br	Arquivo contendo cadeias das autoridades certificadoras(CAs)
 find and register all application hooks	admin	pt-br	Procurar e registrar todas as configurações de aplicações
+Folders management	common	pt-br	Gerenciamento de Pastas
+Folder to temporary files to digital certificate validation	admin	pt-br	Pasta para conter arquivos temporarios usados na validacao do certificado digital
+Folder with CRLs	admin	pt-br	Pasta para conter Listas de Revogacao de Certificados(CRLs)
 force selectbox	admin	pt-br	Forçar Caixa de seleção
 for the times above	admin	pt-br	para os horários acima
 for the times below (empty values count as '*', all empty = every minute)	admin	pt-br	para os horários abaixo (campos vazios contam como '*", todos vazios = a cada minuto)
-Folders management	common	pt-br	Gerenciamento de Pastas
 global categories	common	pt-br	Categorias globais
 global options	admin	pt-br	Opções globais
 group ?	admin	pt-br	grupo?
@@ -239,8 +274,8 @@ hide php information	admin	pt-br	Esconder informações de PHP
 home directory	admin	pt-br	Diretório de instalação
 host information	admin	pt-br	Informações do servidor
 hour<br>(0-23)	admin	pt-br	Hora<br>(0-23)
-How many days the password should be kept(empty to disable this) ?	admin	pt-br	Quantos dias a senha deve ser considerada válida (Deixe vazio para não usar)?
 how many days should entries stay in the access log, before they get deleted (default 90) ?	admin	pt-br	Quantos dias as entradas devem ser mantidas no registro de acessos, antes de serem apagadas (padrão 90)?
+How many days the password should be kept(empty to disable this) ?	admin	pt-br	Quantos dias a senha deve ser considerada válida (Deixe vazio para não usar)?
 How many letters the user password must contain (default 3) ?	admin	pt-br	Quantas letras a senha do usuário precisa ter (padrão 3) ?
 how many minutes should an account or ip be blocked (default 30) ?	admin	pt-br	Quantos minutos uma conta ou endereço IP devem ser bloqueados (padrão 30)?
 How many special letters the user password must contain (default 0) ?	admin	pt-br	Quantas letras especiais a senha do usuário precisa ter (padrão 0) ?
@@ -248,6 +283,8 @@ How many uppercase letters the user password must contain (default 1) ?	admin	pt
 HTML code of the organization login	admin	pt-br	Insira o código HTML referente ao rodapé do login (logotipo da empresa)
 icon	admin	pt-br	Ícone
 idle	admin	pt-br	ocioso
+Idle Time	admin	pt-br	Inativo
+ID Number	admin	pt-br	Identificação
 if no acl records for user or any group the user is a member of	admin	pt-br	Se não houver registro de permissoes ou grupo para o usuário ele é membro do
 if using ldap, do you want to manage homedirectory and loginshell attributes?	admin	pt-br	se estiver usando LDAP, você deseja definir atributos de diretório home e shell de login?
 inbound	admin	pt-br	Entrada
@@ -256,6 +293,7 @@ installed applications	common	pt-br	Aplicativos Instalados
 installed crontab	admin	pt-br	Crontab instalado
 interface	admin	pt-br	Interface
 ip	admin	pt-br	IP
+Issuer	admin	pt-br	Emitido por
 jobs	admin	pt-br	Trabalhos
 kill	admin	pt-br	Terminar
 kill session	admin	pt-br	Terminar sessão
@@ -278,16 +316,19 @@ ldap root password	admin	pt-br	senha do super usuário LDAP
 leave the category untouched and return back to the list	admin	pt-br	deixar a categoria intocada e retornar à lista
 leave the group untouched and return back to the list	admin	pt-br	deixar o grupo intocado e retornar à lista
 Leave the host field empty to use the same DB of the ExpressoLivre	admin	pt-br	Deixe o campo host vazio para utilizar o mesmo BD do ExpressoLivre
+Let it blank to generate the logon script with user login	admin	pt-br	Deixe em branco para gerar o script de logon com o login do usuário
 list config settings	admin	pt-br	Listar parâmetros de configuração
 list current sessions	admin	pt-br	Listar sessões correntes
 list of current users	admin	pt-br	lista de usuários conectados
+Loading ...	admin	pt-br	Carregando ...
+loginhelp	admin	pt-br	Ajuda do Login
 login history	common	pt-br	Histórico de conexões
 loginid	admin	pt-br	Código do usuário
 login message	admin	pt-br	Mensagem de entrada
 loginscreen	admin	pt-br	Tela de Conexão
-loginhelp	admin	pt-br	Ajuda do Login
 login shell	admin	pt-br	Shell de Conexão
 login time	admin	pt-br	Hora da conexão
+Log of RCLs update	admin	pt-br	Log da atualizacao das LCRs
 mail settings	admin	pt-br	Configurações de Correio Eletronico
 main administration application	common	pt-br	Módulo de Administração Central
 main screen message	admin	pt-br	Mensagem da tela principal
@@ -298,9 +339,12 @@ manager	admin	pt-br	Gerenciador
 Manage SAMBA attributes	admin	pt-br	Gerenciar atributos do SAMBA
 manage userPasswordRFC2617 attribute	admin	pt-br	Gerenciar atributo userPasswordRFC2617
 Max attachment size	admin	pt-br	Tamanho máximo de anexos
+Max file size	admin	pt-br	Tamanho máximo de arquivo
 maximum account id (e.g. 65535 or 1000000)	admin	pt-br	id máximo para contas (Exemplo: 65535 ou 1000000)
 maximum entries in click path history	admin	pt-br	Máximo de entradas no histórico de caminho de cliques
+Maximum length of file log(bytes)	admin	pt-br	Tamanho maximo do arquivo de log(em bytes)
 maximum length of photo archive  (default 10240 = 10 kb)	admin	pt-br	Tamanho máximo do arquivo de foto  (padrão 10240 = 10 kb)
+Maximum number of files log to retain	admin	pt-br	Numero maximo de arquivos de log a serem guardados
 message has been updated	admin	pt-br	Mensagem foi atualizada
 method	admin	pt-br	Método
 Minimal character to name search	admin	pt-br	Mínimo de caracteres para pesquisa de nome
@@ -323,32 +367,54 @@ no permission to add groups	admin	pt-br	sem permissão para adicionar grupos
 no permission to add users	admin	pt-br	sem permissão para adicionar grupos
 no permission to create groups	admin	pt-br	sem permissão para criar grupos
 note: ssl available only if php is compiled with curl support	admin	pt-br	Nota: O SSL estará disponível somente se o PHP houver sido compilado com suporte a curl
-Organizations	admin	pt-br	Organizações
-Owner (User/Group)	admin	pt-br	Dono (Usuário/Grupo)
+not found	common	pt-br	nao localizado
+not processed. Invalid format	admin	pt-br	nao pode ser processado. Formato invalido
+Num. Certificates	admin	pt-br	Num. certificados
+Num. RCL	admin	pt-br	LCR num.
+of	admin	pt-br	de
 Open automatic contact	admin	pt-br	Abrir contatos automaticamente
+Open Sessions	admin	pt-br	Sessões Abertas
+Organizations	admin	pt-br	Organizações
+organizations help	admin	pt-br	Selecione as organizações administradas por esta instalação
 outbound	admin	pt-br	Saída
+Owner (User/Group)	admin	pt-br	Dono (Usuário/Grupo)
+parameter not found	admin	pt-br	parâmetro não encontrado
+Parameters into	admin	pt-br	Parametros em
 passthrough	admin	pt-br	Atravessar
 password for smtp-authentication	admin	pt-br	Senha para autenticação SMTP
 Password for the account above (if any)	admin	pt-br	Senha para o usuário acima (se houver)
+password sms system	admin	pt-br	Senha de usuário para SMS de sistema
+Path BASE	admin	pt-br	Caminho BASE
 path information	admin	pt-br	Informação de Path
 peer server list	admin	pt-br	Lista de servidores parceiros
 peer servers	admin	pt-br	Servidores parceiros
 percent of users that logged out	admin	pt-br	Percentual de usuários que desconectaram
 percent this user has logged out	admin	pt-br	Percentagem de vezes que este usuário desconectou
+permission denied	admin	pt-br	permissão negada
 permissions	admin	pt-br	Permissões
-permissions this group has	admin	pt-br	Permissões do grupo
 Permissions of groups and users	common	pt-br	Permissões de grupos e usuários
+permissions this group has	admin	pt-br	Permissões do grupo
 personal contact type	admin	pt-br	Tipo de contato pessoal
 phpinfo	admin	pt-br	Informações do PHP
+Please confirm that you want to terminate all sessions.	admin	pt-br	Por favor, confirme que você deseja encerrar todas as sessões.
 please enter a name	admin	pt-br	Por favor digite um nome
 please enter a name for that server !	admin	pt-br	Por favor digite um nome para este servidor !
 please run setup to become current	admin	pt-br	Por favor execute a Configuração para atualizar o sistema
 please select	admin	pt-br	Por favor selecione
+Point to file with URLs of CRLs	admin	pt-br	Arquivo contendo as URLs para obter as listas de certificados revogados 
 preferences	admin	pt-br	Preferências
 primary group	admin	pt-br	Grupo primário
+Query time	admin	pt-br	Hora da consulta
+quota management	common	pt-br	Gestão de cotas
+quota size	admin	pt-br	Tamanho padrão de quota
+Raise user quota, to default, on login	admin	pt-br	Aumentar quota do usuário, para o padrão, ao entrar
+RCLs configurated	admin	pt-br	LCRs configuradas
+RCLs get in	admin	pt-br	Lista de Certificados revogados obtida em
+RCLs(Revoked Certificate List)	admin	pt-br	LCRs(Listas de Certificados Revogados)
 read this list of methods.	admin	pt-br	Ler esta lista de métodos
 REALM for userPasswordRFC2617 attribute	admin	pt-br	REALM para o atributo userPasswordRFC2617
 recent changes	common	pt-br	Alterações recentes
+records	admin	pt-br	registros
 re-enter password	admin	pt-br	Re-digite a senha
 register application hooks	admin	pt-br	Registrar configurações das aplicações
 remove all users from this group ?	admin	pt-br	Remover todos os usuários desse grupo?
@@ -366,6 +432,8 @@ search groups	admin	pt-br	Pesquisar grupos
 search peer servers	admin	pt-br	Pesquisar servidores parceiros
 security	admin	pt-br	Segurança
 selectbox	admin	pt-br	Tela de seleção
+selected groups	admin	pt-br	Grupos Selecionados
+selecteds	admin	pt-br	Selecionados
 select group managers	admin	pt-br	Selecione Manutenção de Grupos
 Select module version expressoMail (if available)	admin	pt-br	Selecione o módulo expressoMail (se disponível)
 Select Organization	admin	pt-br	Selecione Organização
@@ -385,6 +453,8 @@ server type(mode)	admin	pt-br	Tipo de servidor (modo)
 server url	admin	pt-br	URL do servidor
 server username	admin	pt-br	Usuário do servidor
 Servidor LDAP	admin	pt-br	Servidor LDAP
+Session	admin	pt-br	Sessão
+sessions not found	admin	pt-br	sessões não encontradas
 set preferences value	admin	pt-br	Definir preferências
 set preference values.	admin	pt-br	Definir preferências.
 should the login page include a language selectbox (useful for demo-sites) ?	admin	pt-br	A tela de conexão deve incluír uma caixa de seleção de idioma? (útil para sites de demonstração)
@@ -396,9 +466,11 @@ show 'powered by' logo on	admin	pt-br	Área para exibição de 'powered by eGroupWa
 show session ip address	admin	pt-br	Exibir endereço IP das sessões
 site	admin	pt-br	Site
 site configuration	common	pt-br	Configuração do servidor
-quota management	common	pt-br	Gestão de cotas
 site links	admin	pt-br	links de sites
+sms module enabled	admin	pt-br	Habilitar módulo SMS
+sms settings	admin	pt-br	Configuração de Serviço SMS
 soap	admin	pt-br	SOAP
+Some data has changed, we need to update. Please wait.	admin	pt-br	Alguns dados mudou, precisamos atualizar. Por favor, aguarde.
 sorry, that group name has already been taken.	admin	pt-br	Este nome de grupo já está em uso.
 sorry, that group name has already been taking.	admin	pt-br	Desculpe, este grupo já existe
 sorry, the above users are still a member of the group %1	admin	pt-br	Desculpe, os usuários acima ainda são membros do grupo %1
@@ -412,7 +484,10 @@ status	admin	pt-br	Status
 (stored password will not be shown here)	admin	pt-br	(Senha salva não será exibida aqui)
 submit changes	admin	pt-br	Enviar alterações
 submit the search string	admin	pt-br	Enviar expressão de busca
+Subversion	admin	pt-br	Subversion
 template selection	admin	pt-br	Seleção de modelos
+Terminate	admin	pt-br	Encerrar
+Terminate All Sessions	admin	pt-br	Encerrar Todas Sessões
 test connection with DB	admin	pt-br	Testar conexão com o BD
 text entry	admin	pt-br	Entrada de texto
 that application name already exists.	admin	pt-br	Este nome de aplicativo já existe.
@@ -435,6 +510,8 @@ they must be removed before you can continue	admin	pt-br	Eles devem ser removido
 this application is current	admin	pt-br	Este aplicativo está atualizado
 this application requires an upgrade	admin	pt-br	Esta aplicativo precisa ser atualizado
 this category is currently being used by applications as a parent category	admin	pt-br	Esta categoria está sendo usada por Aplicativos como categoria pai.
+This server uses Sending Control List by Policy	admin	pt-br	Este servidor utiliza "Sending Control List by Policy"
+Time for expire inatives accounts(0 for never expires)	admin	pt-br	Dias para expirar contas(0 para desabilitar)
 timeout for application session data in seconds (default 86400 = 1 day)	admin	pt-br	Tempo para expiração de dados da sessão do aplicativo em segundos (padrão 86400 = 1 dia)
 timeout for sessions in seconds (default 14400 = 4 hours)	admin	pt-br	Tempo para expiração da sessões em segundos (padrão 14400 = 4 horas)
 times	admin	pt-br	Horários
@@ -446,11 +523,13 @@ total records	admin	pt-br	Total de registros
 trust level	admin	pt-br	Nível de confiança
 trust relationship	admin	pt-br	Relação de confiança
 under windows you can only use the fallback mode at the moment. fallback means the jobs get only checked after each page-view !!!	admin	pt-br	No Windows você só pode usar o modo seguro. Modo seguro significa que os trabalhos serão marcados após cada visualização de página.
+uri of the wsdl file	admin	pt-br	Caminho URI do arquivo WSDL
+use agree term	admin	pt-br	Habilitar termo de aceite?
 use cookies to pass sessionid	admin	pt-br	Usar cookies para transmitir id de sessão
+use login generator	admin	pt-br	Algoritmo para geração de logins:
 Use organization prefix on account creation	admin	pt-br	Usar prefixo de organização nas criações de contas
-Let it blank to generate the logon script with user login	admin	pt-br	Deixe em branco para gerar o script de logon com o login do usuário
-This server uses Sending Control List by Policy	admin	pt-br	Este servidor utiliza "Sending Control List by Policy"
 use pure html compliant code (not fully working yet)	admin	pt-br	Usar código HTML puro (não funciona totalmente ainda)
+use quotas control for ou	admin	pt-br	Usar controle de quota por Ou
 user accounts	admin	pt-br	Contas de usuários
 userdata	admin	pt-br	Dados de usuário
 user data	admin	pt-br	Dados de usuários
@@ -458,12 +537,14 @@ use restrictions in the creation of emaillists	admin	pt-br	Usar restrições na cr
 use restrictions in the creation of groups	admin	pt-br	Usar restrições na criação dos grupos
 user for smtp-authentication (leave it empty if no auth required)	admin	pt-br	Usuário para autenticação SMTP (deixe em branco se não requer autenticação)
 user groups	admin	pt-br	Grupos de usuários
+username sms system	admin	pt-br	Nome de usuário para SMS de sistema
+user not found	admin	pt-br	usuário não encontrado
 users choice	admin	pt-br	Escolha do usuário
 use theme	admin	pt-br	Usar tema
-use quotas control for ou	admin	pt-br	Usar controle de quota por Ou
 view access log	admin	pt-br	Exibir registro de acessos
 view account	admin	pt-br	Visualizar conta
 view category	admin	pt-br	Visualizar categoria
+View Current configuration	admin	pt-br	Visualizar Configuracao em uso
 view error log	admin	pt-br	Exibir registro de erros
 view sessions	admin	pt-br	Exibir sessões
 view system informations	admin	pt-br	Visualizar informação do sistema
@@ -471,6 +552,7 @@ view this user	admin	pt-br	visualizar este usuário
 view user account	admin	pt-br	visualizar conta de usuário
 VoIP settings	admin	pt-br	Configurações servidor VoIP
 Wait Loading...!	admin	pt-br	Aguarde Carregando...!
+Where save RCLs	admin	pt-br	Onde é salva a LCR
 who would you like to transfer all records owned by the deleted user to?	admin	pt-br	Para quem você deseja transferir todas as entradas do usuário removido?
 wiki administration	common	pt-br	Administração Wiki
 wiki menu	common	pt-br	Wiki menú
@@ -493,85 +575,3 @@ you must enter an application title.	admin	pt-br	Você deve digitar um título par
 you must enter a password	admin	pt-br	Você deve inserir uma senha
 you must select a file type	admin	pt-br	Você deve selecionar um tipo de arquivo
 you will need to remove the subcategories before you can delete this category	admin	pt-br	Você deverá remover as sub-categorias antes de remover esta categoria !
-use login generator	admin	pt-br	Algoritmo para geração de logins:
-Time for expire inatives accounts(0 for never expires)	admin	pt-br	Dias para expirar contas(0 para desabilitar)
-use agree term	admin	pt-br	Habilitar termo de aceite?
-agree term	admin	pt-br	Termo de aceite
-CASCRLS	admin	pt-br	Informa&ccedil;&otilde;es de ACs e LCRs
-Subversion	admin	pt-br	Subversion
-Parameters into	admin	pt-br	Parametros em
-Path BASE	admin	pt-br	Caminho BASE
-Folder to temporary files to digital certificate validation	admin	pt-br	Pasta para conter arquivos temporarios usados na validacao do certificado digital
-File with Certificate Authority(CAs) chains	admin	pt-br	Arquivo contendo cadeias das autoridades certificadoras(CAs)
-Folder with CRLs	admin	pt-br	Pasta para conter Listas de Revogacao de Certificados(CRLs)
-Empty to disable revogation test	admin	pt-br	Deixar vazio para nao verificar se certificado esta revogado
-Point to file with URLs of CRLs	admin	pt-br	Arquivo contendo as URLs para obter as listas de certificados revogados 
-File to execution log of get CRLs	admin	pt-br	Arquivo para conter log de execucao da rotina de obtencao das listas de certificados revogados
-Back	admin	pt-br	Voltar
-Administration data of AC\'s and RCL\'s not found	admin	pt-br	Dados para administra&ccedil;&atilde;o das CA\'s e CRL\'s n&atilde;o foram localizados
-CRLs use is disable	admin	pt-br	O uso de listas de revogacao de certificados nao esta habilitado
-RCLs configurated	admin	pt-br	LCRs configuradas
-RCLs get in	admin	pt-br	Lista de Certificados revogados obtida em
-Where save RCLs	admin	pt-br	Onde é salva a LCR
-File not found	admin	pt-br	Arquivo nao localizado
-Create in	admin	pt-br	Gerada em
-Expired on	admin	pt-br	Expirada em
-Expire on	admin	pt-br	Expira em
-Execute RCLs update	admin	pt-br	Executar atualização das LCRs
-Confirm RCLs update	admin	pt-br	Confirma atualização das LCRs
-Log of RCLs update	admin	pt-br	Log da atualizacao das LCRs
-File	admin	pt-br	Arquivo
-not found	common	pt-br	nao localizado
-CAs (Certificate Authority)	admin	pt-br	ACs (Autoridades Certificadoras)
-RCLs(Revoked Certificate List)	admin	pt-br	LCRs(Listas de Certificados Revogados)
-View Current configuration	admin	pt-br	Visualizar Configuracao em uso
-Cancel	admin	pt-br	Cancelar
-Error.	admin	pt-br	Erro.
-Configuration file not found in server.	admin	pt-br	Não foi possível localizar arquivo de configuração no servidor.
-not processed. Invalid format	admin	pt-br	nao pode ser processado. Formato invalido
-Certificate added to	admin	pt-br	Adicionado certificado para
-File updated and save	admin	pt-br	Arquivo atualizado e salvo
-Failure on save file (CD04). The requested operation is not concluded	admin	pt-br	Falhou ao salvar arquivo (CD04). Nao foi concluida a operacao solicitada'
-Failure on save file (CD03). The requested operation is not concluded	admin	pt-br	Falhou ao salvar arquivo (CD03). Nao foi concluida a operacao solicitada
-CAs certificates not found	admin	pt-br	Nao foram localizados certificados de ACs
-Choose a file with CAs to add	admin	pt-br	Selecione um arquivo com certificados de ACs para adionar ao arquivo de ACs em uso
-Add	admin	pt-br	Adicionar
-Add file contents to CAs file	admin	pt-br	Adicionar conteudo do arquivo selecionado ao arquivo de ACs
-Certificates in	admin	pt-br	Certificados em
-Loading ...	admin	pt-br	Carregando ...
-Maximum length of file log(bytes)	admin	pt-br	Tamanho maximo do arquivo de log(em bytes)
-Maximum number of files log to retain	admin	pt-br	Numero maximo de arquivos de log a serem guardados
-Issuer	admin	pt-br	Emitido por
-Num. Certificates	admin	pt-br	Num. certificados
-Num. RCL	admin	pt-br	LCR num.
-Certificate not in chain	admin	pt-br	Certificado ausente da cadeia
-selected groups	admin	pt-br	Grupos Selecionados
-sms settings	admin	pt-br	Configuração de Serviço SMS
-sms module enabled	admin	pt-br	Habilitar módulo SMS
-uri of the wsdl file	admin	pt-br	Caminho URI do arquivo WSDL
-username sms system	admin	pt-br	Nome de usuário para SMS de sistema
-password sms system	admin	pt-br	Senha de usuário para SMS de sistema
-credentials	admin	pt-br	Credenciais
-Query time	admin	pt-br	Hora da consulta
-Expire	admin	pt-br	Expirar
-records	admin	pt-br	registros
-organizations help	admin	pt-br	Selecione as organizações administradas por esta instalação
-availables	admin	pt-br	Disponíveis
-selecteds	admin	pt-br	Selecionados
-Raise user quota, to default, on login	admin	pt-br	Aumentar quota do usuário, para o padrão, ao entrar
-Open Sessions	admin	pt-br	Sessões Abertas
-Displaying	admin	pt-br	Mostrando
-of	admin	pt-br	de
-Session	admin	pt-br	Sessão
-ID Number	admin	pt-br	Identificação
-Idle Time	admin	pt-br	Inativo
-Terminate	admin	pt-br	Encerrar
-Continue	admin	pt-br	Continue
-Terminate All Sessions	admin	pt-br	Encerrar Todas Sessões
-Please confirm that you want to terminate all sessions.	admin	pt-br	Por favor, confirme que você deseja encerrar todas as sessões.
-sessions not found	admin	pt-br	sessões não encontradas
-user not found	admin	pt-br	usuário não encontrado
-parameter not found	admin	pt-br	parâmetro não encontrado
-permission denied	admin	pt-br	permissão negada
-error log out	admin	pt-br	erro ao encerrar a sessão
-Some data has changed, we need to update. Please wait.	admin	pt-br	Alguns dados mudou, precisamos atualizar. Por favor, aguarde.

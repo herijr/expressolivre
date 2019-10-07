@@ -31,11 +31,11 @@ maintain news	admin	pt-br	Manutenção dos Boletins
 message has been added	news_admin	pt-br	Mensagem foi adicionada
 more news	news_admin	pt-br	Mais Boletins
 new item has been added	news_admin	pt-br	Novo item foi adicionado
-news admin	news_admin	pt-br	Boletins Internos
+news_admin	common	pt-br	Boletins Internos
 news administration	news_admin	pt-br	Administração de Boletins
+news admin	news_admin	pt-br	Boletins Internos
 news item has been added	news_admin	pt-br	Item adicionado
 news item has been updated	news_admin	pt-br	Item atualizado
-news_admin	common	pt-br	Boletins Internos
 no entries found	news_admin	pt-br	nenhuma entrada encontrada
 no news	news_admin	pt-br	Não existe boletins disponíveis para esta categoria
 no rss export	news_admin	pt-br	Não existe conteúdo RSS para exportar

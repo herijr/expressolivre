@@ -1,0 +1,569 @@
+access control list	expressoAdmin1_2	en	Access control list
+access log	expressoAdmin1_2	en	Access log
+Account Active	expressoAdmin1_2	en	Account Active
+account type	expressoAdmin1_2	en	Account type
+Accumulated system time for this process (seconds)	expressoAdmin1_2	en	Accumulated system time for this process (seconds)
+Accumulated user time for this process (seconds)	expressoAdmin1_2	en	Accumulated user time for this process (seconds)
+acl add shared accounts	expressoAdmin1_2	en	ACL add shared accounts
+acl delete shared accounts	expressoAdmin1_2	en	ACL delete shared accounts
+acl edit shared accounts acl	expressoAdmin1_2	en	ACL edit shared accounts
+acl edit shared accounts	expressoAdmin1_2	en	ACL edit shared accounts
+acl edit shared accounts quote	expressoAdmin1_2	en	ACL edit shared accounts quote
+acl empty shared accounts inbox	expressoAdmin1_2	en	ACL empty shared accounts inbox
+active directory enable	expressoAdmin1_2	en	Active Directory enable
+Active Directory information	expressoAdmin1_2	en	Active Directory information
+Active Directory Settings	expressoAdmin1_2	en	Active Directory Settings
+Active email account	expressoAdmin1_2	en	Active email account
+active user	expressoAdmin1_2	en	Active User
+added user samba attribute	expressoAdmin1_2	en	Added user samba attribute
+Add Email Lists	expressoAdmin1_2	en	Add Email Lists
+Add	expressoAdmin1_2	en	Add
+add external emails	expressoAdmin1_2	en	Add external emails
+Add Field	expressoAdmin1_2	en	Add Field
+Add Groups	expressoAdmin1_2	en	Add Groups
+add institutional accounts	expressoAdmin1_2	en	Add institutional accounts
+Add institutional accounts	expressoAdmin1_2	en	Add institutional accounts
+Add Manager	expressoAdmin1_2	en	Add Manager
+Add Managers	expressoAdmin1_2	en	Add Managers
+add owner	expressoAdmin1_2	en	add owner
+Add owner	expressoAdmin1_2	en	Add owner
+Add Profile	expressoAdmin1_2	en	Add Profile
+Add Samba Domain	expressoAdmin1_2	en	Add Samba Domain
+Add Samba Domains	expressoAdmin1_2	en	Add Samba Domains
+Add Sectores	expressoAdmin1_2	en	Add Sectores
+Add Sectors	expressoAdmin1_2	en	Add Sectors
+Add shared accounts	expressoAdmin1_2	en	Add shared accounts
+Add Sub Sectors	expressoAdmin1_2	en	Add Sub Sectors
+Add User	expressoAdmin1_2	en	Add User
+Add users	expressoAdmin1_2	en	Add users
+ad loading	expressoAdmin1_2	en	AD Loading
+admin group	expressoAdmin1_2	en	Admin Group
+Administration Module for Users, Groups and Lists	common	en	Administration Module for Users, Groups and Lists
+Administrator password	expressoAdmin1_2	en	Administrator password
+Administrator username	expressoAdmin1_2	en	Administrator username
+AD Servers information	expressoAdmin1_2	en	AD Servers information
+alert your administrator about this	expressoAdmin1_2	en	Alert your administrator about this
+Alias email	expressoAdmin1_2	en	Alias email
+allow create or delete folders on this mailbox	expressoAdmin1_2	en	Allow create or delete folders on this mailbox
+all users groups and subsectors from this sector will be deleted	expressoAdmin1_2	en	All users groups and subsectors from this sector will be deleted
+Alternate email	expressoAdmin1_2	en	Alternate email
+alternative email is being used by 1 user	expressoAdmin1_2	en	Alternative email is being used by 1 user
+alternative email is being used by 2 or more users	expressoAdmin1_2	en	Alternative email is being used by 2 or more users
+Anonymous	expressoAdmin1_2	en	Anonymous
+Another operation is using this feature, try later	expressoAdmin1_2	en	Another operation is using this feature, try later
+Any user is in the list	expressoAdmin1_2	en	Any user is in the list
+aplication	expressoAdmin1_2	en	Application
+Aplication Permission	expressoAdmin1_2	en	Application Permission
+application info	expressoAdmin1_2	en	Application Info
+applications	expressoAdmin1_2	en	Applications
+Applications	expressoAdmin1_2	en	Applications
+Applications for this group	expressoAdmin1_2	en	Applications for this group
+apply send control list to this list	expressoAdmin1_2	en	Apply send control list to this list
+Are you sure that you want to delete this institutional account	expressoAdmin1_2	en	Are you sure that you want to delete this institutional account
+Are you sure that you want to delete this shared account	expressoAdmin1_2	en	Are you sure that you want to delete this shared account
+Asynchronous service unavailable	expressoAdmin1_2	en	Asynchronous service unavailable
+A updated version of these files can be found here	expressoAdmin1_2	en	A updated version of these files can be found here
+Available filter	common	en	Available filter
+available groups	expressoAdmin1_2	en	Available groups
+available mail lists	expressoAdmin1_2	en	Available mail lists
+Awaiting execution	expressoAdmin1_2	en	Awaiting execution
+Base DN for the directory	expressoAdmin1_2	en	Base DN for the directory
+Birthdate	expressoAdmin1_2	en	Birthdate
+block personal data edit	expressoAdmin1_2	en	Block personal data edit
+Brief	expressoAdmin1_2	en	Brief
+Can not login sieve	expressoAdmin1_2	en	Can not login sieve
+Cannot open mailbox	expressoAdmin1_2	en	Cannot open mailbox
+change first name	expressoAdmin1_2	en	Change first name
+Change password	expressoAdmin1_2	en	Change password
+Change users password	expressoAdmin1_2	en	Change users password
+Change users quote	expressoAdmin1_2	en	Change users quote
+characters	expressoAdmin1_2	en	characters
+Cleanned user mailbox	expressoAdmin1_2	en	Cleanned user mailbox
+close	expressoAdmin1_2	en	Flose
+Computer	expressoAdmin1_2	en	Computer
+Computers	expressoAdmin1_2	en	Computers
+Computer Type	expressoAdmin1_2	en	Computer Type
+Computer UID	expressoAdmin1_2	en	Computer UID
+Configuration saved successfully	expressoAdmin1_2	en	Configuration saved successfully
+Connection with ldap fail	expressoAdmin1_2	en	Connection with ldap fail
+Content the folling groups	expressoAdmin1_2	en	Content the folling groups
+Content the folling sectors	expressoAdmin1_2	en	Content the folling sectors
+Content the folling users	expressoAdmin1_2	en	Content the folling users
+context does not exist	expressoAdmin1_2	en	Context does not exist
+Context	expressoAdmin1_2	en	Context
+context field is empty	expressoAdmin1_2	en	Context field is empty
+Context not found	expressoAdmin1_2	en	Context not found
+Contexts	expressoAdmin1_2	en	Contexts
+corporative	expressoAdmin1_2	en	Corporatives
+Corporative Information	expressoAdmin1_2	en	Corporative Information
+cpf	expressoAdmin1_2	en	CPF
+Create Computers	expressoAdmin1_2	en	Create Computers
+created user	expressoAdmin1_2	en	Created user
+Create Email List	expressoAdmin1_2	en	Create Email List
+create	expressoAdmin1_2	en	Create
+Create Group	expressoAdmin1_2	en	Create Group
+create institutional account	expressoAdmin1_2	en	Create institutional account
+Create Organizations	expressoAdmin1_2	en	Create Organizations
+Create Sector	expressoAdmin1_2	en	Create Sector
+Create Sectors	expressoAdmin1_2	en	Create Sectors
+create shared account	expressoAdmin1_2	en	Create shared account
+Create Shared Account	expressoAdmin1_2	en	Create Shared Account
+create the account in the oraganization unit	expressoAdmin1_2	en	Create the account in the oraganization unit
+Create User	expressoAdmin1_2	en	Create User
+create user inbox	expressoAdmin1_2	en	Create user inbox
+Creation	expressoAdmin1_2	en	Creation
+Creation of Shared Accounts	expressoAdmin1_2	en	Creation of Shared Accounts
+criation of institutional accounts	expressoAdmin1_2	en	Creation of institutional accounts
+Cumulative number of retrieval requests	expressoAdmin1_2	en	Cumulative number of retrieval requests
+Cumulative number of storage requests	expressoAdmin1_2	en	Cumulative number of storage requests
+date for password expiration	expressoAdmin1_2	en	Date for password expiration
+days	expressoAdmin1_2	en	days
+default	expressoAdmin1_2	en	Default
+default password already registered	expressoAdmin1_2	en	Default password already registered
+default password not registered	expressoAdmin1_2	en	Default password not registered
+default password successful saved	expressoAdmin1_2	en	Default password successful saved
+Delete computers	expressoAdmin1_2	en	Delete computers
+deleted user	expressoAdmin1_2	en	Deleted user
+Delete email lists	expressoAdmin1_2	en	Delete email lists
+delete	expressoAdmin1_2	en	Delete
+Delete Group	expressoAdmin1_2	en	Delete Group
+Delete groups	expressoAdmin1_2	en	Delete groups
+Delete Organizations	expressoAdmin1_2	en	Delete Organizations
+delete photo	expressoAdmin1_2	en	Delete photo
+Delete Sectors	expressoAdmin1_2	en	Delete sectors
+Delete shared accounts	expressoAdmin1_2	en	Delete shared accounts
+Delete user	expressoAdmin1_2	en	Delete user
+Delete users	expressoAdmin1_2	en	Delete users
+Department	expressoAdmin1_2	en	Department
+desactive user	expressoAdmin1_2	en	inactive user
+description	expressoAdmin1_2	en	description
+Description	expressoAdmin1_2	en	Description
+DESCRIPTION field contains characters not allowed	expressoAdmin1_2	en	DESCRIPTION field contains characters not allowed
+DESCRIPTION field is empty	expressoAdmin1_2	en	DESCRIPTION field is empty
+Description field required	expressoAdmin1_2	en	Description field required
+Description has an invalid character	expressoAdmin1_2	en	Description has an invalid character
+Description must be non empty	expressoAdmin1_2	en	Description must be non empty
+Displaying	expressoAdmin1_2	en	Displaying
+do not show this account in the contact center	expressoAdmin1_2	en	Do not show this account in the contact center
+do not show this email list	expressoAdmin1_2	en	Do not show this email list
+do not show this group	expressoAdmin1_2	en	Do not show this group
+do not show this sector	expressoAdmin1_2	en	Do not show this sector
+Do you really want delete the email list	expressoAdmin1_2	en	Do you really want delete the email list
+Do you really want delete the group	expressoAdmin1_2	en	Do you really want delete the group
+Do you really want delete the user	expressoAdmin1_2	en	Do you really want delete the user
+do you really want delete this sector	expressoAdmin1_2	en	Do you really want delete this sector
+Do you really want delete this sector	expressoAdmin1_2	en	Do you really want delete this sector
+Do you want to continue anyway	expressoAdmin1_2	en	Do you want to continue anyway
+drafts	expressoAdmin1_2	en	Drafts
+Edit computers	expressoAdmin1_2	en	Edit computers
+Edit email attribute from the groups	expressoAdmin1_2	en	Edit email attribute from the groups
+Edit Email Lists	expressoAdmin1_2	en	Edit Email Lists
+Edit Group	expressoAdmin1_2	en	Edit Group
+Edit groups	expressoAdmin1_2	en	Edit groups
+edit institutional accounts	expressoAdmin1_2	en	Edit institutional accounts
+Edit Managers	expressoAdmin1_2	en	Edit Managers
+Edit Organizations	expressoAdmin1_2	en	Edit Organizations
+Edit SAMBA domains	expressoAdmin1_2	en	Edit SAMBA domains
+Edit SAMBA users attributes	expressoAdmin1_2	en	Edit SAMBA users attributes
+edit SCL email lists	expressoAdmin1_2	en	Edit SCL email lists
+Edit Sector	expressoAdmin1_2	en	Edit Sector
+Edit Sectors	expressoAdmin1_2	en	Edit Sectors
+Edit Sending Control List	expressoAdmin1_2	en	Edit Sending Control List
+Edit Shared Accounts Acl	expressoAdmin1_2	en	Edit Shared Accounts Acl
+Edit Shared Accounts	expressoAdmin1_2	en	Edit Shared Accounts
+Edit Shared Accounts Quote	expressoAdmin1_2	en	Edit Shared Accounts Quote
+Edit User	expressoAdmin1_2	en	Edit User
+Edit users	expressoAdmin1_2	en	Edit users
+edit users phonenumber	expressoAdmin1_2	en	Edit users phonenumber
+edit users picture	expressoAdmin1_2	en	Edit users picture
+Eg	common	en	Eg
+Email Config	expressoAdmin1_2	en	Email Config
+Email field is empty	expressoAdmin1_2	en	Email field is empty
+Email field is not valid	expressoAdmin1_2	en	Email field is not valid
+email list	expressoAdmin1_2	en	email list
+email list is active	expressoAdmin1_2	en	Email list is active
+Email List name	expressoAdmin1_2	en	Email List name
+email lists	expressoAdmin1_2	en	Email lists
+Email Lists Logins	expressoAdmin1_2	en	Email Lists Logins
+Email Lists Names	expressoAdmin1_2	en	Email Lists Names
+Email list successful created	expressoAdmin1_2	en	Email list successful created
+Email list successful deleted	expressoAdmin1_2	en	Email list successful deleted
+Email list successful saved	expressoAdmin1_2	en	Email list successful saved
+Email quota in MB	expressoAdmin1_2	en	Email quota in MB
+emails did not find	expressoAdmin1_2	en	emails did not find
+EmployeeNumber contains characters not allowed	expressoAdmin1_2	en	EmployeeNumber contains characters not allowed
+Employee number	expressoAdmin1_2	en	Employee number
+Emptied	expressoAdmin1_2	en	Emptied
+empty inbox	expressoAdmin1_2	en	Empty Inbox
+empty shared accounts inbox	expressoAdmin1_2	en	Empty shared accounts inbox
+empty user inbox	expressoAdmin1_2	en	Empty user inbox
+Empty value	expressoAdmin1_2	en	Empty value
+enable account on active directory	expressoAdmin1_2	en	Enable account on active directory
+Enable Active Directory	expressoAdmin1_2	en	Enable Active Directory
+Enable filter by group	expressoAdmin1_2	en	Enable filter by group
+Enable Messenger	expressoAdmin1_2	en	Enable Messenger
+Enable Radius	expressoAdmin1_2	en	Enable Radius
+Encrypts the password before sending to jabber server	expressoAdmin1_2	en	Encrypts the password before sending to jabber server
+error adding application to new manager	expressoAdmin1_2	en	Error adding application to new manager
+Error in OpenLDAP.	expressoAdmin1_2	en	Error in OpenLDAP.
+Error in OpenLDAP recording	expressoAdmin1_2	en	Error in OpenLDAP recording
+ERROR in the copy of the mailbox	expressoAdmin1_2	en	ERROR in the copy of the mailbox
+Error on function	expressoAdmin1_2	en	Error on function
+Error requesting page	expressoAdmin1_2	en	Error requesting page
+Error sector count invalid	expressoAdmin1_2	en	Error sector count invalid
+Errors	expressoAdmin1_2	en	Errors
+exceeded quota	expressoAdmin1_2	en	Exceeded quota
+Exclusion	expressoAdmin1_2	en	Exclusion
+Expire	expressoAdmin1_2	en	Expire
+expressoAdmin1_2	common	en	expressoAdmin1_2
+expressoadmin	expressoAdmin1_2	en	ExpressoAdmin
+expresso	expressoAdmin1_2	en	expresso
+external email	expressoAdmin1_2	en	External email
+external group	expressoAdmin1_2	en	External group
+extern	expressoAdmin1_2	en	extern
+Field CPF cannot be duplicated	expressoAdmin1_2	en	Field CPF cannot be duplicated
+Field CPF is invalid	expressoAdmin1_2	en	Field CPF is invalid
+Field CPF must be completed	expressoAdmin1_2	en	Field CPF must be completed
+Field CPF used by	expressoAdmin1_2	en	Field CPF used by
+Field description is empty	expressoAdmin1_2	en	Field description is empty
+Field is single value	expressoAdmin1_2	en	Field is single value
+Field mail already in use	expressoAdmin1_2	en	Field mail already in use
+Field mailAlternateAddress is not formed correcty	expressoAdmin1_2	en	Field mailAlternateAddress is not formed correcty
+Field mail is not formed correcty	expressoAdmin1_2	en	Field mail is not formed correcty
+Field mail or name is empty	expressoAdmin1_2	en	Field mail or name is empty
+Fields blocked	expressoAdmin1_2	en	Fields blocked
+First name field contains characters not allowed	expressoAdmin1_2	en	First name field contains characters not allowed
+First name field is empty	expressoAdmin1_2	en	First name field is empty
+FirstParent	expressoAdmin1_2	en	FirstParent
+folder	expressoAdmin1_2	en	Folder
+forward email is empty	expressoAdmin1_2	en	Forward email is empty
+Forwarding email	expressoAdmin1_2	en	Forwarding email
+Forwarding email	expressoAdmin1_2	en	Forwarding email
+found managers	expressoAdmin1_2	en	Found managers
+full name	expressoAdmin1_2	en	Full name
+general	expressoAdmin1_2	en	General
+General Information	expressoAdmin1_2	en	General Information
+generate password	expressoAdmin1_2	en	Generate password
+Global Configuration	common	en	Global Configuration
+group	expressoAdmin1_2	en	group
+Group filter options	expressoAdmin1_2	en	Group filter options
+Group Info	expressoAdmin1_2	en	Group Info
+Group Name Field	expressoAdmin1_2	en	Group Name Field
+groupOfNames	expressoAdmin1_2	en	groupOfNames
+groupOfUniqueNames	expressoAdmin1_2	en	groupOfUniqueNames
+group only exist on DB, but does not exist on ldap	expressoAdmin1_2	en	Group only exist on DB, but does not exist on ldap
+Group Organization	expressoAdmin1_2	en	Group Organization
+groups from the sector	expressoAdmin1_2	en	Groups from the sector
+Groups Name	expressoAdmin1_2	en	Groups Name
+Groups Names	expressoAdmin1_2	en	Groups Names
+Groups Permission	expressoAdmin1_2	en	Groups Permission
+group successful copied	expressoAdmin1_2	en	Group successful copied
+Group successful created	expressoAdmin1_2	en	Group successful created
+Group successful deleted	expressoAdmin1_2	en	Group successful deleted
+Group successful saved	expressoAdmin1_2	en	Group successful saved
+Group users	expressoAdmin1_2	en	Group users
+Home Directory	expressoAdmin1_2	en	Home Directory
+Home	expressoAdmin1_2	en	Home
+Hour	expressoAdmin1_2	en	Hour
+Inbox already exists in destiny	expressoAdmin1_2	en	Inbox already exists in destiny
+included memberuid on ldap	expressoAdmin1_2	en	included memberuid on ldap
+included user on group	expressoAdmin1_2	en	Included user on group
+included user to group	expressoAdmin1_2	en	Included user to group
+included user to maillist	expressoAdmin1_2	en	Included user to maillist
+institutional accounts	expressoAdmin1_2	en	Institutional accounts
+Institutional account successful created	expressoAdmin1_2	en	Institutional account successful created
+Institutional account successful deleted	expressoAdmin1_2	en	Institutional account successful deleted
+Institutional account successful saved	expressoAdmin1_2	en	Institutional account successful saved
+invalid external email	expressoAdmin1_2	en	Invalid external email
+Invalid value	expressoAdmin1_2	en	Invalid value
+ip address	expressoAdmin1_2	en	IP Address
+i really want delete this sector	expressoAdmin1_2	en	I really want delete this sector
+is account active	expressoAdmin1_2	en	Is account active
+is not valid or duplicate	expressoAdmin1_2	en	is not valid or duplicate
+it is needed to create samba passwords	expressoAdmin1_2	en	It is needed to create samba passwords
+It is not allow select all users from the root organization	expressoAdmin1_2	en	It is not allow select all users from the root organization
+It was not possible clean the inbox	expressoAdmin1_2	en	It was not possible clean the inbox
+It was not possible create the group because the LDAP schemas are not update	expressoAdmin1_2	en	It was not possible create the group because the LDAP schemas are not update
+it was not possible to change users mailbox quota	expressoAdmin1_2	en	It was not possible to change users mailbox quota
+it was not possible to clean the mailbox	expressoAdmin1_2	en	It was not possible to clean the mailbox
+it was not possible to clean the users mailbox	expressoAdmin1_2	en	It was not possible to clean the users mailbox
+it was not possible to delete mailbox	expressoAdmin1_2	en	It was not possible to delete mailbox
+It was not possible to determine if the name or email is in use	expressoAdmin1_2	en	It was not possible to determine if the name or email is in use
+LastParent	expressoAdmin1_2	en	LastParent
+Last password update	expressoAdmin1_2	en	Last password update
+Last update	expressoAdmin1_2	en	Last update
+leave empty for no quota	expressoAdmin1_2	en	Llave empty for no quota
+list 	expressoAdmin1_2	en	list
+ListGroups	expressoAdmin1_2	en	List Groups
+List Managers	expressoAdmin1_2	en	List Managers
+listname	expressoAdmin1_2	en	List Name
+List of current users	expressoAdmin1_2	en	List of current users
+lists	expressoAdmin1_2	en	Lists
+login field contains characters not allowed	expressoAdmin1_2	en	Login FIELD contains characters not allowed
+login field is empty	expressoAdmin1_2	en	Login FIELD is empty
+login field is incomplete	expressoAdmin1_2	en	Login FIELD is incomplete
+login field must be bigger than	expressoAdmin1_2	en	Login FIELD must be bigger than
+Login ID	expressoAdmin1_2	en	Login ID
+Logon Script	expressoAdmin1_2	en	Logon Script
+Logon script is empty	expressoAdmin1_2	en	Logon script is empty
+Logs	expressoAdmin1_2	en	Logs
+Mailbox profile	expressoAdmin1_2	en	Mailbox profile
+mail	expressoAdmin1_2	en	E-mail
+Maillist login	expressoAdmin1_2	en	Maillist Login
+Maillist Mail	expressoAdmin1_2	en	Maillist Mail
+Maillist name	expressoAdmin1_2	en	Maillist Name
+Maillist Organization	expressoAdmin1_2	en	Maillist Organization
+Maillist users	expressoAdmin1_2	en	Maillist Users
+Manage RADIUS attributes	common	en	Manage RADIUS attributes
+manager already exist	expressoAdmin1_2	en	Manager already exist
+manager	expressoAdmin1_2	en	Manager
+Manager LID	expressoAdmin1_2	en	Manager LID
+Manager Login	expressoAdmin1_2	en	Manager Login
+Manager name	expressoAdmin1_2	en	Manager Name
+Manager successful saved	expressoAdmin1_2	en	Manager successful saved
+Manage SHARED accounts	common	en	Manage SHARED accounts
+Manipulate corporative information	expressoAdmin1_2	en	Manipulate corporative information
+MB from inbox	expressoAdmin1_2	en	MB from Inbox
+MB from user inbox	expressoAdmin1_2	en	MB from User Inbox
+MB to organization default quota	expressoAdmin1_2	en	MB to Organization Default quota
+Memcache Server version	expressoAdmin1_2	en	Memcached Server version
+Migration	expressoAdmin1_2	en	Migration
+modified user email	expressoAdmin1_2	en	Modified user email
+modified user homedirectory	expressoAdmin1_2	en	Modified user home directory
+modified user password	expressoAdmin1_2	en	Modified user password
+modified user primary group	expressoAdmin1_2	en	Modified user primary group
+modified user telephonenumber	expressoAdmin1_2	en	Modified user telephonenumber
+More then one uid was found	expressoAdmin1_2	en	More then one uid was found
+NAME field contains characters not allowed	expressoAdmin1_2	en	NAME field contains characters not allowed
+NAME field is empty	expressoAdmin1_2	en	NAME field is empty
+NAME field is incomplete	expressoAdmin1_2	en	NAME field is incomplete
+No matches found	expressoAdmin1_2	en	No matches found
+No uid was found	expressoAdmin1_2	en	No uid was found
+now	expressoAdmin1_2	en	Now
+Number of bytes this server is allowed to use for storage	expressoAdmin1_2	en	Number of bytes this server is allowed to use for storage
+Number of connection structures allocated by the server	expressoAdmin1_2	en	Number of connection structures allocated by the server
+Number of items that have been requested and not found	expressoAdmin1_2	en	Number of items that have been requested and not found
+Number of keys that have been requested and found present	expressoAdmin1_2	en	Number of keys that have been requested and found present
+Number of open connections	expressoAdmin1_2	en	Number of open connections
+Number of session keys allocated	expressoAdmin1_2	en	Number of session keys allocated
+Number of valid items removed from cache to free memory for new items	expressoAdmin1_2	en	Number of valid items removed from cache to free memory for new items
+Occult Sector	expressoAdmin1_2	en	Occult Sector
+of	expressoAdmin1_2	en	of
+omit account from the catalog	expressoAdmin1_2	en	Omit account from the catalog
+Only allow access to these networks	common	en	Only allow access to these networks
+Only forwarding	expressoAdmin1_2	en	Only forwarding
+Only numbers are allowed	expressoAdmin1_2	en	Only numbers are allowed
+only on ldap	expressoAdmin1_2	en	Only on LDAP
+Organizational Unit	expressoAdmin1_2	en	Organizational Unit
+Organization dn	expressoAdmin1_2	en	Organization DN
+organization	expressoAdmin1_2	en	Organization
+Organization name	expressoAdmin1_2	en	Organization Name
+Organizations and users	expressoAdmin1_2	en	Organizations and Users
+Organizations	expressoAdmin1_2	en	Organizations
+Organization Unit List	expressoAdmin1_2	en	Organization Unit List
+Others	expressoAdmin1_2	en	Others
+other users will save the sent messages as you in this mailbox	expressoAdmin1_2	en	Other users will save the sent messages as you in this mailbox
+owners	expressoAdmin1_2	en	Owners
+participants from the list can send email to this list	expressoAdmin1_2	en	Participants from the list can send email to this list
+password and re-password are different	expressoAdmin1_2	en	Password and Re-password are different
+Password expired	expressoAdmin1_2	en	Password expired
+Password field is empty	expressoAdmin1_2	en	Password field is empty
+password will expire on	expressoAdmin1_2	en	Password will expire on
+password without expiration	expressoAdmin1_2	en	Password without expiration
+Phone	expressoAdmin1_2	en	Phone
+Phone field is incorrect	expressoAdmin1_2	en	Phone field is incorrect
+Photo	expressoAdmin1_2	en	Photo
+Primary Group	expressoAdmin1_2	en	Primary Group
+Problem activating sieve script	expressoAdmin1_2	en	Problem activating sieve script
+Problem deleting old script	expressoAdmin1_2	en	Problem deleting old script
+problems getting user id	expressoAdmin1_2	en	Problems getting user id
+Process id of this server process	expressoAdmin1_2	en	Process ID of this server process
+Profile in use	expressoAdmin1_2	en	Profile in use
+Profile Name	expressoAdmin1_2	en	Profile Name
+Profile not found	expressoAdmin1_2	en	Profile not found
+Public Key	expressoAdmin1_2	en	Public Key
+quota changed from	expressoAdmin1_2	en	Quota changed from
+Quota used in MB	expressoAdmin1_2	en	Quota used in MB
+Radius Config	expressoAdmin1_2	en	Radius Config
+radius	expressoAdmin1_2	en	Radius
+Radius	expressoAdmin1_2	en	Radius
+radius filter	expressoAdmin1_2	en	radius filter
+Radius Profiles	expressoAdmin1_2	en	Radius Profiles
+Reading	expressoAdmin1_2	en	Reading
+recursive list search	expressoAdmin1_2	en	Recursive list search
+removed user from group	expressoAdmin1_2	en	Removed user from group
+removed user from list	expressoAdmin1_2	en	Removed user from list
+Remove	expressoAdmin1_2	en	Remove
+remove institutional accounts	expressoAdmin1_2	en	Remove institutional accounts
+remove owner	expressoAdmin1_2	en	Remove Owner
+Remove Profile	expressoAdmin1_2	en	Remove Profile
+Remove User	expressoAdmin1_2	en	Remove User
+Remove Users	expressoAdmin1_2	en	Remove Users
+Rename users	expressoAdmin1_2	en	Rename users
+Rename users login from	expressoAdmin1_2	en	Rename users login from
+Re-Password	expressoAdmin1_2	en	Re-Password
+re-password field is empty	expressoAdmin1_2	en	Re-password field is empty
+Repeated value	expressoAdmin1_2	en	Repeated value
+Required value	expressoAdmin1_2	en	Required value
+return user password	expressoAdmin1_2	en	Return user password
+rg	expressoAdmin1_2	en	RG
+rguf	expressoAdmin1_2	en	rgUF
+RootDn	expressoAdmin1_2	en	RootDn
+Running	expressoAdmin1_2	en	Running
+Runtime server (days h:m:s)	expressoAdmin1_2	en	Runtime server (days h:m:s)
+Samba Config	expressoAdmin1_2	en	Samba Config
+Samba domain name	expressoAdmin1_2	en	Samba domain name
+Samba domain name or SID already exist	expressoAdmin1_2	en	Samba domain name or SID already exist
+Samba Domains	expressoAdmin1_2	en	Samba Domains
+Samba domain SID	expressoAdmin1_2	en	Samba domain SID
+Samba domains name	expressoAdmin1_2	en	Samba domains name
+Samba domains name is empty	expressoAdmin1_2	en	Samba domains name is empty
+samba	expressoAdmin1_2	en	samba
+sambaSID	expressoAdmin1_2	en	sambaSID
+Samba SID is empty	expressoAdmin1_2	en	Samba SID is empty
+Samba User Active	expressoAdmin1_2	en	Samba User Active
+Samba User Desactive	expressoAdmin1_2	en	Samba User Desactive
+save	expressoAdmin1_2	en	Save
+scl	expressoAdmin1_2	en	SCL
+scl successful saved	expressoAdmin1_2	en	SCL successful saved
+search email list	expressoAdmin1_2	en	Search email list
+Search filter for user groups	expressoAdmin1_2	en	Search filter for user groups
+search for group	expressoAdmin1_2	en	Search for group
+search for manager	expressoAdmin1_2	en	Search for manager
+searching	expressoAdmin1_2	en	searching
+search organization	expressoAdmin1_2	en	Search organization
+Search user	expressoAdmin1_2	en	Search user
+Sector	expressoAdmin1_2	en	Sector
+Sector name already exist	expressoAdmin1_2	en	Sector name already exist
+Sector Name	expressoAdmin1_2	en	Sector Name
+Sector name is empty	expressoAdmin1_2	en	Sector name is empty
+Sectors	expressoAdmin1_2	en	Sectors
+select all	expressoAdmin1_2	en	Select all
+select an user	expressoAdmin1_2	en	Select an user
+select one manager	expressoAdmin1_2	en	Select one manager
+select only one	expressoAdmin1_2	en	Select only one
+Select users from all sub-organizations	expressoAdmin1_2	en	Select users from all sub-organizations
+Select value	expressoAdmin1_2	en	Select value
+sending control mail	expressoAdmin1_2	en	Sending control mail
+senhas email lists	expressoAdmin1_2	en	Senhas email lists
+sent	expressoAdmin1_2	en	Sent
+Server	expressoAdmin1_2	en	Server
+Server return	expressoAdmin1_2	en	Server return
+Server returns	expressoAdmin1_2	en	Server returns
+Session path	expressoAdmin1_2	en	Session path
+Set default users password	expressoAdmin1_2	en	Set default users password
+Shared Account	expressoAdmin1_2	en	Shared Account
+Shared Accounts	expressoAdmin1_2	en	Shared Accounts
+Shared Accounts	expressoAdmin1_2	en	Shared Accounts
+Shared account successful created	expressoAdmin1_2	en	Shared account successful created
+Shared account successful deleted	expressoAdmin1_2	en	Shared account successful deleted
+Shared account successful saved	expressoAdmin1_2	en	Shared account successful saved
+show access logs	expressoAdmin1_2	en	Show access logs
+Show Session - Global	expressoAdmin1_2	en	Show Session - Global
+Show Sessions	expressoAdmin1_2	en	Show Sessions
+Show users from all sub-organizations	expressoAdmin1_2	en	Show users from all sub-organizations
+spam	expressoAdmin1_2	en	Spam
+Store in PEM format: base64 encoded, closed between "%1" and "%2"	expressoAdmin1_2	en	Store in PEM format: base64 encoded, closed between "%1" and "%2"
+subsectors from the sector	expressoAdmin1_2	en	Subsectors from the sector
+text	expressoAdmin1_2	en	Text
+The administrator must update the directory /etc/ldap/schema/ and re-start LDAP	expressoAdmin1_2	en	The administrator must update the directory /etc/ldap/schema/ and re-start LDAP
+the binary file /home/expressolivre/mkntpwd does not exist	expressoAdmin1_2	en	The binary file /home/expressolivre/mkntpwd does not exist
+the expressoadmin corrected the following inconsistencies	expressoAdmin1_2	en	The expressoadmin corrected the following inconsistencies
+the login field must be formed like	expressoAdmin1_2	en	The login field must be formed like
+The mailbox is being migrated wait	expressoAdmin1_2	en	The mailbox is being migrated wait
+the name field must be formed like	expressoAdmin1_2	en	The name field must be formed like
+The name length must be between 1 and 32 characters	expressoAdmin1_2	en	The name length must be between 1 and 32 characters
+The name must begin with a letter, without spaces	expressoAdmin1_2	en	The name must begin with a letter, without spaces
+The number of the phone is invalid	expressoAdmin1_2	en	The number of the phone is invalid
+The owner can create or add new message	expressoAdmin1_2	en	The owner can create or add new message
+The owner can delete or move the message	expressoAdmin1_2	en	The owner can delete or move the message
+The owner can read the messages	expressoAdmin1_2	en	The owner can read the messages
+The owner can send message	expressoAdmin1_2	en	The owner can send message
+There are shares that will be lost when moving the mailbox between servers	expressoAdmin1_2	en	There are shares that will be lost when moving the mailbox between servers
+The surname field contains characters not allowed	expressoAdmin1_2	en	The surname field contains characters not allowed
+The surname field is empty	expressoAdmin1_2	en	The surname field is empty
+The surname field must contain letters or numbers	expressoAdmin1_2	en	The surname field must contain letters or numbers
+the user is part of this email lists	expressoAdmin1_2	en	The user is part of this email lists
+This action completely erase the mailbox	expressoAdmin1_2	en	This action completely erase the mailbox
+this email address is already used	expressoAdmin1_2	en	This email address is already used
+this email address is being used by 1 user	expressoAdmin1_2	en	This email address is being used by 1 user
+this email address is being used by 2 or more users	expressoAdmin1_2	en	This email address is being used by 2 or more users
+this email list login is already used	expressoAdmin1_2	en	This email list login is already used
+this login can not be used because is a system account	expressoAdmin1_2	en	This login can not be used because is a system account
+this login is already used by a user in another organization	expressoAdmin1_2	en	This login is already used by a user in another organization
+this login is already used by	expressoAdmin1_2	en	This login is already used by
+This login is being used by a group	expressoAdmin1_2	en	This login is being used by a group
+This name is already used	expressoAdmin1_2	en	This name is already used
+This name is in use	expressoAdmin1_2	en	This name is in use
+to delete	expressoAdmin1_2	en	To delete
+to	expressoAdmin1_2	en	To
+to rename	expressoAdmin1_2	en	To Rename
+to search	expressoAdmin1_2	en	To Search
+To send	expressoAdmin1_2	en	To Send
+Total number of bytes read by this server from network	expressoAdmin1_2	en	Total number of bytes read by this server from network
+Total number of bytes sent by this server to network	expressoAdmin1_2	en	Total number of bytes sent by this server to network
+Total number of connections opened since the server started running	expressoAdmin1_2	en	Total number of connections opened since the server started running
+Total number of items stored by this server ever since it started	expressoAdmin1_2	en	Total number of items stored by this server ever since it started
+Total Sessions	expressoAdmin1_2	en	Total Sessions
+Total sessions on server	expressoAdmin1_2	en	Total sessions on server
+Total sessions on server	expressoAdmin1_2	en	Total sessions on server
+trash	expressoAdmin1_2	en	Trash
+Trust Account	expressoAdmin1_2	en	Trust Account
+Type	expressoAdmin1_2	en	Type
+type new managers login	expressoAdmin1_2	en	Type new managers login
+type the common name of the new group	expressoAdmin1_2	en	Type the common name of the new group
+Unknown entries below the sector	expressoAdmin1_2	en	Unknown entries below the sector
+unknown	expressoAdmin1_2	en	unknown
+URL soap wsdl	expressoAdmin1_2	en	URL soap wsdl
+Use password generator	common	en	Use password generator
+User Accounts	expressoAdmin1_2	en	User Accounts
+User email alredy exist.	expressoAdmin1_2	en	User email alredy exist.
+User Groups	expressoAdmin1_2	en	User Groups
+User inbox successful created	expressoAdmin1_2	en	User inbox successful created
+User Info	expressoAdmin1_2	en	User Info
+User is not in any group	expressoAdmin1_2	en	User is not in any group
+User login alredy exist.	expressoAdmin1_2	en	User login alredy exist.
+User login successful renamed	expressoAdmin1_2	en	User login successful renamed
+User photo could not be saved because is bigger than	expressoAdmin1_2	en	User photo could not be saved because is bigger than
+user removed from group because the group was not found	expressoAdmin1_2	en	User removed from group because the group was not found
+users did not find on DB, only on ldap	expressoAdmin1_2	en	Users did not find on DB, only on ldap
+users	expressoAdmin1_2	en	Users
+Users for inclusion	expressoAdmin1_2	en	Users for inclusion
+users from the sector	expressoAdmin1_2	en	Users from the sector
+Users home directory is empty	expressoAdmin1_2	en	Users home directory is empty
+Users in Email List	expressoAdmin1_2	en	Users in Email List
+Users password successful returned	expressoAdmin1_2	en	Users password successful returned
+User successful created	expressoAdmin1_2	en	User successful created
+User successful deleted	expressoAdmin1_2	en	User successful deleted
+User successful saved	expressoAdmin1_2	en	User successful saved
+users who can send email to this list	expressoAdmin1_2	en	Users who can send email to this list
+user without email quota	expressoAdmin1_2	en	User without email quota
+user without inbox	expressoAdmin1_2	en	User without inbox
+Use samba attributes	expressoAdmin1_2	en	Use samba attributes
+View Log	expressoAdmin1_2	en	View Log
+View logs	expressoAdmin1_2	en	View logs
+View user	expressoAdmin1_2	en	View user
+View users	expressoAdmin1_2	en	View users
+Wait	expressoAdmin1_2	en	Wait
+when to expire the password	expressoAdmin1_2	en	When to expire the password
+without quota	expressoAdmin1_2	en	Without quota
+WorkStation Active	expressoAdmin1_2	en	WorkStation (ACTIVE)
+WorkStation Desactive	expressoAdmin1_2	en	WorkStation (INACTIVE)
+You do not have access to clean an inbox	expressoAdmin1_2	en	You do not have access to clean an inbox
+You do not have access to clean an user inbox	expressoAdmin1_2	en	You do not have access to clean an user inbox
+you do not have access to create sectors	expressoAdmin1_2	en	You do not have access to create sectors
+You do not have access to this module	expressoAdmin1_2	en	You do not have access to this module
+You do not have access to this module or you are accessing this module from a denied network	expressoAdmin1_2	en	You do not have access to this module or you are accessing this module from a denied network
+You do not have access to this organization	expressoAdmin1_2	en	You do not have access to this organization
+You do not have right to create institutional accounts	expressoAdmin1_2	en	You do not have right to create institutional accounts
+You do not have right to create shared accounts	expressoAdmin1_2	en	You do not have right to create shared accounts
+You do not have right to delete institutional accounts	expressoAdmin1_2	en	You do not have right to delete institutional accounts
+You do not have right to delete shared accounts	expressoAdmin1_2	en	You do not have right to delete shared accounts
+You do not have right to edit an shared accounts acl	expressoAdmin1_2	en	You do not have right to edit an shared accounts acl
+You do not have right to edit an shared accounts	expressoAdmin1_2	en	You do not have right to edit an shared accounts
+You do not have right to edit an shared accounts quota	expressoAdmin1_2	en	You do not have right to edit an shared accounts quota
+You do not have right to edit institutional accounts	expressoAdmin1_2	en	You do not have right to edit institutional accounts
+You do not have right to empty an shared account inbox	expressoAdmin1_2	en	You do not have right to empty an shared account inbox
+You do not have right to empty an shared accounts inbox	expressoAdmin1_2	en	You do not have right to empty an shared accounts inbox
+You do not have right to list institutional accounts	expressoAdmin1_2	en	You do not have right to list institutional accounts
+you do not have right to list shared accounts	expressoAdmin1_2	en	You do not have right to list shared accounts
