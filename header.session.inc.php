@@ -84,9 +84,34 @@ if ($sessionID && isset($GLOBALS['phpgw'])) {
 			$GLOBALS['phpgw']->redirect($GLOBALS['phpgw_info']['server']['webserver_url'] . '/login.php?cd=10');
 		}
 
+		// Unset variables
+		if (isset($sessionID)){ unset($sessionID); }
+		if (isset($isController)){ unset($isController); }
+		if (isset($filter)){ unset($filter); }
+		if (isset($httpUserAgent)){ unset($httpUserAgent); }
+		if (isset($dataSetDB)){ unset($dataSetDB); }
+		if (isset($loginID)){ unset($loginID); }
+		if (isset($query)){ unset($query); }
+		if (isset($testLoginId)){ unset($testLoginId); }
+		if (isset($testBrowser)){ unset($testBrowser); }	
+		if (isset($testUserIP)){ unset($testUserIP); }
+
 		die();
 	}
 
 	// From ExpressoAjax update session_dla (datetime last access).
 	if ($isController) $_SESSION['phpgw_session']['session_dla'] = time();
 }
+
+
+// Unset variables
+if (isset($sessionID)){ unset($sessionID); }
+if (isset($isController)){ unset($isController); }
+if (isset($filter)){ unset($filter); }
+if (isset($httpUserAgent)){ unset($httpUserAgent); }
+if (isset($dataSetDB)){ unset($dataSetDB); }
+if (isset($loginID)){ unset($loginID); }
+if (isset($query)){ unset($query); }
+if (isset($testLoginId)){ unset($testLoginId); }
+if (isset($testBrowser)){ unset($testBrowser); }	
+if (isset($testUserIP)){ unset($testUserIP); }
