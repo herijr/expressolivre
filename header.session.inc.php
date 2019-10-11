@@ -1,180 +1,92 @@
 <?php
-	/**************************************************************************\
-	* eGroupWare                                                               *
-	* http://www.egroupware.org                                                *
-	* The file written by Joseph Engo <jengo@phpgroupware.org>                 *
-	* This file modified by Greg Haygood <shrykedude@bellsouth.net>            *
-	* --------------------------------------------                             *
-	*  This program is free software; you can redistribute it and/or modify it *
-	*  under the terms of the GNU General Public License as published by the   *
-	*  Free Software Foundation; either version 2 of the License, or (at your  *
-	*  option) any later version.                                              *
-	\**************************************************************************/
+
+	/***************************************************************************\
+	 * eGroupWare                                                               *
+	 * http://www.egroupware.org                                                *
+	 * The file written by Joseph Engo <jengo@phpgroupware.org>                 *
+	 * This file modified by Greg Haygood <shrykedude@bellsouth.net>            *
+	 * --------------------------------------------                             *
+	 *  This program is free software; you can redistribute it and/or modify it *
+	 *  under the terms of the GNU General Public License as published by the   *
+	 *  Free Software Foundation; either version 2 of the License, or (at your  *
+	 *  option) any later version.                                              *
+	\***************************************************************************/
+
+$sessionID = false;
 
 if (isset($_COOKIE['sessionid'])) {
+	$sessionID = trim($_COOKIE['sessionid']);
 	session_write_close();
-	session_id($_COOKIE['sessionid']);
+	session_id($sessionID);
+	session_start();
 }
-session_start();
 
-$invalidSession = false;
+$isController = strstr($_SERVER['SCRIPT_NAME'], '/controller.php');
 
-$userAgent = array();
+if ($sessionID && isset($GLOBALS['phpgw'])) {
 
-// Update and Load DB information auth
-if ( isset( $GLOBALS['phpgw'] ) && !isset( $_SESSION['connection_db_info'] ) )
-{
-	$_SESSION['phpgw_info']['admin']['server']['sessions_checkip'] = $GLOBALS['phpgw_info']['server']['sessions_checkip'];
+	$filter          = function ($str) {
+		return trim(preg_replace('#FirePHP[/ ][0-9.]+#', '', $str));
+	};
+	$httpUserAgent   = $filter(substr($_SERVER['HTTP_USER_AGENT'], 0, 199));
+	$loginID         = (isset($_COOKIE['last_loginid']) ? $_COOKIE['last_loginid'] : "");
 
-	if ( intval( $GLOBALS['phpgw_info']['server']['use_https'] ) == 1 )
-	{
-		$newIP = "";
+	$query = sprintf(
+		'SELECT * FROM phpgw_access_log ' .
+			'WHERE account_id <> 0 AND lo = 0 ' .
+			'AND sessionid = \'%s\' AND loginid = \'%s\' LIMIT 1',
+		pg_escape_string($sessionID),
+		pg_escape_string($loginID)
+	);
 
-		if( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )
-		{
-			$newIP = $_SERVER['HTTP_X_FORWARDED_FOR'] . ",";
-		}
+	$GLOBALS['phpgw']->db->query($query, __LINE__, __FILE__);
 
-		$newIP = $newIP . $_SERVER['REMOTE_ADDR'];
-
-		$query = "UPDATE phpgw_access_log SET ip = '".$newIP."' " .
-				 "WHERE account_id <> 0 AND lo = 0 AND sessionid='".$GLOBALS['sessionid']."'";
-
-		$GLOBALS['phpgw']->db->query( $query, __LINE__, __FILE__ );
-		
-		unset( $newIP );
-
-		unset( $query );
-	}
-	
-	$sessionsCheckip = ( isset( $_SESSION['phpgw_info']['admin']['server']['sessions_checkip'] ) ? ',ip' : '' );
-
-	$query = "SELECT trim(sessionid)".$sessionsCheckip.",browser " .
-			 "FROM phpgw_access_log " .
-			 "WHERE account_id <> 0 AND lo = 0 " .
-			 "AND sessionid = '".$GLOBALS['sessionid']."' " .
-			 "LIMIT 1";
-
-	$GLOBALS['phpgw']->db->query( $query, __LINE__, __FILE__ );
-	
 	$GLOBALS['phpgw']->db->next_record();
-	
-	if ( $GLOBALS['phpgw']->db->row() )
-	{
-		$userAuth     = "";
-		$rows         = $GLOBALS['phpgw']->db->row();
 
-		if( isset( $rows['btrim'] ) )
-		{
-		    $userAuth = $rows['btrim'];
-		}
+	$dataSetDB = $GLOBALS['phpgw']->db->row();
 
-		if( isset( $rows['ip'] ) )
-		{
-		    $userAuth .= "{".$rows['ip']."}";
-		}
+	$testLoginId = (trim($loginID) === trim($_SESSION['phpgw_session']['session_lid'])) ? true : false;
+	$testBrowser = (md5($httpUserAgent) === md5($dataSetDB['browser'])) ? true : false;
+	$testUserIP  = true;
 
-		if( isset( $rows['browser'] ) )
-		{
-		    $userAuth .= $rows['browser'];
-		}
-
-		$_SESSION['connection_db_info']['user_auth'] = $userAuth;
-
-		unset( $userAuth );
-		unset( $rows );
+	if( isset( $GLOBALS['phpgw_info']['server']['sessions_checkip'] ) ){
+		$testUserIP = (trim($GLOBALS['phpgw']->session->getuser_ip()) === trim($dataSetDB['ip'])) ? true : false;
 	}
-	
-	unset( $query );
+
+	if ( !$testLoginId || !$testBrowser || !$testUserIP ) {
+
+		if (is_array($dataSetDB) && count($dataSetDB) > 0) {
+
+			$query = sprintf(
+				'UPDATE phpgw_access_log SET lo = \'%s\' WHERE sessionid = \'%s\' AND loginid = \'%s\';',
+				pg_escape_string(time()),
+				pg_escape_string($sessionID),
+				pg_escape_string($loginID)
+			);
+
+			$GLOBALS['phpgw']->db->query($query, __LINE__, __FILE__);
+		}
+
+		// Session Close
+		session_write_close();
+
+		// Removing session cookie.
+		setcookie(session_name(), '', 0);
+
+		// From Ajax response "nosession"
+		if ($isController) {
+			if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'json')) {
+				echo json_encode(array('nosession' => true));
+			} else {
+				echo serialize(array('nosession' => true));
+			}
+		} else {
+			$GLOBALS['phpgw']->redirect($GLOBALS['phpgw_info']['server']['webserver_url'] . '/login.php?cd=10');
+		}
+
+		die();
+	}
+
+	// From ExpressoAjax update session_dla (datetime last access).
+	if ($isController) $_SESSION['phpgw_session']['session_dla'] = time();
 }
-
-// Check User Agent
-if ( isset($_SESSION['connection_db_info']['user_auth']) && $_SESSION['connection_db_info']['user_auth'] )
-{
-	$invalidSession  = true;
-	$sess            = $_SESSION['phpgw_session'];
-	$filter          = function( $str ){ return trim( preg_replace( '#FirePHP[/ ][0-9.]+#', '', $str ) ); };
-	$http_user_agent = $filter( substr($_SERVER[ 'HTTP_USER_AGENT' ], 0, 199 ) );
-	
-	// userIP
-	$userIP = array( $_SERVER['REMOTE_ADDR'] );
-	if( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) )
-	{
-		$userIP = array( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_X_FORWARDED_FOR'] );
-	}
-
-	// userAgent
-	$userAgent = array( $sess['session_id'] . $http_user_agent );
-	if( isset( $_SESSION['phpgw_info']['admin']['server']['sessions_checkip'] ) )
-	{
-		$userAgent = array( $sess['session_id']."{".$userIP[0]."}".$http_user_agent );
-	}
-	
-	if ( count( $userIP ) == 2 )
-	{
-		$userAgent[] = $sess['session_id']."{".$userIP[1]."}".$http_user_agent;
-		$userAgent[] = $sess['session_id']."{".implode(',', array_reverse( $userIP ))."}".$http_user_agent;
-	}
-	
-	$pconnectionID = $filter( $_SESSION['connection_db_info']['user_auth'] );
-
-	if ( array_search( $pconnectionID, $userAgent ) !== false )
-	{
-		$invalidSession = false;
-	}
-	
-	foreach ( $userAgent as $agent )
-	{
-		if ( strpos( $pconnectionID, $agent ) !== false )
-		{
-			$invalidSession = false;
-		}
-	}
-	
-	unset( $sess );
-	unset( $filter );
-	unset( $userIP );
-	unset( $http_user_agent );
-	unset( $pconnectionID );
-	
-}
-
-$isController = strstr( $_SERVER['SCRIPT_NAME'] , '/controller.php' );
-
-// Session Invalid
-if ( empty( $_SESSION['phpgw_session']['session_id'] ) || $invalidSession )
-{
-	if( $isController === false && isset( $_SESSION['connection_db_info']['user_auth'] ) )
-	{
-		error_log( '[ INVALID SESSION ] >>>>'.$_SESSION['connection_db_info']['user_auth'].'<<<< - >>>>' . implode( '', $userAgent ), 0 );
-	
-		isset( $GLOBALS['phpgw']->session ) ? $GLOBALS['phpgw']->session->phpgw_setcookie( 'sessionid' ) : setcookie( 'sessionid', '', 0 );
-	
-		$GLOBALS['phpgw']->redirect( $GLOBALS['phpgw_info']['server']['webserver_url'].'/login.php?cd=10' );
-	}
-	
-	// Removing session cookie.
-	setcookie( session_name(), '', 0 );
-	
-	// Removing session values.
-	unset( $_SESSION );
-	
-	// From ExpressoAjax response "nosession"
-	if ( $isController )
-	{
-		echo serialize( array( 'nosession' => true ) );
-		exit;
-	}
-	else if ( strpos( $_SERVER['SCRIPT_NAME'], 'login.php' ) === false )
-	{
-		header( 'Location: /login.php?cd=2' );
-		exit;
-	}
-}
-
-// From ExpressoAjax update session_dla (datetime last access).
-if ( $isController ) $_SESSION['phpgw_session']['session_dla'] = time();
-
-unset( $invalidSession );
-unset( $userAgent );
-unset( $isController );
