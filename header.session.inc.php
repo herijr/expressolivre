@@ -73,16 +73,24 @@ if ($sessionID && isset($GLOBALS['phpgw'])) {
 		// Removing session cookie.
 		setcookie(session_name(), '', 0);
 
+		$reason = '10';
+
 		// From Ajax response "nosession"
 		if ($isController) {
+
 			if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'json')) {
 				echo json_encode(array('nosession' => true));
 			} else {
 				echo serialize(array('nosession' => true));
 			}
-		} else {
-			$GLOBALS['phpgw']->redirect($GLOBALS['phpgw_info']['server']['webserver_url'] . '/login.php?cd=10');
+
+			die();
 		}
+
+		if ( strpos( $_SERVER['SCRIPT_NAME'], 'login.php' ) === false )
+		{
+			$reason = '2';
+		}		
 
 		// Unset variables
 		if (isset($sessionID)){ unset($sessionID); }
@@ -96,7 +104,7 @@ if ($sessionID && isset($GLOBALS['phpgw'])) {
 		if (isset($testBrowser)){ unset($testBrowser); }	
 		if (isset($testUserIP)){ unset($testUserIP); }
 
-		die();
+		$GLOBALS['phpgw']->redirect($GLOBALS['phpgw_info']['server']['webserver_url'] . '/login.php?cd='.$reason);
 	}
 
 	// From ExpressoAjax update session_dla (datetime last access).
