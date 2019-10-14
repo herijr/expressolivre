@@ -146,8 +146,8 @@
 			{
 				$GLOBALS['phpgw']->js = CreateObject('phpgwapi.javascript');
 			}
-			$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-latest.min.js');
-			$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-ui-latest.min.js');
+			$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-latest.min.js');
+			$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-ui-latest.min.js');
 			$GLOBALS['phpgw']->js->validate_file('jscode','openwindow','admin');
 			$GLOBALS['phpgw']->js->validate_file('jscode','selectBox','admin');
 

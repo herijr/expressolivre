@@ -42,8 +42,8 @@ class uisms
 		{
 			$GLOBALS['phpgw']->js = CreateObject('phpgwapi.javascript');
 		}
-		$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-latest.min.js');
-		$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-ui-latest.min.js');
+		$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-latest.min.js');
+		$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-ui-latest.min.js');
 		$GLOBALS['phpgw']->css->validate_file('prototype/plugins/jquery/css/redmond/jquery-ui-latest.min.css');
 
 		$webserver_url = $GLOBALS['phpgw_info']['server']['webserver_url'];

@@ -63,8 +63,8 @@ class uimessenger
 	{
 		if ( !$GLOBALS['phpgw']->acl->check('run',1,'admin') ) $GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/admin/index.php'));
 		
-		$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-latest.min.js');
-		$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-ui-latest.min.js');
+		$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-latest.min.js');
+		$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-ui-latest.min.js');
 		$GLOBALS['phpgw']->js->validate_file('jscode','connector','expressoAdmin1_2');
 		$GLOBALS['phpgw']->js->validate_file('jscode','lang','expressoAdmin1_2');
 		$GLOBALS['phpgw']->js->validate_file('jscode','messenger_config','expressoAdmin1_2');

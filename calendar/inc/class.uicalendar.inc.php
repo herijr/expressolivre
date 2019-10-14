@@ -163,7 +163,7 @@
 			$this->html = &$GLOBALS['phpgw']->html;
 			
 			if (!is_object($GLOBALS['phpgw']->js)) $GLOBALS['phpgw']->js = CreateObject('phpgwapi.javascript');
-			$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-latest.min.js');
+			$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-latest.min.js');
 		}
 
 		function screen_delegate_event($params=NULL) {
