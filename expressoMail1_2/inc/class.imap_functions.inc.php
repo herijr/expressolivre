@@ -2406,14 +2406,16 @@ class imap_functions
 		if ( ( $msg = $this->check_Attachments( $params ) ) !== true ) return $msg;
 
 		$mail = $this->compose_msg( $params, false );
-		
+
 		if( isset($mail->error_count) && $mail->error_count > 0 ){
 			return array( 'success' => false, 'error' => $mail->ErrorInfo );	
 		}
 
 		$signed = isset($params['input_return_digital'])? $params['input_return_digital'] : false;
 
-		if ( !( $sent = $mail->Send() ) ) $this->parse_error( $mail->ErrorInfo );
+		if ( !( $sent = $mail->Send() ) ){ 
+			return array( 'success' => false, 'error' => $this->parse_error( $mail->ErrorInfo ) );	
+		}
 
 		if ( $signed && !$params['smime'] ) return $sent;
 
