@@ -1807,6 +1807,20 @@
 		{
 			$updateContact = unserialize($sdata);
 
+			// Verifica se email ja existe!
+			$boGroup = CreateObject('contactcenter.bo_group');
+
+			$emails = explode(",", $updateContact[4]);
+			foreach ($emails as $email) {
+				$contact = $boGroup->verify_contact($email);
+				if ( $contact ) {
+					return serialize(array(
+						'msg'    => "CATALOG_EMAIL_EXIST",
+						'status' => "false"
+					));
+				}
+			}
+
 			$data = array();
 			if ($id != false) {
 
@@ -1834,7 +1848,7 @@
 			$data['notes'] = '';
 			$data['addresses'] = '';
 
-			$emails = explode(",", $updateContact[4]);
+			// $emails = explode(",", $updateContact[4]);
 			foreach ($emails as $email) {
 				$data['connections']['connection' . $count]['id_connection'] = '_NEW_';
 				$data['connections']['connection' . $count]['id_typeof_connection'] = 1;
