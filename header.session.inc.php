@@ -45,6 +45,7 @@ if ($sessionID && isset($GLOBALS['phpgw'])) {
 
 	$dataSetDB = $GLOBALS['phpgw']->db->row();
 
+	$isntLogin   = ( strpos( $_SERVER['SCRIPT_NAME'], 'login.php' ) === false );
 	$testLoginId = (trim($loginID) === trim($_SESSION['phpgw_session']['session_lid'])) ? true : false;
 	$testBrowser = (md5($httpUserAgent) === md5($dataSetDB['browser'])) ? true : false;
 	$testUserIP  = true;
@@ -53,7 +54,7 @@ if ($sessionID && isset($GLOBALS['phpgw'])) {
 		$testUserIP = (trim($GLOBALS['phpgw']->session->getuser_ip()) === trim($dataSetDB['ip'])) ? true : false;
 	}
 
-	if ( !$testLoginId || !$testBrowser || !$testUserIP ) {
+	if ( $isntLogin && !( $testLoginId && $testBrowser && $testUserIP )){
 
 		if (is_array($dataSetDB) && count($dataSetDB) > 0) {
 
@@ -86,23 +87,6 @@ if ($sessionID && isset($GLOBALS['phpgw'])) {
 
 			die();
 		}
-
-		if ( strpos( $_SERVER['SCRIPT_NAME'], 'login.php' ) === false )
-		{
-			$reason = '2';
-		}		
-
-		// Unset variables
-		if (isset($sessionID)){ unset($sessionID); }
-		if (isset($isController)){ unset($isController); }
-		if (isset($filter)){ unset($filter); }
-		if (isset($httpUserAgent)){ unset($httpUserAgent); }
-		if (isset($dataSetDB)){ unset($dataSetDB); }
-		if (isset($loginID)){ unset($loginID); }
-		if (isset($query)){ unset($query); }
-		if (isset($testLoginId)){ unset($testLoginId); }
-		if (isset($testBrowser)){ unset($testBrowser); }	
-		if (isset($testUserIP)){ unset($testUserIP); }
 
 		$GLOBALS['phpgw']->redirect($GLOBALS['phpgw_info']['server']['webserver_url'] . '/login.php?cd='.$reason);
 	}
