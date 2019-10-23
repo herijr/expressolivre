@@ -284,7 +284,7 @@ class WorkflowObjects
 		
 		// Get third config level: database
 		$path = Factory::getInstance('WorkflowObjects')->getDBExpresso()->Link_ID->query( $sql, array( 'workflow', 'basedir' ) )->fetchRow();
-		$path = ( $path !== false ) ? $path['config_value'] : $GLOBALS['phpgw_info']['server']['files_dir'];
+		$path = ( $path !== false )? $path['config_value'] : '/home/expressolivre/workflow';
 		
 		// Check wildcard
 		if ( strpos( $path, '%u' ) !== false ) {
