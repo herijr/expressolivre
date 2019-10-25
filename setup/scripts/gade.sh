@@ -141,18 +141,22 @@ function restoreLdap {
 
 
 function bkpPostgres {
-	
-	docker exec -it database.expresso su -c "pg_dump -Fp -C -d expresso | gzip > /tmp/expresso.gz" postgres
-	docker cp database.expresso:/tmp/expresso.gz $WORKSPACE/../../../DB-DESENV/postgres/
+
+	db=$1
+
+	docker exec -it database.expresso su -c "pg_dump -Fp -C -d ${db} | gzip > /tmp/${db}.gz" postgres
+	docker cp database.expresso:/tmp/${db}.gz $WORKSPACE/../../../DB-DESENV/postgres/
 }
 
 
 function restorePostgres {
 	
-	docker exec -it database.expresso su -c "echo \"DROP DATABASE expresso;\" | psql" postgres
-	docker cp $WORKSPACE/../../../DB-DESENV/postgres/expresso.gz database.expresso:/tmp/expresso.gz
-	docker exec -it database.expresso su -c "cat /tmp/expresso.gz | gunzip | psql" postgres
-	docker exec -it database.expresso rm -f /tmp/expresso.gz
+	db=$1
+
+	docker exec -it database.expresso su -c "echo \"DROP DATABASE ${db};\" | psql" postgres
+	docker cp $WORKSPACE/../../../DB-DESENV/postgres/${db}.gz database.expresso:/tmp/${db}.gz
+	docker exec -it database.expresso su -c "cat /tmp/${db}.gz | gunzip | psql" postgres
+	docker exec -it database.expresso rm -f /tmp/${db}.gz
 }
 
 
@@ -186,7 +190,8 @@ function down {
 
 	bkpLdap
 
-	bkpPostgres
+	bkpPostgres expresso
+	bkpPostgres workflow
 	
 	docker stop $(docker ps -aq)
 	echo -e "\nAmbiente Docker Expresso Down! Va para casa dormir um pouco...\n"
@@ -329,20 +334,33 @@ function new {
 	fi
 
 
-	# Server Database
+	# Server Database Expresso
 	if [ -f $WORKSPACE/../../../DB-DESENV/postgres/expresso.gz ]; then
+
+		echo -e "Encontrei uma base de Backup do Expresso, vou restaurar...\n"
 		
 		docker run -itd --name database.expresso -v /etc/localtime:/etc/localtime -p 5432:5432 expressolivre/database
 		docker exec -it database.expresso service postgresql restart
 		
-		restorePostgres
+		restorePostgres expresso
 	else
 		
 		mkdir -p $WORKSPACE/../../../DB-DESENV/postgres
 		docker run -itd --name database.expresso -v /etc/localtime:/etc/localtime -p 5432:5432 expressolivre/database
 		docker exec -it database.expresso service postgresql restart
 		
-		bkpPostgres	
+		bkpPostgres	expresso
+	fi
+
+	# Server Database Workflow
+	if [ -f $WORKSPACE/../../../DB-DESENV/postgres/workflow.gz ]; then
+		
+		echo -e "Encontrei uma base de Backup do Workflow, vou restaurar...\n"
+
+		restorePostgres workflow
+	else
+
+		bkpPostgres	workflow
 	fi
 
 	docker exec -it database.expresso service rsyslog restart
