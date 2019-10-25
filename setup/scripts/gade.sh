@@ -8,6 +8,7 @@
 
 
 WORKSPACE=$(pwd)
+WORKFLOW_HOME="WORKFLOW_HOME"
 
 NEW=false
 UP=false
@@ -354,9 +355,13 @@ function new {
 
 	
 	# Servers Frontend - PHP x.x
+
+	mkdir -p $WORKSPACE/../../../$WORKFLOW_HOME
+	chmod -R 777 $WORKSPACE/../../../$WORKFLOW_HOME
+
 	for versao in ${!versoes[*]}; do
 	
-		docker run -itd --name frontend-php${versao}.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p ${versoes[$versao]} expressolivre/frontend-des:php${versao}
+		docker run -itd --name frontend-php${versao}.expresso -v /etc/localtime:/etc/localtime -v $WORKSPACE/../../:/var/www/expresso -v $WORKSPACE/../../../$WORKFLOW_HOME:/home/expressolivre/workflow --link database.expresso --link mailboxes.expresso --link ldap.expresso --link memcache.expresso -p ${versoes[$versao]} expressolivre/frontend-des:php${versao}
 	done
 
 
