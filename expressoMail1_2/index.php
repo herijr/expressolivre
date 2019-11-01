@@ -247,7 +247,7 @@ $GLOBALS['phpgw']->js->add( 'txt' , '
 );
 
 $str = 'connector.updateVersion = {};'.PHP_EOL;
-foreach ( array( 'ccQuickAdd', 'color_palette', 'filter', 'filters', 'InfoContact', 'mail_sync', 'preferences',
+foreach ( array( 'ccQuickAdd', 'color_palette', 'filter', 'filters', 'InfoContact', 'preferences',
 	'QuickAddTelephone', 'QuickCatalogSearch', 'QuickSearchUser', 'rich_text_editor', 'search', 'sharemailbox',
 	'TreeS', 'TreeShow', 'wfolders',
 ) as $fname ) $str .= 'connector.updateVersion["'.$fname.'"] = "'.$GLOBALS['phpgw']->js->version('js/'.$fname.'.js').'";'.PHP_EOL;

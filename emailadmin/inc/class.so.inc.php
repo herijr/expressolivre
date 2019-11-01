@@ -96,11 +96,11 @@ class so
 			(($mode == 'mail')? ' INNER JOIN phpgw_emailadmin_domains ON (phpgw_emailadmin.profileid = phpgw_emailadmin_domains.profileid)' : '').
 			' WHERE ('.(($mode == 'mail')? 'phpgw_emailadmin_domains.domain' : 'phpgw_emailadmin.profileid').' = \''.$value.'\' )';
 		$this->db->query($query, __LINE__, __FILE__);
+		
 		return $this->db->next_record()? array_merge(
 			$this->colMap( $this->db->row() ),
 			array(
 				'defaultUserQuota'     => $this->getDefaultUserQuota( ( $mode === 'mail' )? $value : '' ),
-				'defaultUserSignature' => $this->getDefaultSignature( $value ),
 			)
 		) : false;
 	}

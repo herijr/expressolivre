@@ -77,12 +77,8 @@ class PreferencesAdapter extends ExpressoAdapter
 
 	protected function getDefaultSignature()
 	{
-		$profile = CreateObject('emailadmin.bo');
-		$itens = $profile->getProfileList();
-		$config = $profile->getProfile($itens[0]['profileid']);
-
-		return ( isset( $config['defaultUserSignature'] ) && $config['defaultUserSignature'] ) ? 
-					$config['defaultUserSignature'] : false;
+		$soemailadmin = CreateObject( 'emailadmin.so' );
+		return $soemailadmin->getDefaultSignature( $GLOBALS['phpgw_info']['user']['email'] );
 	}
 }
 

@@ -122,9 +122,13 @@
 
 		function get_preferences() {
 			$result = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
-			if ( $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserSignature'] ) {
+
+			include_once(dirname(__FILE__) . '/../../header.inc.php');
+			$soemailadmin = CreateObject( 'emailadmin.so' );
+
+			if ( $signature !== false ) {
 				$result['default_signature'] = true;
-				$result['signature']      = $_SESSION['phpgw_info']['expressomail']['email_server']['defaultUserSignature'];
+				$result['signature']      = $soemailadmin->getDefaultSignature( $_SESSION['phpgw_info']['expressomail']['user']['email'] );
 				$result['type_signature'] = 'html';
 			}
 			return $result;
