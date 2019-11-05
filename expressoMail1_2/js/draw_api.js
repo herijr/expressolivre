@@ -2881,6 +2881,7 @@ function load_from_field()
 		sharedUsers[sharedUsers.length] = matchUser.substring(("user"+cyrus_delimiter).length,matchUser.length);
 	}
 
+	SharedUsersData = false;
 	var form = $('<form>').append($('<input>').attr({'name':'uids'}).val(sharedUsers.join(';')));
 	Ajax( '$this.ldap_functions.getSharedUsersFrom', form, function( data ) {
 		SharedUsersData = data;
