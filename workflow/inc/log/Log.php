@@ -114,7 +114,7 @@ class Log
      * @access private
      * @since Log 1.9.13
      */
-    function _classExists($class)
+    static protected function _classExists($class)
     {
         if (version_compare(PHP_VERSION, '5.0.0', 'ge')) {
             return class_exists($class, false);
