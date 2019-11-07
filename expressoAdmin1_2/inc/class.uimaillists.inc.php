@@ -350,6 +350,10 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				}
 			}
 
+			// Issue #500 - https://redmine.expressolivre.org/issues/500
+			// Provável que uma das variáveis do tpl não esteja sendo preenchida corretamente no ambiente de produção
+			// onde o erro foi apontado, porém, em abiente de testes, não é possível reproduzir o erro da Issue #500
+
 			// Seta variaveis utilizadas pelo tpl.
 			$var = Array(
 				'color_bg1'						=> "#E8F0F0",
