@@ -121,15 +121,14 @@
 		}
 
 		function get_preferences() {
-			$result = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
-
 			include_once(dirname(__FILE__) . '/../../header.inc.php');
+			$result       = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
 			$soemailadmin = CreateObject( 'emailadmin.so' );
-
+			$signature    = $soemailadmin->getDefaultSignature( $_SESSION['phpgw_info']['expressomail']['user']['email'] );
 			if ( $signature !== false ) {
 				$result['default_signature'] = true;
-				$result['signature']      = $soemailadmin->getDefaultSignature( $_SESSION['phpgw_info']['expressomail']['user']['email'] );
-				$result['type_signature'] = 'html';
+				$result['signature']         = $signature;
+				$result['type_signature']    = 'html';
 			}
 			return $result;
 		}
