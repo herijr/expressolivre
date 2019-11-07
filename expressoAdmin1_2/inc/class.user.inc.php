@@ -1,6 +1,6 @@
 <?php
 	/**********************************************************************************\
-	* Expresso Administra��o                 									      *
+	* Expresso Administracao                 									      *
 	* by Joao Alfredo Knopik Junior (joao.alfredo@gmail.com, jakjr@celepar.pr.gov.br) *
 	* --------------------------------------------------------------------------------*
 	*  This program is free software; you can redistribute it and/or modify it		  *
@@ -50,7 +50,7 @@
 			{
 				$profile = CreateObject('emailadmin.bo')->getProfile('mail', $params['mail']);
 				
-				// Adiciona a organiza��o na frente do uid.
+				// Adiciona a organizacao na frente do uid.
 				if ($this->current_config['expressoAdmin_prefix_org'] == 'true')
 				{
 					$context_dn = ldap_explode_dn(strtolower($GLOBALS['phpgw_info']['server']['ldap_context']), 1);
@@ -61,9 +61,9 @@
 					$params['uid'] = $explode_dn[$context_dn['count']] . '-' . $params['uid'];
 				}
 			
-				// Leio o ID a ser usado na cria��o do objecto. Esta fun��o j� incrementa o ID no BD.
+				// Leio o ID a ser usado na criacao do objecto. Esta funcao ja incrementa o ID no BD.
 				$next_id = $this->db_functions->get_next_id();
-				error_log(print_r($next_id,true) . PHP_EOL, 3, "/var/www/expresso/debug.log");
+				
 				if ((!is_numeric($next_id['id'])) || (!$next_id['status']))
 				{
 					$return['status'] = false;
@@ -119,7 +119,7 @@
 				if ($params['telephonenumber'] != '')
 					$user_info['telephoneNumber']	= $params['telephonenumber'];
 				
-				//Ocultar da pesquisa e do cat�logo
+				//Ocultar da pesquisa e do catalogo
 				if ($params['phpgwaccountvisible'])
 					$user_info['phpgwAccountVisible'] = '-1';
 				
@@ -154,7 +154,7 @@
 				if (($this->current_config['expressoAdmin_samba_support'] == 'true') && ($params['use_attrs_samba'] == 'on'))
 				{
 					
-					// Qualquer um que crie um usu�rio, deve ter permiss�o para adicionar a senha samba.
+					// Qualquer um que crie um usuario, deve ter permissao para adicionar a senha samba.
 					// Verifica o acesso do gerente aos atributos samba
 					//if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES ))
 					//{
@@ -195,7 +195,7 @@
 				// Verifica o acesso do gerente aos atributos corporativos
 				if ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_CORPORATIVE ))
 				{
-					//retira caracteres que n�o s�o n�meros.
+					//retira caracteres que nao sao numeros.
 					$params['corporative_information_cpf'] = preg_replace("/[^0-9]/", "", $params['corporative_information_cpf']);
 					//description
 					$params['corporative_information_description'] = utf8_encode($params['corporative_information_description']);
@@ -236,7 +236,7 @@
 				}
 				
 				$result = $this->ldap_functions->ldap_add_entry($dn, $user_info);
-				if (!$result['status'])
+				if ( !( isset( $result['status'] ) && $result['status'] ) )
 				{
 					$return['status'] = false;
 					$return['msg'] .= $result['msg'];
@@ -303,7 +303,7 @@
 					}
 				}
 			
-				// Inclusao do Mail do usu�rio nas listas de email selecionadas.
+				// Inclusao do Mail do usuario nas listas de email selecionadas.
 				if ($params['maillists'])
 				{
 					foreach($params['maillists'] as $uid)
@@ -393,7 +393,7 @@
 			
 			$dn = 'uid=' . $old_values['uid'] . ',' . strtolower($old_values['context']);
 
-			//retira caracteres que n�o s�o n�meros.
+			//retira caracteres que nao sao numeros.
 			$new_values['corporative_information_cpf'] = preg_replace("/[^0-9]/", "", $new_values['corporative_information_cpf']);
 
 			$diff = array_diff($new_values, $old_values);
@@ -613,7 +613,7 @@
 			{
 
 				// CENTRAL DE SEGURANCA
-				// Verifica se o campo � protegido 
+				// Verifica se o campo e protegido 
 				$fields_protected = array();
 
 				$fields_protected = explode( ",", $new_values['protected_fields'] );
@@ -1432,7 +1432,7 @@
 			if( count($migrateMB) && strtolower($migrateMB['uid']) == strtolower($uid) )
 				return array( 'status' => false, 'msg' => $this->functions->lang('The mailbox is being migrated wait').'.' );
 			
-			// Verifica acesso do gerente (OU) ao tentar renomear um usu�rio.
+			// Verifica acesso do gerente (OU) ao tentar renomear um usuario.
 			if ( !$this->ldap_functions->check_access_to_renamed($uid) )
 				return array( 'status' => false, 'msg' => $this->functions->lang('You do not have access to delete user').'.' );
 			
