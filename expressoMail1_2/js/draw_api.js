@@ -106,7 +106,7 @@ function draw_tree_folders(folders){
 			}
 		}
 		
-		Ajax( '$this.imap_functions.get_folders_list', { 'folder': current_folder }, update_tree_folders );
+		Ajax( '$this.imap_functions.get_folders_list', {}, update_tree_folders );
 
 		return;
 

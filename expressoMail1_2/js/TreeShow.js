@@ -38,8 +38,11 @@ var ttreeBox = new function()
 		}
 		
 		if ( !expresso_offline ) {
-			Ajax( '$this.imap_functions.get_folders_list', { 'folder': current_folder }, handler_update_folders );
-		} else handler_update_folders( '' );
+			localCache.remove('get_folders_list');
+			Ajax( '$this.imap_functions.get_folders_list', {}, handler_update_folders );
+		} else {
+			handler_update_folders( '' );
+		}
 	}
 	
 	this.verify_children = function( param )

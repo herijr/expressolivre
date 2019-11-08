@@ -2489,6 +2489,20 @@ function Download( action, data, callback )
 	$(frm).appendTo( iframe_download ).submit().remove();
 }
 
+function hashCode( obj )
+{
+	var hash = 0, i, chr;
+	obj = typeof obj === 'undefined'? false : obj;
+	var str = JSON.stringify( obj ); 
+	if (str.length === 0) return hash;
+	for (i = 0; i < str.length; i++) {
+		chr   = str.charCodeAt(i);
+		hash  = ((hash << 5) - hash) + chr;
+		hash |= 0; // Convert to 32bit integer
+	}
+	return hash;
+ }
+
 function Ajax( action, data, callback, method )
 {
 	var buildBar =  function(){
@@ -2540,7 +2554,7 @@ function Ajax( action, data, callback, method )
 		type        : method,
 		url         : './controller.php?action='+action,
 		dataType    : 'json',
-		cache       : false
+		cache       : true
 	};
 	
 	if ( typeof data !== 'undefined' ) {
@@ -2555,8 +2569,8 @@ function Ajax( action, data, callback, method )
 					});
 				});
 				if ( count_files ) formData.append( 'count_files', count_files );
-				var params = $obj.serializeArray();
-				$.each(params, function ( i, val ) {
+				var params_tmp = $obj.serializeArray();
+				$.each(params_tmp, function ( i, val ) {
 					formData.append( val.name, val.value );
 				});
 				return formData;
@@ -2578,8 +2592,79 @@ function Ajax( action, data, callback, method )
 		} 
 		return node;
 	};
-	return $.ajax( opts ).done( function( data, textStatus, jqXHR ) {
-		if ( typeof callback === 'function' ) callback( f_count( data ), textStatus, jqXHR );
+
+	// Cache
+	var func = $.trim( action.substr(action.lastIndexOf('.')+1));
+	func = ( func.indexOf('&') > 0 ) ? func.substr(0,func.indexOf('&')) : func ;
+	var hash = hashCode( data );
+
+	opts.beforeSend = function(jqXHR){
+		if( localCache.exist(func,hash) ){
+			if( (new Date()).getTime() > localCache.get(func,hash).expire ){
+				localCache.remove(func,hash);
+				console.log( 'CACHE REMOVIDO' );
+			} else {
+				if( localCache.exist(func,hash) ){
+					var timeStamp = localCache.get(func,hash).expire;
+					var dt = new Date( timeStamp );
+					console.log( 'CACHE EXIST EH VALIDO', func , dt );
+					callback( localCache.get(func, hash).result );
+					return false;
+				}
+			}
+		}
+	}
+
+	return $.ajax( opts ).done( function( data, textStatus, jqXHR )
+	{
+		if ($.isFunction(callback))
+		{
+			localCache.set( func, hash, f_count( data ) , callback, textStatus, jqXHR );
+		}
+		
 		hideProgressBar();
-	} ).fail(function() { hideProgressBar(); write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) ); });
+
+	}).fail(function(jqXHR) { 
+		
+		hideProgressBar();
+
+		if( jqXHR.statusText !== "canceled" )
+		{ 
+			console.log( action , jqXHR.statusText );
+
+			write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) );
+		}
+	});
 }
+
+// localCache
+var localCache = {
+
+	cached: [ 'get_preferences', 'get_folders_list', 'getSharedUsersFrom' ],
+
+	data: {},
+
+	remove: function (url,hash) {
+		if ( typeof hash === 'undefined' ) delete localCache.data[url];
+		else delete localCache.data[url][hash];
+		return true;
+	},
+
+	exist: function ( url, hash ) {
+		return !!( localCache && localCache.data && localCache.data[url] && localCache.data[url][hash] );
+	},
+
+	get: function ( url, hash ) {
+		return localCache.data[url][hash];
+	},
+
+	set: function (url, hash, cachedData, callback, textStatus, jqXHR) {
+		if ($.inArray(url, localCache.cached) > -1) {
+			localCache.data[url] = {};
+			localCache.data[url][hash] = {};
+			localCache.data[url][hash].result = cachedData;
+			localCache.data[url][hash].expire = (new Date()).getTime() + 3 * 60000;
+		}
+		if ($.isFunction(callback)) { callback(cachedData, textStatus, jqXHR); }
+	}
+};

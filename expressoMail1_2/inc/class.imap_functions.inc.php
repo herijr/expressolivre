@@ -1806,14 +1806,7 @@ class imap_functions
 			}
 		}
 
-		if ($params && !(isset($params['noQuotaInfo']) && $params['noQuotaInfo'])) {
-			//Get quota info of current folder
-			$arr_quota_info = $this->get_quota(array(
-				'folder_id' => (isset($params['folder']) && $params['folder']) ? $params['folder'] : 'INBOX',
-			));
-		} else {
-			$arr_quota_info = array();
-		}
+		$arr_quota_info = $this->get_quota( array('folder_id' => 'INBOX'));
 
 		// Sorting resultMine
 		$array_tmp = array();
