@@ -85,7 +85,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				// Leio o ID a ser usado na criação do objecto.
 				$result = $this->db_functions->get_next_id();
 				if ( !( is_numeric( $result['id'] ) && $result['status'] ) )
-					return array( 'status' => false, 'msg' => lang( 'Problems getting  group ID' ).':'.$result['msg'] );
+					return array( 'status' => false, 'msg' => lang( 'Problems getting group ID' ).':'.$result['msg'] );
 				
 				$group_info['gidNumber'] = $id     = $result['id'];
 				$group_info['objectClass'][]       = 'phpgwAccount';
