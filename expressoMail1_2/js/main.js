@@ -120,12 +120,17 @@ function init(){
 }
 
 function init_offline(){
-        current_folder = 'local_Inbox';
+	
+	current_folder = 'local_Inbox';
+	
 	if (account_id != null) {
-		if (!is_ie)
+		
+		if (!is_ie){
 			Element('tableDivAppbox').width = '100%';
-		else
+		} else {
 			connector.createXMLHTTP();
+		}
+
 		Element('divStatusBar').innerHTML = '<table height="16px" border=0 width=100% cellspacing=0 cellpadding=2>' +
 		'<tr>' +
 		'<td style="padding-left:17px" width=33% id="content_quota" align=left></td>' +
@@ -143,10 +148,9 @@ function init_offline(){
 		})
 
 		// Get cyrus delimiter
-	cyrus_delimiter = Element('cyrus_delimiter').value;
+		cyrus_delimiter = Element('cyrus_delimiter').value;
 
-	cExecute ("$this.db_functions.get_dropdown_contacts_to_cache", function(data) {contacts = data;});
-	//cExecute ("$this.functions.get_preferences", save_preferences);
+		cExecute ("$this.db_functions.get_dropdown_contacts_to_cache", function(data) {contacts = data;});
 	}
 }
 
@@ -1591,8 +1595,6 @@ function send_message_return( data, ID ){
 
 				wfolders.setAlertMsg(false);
 
-				if ( data.hasOwnProperty('refresh_folders')) { ttreeBox.update_folder(); }
-
 			} else {
 				write_msg(get_lang('Your message was sent.'));
 			}
@@ -2501,7 +2503,7 @@ function hashCode( obj )
 		hash |= 0; // Convert to 32bit integer
 	}
 	return hash;
- }
+}
 
 function Ajax( action, data, callback, method )
 {
@@ -2596,7 +2598,7 @@ function Ajax( action, data, callback, method )
 	// Cache
 	var func = $.trim( action.substr(action.lastIndexOf('.')+1));
 	func = ( func.indexOf('&') > 0 ) ? func.substr(0,func.indexOf('&')) : func ;
-	var hash = hashCode( data );
+	var hash = ( localCache.cached.hasOwnProperty( func ) ) ? hashCode( data ) : '';
 
 	opts.beforeSend = function(jqXHR){
 		if( localCache.exist(func,hash) ){
@@ -2607,7 +2609,7 @@ function Ajax( action, data, callback, method )
 				if( localCache.exist(func,hash) ){
 					var timeStamp = localCache.get(func,hash).expire;
 					var dt = new Date( timeStamp );
-					console.log( 'CACHE EXIST EH VALIDO', func , dt );
+					console.log( 'CACHE VALIDO', func , dt );
 					callback( localCache.get(func, hash).result );
 					return false;
 				}
@@ -2640,7 +2642,11 @@ function Ajax( action, data, callback, method )
 // localCache
 var localCache = {
 
-	cached: [ 'get_preferences', 'get_folders_list', 'getSharedUsersFrom' ],
+	cached : {
+		'get_preferences'    : 2 * 60000,  // 2 minutes
+		'get_folders_list'   : 6 * 60000,  // 6 minutes
+		'getSharedUsersFrom' : 2 * 60000   // 5 minutes
+	},
 
 	data: {},
 
@@ -2659,11 +2665,12 @@ var localCache = {
 	},
 
 	set: function (url, hash, cachedData, callback, textStatus, jqXHR) {
-		if ($.inArray(url, localCache.cached) > -1) {
+
+		if( localCache.cached.hasOwnProperty( url ) ){
 			localCache.data[url] = {};
 			localCache.data[url][hash] = {};
 			localCache.data[url][hash].result = cachedData;
-			localCache.data[url][hash].expire = (new Date()).getTime() + 3 * 60000;
+			localCache.data[url][hash].expire = (new Date()).getTime() + localCache.cached[url];
 		}
 		if ($.isFunction(callback)) { callback(cachedData, textStatus, jqXHR); }
 	}
