@@ -2649,7 +2649,7 @@ var localCache = {
 	cached : {
 		'get_preferences'    : 2 * 60000,  // 2 minutes
 		'get_folders_list'   : 6 * 60000,  // 6 minutes
-		'getSharedUsersFrom' : 2 * 60000   // 5 minutes
+		'getSharedUsersFrom' : 2 * 60000   // 2 minutes
 	},
 
 	data: {},
