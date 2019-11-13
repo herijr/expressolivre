@@ -1840,46 +1840,48 @@ function return_saveas(data,border_id,folder_name)
 }
 
 // Get checked messages
-function set_messages_flag(flag, msgs_to_set){
+function set_messages_flag(flag, msgs_to_set) {
 
 	var folder = get_current_folder();
 
-	if( msgs_to_set == 'get_selected_messages'){
+	if (msgs_to_set == 'get_selected_messages') {
 		var msgs_to_set = this.get_selected_messages();
 	} else {
-		folder = $("#input_folder_"+msgs_to_set+"_r").val();
+		folder = $("#input_folder_" + msgs_to_set + "_r").val();
 	}
 
-	if (msgs_to_set){
+	if (msgs_to_set) {
 
-		Ajax( '$this.imap_functions.set_messages_flag', { 
-			'folder' : folder,
-			'msgs_to_set' : msgs_to_set,
-			'flag' : flag
-			}, 
-			function(data){
-				if(!verify_session(data)) return;
+		localCache.remove('get_folders_list');
+
+		Ajax('$this.imap_functions.set_messages_flag', {
+			'folder': folder,
+			'msgs_to_set': msgs_to_set,
+			'flag': flag
+		},
+			function (data) {
+				if (!verify_session(data)) return;
 
 				var msgs_to_set = data.msgs_to_set.split(",");
-		
-				if(!data.status) {
+
+				if (!data.status) {
 					write_msg(data.msg);
-					
+
 					$("#chk_box_select_all_messages").attr("checked", false);
-		
+
 					for (var i = 0; i < msgs_to_set.length; i++) {
 						Element("check_box_message_" + msgs_to_set[i]).checked = false;
 						remove_className(Element(msgs_to_set[i]), 'selected_msg');
 					}
-					if(!data.msgs_unflageds)
+					if (!data.msgs_unflageds)
 						return;
 					else
 						msgs_to_set = data.msgs_unflageds.split(",");
 				}
-	
-				for (var i=0; i<msgs_to_set.length; i++){
-					if(Element("check_box_message_" + msgs_to_set[i])){
-						switch(data.flag){
+
+				for (var i = 0; i < msgs_to_set.length; i++) {
+					if (Element("check_box_message_" + msgs_to_set[i])) {
+						switch (data.flag) {
 							case "unseen":
 								set_msg_as_unread(msgs_to_set[i]);
 								Element("check_box_message_" + msgs_to_set[i]).checked = false;
@@ -1899,42 +1901,44 @@ function set_messages_flag(flag, msgs_to_set){
 						}
 					}
 				}
-		
+
 				$("#chk_box_select_all_messages").attr("checked", false);
-		});
+			});
 	} else {
 		write_msg(get_lang('No selected message.'));
 	}
 }
 
 // By message number
-function set_message_flag(msg_number, flag, func_after_flag_change){
-	
-	var msg_number_folder = $("#new_input_folder_"+msg_number+"_r")[0]; //Mensagens respondidas/encaminhadas
-	
+function set_message_flag(msg_number, flag, func_after_flag_change) {
+
+	var msg_number_folder = $("#new_input_folder_" + msg_number + "_r")[0]; //Mensagens respondidas/encaminhadas
+
 	if (!msg_number_folder) {
-		var msg_number_folder = $("#input_folder_"+msg_number+"_r")[0]; //Mensagens abertas
+		var msg_number_folder = $("#input_folder_" + msg_number + "_r")[0]; //Mensagens abertas
 	}
-	
-	Ajax( '$this.imap_functions.set_messages_flag', 
+
+	localCache.remove('get_folders_list');
+
+	Ajax('$this.imap_functions.set_messages_flag',
 		{
-			'folder' : ( msg_number_folder ?  msg_number_folder.value : get_current_folder() ),
-			'msgs_to_set' : msg_number,
-			'flag' : flag
+			'folder': (msg_number_folder ? msg_number_folder.value : get_current_folder()),
+			'msgs_to_set': msg_number,
+			'flag': flag
 		},
-		function(data){
-			if(!verify_session(data)) return;
-		
-			if(!data.status) {
+		function (data) {
+			if (!verify_session(data)) return;
+
+			if (!data.status) {
 				write_msg(get_lang("this message cant be marked as normal"));
 				return;
-			} else if( func_after_flag_change ) {
+			} else if (func_after_flag_change) {
 				func_after_flag_change(true);
 			}
-	
-			if (data.status && Element("td_message_answered_"+msg_number)) {
-				
-				switch(flag){
+
+			if (data.status && Element("td_message_answered_" + msg_number)) {
+
+				switch (flag) {
 					case "unseen":
 						set_msg_as_unread(msg_number);
 						break;
@@ -1948,12 +1952,12 @@ function set_message_flag(msg_number, flag, func_after_flag_change){
 						set_msg_as_unflagged(msg_number);
 						break;
 					case "answered":
-						Element("td_message_answered_"+msg_number).innerHTML = '<img src=templates/'+template+'/images/answered.gif title=Respondida>';
+						Element("td_message_answered_" + msg_number).innerHTML = '<img src=templates/' + template + '/images/answered.gif title=Respondida>';
 						break;
 					case "forwarded":
-						Element("td_message_answered_"+msg_number).innerHTML = '<img src=templates/'+template+'/images/forwarded.gif title=Encaminhada>';
+						Element("td_message_answered_" + msg_number).innerHTML = '<img src=templates/' + template + '/images/forwarded.gif title=Encaminhada>';
 						break;
-				}				
+				}
 			} else {
 				refresh();
 			}
