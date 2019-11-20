@@ -7,6 +7,7 @@ if ( isset( $offline_language ) ) {
 	$_SESSION['phpgw_info']['expressomail']['user']['preferences']['common']['lang'] = $offline_language;
 }
 $f_lang = 'setup/phpgw_'.$_SESSION['phpgw_info']['expressomail']['user']['preferences']['common']['lang'].'.lang';
+
 function get_js_src( $f_in ) {
 	$array_keys = array();
 	if ( file_exists( $f_in) ) {
@@ -23,7 +24,6 @@ function get_js_src( $f_in ) {
 		$buf .= "array_lang['".str_replace("'","\'",strtolower($key))."'] = '".str_replace("'","\'",$value)."';\n";
 	return $buf;
 }
-
 if ( isset( $GLOBALS['phpgw']->js ) ) {
 	$f_JS = 'js/lang/'.basename($f_lang).'.js';
 	$f_out    = dirname( $_SERVER['SCRIPT_FILENAME'] ).SEP.$f_JS;
@@ -32,7 +32,7 @@ if ( isset( $GLOBALS['phpgw']->js ) ) {
 	if ( $stat2 === false || $stat1['mtime'] !== $stat2['mtime'] ) {
 		file_put_contents( $f_out, get_js_src( $f_lang ) );
 		touch( $f_out,$stat1['mtime'] );
-	}
+	} else get_js_src( $f_lang );
 	$GLOBALS['phpgw']->js->add( 'file', $f_JS );
 } else {
 	echo '<script type="text/javascript">'.get_js_src( $f_lang ).'</script>';
