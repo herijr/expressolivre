@@ -789,7 +789,7 @@ function move_search_msgs(border_id, new_folder, new_folder_name)
 
 		}
 
-		Ajax('this.imap_functions.move_search_messages', params, function (data) {
+		Ajax('$this.imap_functions.move_search_messages', params, function (data) {
 			if (!data || !data.msgs_number)
 				return;
 			else if (data.deleted) {
@@ -814,7 +814,7 @@ function move_search_msgs(border_id, new_folder, new_folder_name)
 			if (main_list.length > 1) {
 				updateBoxBgColor(box);
 			}
-			connector.purgeCache();
+			localCache.remove('get_folders_list');
 		});
 	} else {
 		write_msg(get_lang('No selected message.'));
