@@ -1565,13 +1565,13 @@ function send_message( ID, folder, folder_name )
 	Ajax( '$this.imap_functions.send_mail', form, function( data ) {
 		return send_message_return( data, ID );
 	} );
+
+	$('#send_button_'+ID).attr('disabled',null);
 }
 
 function send_message_return( data, ID ){
 
 	watch_changes_in_msg(ID);
-
-	$('#send_button_'+ID).attr('disabled',null);
 
 	if( typeof(data) == 'object' ){
 
