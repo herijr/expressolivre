@@ -1564,14 +1564,16 @@ function send_message( ID, folder, folder_name )
 
 	Ajax( '$this.imap_functions.send_mail', form, function( data ) {
 		return send_message_return( data, ID );
-	} );
-
-	$('#send_button_'+ID).attr('disabled',null);
+	}, undefined, function( data ) {
+		$('#send_button_'+ID).attr('disabled',null);
+	}  );
 }
 
 function send_message_return( data, ID ){
 
 	watch_changes_in_msg(ID);
+
+	$('#send_button_'+ID).attr('disabled',null);
 
 	if( typeof(data) == 'object' ){
 
@@ -2509,7 +2511,7 @@ function hashCode( obj )
 	return hash;
 }
 
-function Ajax( action, data, callback, method )
+function Ajax( action, data, callback, method, callbackFail )
 {
 	var buildBar =  function(){
 
@@ -2621,18 +2623,19 @@ function Ajax( action, data, callback, method )
 		}
 	}
 
-	return $.ajax( opts ).done( function( data, textStatus, jqXHR )
-	{
+	return $.ajax( opts ).done( function( data, textStatus, jqXHR ) {
+		
 		if ($.isFunction(callback))
 		{
 			localCache.set( func, hash, f_count( data ) , callback, textStatus, jqXHR );
 		}
-		
-		hideProgressBar();
 
 	}).fail(function(jqXHR) { 
 		
-		hideProgressBar();
+		if ($.isFunction(callbackFail))
+		{
+			callbackFail(jqXHR);
+		}
 
 		if( jqXHR.statusText !== "canceled" )
 		{ 
@@ -2640,6 +2643,10 @@ function Ajax( action, data, callback, method )
 
 			write_msg( get_lang( 'An unknown error occurred. The operation could not be completed.' ) );
 		}
+
+	}).always(function(jqXHR) {
+
+		hideProgressBar();
 	});
 }
 
