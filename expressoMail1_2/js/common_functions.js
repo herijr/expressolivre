@@ -352,15 +352,9 @@ function set_msg_as_unflagged(msg_number){
 	Element("td_message_important_"+msg_number).innerHTML = "&nbsp;&nbsp;&nbsp;";
 }
 
-function removeAll(id){
-	do
-	{
-		if( Element(id) && typeof(Element(id)) == 'undefined' ){
-			break;
-		}
-		Element(id).parentNode.removeChild(Element(id));
-	}
-	while(Element(id));
+function removeAll(id) {
+
+	if ($("#" + id).length > 0) { $("#" + id).remove(); }
 }
 
 function get_current_folder(){
