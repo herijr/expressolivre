@@ -772,9 +772,10 @@ class wf_orgchart
 	/**
 	 * Busca as áreas abaixo de uma determinada área.
 	 *
-	 * Este método irá buscar as áreas imediatamente inferiores à solicitada, não descendo nos próximos níveis da hierarquia.
+	 * Este método irá buscar as áreas imediatamente inferiores à solicitada podendo descer à toda hierarquia ou apenas ao próximo nível.
 	 * @param int $parentAreaID O ID da área da qual se quer saber as áreas imediatamente inferiores.
 	 * @param boolean $onlyActiveAreas Valor lógico que, caso verdadeiro, faz com que o método retorne somente as áreas ativas
+	 * @param boolean $recursive, valor lógico, caso verdadeiro desce toda a árvore hierarquica, caso falso desce apenas um degrau na árvore hierarquica. 
 	 * @return array Um array de arrays associativos contendo os atributos de várias áreas. Cada linha do array conterá:
 	 * - organizacao_id
 	 * - area_id
@@ -789,7 +790,7 @@ class wf_orgchart
 	 * - auxiliar_funcionario_id: o id da secretária da área
 	 * @access public
 	 */
-	function getSubAreasByParentAreaID($parentAreaID, $onlyActiveAreas = false)
+	function getSubAreasByParentAreaID($parentAreaID, $onlyActiveAreas = false, $recursive = false)
 	{
 		$query = "SELECT a.organizacao_id, a.area_id, a.area_status_id, " .
 				 "       a.superior_area_id, a.centro_custo_id, a.titular_funcionario_id, " .
@@ -812,7 +813,22 @@ class wf_orgchart
 			return false;
 
 		$output = $result->GetArray(-1);
-		return $output;
+
+		if($recursive){
+			$areas = $output;
+			$areas_return = array();
+			if(is_array($areas) && count($areas)){
+				foreach($areas AS $area){
+					$areas_return = array_merge($areas_return,  array($area['area_id']),$this->getSubAreasByParentAreaID($area['area_id'], true, true));	
+				}
+			}
+			
+			return $areas_return;
+
+		} else {
+			
+			return $output;
+		}
 	}
 
 	/**
@@ -1666,17 +1682,14 @@ class wf_orgchart
 	 * - funcionario_id
 	 * @access public
 	 */
-	function getEmployeeByManager($user_id){
+	function getEmployeesByManager($user_id){
 
-		//$orgchart = Factory::getInstance('wf_orgchart');
 		// Recupera área do usuário corrente
 		$current_employee = $this->getEmployee($user_id);
 		$area_id = $current_employee['area_id'];
-		$generic   = new Generic();
 
 		// Captura todos usuários da área (e sub-areas) do funcionário
-		$sub_areas = $generic->recuperaSubAreasRecursivamente($area_id);
-
+		$sub_areas = $this->getSubAreasByParentAreaID($area_id, true, true);
 		
 		if(is_array($sub_areas) && count($sub_areas)){
 			$func_ids = array();
@@ -1691,7 +1704,6 @@ class wf_orgchart
 		if(is_array($func_ids))
 		{
 		
-			$ldap = Factory::getInstance('wf_ldap');
 			foreach($func_ids as $elem)
 			{
 				
@@ -1700,9 +1712,6 @@ class wf_orgchart
 			}
 		}
 		
-		// Ordena array de funcionários (uidnumbers)
-		asort($executores);
-
 		return $executores;
 	}
 
