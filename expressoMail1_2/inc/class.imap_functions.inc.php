@@ -171,7 +171,6 @@ class imap_functions
 				}
 			}
 			$return['num_msgs'] = $num_msgs;
-
 		} else {
 
 			$return['tot_unseen'] = 0;
@@ -203,7 +202,7 @@ class imap_functions
 		$imap_attachment = new imap_attachment();
 
 		$header = $this->get_header($msg_number);
-
+		
 		$tempHeader = imap_fetchheader($this->mbox, imap_msgno($this->mbox, $msg_number));
 		$flag = preg_match('/importance *: *(.*)\r/i', $tempHeader, $importance);
 		$head_array['ContentType'] = $this->getMessageType($msg_number, $tempHeader);
@@ -236,8 +235,11 @@ class imap_functions
 		$head_array['smalldate'] = (date("d/m/Y") == $date_msg) ? gmdate("H:i",$msgTimestamp) : gmdate("d/m/Y",$msgTimestamp);
 
 		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? end( $header->from ) : false );
-		$head_array['to']      = (array)$this->mk_addr( isset( $header->to ) && is_array( $header->to ) && !( isset( $header->to[1]->host ) && $header->to[1]->host === '.SYNTAX-ERROR.' )? reset( $header->to   ) : false );
+		//$head_array['to'] = (array)$this->mk_addr( isset( $header->to ) && is_array( $header->to ) && !( isset( $header->to[1]->host ) && $header->to[1]->host === '.SYNTAX-ERROR.' )? reset( $header->to   ) : false );
 
+		$head_array['to'] = array();
+		foreach($header->to as $to) $head_array['to'][] = (array)$this->mk_addr($to);
+		
 		if ( empty( $head_array['to']['email'] ) && isset( $header->cc  ) && is_array( $header->cc  ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->cc ) );
 		if ( empty( $head_array['to']['email'] ) && isset( $header->bcc ) && is_array( $header->bcc ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->bcc ) );
 		if ( empty( $head_array['to']['email'] ) ) $head_array['to']['name'] = $head_array['to']['email'] = null;
@@ -470,7 +472,6 @@ class imap_functions
 			$new_params["msg_number"] = $msg_number;
 			//ini_set("display_errors","1");
 			$msg_info = $this->get_info_msg($new_params);
-
 			$this->mbox = $this->open_mbox($params['folder']); //Nao sei porque, mas se nao abrir de novo a caixa da erro.
 			$msg_info['header'] = $this->get_info_head_msg($msg_number);
 
@@ -496,7 +497,6 @@ class imap_functions
 	{
 		include_once( 'class.message_reader.inc.php' );
 		$mail_reader = new MessageReader();
-
 		$return = array();
 		$msg_number = $params['msg_number'];
 		if(preg_match('/(.+)(_[a-zA-Z0-9]+)/',$msg_number,$matches)) { //Verifies if it comes from a tab diferent of the main one.
@@ -511,7 +511,6 @@ class imap_functions
 		if ( !$this->mbox || !is_resource( $this->mbox ) ) $this->mbox = $this->open_mbox( $msg_folder );
 
 		if ( !( $header = $this->get_header( $msg_number ) ) ) return array( 'status_get_msg_info' => 'false' );
-
 		$header_src = imap_fetchheader( $this->mbox, $msg_number, FT_UID );
 
 		$mail_reader->setMessage( $this->mbox, $msg_folder, $msg_number );
@@ -2399,7 +2398,6 @@ class imap_functions
 		if ( ( $msg = $this->check_Attachments( $params ) ) !== true ) return $msg;
 
 		$mail = $this->compose_msg( $params, false );
-
 		if( isset($mail->error_count) && $mail->error_count > 0 ){
 			return array( 'success' => false, 'error' => $mail->ErrorInfo );	
 		}

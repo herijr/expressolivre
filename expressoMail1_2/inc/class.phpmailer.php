@@ -962,7 +962,7 @@ class PHPMailer
 		if ( $this->Mailer != 'mail' ) {
 			if ( count( $this->to ) == 0 && count( $this->cc ) == 0 && !$this->SaveMessageAsDraft )
 				$result .= $this->HeaderLine( 'To', $this->Lang( 'undisclosed-recipient' ) );
-			$result .= $this->AddrAppend( 'To', $this->to );
+            $result .= $this->AddrAppend( 'To', $this->to );
 			$result .= $this->AddrAppend( 'Cc', $this->cc );
 		}
 
@@ -1252,13 +1252,13 @@ class PHPMailer
 		foreach ( $addrs as $addr ) {
 			if ( $skip_first ) $skip_first = false;
 			else $str .= $this->_str_split( ', ', $str );
-			$label  = $this->_str_decode( $addr[1] );
+            $label  = str_replace(' ', '_', $this->_str_decode( $addr[1] ));
 			$email  = empty( $label )? trim( $addr[0] ) : '<'.trim( $addr[0] ).'>';
 			if ( !empty( $label ) ) {
 				$B = mb_encode_mimeheader( $label, 'UTF-8', 'B', $this->LE, $this->_str_indent( $str ) );
-				$Q = mb_encode_mimeheader( $label, 'UTF-8', 'Q', $this->LE, $this->_str_indent( $str ) );
-				$str .= ( strlen( $B ) < strlen( $Q ) )? $B : $Q;
-				$str .= $this->_str_split( ' ', $str );
+                $Q = mb_encode_mimeheader( $label, 'UTF-8', 'Q', $this->LE, $this->_str_indent( $str ) );
+                $str .= ( strlen( $B ) < strlen( $Q ) )? $B : $Q;
+                $str .= $this->_str_split( ' ', $str );
 			}
 			$str .= $this->_str_split( $email, $str );
         }
