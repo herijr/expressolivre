@@ -89,9 +89,10 @@ if( strpos($action, '/') === false)
 	// Return result serialized.
 	if ( $cExecuteFormReturn ) $_SESSION['response'] = $result;
 	else set_response( $result, isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'json' ), false );
+
+	session_write_close();
 }
 else if ( substr($action, 0, 5) == '$this' )
 {
 	include_once(substr($action, 6).'.php');
-	
 }
