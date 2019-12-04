@@ -88,8 +88,8 @@ if (!$passwd_changed) {
 	$db_functions = new db_functions();
 	$db_functions->write_log('modified user password', 'User change its own password in preferences');
 
-	require_once(PHPGW_API_INC . '/class.activedirectory.inc.php');
-	ActiveDirectory::getInstance()->passwd($GLOBALS['phpgw_info']['user']['account_lid'], $n_passwd);
+			require_once( PHPGW_API_INC.'/class.eventws.inc.php' );
+			EventWS::getInstance()->send( 'user_passwd_changed', $GLOBALS['phpgw_info']['user']['account_dn'], array( 'passwd' => $n_passwd ) );
 
 	$GLOBALS['hook_values']['uid']        = $GLOBALS['phpgw_info']['user']['account_lid'];
 	$GLOBALS['hook_values']['account_id'] = $GLOBALS['phpgw_info']['user']['account_id'];

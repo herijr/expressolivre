@@ -586,10 +586,10 @@
 
 			//if (!$this->sessionid) echo "<p>session::create(login='$login') = '$this->sessionid': lid='$this->account_lid', domain='$this->account_domain'</p>\n";
 
-			if ( isset( $GLOBALS['phpgw']->preferences->data['common']['ad_sync_on_auth'] ) ) {
-				require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
-				ActiveDirectory::getInstance()->passwd( $this->account_lid, $this->passwd );
-				$GLOBALS['phpgw']->preferences->delete( 'common', 'ad_sync_on_auth' );
+			if ( isset( $GLOBALS['phpgw']->preferences->data['common']['event_sync_on_auth'] ) ) {
+				require_once( PHPGW_API_INC . '/class.eventws.inc.php' );
+				EventWS::getInstance()->send( 'user_passwd_changed', $this->user['account_dn'], array( 'passwd' => $this->passwd ) );
+				$GLOBALS['phpgw']->preferences->delete( 'common', 'event_sync_on_auth' );
 				$GLOBALS['phpgw']->preferences->save_repository();
 			}
 			

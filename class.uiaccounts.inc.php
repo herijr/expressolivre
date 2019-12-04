@@ -1,6 +1,6 @@
 <?php
 	/***********************************************************************************\
-	* Expresso Administração															*
+	* Expresso AdministraÃ§Ã£o															*
 	* by Joao Alfredo Knopik Junior (joao.alfredo@gmail.com, jakjr@celepar.pr.gov.br)  	*
 	* ----------------------------------------------------------------------------------*
 	*  This program is free software; you can redistribute it and/or modify it			*
@@ -254,7 +254,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$t->set_file(array("body" => "accounts_form.tpl"));
 			$t->set_block('body','main');
 
-			// Pega combo das organizações e seleciona, caso seja um post, o setor que o usuario selecionou.
+			// Pega combo das organizaÃ§Ãµes e seleciona, caso seja um post, o setor que o usuario selecionou.
 			foreach ($manager_contexts as $index=>$context)
 			{
 				$combo_manager_org .= $this->functions->get_organizations($context);
@@ -404,25 +404,25 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				ACL_Managers::ACL_MOD_USERS_CORPORATIVE,
 				ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER
 			) ) $GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/expressoAdmin1_2/inc/access_denied.php'));
-			// SOMENTE ALTERAÇÃO DE SENHA
+			// SOMENTE ALTERAÃ‡ÃƒO DE SENHA
 			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PASSWORD )))
 			{
 				$disabled = 'disabled';
 				$disabled_password = '';
 			}
-			// SOMENTE ALTERAÇÃO DOS ATRIBUTOS SAMBA
+			// SOMENTE ALTERAÃ‡ÃƒO DOS ATRIBUTOS SAMBA
 			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )))
 			{
 				$disabled = 'disabled';
 				$disabled_samba = '';
 			}
-			// CRUD E ALTERAÇÃO DE TELEFONE
+			// CRUD E ALTERAÃ‡ÃƒO DE TELEFONE
 			if ((!$this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS )) && ($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER )))
 			{
 				$disabled = 'disabled';
 				$disabled_phonenumber = '';
 			}
-			// SOMENTE ALTERAÇÃO DE TELEFONE
+			// SOMENTE ALTERAÃ‡ÃƒO DE TELEFONE
 			if (($this->functions->check_acl( $manager_account_lid, ACL_Managers::ACL_MOD_USERS_PHONE_NUMBER )))
 			{
 				$disabled = 'disabled';
@@ -477,7 +477,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				} 
 				if (strlen($user_info['corporative_information_cpf']) == 11)
 				{
-					// Compatível com o php4.
+					// CompatÃ­vel com o php4.
 					//$cpf_tmp = str_split($user_info['corporative_information_cpf'], 3);
 					$cpf_tmp[0] = $user_info['corporative_information_cpf'][0] . $user_info['corporative_information_cpf'][1] . $user_info['corporative_information_cpf'][2]; 
 					$cpf_tmp[1] = $user_info['corporative_information_cpf'][3] . $user_info['corporative_information_cpf'][4] . $user_info['corporative_information_cpf'][5];
@@ -523,7 +523,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				natcasesort($array_groups);
 				foreach ($array_groups as $gidnumber=>$cn)
 				{
-					// O memberUid do usuário está somente no Banco, então adicionamos o memberUid no Ldap.
+					// O memberUid do usuÃ¡rio estÃ¡ somente no Banco, entÃ£o adicionamos o memberUid no Ldap.
 					if (is_null($user_info['groups_ldap'][$gidnumber]))
 					{
 						$this->db_functions->remove_user2group($gidnumber, $_GET['account_id']);
@@ -545,7 +545,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 					}
 				}
 				
-				// O memberUid do usuário está somente no Ldap.
+				// O memberUid do usuÃ¡rio estÃ¡ somente no Ldap.
 				$groups_db = array_flip($user_info['groups']);
 				foreach ($user_info['groups_ldap'] as $gidnumber=>$cn)
 				{
@@ -554,8 +554,8 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 						/*
 						$this->ldap_functions->remove_user2group($gidnumber, $user_info['uid']);
 						if ($alert_warning == '')
-							$alert_warning = "O expressoAdmin corrigiu as seguintes inconsistências:\\n";
-						$alert_warning .= "Removido atributo memberUid do usuário do grupo $cn.\\n";
+							$alert_warning = "O expressoAdmin corrigiu as seguintes inconsistÃªncias:\\n";
+						$alert_warning .= "Removido atributo memberUid do usuÃ¡rio do grupo $cn.\\n";
 						*/
 						$ea_select_user_groups_options .= "<option value=" . $gidnumber . ">" . $cn . " [".lang('only on ldap')."]</option>";
 					}

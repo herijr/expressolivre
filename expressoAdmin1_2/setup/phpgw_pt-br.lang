@@ -10,9 +10,6 @@ acl edit shared accounts acl	expressoAdmin1_2	pt-br	Editar ACL de contas compart
 acl edit shared accounts	expressoAdmin1_2	pt-br	Editar contas compartilhadas
 acl edit shared accounts quote	expressoAdmin1_2	pt-br	Editar COTA de contas compartilhadas
 acl empty shared accounts inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX de contas compartilhadas
-active directory enable	expressoAdmin1_2	pt-br	Ativar Active Directory
-Active Directory information	expressoAdmin1_2	pt-br	Informações do Active Directory
-Active Directory Settings	expressoAdmin1_2	pt-br	Configurações do Active Directory
 Active email account	expressoAdmin1_2	pt-br	Conta de E-mail ativa
 active user	expressoAdmin1_2	pt-br	usuário ativo
 added user samba attribute	expressoAdmin1_2	pt-br	Adicionado atributos samba ao usuário
@@ -36,7 +33,6 @@ Add shared accounts	expressoAdmin1_2	pt-br	Cria Contas Compartilhadas
 Add Sub Sectors	expressoAdmin1_2	pt-br	Criar Sub-Setores
 Add User	expressoAdmin1_2	pt-br	Adicionar Usuário
 Add users	expressoAdmin1_2	pt-br	Adicionar usuários
-ad loading	expressoAdmin1_2	pt-br	Carregando o Active Directory
 admin group	expressoAdmin1_2	pt-br	grupo administrador
 Administration Module for Users, Groups and Lists	common	pt-br	Módulo de Administração de Usuários, Grupos e Listas
 Administrator password	expressoAdmin1_2	pt-br	Senha do administrador
@@ -198,8 +194,12 @@ empty inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX
 empty shared accounts inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX de Contas Compartilhadas
 empty user inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX do usuário
 Empty value	expressoAdmin1_2	pt-br	Valor vazio
-enable account on active directory	expressoAdmin1_2	pt-br	Ativar conta no Active Directory
-Enable Active Directory	expressoAdmin1_2	pt-br	Ativar o Active Directory
+enable account on Event Web Service	expressoAdmin1_2	pt-br	Ativar conta no Event Web Service
+Event Web Service information	expressoAdmin1_2	pt-br	Informações do Event Web Service
+Event Web Service enable	expressoAdmin1_2	pt-br	Ativar Event Web Service
+Event Web Service Settings	expressoAdmin1_2	pt-br	Configurações do Event Web Service
+Enable Event Web Service	expressoAdmin1_2	pt-br	Ativar o Event Web Service
+Event Web Service loading	expressoAdmin1_2	pt-br	Carregando o Event Web Service
 Enable filter by group	expressoAdmin1_2	pt-br	Ativar filtro por grupo
 Enable Messenger	expressoAdmin1_2	pt-br	Ativar o Messenger
 Enable Radius	expressoAdmin1_2	pt-br	Habilitar Radius

@@ -17,7 +17,6 @@ class ACL_Managers
 	const ACL_SET_USERS_EMPTY_INBOX        = 'empty_user_inbox';
 	const ACL_REN_USERS                    = 'rename_users';
 	const ACL_DEL_USERS                    = 'delete_users';
-	const ACL_SET_USERS_ACTIVE_DIRECTORY   = 'active_directory_enable';
 
 	const ACL_ADD_INSTITUTIONAL_ACCOUNTS   = 'add_institutional_accounts';
 	const ACL_MOD_INSTITUTIONAL_ACCOUNTS   = 'edit_institutional_accounts';
@@ -113,7 +112,6 @@ class ACL_Managers
 		self::ACL_MOD_SHARED_ACCOUNTS_QUOTA,
 		self::ACL_SET_SHARED_ACCOUNTS_ACL_EMPTY,
 		self::ACL_DEL_SHARED_ACCOUNTS,
-		self::ACL_SET_USERS_ACTIVE_DIRECTORY,
 	);
 
 	private static $_bits_grp = array(

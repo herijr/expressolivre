@@ -14,6 +14,7 @@
 	include_once('class.imap_functions.inc.php');
 	include_once('class.functions.inc.php');
 include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
+	require_once( PHPGW_API_INC.'/class.eventws.inc.php' );
 	
 	class group
 	{
@@ -75,9 +76,11 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			
 			if ( isset( $params['members'] ) && is_array( $params['members'] ) && count( $params['members'] ) ) {
 				$uidnumber2method         = $isPhpgwAccount? 'uidnumber2uid' : 'uidnumber2dn';
-				$group_info[$member_attr] = $members= array();
-				foreach ( array_unique( $params['members'] ) as $uidnumber )
+				$group_info[$member_attr] = $members = $members_dn = array();
+				foreach ( array_unique( $params['members'] ) as $uidnumber ) {
 					$group_info[$member_attr][] = $members[$uidnumber] = $this->ldap_functions->$uidnumber2method( $uidnumber );
+					$members_dn[] = $isPhpgwAccount? $this->ldap_functions->uidnumber2dn( $uidnumber ) : $members[$uidnumber];
+				}
 			} else if ( !$isPhpgwAccount ) $group_info[$member_attr] = null;
 			
 			if ( $isPhpgwAccount ) {
@@ -149,6 +152,10 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			}
 			
 			$this->db_functions->write_log( 'Created group', $dn );
+			EventWS::getInstance()->send( 'group_created', $dn, $group_info );
+			if ( isset( $members_dn ) )
+				foreach ( $members_dn as $user_dn )
+					EventWS::getInstance()->send( 'user_group_in', $user_dn, array( 'groups' => array( $dn ) ) );
 			return array( 'status' => true );
 		}
 
@@ -157,6 +164,8 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			// Check manager access
 			if ( !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_GROUPS ) )
 				return array( 'status' => false, 'msg' => lang( 'You do not have access to edit groups' ).'.' );
+			
+			$has_change = array();
 			
 			// Check valid DN
 			$dn = $new_values['dn'];
@@ -184,8 +193,10 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				$result = $this->ldap_functions->change_user_context( $dn, 'cn='.$new_values['cn'], $new_values['context'] );
 				if ( !( isset( $result['status'] ) && $result['status'] ) )
 					return array( 'status' => false, 'msg' => $result['msg'] );
+				$old_dn = $dn;
 				$dn = 'cn='.$new_values['cn'].','.$new_values['context'];
 				$this->db_functions->write_log( 'Renamed group', $old_values['cn'].' -> '.$dn );
+				EventWS::getInstance()->send( 'group_renamed', $dn, array( 'old_dn' => $old_dn ) );
 			}
 			
 			//==========================================================================================================
@@ -329,7 +340,9 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 						foreach ( $add_members as $uidnumber => $user ) {
 							if ( $isPhpgwAccount ) $this->db_functions->add_user2group( $new_values['gidnumber'], $uidnumber );
 							$this->db_functions->write_log( 'included user to group', $dn.': '.$user );
+							EventWS::getInstance()->send( 'user_group_in', $this->ldap_functions->uidnumber2dn( $uidnumber ), array( 'groups' => array( $dn ) ) );
 						}
+						unset( $ldap_mod_add[$member_attr] );
 					}
 					
 					if ( isset( $ldap_mod_add['mailsenderaddress'] ) )
@@ -338,6 +351,8 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 					
 					if ( isset( $ldap_mod_add['objectClass'] ) && in_array( 'sambaGroupMapping', $ldap_mod_add['objectClass'] ) )
 						$this->db_functions->write_log( 'Added samba attibutes to group', $dn.': '.$new_values['sambasid'] );
+					
+					if ( count( $ldap_mod_add ) ) $has_change['ldap_add'] = $ldap_mod_add;
 				}
 			}
 			
@@ -352,7 +367,9 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 						foreach ( $rem_members as $uidnumber => $user ) {
 							if ( $isPhpgwAccount ) $this->db_functions->remove_user2group( $new_values['gidnumber'], $uidnumber );
 							$this->db_functions->write_log( 'removed user from group', $dn.': '.$user );
+							EventWS::getInstance()->send( 'user_group_out', $this->ldap_functions->uidnumber2dn( $uidnumber ), array( 'groups' => array( $dn ) ) );
 						}
+						unset( $ldap_mod_del[$member_attr] );
 					}
 					
 					if ( isset( $ldap_mod_del['mailsenderaddress'] ) )
@@ -361,6 +378,11 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 					
 					if ( isset( $ldap_mod_del['objectClass'] ) && in_array( 'sambaGroupMapping', $ldap_mod_del['objectClass'] ) )
 						$this->db_functions->write_log( 'removed group samba attributes', $dn );
+					
+					if ( count( $ldap_mod_del) ) {
+						$has_change['ldap_remove']  = $ldap_mod_del;
+						$has_change['old_sambaSID'] = $old_values['sambasid'].'-'.( ( 2 * $old_values['gidnumber'] ) + 1001 );
+					}
 				}
 			}
 			
@@ -370,6 +392,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			if ( $r_status && count( $ldap_mod_replace ) ) {
 				$result = $this->ldap_functions->replace_user_attributes( $dn, $ldap_mod_replace );
 				$r_status = ( isset( $result['status'] ) && $result['status'] );
+				$has_change['ldap_mod_replace'] = $ldap_mod_replace;
 			}
 			
 			//==========================================================================================================
@@ -449,6 +472,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 				}
 				
 			}
+			if ( count( $has_change ) ) EventWS::getInstance()->send( 'group_changed', $dn, $has_change );
 			return array( 'status' => true );
 		}
 
@@ -494,6 +518,8 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			$group_type = $this->get_type( $dn );
 			if ( $group_type['type'] === 0 ) {
 				
+				$info = $this->get_info( $group_type['gidnumber'] );
+				
 				//LDAP
 				$result_ldap = $this->ldap_functions->delete_group( $group_type['gidnumber'] );
 				if (!$result_ldap['status'])
@@ -510,14 +536,19 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 					$return['msg'] .= $result_db['msg'];
 				}
 			} else {
+				
+				$info = $this->get_info_groupOfNames( $dn );
+				
 				//LDAP
 				$result_ldap = $this->ldap_functions->delete_groupOfNames( $dn );
 				if ( !$result_ldap['status'] )
 					$return = array( 'status' => false, 'msg' => $result_ldap['msg'] );
 			}
 			
-			if ( $return['status'] == true )
+			if ( $return['status'] == true ) {
 				$this->db_functions->write_log( 'deleted group', array_pop( explode( '=', array_shift( explode( ',', $dn ) ) ) ) );
+				EventWS::getInstance()->send( 'group_deleted', $dn, $info );
+			}
 			
 			return $return;
 		}

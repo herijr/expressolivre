@@ -82,7 +82,8 @@
 				$user_info['cn']						= $params['givenname'] . ' ' . $params['sn'];
 				$user_info['gidNumber']					= $params['gidnumber'];
 				$user_info['givenName']					= $params['givenname'];
-				$user_info['homeDirectory']				= '/home/' . $params['uid'];
+				$user_info['homeDirectory']             = $params['sambahomedirectory'];
+				$user_info['loginShell']                = $params['loginshell'];
 				$user_info['mail']						= $params['mail'];
 				$user_info['objectClass'][]				= 'posixAccount';
 				$user_info['objectClass'][]				= 'inetOrgPerson';
@@ -169,25 +170,17 @@
 						}
 						else
 						{
-							$user_info['objectClass'][] 		= 'sambaSamAccount';
-							$user_info['loginShell']			= $params['loginshell'];
-	
-							$user_info['sambaSID']				= $params['sambadomain'] . '-' . ((2 * $id)+1000);
-							$user_info['sambaPrimaryGroupSID']	= $params['sambadomain'] . '-' . ((2 * $user_info['gidNumber'])+1001);
-
-							$user_info['sambaAcctFlags']		= $params['sambaacctflags'];
-			
-							$user_info['sambaLogonScript']		= $params['sambalogonscript'];
-							$user_info['homeDirectory']			= $params['sambahomedirectory'];
-			
-							$user_info['sambaLMPassword']		= exec('/home/expressolivre/mkntpwd -L "'.$params['password1'] . '"');
-							$user_info['sambaNTPassword']		= exec('/home/expressolivre/mkntpwd -N "'.$params['password1'] . '"');
-							
-							$user_info['sambaPasswordHistory']	= '0000000000000000000000000000000000000000000000000000000000000000';
-			
-							$user_info['sambaPwdCanChange']		= strtotime("now");
-							$user_info['sambaPwdLastSet']		= strtotime("now");
-							$user_info['sambaPwdMustChange']	= '2147483647';
+							$user_info['objectClass'][]        = 'sambaSamAccount';
+							$user_info['sambaSID']             = $params['sambadomain'] . '-' . ((2 * $id)+1000);
+							$user_info['sambaPrimaryGroupSID'] = $params['sambadomain'] . '-' . ((2 * $user_info['gidNumber'])+1001);
+							$user_info['sambaAcctFlags']       = $params['sambaacctflags'];
+							$user_info['sambaLogonScript']     = $params['sambalogonscript'];
+							$user_info['sambaLMPassword']      = exec('/home/expressolivre/mkntpwd -L "'.$params['password1'] . '"');
+							$user_info['sambaNTPassword']      = exec('/home/expressolivre/mkntpwd -N "'.$params['password1'] . '"');
+							$user_info['sambaPasswordHistory'] = '0000000000000000000000000000000000000000000000000000000000000000';
+							$user_info['sambaPwdCanChange']    = strtotime("now");
+							$user_info['sambaPwdLastSet']      = strtotime("now");
+							$user_info['sambaPwdMustChange']   = '2147483647';
 						}
 					//}
 				}
@@ -353,16 +346,10 @@
 					}
 				}
 				$this->db_functions->write_log("created user",$dn);
-
-				////////////////////////////////////////////////////////////////////////////////////////////////////////
-				// Active Directory
-				////////////////////////////////////////////////////////////////////////////////////////////////////////
-				$result = $this->ad_functions( 'add', $params['uid'], array(
-					'gn'  => $params['givenname'],
-					'sn'  => $params['sn'],
-					'dep' => $params['context'],
-					'pwd' => $params['password1'],
-				) );
+				
+				require_once( PHPGW_API_INC . '/class.eventws.inc.php' );
+				EventWS::getInstance()->send( 'user_created', $dn, array( 'passwd' => $params['password1'] ) );
+				
 				if ( is_string( $result ) ) {
 					$return['status'] = true;
 					$return['msg']   .= $this->functions->lang( $result );
@@ -377,6 +364,7 @@
 		{
 			$create_user_inbox = false;
 			$mbox_migrate = false;
+			$has_change = array();
 			
 			$return = array('status' => true);
 			$return['msg'] = '';
@@ -430,6 +418,7 @@
 						}
 						else
 						{
+							$has_change['old_dn'] = $dn;
 							$dn = $newrdn . ',' . $newparent;
 							$this->db_functions->write_log('modified user context', $dn . ': ' . $old_values['uid'] . '->' . $new_values['context']);
 						}
@@ -449,6 +438,17 @@
 					$ldap_mod_replace['sn'] = $new_values['sn'];
 					$ldap_mod_replace['cn'] = $new_values['givenname'] . ' ' . $new_values['sn'];
 					$this->db_functions->write_log("modified last name", "$dn: " . $old_values['sn'] . "->" . $new_values['sn']);
+				}
+				if (isset($diff['sambahomedirectory']) && $diff['sambahomedirectory'])
+				{
+					$ldap_mod_replace['homedirectory'] = $new_values['sambahomedirectory'];
+					$this->db_functions->write_log("modified user homedirectory",$dn);
+				}
+				if (isset($diff['loginshell']) && $diff['loginshell'])
+				{
+					if ( isset( $old_values['loginshell'] ) ) $ldap_mod_replace['loginshell'] = $new_values['loginshell'];
+					else $ldap_add['loginshell'] = $new_values['loginshell'];
+					$this->db_functions->write_log("modified user loginshell",$dn);
 				}
 				
 				if (isset($diff['mail']) && $diff['mail'])
@@ -533,13 +533,11 @@
 					$ldap_mod_replace['phpgwlastpasswdchange'] = time();
 					$this->db_functions->write_log("modified user password",$dn);
 					
-					require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
-					ActiveDirectory::getInstance()->passwd( $old_values['uid'], $new_values['password1'] );
-					
 					$GLOBALS['hook_values']['uid']        = $old_values['uid'];
 					$GLOBALS['hook_values']['account_id'] = $old_values['uidnumber'];
 					$GLOBALS['hook_values']['new_passwd'] = $new_values['password1'];
 					$GLOBALS['phpgw']->hooks->process('changepassword');
+					$has_change['passwd'] = $new_values['password1'];
 				}
 				
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -741,6 +739,7 @@
 				{
 					if( $this->ldap_functions->ldap_remove_photo($dn) ){
 						$this->db_functions->write_log( "removed user photo", $dn );
+						$has_change['photo_removed'] = true;
 					}
 				}
 				elseif($_FILES['photo']['name'] != '')
@@ -763,6 +762,7 @@
 							$this->db_functions->write_log("added user photo",$dn);
 						}
 						$this->ldap_functions->ldap_save_photo($dn, $_FILES['photo']['tmp_name'], $new_values['photo_exist']);
+						$has_change['photo_added'] = true;
 					}
 				}
 				else if( isset($new_values['accountPhoto']) )	
@@ -785,6 +785,7 @@
 							$this->db_functions->write_log("added user photo",$dn);
 						}
 						$this->ldap_functions->ldap_save_photo( $dn, array( $new_values['accountPhoto']['source'] ), $photo_exist );
+						$has_change['photo_added'] = true;
 					}
 				}
 			}
@@ -933,17 +934,6 @@
 			if ( ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS )) && 
 			     ($this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_MOD_USERS_SAMBA_ATTRIBUTES )) )
 			{
-				if ( $new_values['sambahomedirectory'] == '' )
-				{
-					$ldap_mod_replace['homeDirectory']	= '';
-				}
-				if ( array_key_exists( 'loginshell', $old_values ) )
-					$ldap_mod_replace['loginShell'] = $new_values['loginshell'];
-				else
-				{
-					if ( array_key_exists( 'loginShell', $new_values ) )
-						$ldap_add['loginShell'] = $new_values['loginshell'];
-				}
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				// REMOVE ATTRS OF SAMBA
 				if (($this->current_config['expressoAdmin_samba_support'] == 'true') && ($new_values['userSamba']) && ($new_values['use_attrs_samba'] != 'on'))
@@ -959,6 +949,7 @@
 					$ldap_remove['sambaPwdCanChange']		= array();
 					$ldap_remove['sambaPwdLastSet']			= array();
 					$ldap_remove['sambaPwdMustChange']		= array();
+					$has_change['old_sambaSID']             = $old_values['sambasid'].'-'.( ( 2 * $old_values['uidnumber'] ) + 1000 );
 					$this->db_functions->write_log("removed user samba attributes", $dn);
 				}
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -979,7 +970,6 @@
 						$ldap_add['sambaPrimaryGroupSID']	= $new_values['sambadomain'] . '-' . ((2 * $new_values['gidnumber'])+1001);
 						$ldap_add['sambaAcctFlags']			= $new_values['sambaacctflags'];
 						$ldap_add['sambaLogonScript']		= $new_values['sambalogonscript'];
-						$ldap_mod_replace['homeDirectory']	= $new_values['sambahomedirectory'];
 						$ldap_add['sambaLMPassword']		= exec('/home/expressolivre/mkntpwd -L '.'senha');
 						$ldap_add['sambaNTPassword']		= exec('/home/expressolivre/mkntpwd -N '.'senha');
 						$ldap_add['sambaPasswordHistory']	= '0000000000000000000000000000000000000000000000000000000000000000';
@@ -1027,7 +1017,7 @@
 								
 								$this->db_functions->write_log( "radius attributes was added", $dn );
 							}
-							else
+							else if( !in_array( $radiuskey, $old_values[$radius_conf->groupname_attribute] ) )
 							{
 								$ldap_mod_replace = array_merge_recursive( $ldap_mod_replace, array( $radius_conf->groupname_attribute => $radiuskey ) );
 								
@@ -1068,19 +1058,23 @@
 			
 				if (count($add_groups)>0)
 				{
+					$has_change['user_group_in'] = array();
 					foreach($add_groups as $gidnumber)
 					{
 						$this->db_functions->add_user2group($gidnumber, $new_values['uidnumber']);
 						$add_user2group_result = $this->ldap_functions->add_user2group($gidnumber, $user_uid);
-						if ($add_user2group_result['status'])
+						if ($add_user2group_result['status']) {
 							$this->db_functions->write_log("included user to group", "user_uid:$user_uid -> group_dn:" . $add_user2group_result['group_dn']);
-						else
+							$has_change['user_group_in'][] = $add_user2group_result['group_dn'];
+						} else
 							$this->db_functions->write_log("Fail to include user to group", $add_user2group_result['msg']);
 					}
+					if ( !count( $has_change['user_group_in'] ) ) unset( $has_change['user_group_in'] );
 				}
 				
 				if (count($remove_groups)>0)
 				{
+					$has_change['user_group_out'] = array();
 					foreach($remove_groups as $gidnumber)
 					{
 						foreach($old_values['groups_info'] as $group)
@@ -1089,13 +1083,15 @@
 							{
 								$this->db_functions->remove_user2group($gidnumber, $new_values['uidnumber']);
 								$remove_user2group_result = $this->ldap_functions->remove_user2group($gidnumber, $user_uid);
-								if ($remove_user2group_result['status'])
+								if ($remove_user2group_result['status']) {
 									$this->db_functions->write_log("removed user from group", "user_uid:$user_uid -> group_dn:" . $remove_user2group_result['group_dn']);
-								else
+									$has_change['user_group_out'][] = $remove_user2group_result['group_dn'];
+								} else
 									$this->db_functions->write_log("Fail to remove user from group", $remove_user2group_result['msg']);
 							}
 						}
 					}
+					if ( !count( $has_change['user_group_out'] ) ) unset( $has_change['user_group_out'] );
 				}
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1103,6 +1099,7 @@
 			if (isset($ldap_mod_replace) && count($ldap_mod_replace))
 			{
 				$result = $this->ldap_functions->replace_user_attributes($dn, $ldap_mod_replace);
+				$has_change['ldap_mod_replace'] = $ldap_mod_replace;
 				if (!$result['status'])
 				{
 					$return['status'] = false;
@@ -1114,6 +1111,7 @@
 			// LDAP_MOD_ADD
 			if (isset($ldap_add) && count($ldap_add))
 			{
+				$has_change['ldap_add'] = $ldap_add;
 				$result = $this->ldap_functions->add_user_attributes($dn, $ldap_add);
 				if (!$result['status'])
 				{
@@ -1126,6 +1124,7 @@
 			// LDAP_MOD_REMOVE			
 			if (isset($ldap_remove) && count($ldap_remove))
 			{
+				$has_change['ldap_remove'] = $ldap_remove;
 				$result = $this->ldap_functions->remove_user_attributes($dn, $ldap_remove);
 				if (!$result['status'])
 				{
@@ -1244,36 +1243,11 @@
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			}
 			
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// Active Directory
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			$result = false;
-			if ( isset( $new_values['ad_enabled'] ) != ( $new_values['ad_status'] === '1' ) ) {
-				$result = $this->ad_functions(
-					($new_values['ad_status'] === '0')? 'add' : ( ($new_values['ad_status'] === '1')? 'dis' : 'en' ),
-					$old_values['uid'], array(
-						'gn'  => isset( $new_values['givenname'] )? $new_values['givenname'] : $old_values['givenname'],
-						'sn'  => isset( $new_values['sn']        )? $new_values['sn']        : $old_values['sn'],
-						'dep' => isset( $new_values['context']   )? $new_values['context']   : $old_values['context'],
-						'ou'  => ( isset( $new_values['ad_ou'] ) && !empty( $new_values['ad_ou'] ) )? $new_values['ad_ou']     : false,
-						'pwd' => ( isset( $diff['password1']   ) && $diff['password1']             )? $new_values['password1'] : false,
-					)
-				);
-			} else {
-				if ( isset( $diff['givenname'] ) || isset( $diff['sn'] ) || isset( $diff['context'] ) ) {
-					$result = $this->ad_functions(
-						'upd',
-						$old_values['uid'], array(
-							'gn'  => isset( $new_values['givenname'] )? $new_values['givenname'] : $old_values['givenname'],
-							'sn'  => isset( $new_values['sn']        )? $new_values['sn']        : $old_values['sn'],
-							'dep' => isset( $new_values['context']   )? $new_values['context']   : $old_values['context'],
-						), false
-					);
-				}
-				if ( ( !is_string( $result ) ) && isset( $diff['password1'] ) && $diff['password1'] ) {
-					$result = $this->ad_functions( 'pass', $old_values['uid'], array( 'pwd' => $new_values['password1'] ), false );
-				}
+			if ( count( $has_change ) ) {
+				require_once( PHPGW_API_INC . '/class.eventws.inc.php' );
+				EventWS::getInstance()->send( 'user_changed', $dn, $has_change );
 			}
+			
 			if ( is_string( $result ) ) {
 				$return['status'] = false;
 				$return['msg']   .= $this->functions->lang( $result );
@@ -1403,13 +1377,10 @@
 						$this->db_functions->write_log("deleted users data from IMAP", $user_info['uid']);
 					}
 					
-					////////////////////////////////////////////////////////////////////////////////////////////////////
-					// Active Directory
-					////////////////////////////////////////////////////////////////////////////////////////////////////
-					$result = $this->ad_functions( 'dis', $user_info['uid'], array(), false );
-					if ( is_string( $result ) ) return array( 'status' => true, 'msg' => $this->functions->lang( $result ) );
-					////////////////////////////////////////////////////////////////////////////////////////////////////
+					require_once( PHPGW_API_INC . '/class.eventws.inc.php' );
+					$dn = 'uid='.$user_info['uid'].','.$user_info['context'];
 					
+					EventWS::getInstance()->send( 'user_deleted', $dn, array_merge( $user_info, array( 'groups' => $user_info['groups_ldap_dn'] ) ) );
 				}
 			}
 			else
@@ -1470,12 +1441,8 @@
 			// In this point, not revert ldap or mailbox 
 			$this->db_functions->write_log("renamed user", "$uid -> $new_uid");
 			
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// Active Directory
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			$result = $this->ad_functions( 'rn', $uid, array( 'login' => $new_uid ), false );
-			if ( is_string( $result ) ) return array( 'status' => true, 'msg' => $this->functions->lang( $result ) );
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			require_once( PHPGW_API_INC . '/class.eventws.inc.php' );
+			EventWS::getInstance()->send( 'user_renamed', 'cn='.$new_uid.','.$result['context'], array( 'old_dn' => 'cn='.$uid.','.$result['context']) );
 			
 			// Rename script on sieve
 			if ( $profile && $profile['imapEnableSieve'] === 'yes' ) {
@@ -1572,45 +1539,5 @@
 			
 		}
 		
-		function ad_functions( $action, $login, $params = array(), $check_admin = true )
-		{
-			if ( $check_admin && !$this->functions->check_acl( $_SESSION['phpgw_session']['session_lid'], ACL_Managers::ACL_SET_USERS_ACTIVE_DIRECTORY ) ) return false;
-			
-			require_once( PHPGW_API_INC . '/class.activedirectory.inc.php' );
-			$ad = ActiveDirectory::getInstance();
-			if ( !$ad->enabled ) return false;
-			
-			$sync = false;
-			switch( $action ) {
-				case 'add':
-					if ( ( !$ad->create( $login, $params['gn'], $params['sn'], $params['dep'], $params['pwd'], $params['ou'] ) ) && $ad->getError() ) return $ad->getError();
-					$sync = ( strlen( $params['pwd'] ) == 0 );
-					break;
-				case 'en':
-					if ( ( !$ad->enable( $login ) ) && $ad->getError() ) return $ad->getError();
-					if ( ( !$ad->update( $login, $params['gn'], $params['sn'], $params['dep'], $params['pwd'] ) ) && $ad->getError() ) return $ad->getError();
-					$sync = ( strlen( $params['pwd'] ) == 0 );
-					break;
-				case 'dis':
-					if ( ( !$ad->disable( $login ) ) && $ad->getError() ) return $ad->getError();
-					break;
-				case 'upd':
-					if ( ( !$ad->update( $login, $params['gn'], $params['sn'], $params['dep'] ) ) && $ad->getError() ) return $ad->getError();
-					break;
-				case 'pass':
-					if ( ( !$ad->passwd( $login, $params['pwd'] ) ) && $ad->getError() ) return $ad->getError();
-					break;
-				case 'rn':
-					if ( ( !$ad->rename( $login, $params['login'] ) ) && $ad->getError() ) return $ad->getError();
-					break;
-			}
-			if ( $sync ) {
-				$pref = CreateObject( 'phpgwapi.preferences', $login );
-				$pref->read_repository();
-				$pref->add( 'common', 'ad_sync_on_auth' );
-				$pref->save_repository();
-			}
-			return true;
-		}
 	}
 ?>

@@ -1377,6 +1377,7 @@ class ldap_functions
     			for ($i=0; $i<$entries['count']; $i++)
 	    		{
     				$result['groups_ldap'][ $entries[$i]['gidnumber'][0] ] = $entries[$i]['cn'][0];
+    				$result['groups_ldap_dn'][ $entries[$i]['gidnumber'][0] ] = $entries[$i]['dn'];
     			}
 			}
 		}
@@ -2052,7 +2053,7 @@ class ldap_functions
 				ldap_mod_add( $this->ldap, $entries[$i]['dn'], array( $attrs['attr'] => array( $attrs['new_val'] ) ) );
 			}
 		}
-		return array( 'status' => true, 'new_dn' => $new_dn );
+		return array( 'status' => true, 'new_dn' => $new_dn, 'context' => $context );
 	}
 
 	function rename_cn($cn, $new_cn)
