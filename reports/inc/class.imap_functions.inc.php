@@ -34,7 +34,12 @@ class imap_functions
 			if (!isset($this->_profile[$key]))
 				$this->_profile[$key] = str_replace("*","", $this->functions->lang($value));
 		
-		$this->_imap = imap_open('{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'/novalidate-cert}', $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
+		$encryption = ( $this->_profile['imapEncryption'] !== 'no') ? '/'.$this->_profile['imapEncryption'] : '';
+		$encryption .= ( $this->_profile['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
+		$strConnection = '{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].$encryption.'}';
+		
+		//A string original de conexão: '{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].'/novalidate-cert}';
+		$this->_imap = imap_open($strConnection, $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
 		
 		return $this->profile;
 	}

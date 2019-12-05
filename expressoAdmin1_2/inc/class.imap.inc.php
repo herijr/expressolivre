@@ -22,6 +22,8 @@ class imap
 	private $_user         = false;
 	private $_admin        = false;
 	private $_passwd       = false;
+	private $_encryption   = no;
+	private $_validate_cert= no;
 	
 	function __construct( $perfil, $user )
 	{
@@ -29,11 +31,32 @@ class imap
 		if ( is_array( $perfil ) ) {
 			foreach ( $perfil as $key => $value ) {
 				switch ( $key ) {
-					case 'server'    : case 'imapAdminServer'   : $this->_server    = $value; break;
-					case 'port'      : case 'imapAdminPort'     : $this->_port      = $value; break;
-					case 'admin'     : case 'imapAdminUsername' : $this->_admin     = $value; break;
-					case 'passwd'    : case 'imapAdminPW'       : $this->_passwd    = $value; break;
-					case 'delimiter' : case 'imapDelimiter'     : $this->_delimiter = $value; break;
+					case 'server': 
+					case 'imapAdminServer': 
+						$this->_server = $value; 
+						break;
+					case 'port': 
+					case 'imapAdminPort': 
+						$this->_port = $value; 
+						break;
+					case 'admin': 
+					case 'imapAdminUsername': 
+						$this->_admin = $value; 
+						break;
+					case 'passwd': 
+					case 'imapAdminPW': 
+						$this->_passwd = $value; 
+						break;
+					case 'delimiter': 
+					case 'imapDelimiter': 
+						$this->_delimiter = $value; 
+						break;
+					case 'imapEncryption': 
+						$this->_encryption = $value; 
+						break;
+					case 'imapValidateCert': 
+						$this->_validate_cert = $value; 
+						break;
 				}
 			}
 		}
@@ -49,12 +72,16 @@ class imap
 	 */
 	private function _get_ref( $user_path = false, $auth_opts = false )
 	{
-		$opts  = '/novalidate-cert';
+		/*$opts  = '/novalidate-cert';
 		switch ( $this->_port ) {
 			case 143: $opts .= $this->has_capability( 'starttls' )? '/tls' : '/notls'; break;
 			case 993: $opts .= '/ssl'; break;
 			default: break;
-		}
+		}*/
+
+		$opts = ( $this->_encryption !== 'no' ) ? '/'.$this->_encryption : '';
+		$opts .= ( $this->_validate_cert === 'yes') ? '/validate-cert' : '/novalidate-cert';
+
 		$opts .= $auth_opts? '/authuser=' . $this->_admin                    : '';
 		$opts .= $auth_opts? '/user='     . $this->_user                     : '';
 		$path  = $user_path? 'user'       . $this->_delimiter . $this->_user : '';

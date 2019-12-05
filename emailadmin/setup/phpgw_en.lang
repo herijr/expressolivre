@@ -117,7 +117,7 @@ This operation will move all mailboxes in the domain	emailadmin	en	This operatio
 Trash Folder	emailadmin	en	Trash Folder
 use ldap defaults	emailadmin	en	Use LDAP defaults
 use smtp auth	emailadmin	en	Use SMTP authentication
-use tls authentication	emailadmin	en	Use TLS authentication
-use tls encryption	emailadmin	en	Use TLS encryption
+use encryption	emailadmin	en	Use encryption
+validate cert	emailadmin	en	Validate certificate
 value	emailadmin	en	value
 virtual mail manager	emailadmin	en	Virtual mail manager

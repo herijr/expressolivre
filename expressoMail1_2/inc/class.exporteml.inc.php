@@ -174,9 +174,15 @@ class ExportEml
 	
 	private function _getImapOpts()
 	{
+		/* Old Code
 		return '/novalidate-cert'.(
 			($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes')? '/tls' : '/notls'
-		);
+		);*/
+
+		$imapOpts = ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] !== 'no') ? '/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] : '';
+		$imapOpts .= ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
+
+		return $imapOpts;
 	}
 
 	private function _getImapMailbox( $folder = null )

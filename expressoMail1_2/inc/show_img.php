@@ -13,7 +13,12 @@ $username    = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
 $password    = $_SESSION['phpgw_info']['expressomail']['user']['passwd'];
 $imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 $imap_port   = $_SESSION['phpgw_info']['expressomail']['email_server']['imapPort'];
-$imap_opts   = '/'.($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes'? '' : 'no' ).'tls/novalidate-cert';
+
+/* Old Code
+$imap_opts   = '/'.($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes'? '' : 'no' ).'tls/novalidate-cert';*/
+
+$imap_opts = ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] !== 'no') ? '/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] : '';
+$imap_opts .= ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
 
 if ( ( $mailbox = imap_open( '{'.$imap_server.':'.$imap_port.$imap_opts.'}'.$folder, $username, $password ) ) === false ) exit;
 if ( ( $header  = imap_bodystruct( $mailbox, imap_msgno( $mailbox, $msg_num ), $msg_part ) ) === false ) exit;

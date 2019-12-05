@@ -38,8 +38,13 @@ class imap_functions
 		foreach ($fields as $key => $value)
 			if (!isset($this->_profile[$key]))
 				$this->_profile[$key] = str_replace("*","", $this->functions->lang($value));
-		
-		$this->_imap = imap_open('{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'/novalidate-cert}', $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
+
+		$encryption = ( $this->_profile['imapEncryption'] !== 'no') ? '/'.$this->_profile['imapEncryption'] : '';
+		$encryption .= ( $this->_profile['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
+		$strConnection = '{'.$this->_profile['imapServer'].':'.$this->_profile['imapPort'].$encryption.'}';
+
+		//A string original de conexão: '{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].'/novalidate-cert}'
+		$this->_imap = imap_open($strConnection, $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW'], OP_HALFOPEN);
 		
 		return $this->_profile;
 	}
@@ -335,14 +340,18 @@ class imap_functions
 			return $result;
 		}
 		
-		if ($this->_profile['imapTLSEncryption'] == 'yes')
+		/*if ($this->_profile['imapTLSEncryption'] == 'yes')
 		{
 			$imap_options = '/tls/novalidate-cert';
 		}
 		else
 		{
 			$imap_options = '/notls/novalidate-cert';
-		}
+		}*/
+
+		$encryption = ( $this->_profile['imapEncryption'] !== 'no') ? '/'.$this->_profile['imapEncryption'] : '';
+		$encryption .= ( $this->_profile['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
+		$strConnection = '{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].$encryption.'}';
 
 		$result['status'] = true;
 		$uid = $params['uid'];
@@ -351,7 +360,8 @@ class imap_functions
 		
 		if ($return_setacl)
 		{
-			$mbox_stream = imap_open('{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].$imap_options .'}user'. $this->_profile['imapDelimiter'] . $uid, $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW']);
+			//A string original de conexão: '{'.$this->_profile['imapAdminServer'].':'.$this->_profile['imapAdminPort'].$imap_options .'}user'
+			$mbox_stream = imap_open($strConnection .'user'. $this->_profile['imapDelimiter'] . $uid, $this->_profile['imapAdminUsername'], $this->_profile['imapAdminPW']);
 			
 			$check = imap_mailboxmsginfo($mbox_stream);
 			$inbox_size = (string)(round ((($check->Size)/(1024*1024)), 2));

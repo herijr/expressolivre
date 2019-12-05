@@ -72,6 +72,6 @@ Trash Folder	emailadmin	es-es	Carpeta de la papelera
 use ldap defaults	emailadmin	es-es	usar las opciones predeterminadas para LDAP
 users can define their own emailaccounts	emailadmin	es-es	Los usuarios pueden definir sus propias cuentas de correo
 use smtp auth	emailadmin	es-es	Usar identificación SMTP
-use tls authentication	emailadmin	es-es	Usar identificación TLS
-use tls encryption	emailadmin	es-es	Usar cifrado TLS
+use encryption	emailadmin	es-es	Usar cifrado
+validate cert	emailadmin	es-es	Validar Certificado
 virtual mail manager	emailadmin	es-es	Gestor de correo virtual

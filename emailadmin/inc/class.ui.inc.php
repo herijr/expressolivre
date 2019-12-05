@@ -223,11 +223,11 @@ class ui
 			));
 
 			//Check Boxes
-			$checkBoxes = array( 'imapenablecyrusadmin', 'imapenablesieve', 'imaptlsauthentication', 'imaptlsencryption',
+			$checkBoxes = array( 'imapenablecyrusadmin', 'imapenablesieve', 'imapvalidatecert',
 				'smtpauth', 'smtpldapusedefault', 'imapoldcclient','imapcreatespamfolder');
 
 			//Select Boxes
-			$selectBoxes = array( 'imapdelimiter' );
+			$selectBoxes = array( 'imapdelimiter', 'imapencryption' );
 
 			foreach($profileData as $key => $value)
 			{
@@ -238,12 +238,17 @@ class ui
 				}
 				else if( array_search( strtolower($key), $selectBoxes ) !== FALSE )
 				{
-					$optionValue = 'selected_'.strtolower($key).'_dot';
+					if ( strtolower($key) === 'imapdelimiter') {
+						$optionValue = 'selected_'.strtolower($key).'_dot';
+						if( $value === "/" ){ $optionValue = 'selected_'.strtolower($key).'_slash'; }
+						$this->template->set_var( $optionValue ,'selected="1"');
+					}
 
-					if( $value === "/" ){ $optionValue = 'selected_'.strtolower($key).'_slash'; }
-											
-					$this->template->set_var( $optionValue ,'selected="1"');
-				}	
+					if ( strtolower($key) === 'imapencryption') {
+						$optionValue = 'selected_'.strtolower($key).'_'.$value;
+						$this->template->set_var( $optionValue ,'selected="1"');
+					}
+				}
 				else
 				{
 					$this->template->set_var('value_'.strtolower($key),$value);
@@ -323,8 +328,9 @@ class ui
 			"lang_standard"					=> lang("standard"),
 			"lang_spam_folder" 				=> lang('Spam Folder'),
 			"lang_trash_folder"				=> lang('Trash Folder'),								
-			"lang_use_tls_authentication"	=> lang('use tls authentication'),
-			"lang_use_tls_encryption" 		=> lang('use tls encryption'),
+			"lang_use_encryption" 			=> lang('use encryption'),
+			"lang_validate_cert" 			=> lang('validate cert'),
+			"lang_no" 						=> lang('no'),
 			"lang_Use_SMTP_auth" 			=> lang('Use SMTP auth'),
 			"lang_use_LDAP_defaults" 		=> lang('use LDAP defaults'),
 			"lang_user_defined_accounts"	=> lang("users can define their own emailaccounts"),
@@ -567,6 +573,17 @@ class ui
 		if( $_POST )
 		{	
 			$profile = $_POST;
+
+			//Checkbox Validate Cert ( yes or no! )
+			if ( !isset( $profile['imapvalidatecert'] ) ) $profile['imapvalidatecert'] = 'no';
+			else $profile['imapvalidatecert'] = 'yes';
+
+			//Select Encryption ( no, ssl, tls or notls! )
+			$valOp = array( 'no', 'ssl', 'tls', 'notls' );
+			if ( array_search( $profile['imapencryption'], $valOp ) === FALSE ){
+				$profile['imapencryption'] = 'no';
+				$profile['imapvalidatecert'] = 'no';
+			}
 
 			$profileid = $this->boemailadmin->saveProfile($profile);
 

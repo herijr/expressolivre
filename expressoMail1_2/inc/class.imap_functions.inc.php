@@ -43,9 +43,14 @@ class imap_functions
 		$this->has_cid          = false;
 		$this->prefs            = $_SESSION['phpgw_info']['user']['preferences']['expressoMail'];
 		$this->mbox							= false;
+		
+		/* Old Code
 		$this->imap_options     = '/novalidate-cert'.(
 			($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes')? '/tls' : '/notls'
-		);
+		);*/
+
+		$this->imap_options = ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] !== 'no') ? '/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] : '';
+		$this->imap_options .= ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
 		
 		// Conf full name for display on sending email
 		$this->fullNameUser = $_SESSION['phpgw_info']['expressomail']['user']['fullname'];
@@ -3050,7 +3055,11 @@ class imap_functions
 		) {
 			$userID = $_SESSION['phpgw_info']['expressomail']['user']['userid'];
 			$mailbox = imap_open(
-				'{'.$this->imap_server.':'.$this->imap_port.'/novalidate-cert}',
+				
+				/* Old Code
+				'{'.$this->imap_server.':'.$this->imap_port.'/novalidate-cert}',*/
+
+				'{'.$this->imap_server.':'.$this->imap_port.$this->imap_options.'}',
 				$_SESSION['phpgw_info']['expressomail']['email_server']['imapAdminUsername'],
 				$_SESSION['phpgw_info']['expressomail']['email_server']['imapAdminPW'],
 				OP_HALFOPEN
@@ -3927,7 +3936,13 @@ class imap_functions
         $password = $_SESSION['phpgw_info']['expressomail']['user']['passwd'];
         $imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
         $imap_port 	= $_SESSION['phpgw_info']['expressomail']['email_server']['imapPort'];
-        $imap_options = '/notls/novalidate-cert';
+		
+		/* Old Code
+		$imap_options = '/notls/novalidate-cert'; */
+
+		$imap_options = ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] !== 'no') ? '/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] : '';
+		$imap_options .= ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
+
         $mbox_stream = imap_open("{".$imap_server.":".$imap_port.$imap_options."}".$folder, $username, $password);
         if(imap_last_error())
         {

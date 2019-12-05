@@ -117,7 +117,7 @@ This operation will move all mailboxes in the domain	emailadmin	pt-br	Está opera
 Trash Folder	emailadmin	pt-br	Pasta da lixeira
 use ldap defaults	emailadmin	pt-br	Usar padrões LDAP
 use smtp auth	emailadmin	pt-br	Usar SMTP Autenticado
-use tls authentication	emailadmin	pt-br	Usar autenticação TLS
-use tls encryption	emailadmin	pt-br	Usar encriptação TLS
+use encryption	emailadmin	pt-br	Usar criptografia
+validate cert	emailadmin	pt-br	Validar Certificado
 value	emailadmin	pt-br	valor
 virtual mail manager	emailadmin	pt-br	Gerenciador Virtual Mail

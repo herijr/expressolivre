@@ -4,6 +4,13 @@ $(function()
 	$("#tabs ul.ui-tabs-nav.ui-helper-reset.ui-helper-clearfix.ui-widget-header.ui-corner-all")
 	.css("border","1px solid #D3DCE3")
 	.css("background","#D3DCE3");
+
+	if($("select[name=imapencryption]").val() == "no") {
+		$("input[type=checkbox][name=imapvalidatecert]").prop("checked", false);
+		$("input[type=checkbox][name=imapvalidatecert]").prop("disabled", true);
+	} else {
+		$("input[type=checkbox][name=imapvalidatecert]").prop("disabled", false);
+	}
 });
 
 $("#button_save").button().click(function(){
@@ -67,6 +74,17 @@ $("input[type=text][name=imapport]").on('keypress', function(e)
 $("input[type=text][name=imapsieveport]").on('keypress', function(e)
 {
 	var key = ( window.event) ? event.keyCode: e.which; return _is_number( key );
+});
+
+//IMAPENCRIPTION : IF SELECTED VALID OPTION, DISABLE VALIDADE CERT
+$("select[name=imapencryption]").on('change', function(e)
+{
+	if(this.value == "no") {
+		$("input[type=checkbox][name=imapvalidatecert]").prop("checked", false);
+		$("input[type=checkbox][name=imapvalidatecert]").prop("disabled", true);
+	} else {
+		$("input[type=checkbox][name=imapvalidatecert]").prop("disabled", false);
+	}
 });
 
 function _is_number(key)

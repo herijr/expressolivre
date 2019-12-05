@@ -115,4 +115,15 @@
       $GLOBALS['setup_info']['emailadmin']['currentver'] = '2.2.1';
       return $GLOBALS['setup_info']['emailadmin']['currentver'];
    }
+   /*
+ 	Para posterior analise e correção de erros  
+   $test[] = '2.2.1';
+   function emailadmin_upgrade2_2_1()
+	{
+	  $GLOBALS['phpgw_setup']->oProc->AlterColumn('phpgw_emailadmin','imaptlsencryption', array('type' => 'varchar', 'precision' => 5));
+	  $GLOBALS['phpgw_setup']->oProc->RenameColumn('phpgw_emailadmin','imaptlsencryption','imapencryption');
+	  $GLOBALS['phpgw_setup']->oProc->RenameColumn('phpgw_emailadmin','imaptlsauthentication','imapvalidatecert');
+      $GLOBALS['setup_info']['emailadmin']['currentver'] = '2.2.2';
+      return $GLOBALS['setup_info']['emailadmin']['currentver'];
+   }*/
 ?>

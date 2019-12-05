@@ -132,13 +132,18 @@
 						</div>
 
 						<div>
-							<label>{lang_use_tls_encryption}</label>						
-							<input type="checkbox" name="imaptlsencryption" {selected_imaptlsencryption} value="yes">
+							<label>{lang_use_encryption}</label>						
+							<select name="imapencryption">
+								<option value="no" {selected_imapencryption_no}>&nbsp;{lang_no}&nbsp;</option>
+								<option value="ssl" {selected_imapencryption_ssl}>&nbsp;SSL&nbsp;</option>
+								<option value="tls" {selected_imapencryption_tls}>&nbsp;TLS&nbsp;</option>
+								<option value="notls" {selected_imapencryption_notls}>&nbsp;NOTLS&nbsp;</option>
+							</select>
 						</div>
 
 						<div>
-							<label>{lang_use_tls_authentication}</label>												
-							<input type="checkbox" name="imaptlsauthentication" {selected_imaptlsauthentication} value="yes">
+							<label>{lang_validate_cert}</label>												
+							<input type="checkbox" name="imapvalidatecert" {selected_imapvalidatecert} value="yes">
 						</div>
 
 						<div>

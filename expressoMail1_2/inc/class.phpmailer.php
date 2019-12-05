@@ -682,14 +682,18 @@ class PHPMailer
 			$imapDefaultSentFolder	= $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'];
 			$imapDelimiter			= $_SESSION['phpgw_info']['expressomail']['email_server']['imapDelimiter'];
 			
-			if ($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes')
+            /* Old Code
+            if ($_SESSION['phpgw_info']['expressomail']['email_server']['imapTLSEncryption'] == 'yes')
 			{
 				$imap_options = '/tls/novalidate-cert';
 			}
 			else
 			{
 				$imap_options = '/notls/novalidate-cert';
-			}
+            }*/
+            
+            $imap_options = ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] !== 'no') ? '/'.$_SESSION['phpgw_info']['expressomail']['email_server']['imapEncryption'] : '';
+		    $imap_options .= ( $_SESSION['phpgw_info']['expressomail']['email_server']['imapValidateCert'] === 'yes') ? '/validate-cert' : '/novalidate-cert';
 			
 			$mbox_stream = imap_open("{".$imap_server.":".$imap_port.$imap_options."}".$this->SaveMessageInFolder, $username, $password);
 			
