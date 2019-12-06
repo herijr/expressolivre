@@ -3121,6 +3121,8 @@ class imap_functions
 		$body  = lang("Your message: %1",$this->_toUTF8( $params['subject'] )) . '<br>';
 		$body .= lang("Received in: %1",date("d/m/Y H:i",$params['date'])) . '<br>';
 
+		$resultParse = '';
+		
 		if ( !empty( $params['toaddress2'] ) ) {
 
 			$resultParse = imap_rfc822_parse_adrlist( $params['toaddress2'], null );
@@ -3129,29 +3131,28 @@ class imap_functions
 			$params['toaddress2mail'] = $resultParse[0]->mailbox . '@' . $resultParse[0]->host;
 		}
 
-		if ( !isset($params['toaddress2mail']) && empty( $params['toaddress2mail'] ) ) {
-
-			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));
-		} else {
-
-			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $params['toaddress2name'] , $params['toaddress2mail'], date("d/m/Y H:i"));
-		}
+		$ldapFunctions = CreateObject('expressoMail1_2.ldap_functions');
+		$ehLista = $ldapFunctions->testMailList($resultParse[0]->mailbox);
 		
+		//Caso nao seja uma lista, entao eh uma conta institucional
+		if ( isset($params['toaddress2mail']) && !empty( $params['toaddress2mail'] ) && !$ehLista ) {
+			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $params['toaddress2name'] , $params['toaddress2mail'], date("d/m/Y H:i"));
+		} else {
+			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));			
+		}
 		
 		$mail->SMTPDebug = false;
 		$mail->IsSMTP();
 		$mail->Host = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpServer'];
 		$mail->Port = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpPort'];
 		
-		
-		if ( !isset($params['toaddress2mail']) && empty( $params['toaddress2mail'] ) ) {
-
-			$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];	
-			$mail->FromName = $this->fullNameUser;
-		} else {
-
+		//Caso nao seja uma lista, entao eh uma conta institucional
+		if ( isset($params['toaddress2mail']) && !empty( $params['toaddress2mail'] ) && !$ehLista ) {
 			$mail->From = $params['toaddress2mail'];
 			$mail->FromName = $params['toaddress2name'];
+		} else {
+			$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];	
+			$mail->FromName = $this->fullNameUser;
 		}
 		
 		$mail->AddAddress($toaddress);

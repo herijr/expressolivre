@@ -841,6 +841,7 @@ class ldap_functions
 		}
 		return false;
 	}
+
 	function uidnumber2uid($uidnumber)
 	{
 		// do not follow the referral
@@ -854,6 +855,21 @@ class ldap_functions
 				return false;
 			$info = ldap_get_entries($this->ds, $sr);
 			return $info[0]["uid"][0];
+		}
+		return false;
+	}
+
+	function testMailList($uid)
+	{
+		$this->ldapConnect();
+		if ($this->ds)
+		{
+			$filter="(&(phpgwAccountType=l)(uid=$uid))";
+			$justthese = array("uid");
+			$sr=@ldap_search($this->ds, $this->ldap_context, $filter, $justthese);
+			if(!$sr) return false;
+			$return = ldap_get_entries($this->ds, $sr);
+			return ($return['count'] > 0)?true:false;
 		}
 		return false;
 	}
