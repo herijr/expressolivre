@@ -53,8 +53,8 @@ class uieventws
 	{
 		if ( !$GLOBALS['phpgw']->acl->check('run',1,'admin') ) $GLOBALS['phpgw']->redirect($GLOBALS['phpgw']->link('/admin/index.php'));
 		
-		$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-latest.min.js');
-		$GLOBALS['phpgw']->js->add('src','./prototype/plugins/jquery/jquery-ui-latest.min.js');
+		$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-latest.min.js');
+		$GLOBALS['phpgw']->js->add('file','./prototype/plugins/jquery/jquery-ui-latest.min.js');
 		$GLOBALS['phpgw']->js->add('txt','var config_save_url = "/index.php?menuaction=expressoAdmin1_2.uieventws.save";');
 		$GLOBALS['phpgw']->js->validate_file('jscode','connector','expressoAdmin1_2');
 		$GLOBALS['phpgw']->js->validate_file('jscode','lang','expressoAdmin1_2');
@@ -81,7 +81,7 @@ class uieventws
 			'lang_disabled'                 => lang('Disabled'),
 			'lang_add'                      => lang('Add'),
 			
-			'lang_enabled_ad'               => lang('Enable Event Web Service'),
+			'lang_enabled_eventws'			=> lang('Enable Event Web Service'),
 			'input_name_enabled'            => EventWS::CONFIG_ENABLED,
 			'input_value_enabled'           => $confs[EventWS::CONFIG_ENABLED]? 'checked' : '',
 			

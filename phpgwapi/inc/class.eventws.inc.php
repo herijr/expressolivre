@@ -48,14 +48,20 @@ class EventWS extends ConfigSerial
 	public function send( $event, $dn, $args = array() )
 	{
 		if ( $this->_conn() ) {
-			$result = $this->_soap->event( base64_encode( serialize( (object)array(
-				'admin'  => $this->admin,
-				'passwd' => $this->passwd,
-				'dn'     => $dn,
-				'event'  => $event,
-				'args'   => $args,
-			) ) ) );
+			try {
+				
+				$result = $this->_soap->event( base64_encode( serialize( (object)array(
+					'admin'  => $this->admin,
+					'passwd' => $this->passwd,
+					'dn'     => $dn,
+					'event'  => $event,
+					'args'   => $args,
+				) ) ) );
+			} catch ( SoapFault $e ){
+				unset( $e );
+			}
 		}
+
 		return $this->_error;
 	}
 	

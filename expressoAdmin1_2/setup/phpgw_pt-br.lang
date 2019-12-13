@@ -194,12 +194,12 @@ empty inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX
 empty shared accounts inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX de Contas Compartilhadas
 empty user inbox	expressoAdmin1_2	pt-br	Esvaziar INBOX do usuário
 Empty value	expressoAdmin1_2	pt-br	Valor vazio
-enable account on Event Web Service	expressoAdmin1_2	pt-br	Ativar conta no Event Web Service
-Event Web Service information	expressoAdmin1_2	pt-br	Informações do Event Web Service
-Event Web Service enable	expressoAdmin1_2	pt-br	Ativar Event Web Service
-Event Web Service Settings	expressoAdmin1_2	pt-br	Configurações do Event Web Service
-Enable Event Web Service	expressoAdmin1_2	pt-br	Ativar o Event Web Service
-Event Web Service loading	expressoAdmin1_2	pt-br	Carregando o Event Web Service
+enable account on Event Web Service	expressoAdmin1_2	pt-br	Ativar conta no serviço web de eventos
+Event Web Service information	expressoAdmin1_2	pt-br	Informações do serviço web de eventos
+Event Web Service enable	expressoAdmin1_2	pt-br	Ativar o serviço web de eventos
+Event Web Service Settings	expressoAdmin1_2	pt-br	Configurações do serviço web de eventos
+Enable Event Web Service	expressoAdmin1_2	pt-br	Ativar o serviço web de eventos
+Event Web Service loading	expressoAdmin1_2	pt-br	Carregando o serviço web de eventos
 Enable filter by group	expressoAdmin1_2	pt-br	Ativar filtro por grupo
 Enable Messenger	expressoAdmin1_2	pt-br	Ativar o Messenger
 Enable Radius	expressoAdmin1_2	pt-br	Habilitar Radius

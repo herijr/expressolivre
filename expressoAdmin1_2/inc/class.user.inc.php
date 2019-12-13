@@ -346,10 +346,20 @@
 					}
 				}
 				$this->db_functions->write_log("created user",$dn);
-				
+
+				// Broker Expresso
 				require_once( PHPGW_API_INC . '/class.eventws.inc.php' );
-				EventWS::getInstance()->send( 'user_created', $dn, array( 'passwd' => $params['password1'] ) );
+
+				// PARA ENVIAR TODOS OS DADOS NA CRIACAO DO USUARIO
+				/*
+				$params['passwd'] = $params['password1'];
+				unset( $params['password1'] );
+				unset( $params['password2'] );
+				EventWS::getInstance()->send( 'user_created', $dn, $params );
+				*/
 				
+				EventWS::getInstance()->send( 'user_created', $dn, array( 'passwd' => $params['password1'] ) );
+
 				if ( is_string( $result ) ) {
 					$return['status'] = true;
 					$return['msg']   .= $this->functions->lang( $result );
