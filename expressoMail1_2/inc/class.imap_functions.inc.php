@@ -531,8 +531,11 @@ class imap_functions
 			$return['body']         = $body_struct->body;
 			$return['type']         = $body_struct->type;
 			$return['attachments']  = $mail_reader->getAttachInfo();
+			
 			if ( isset( $body_struct->body_alternative ) ) $return['body_alternative'] = $body_struct->body_alternative;
-
+			
+			if ( isset( $body_struct->infoType ) ) $return['content_type_additional'] = $body_struct->infoType;
+			
 			// TODO: Change security code for client (javascript)
 			if ( $return['type'] === 'html' ) $return['body'] = $this->replace_special_characters( $return['body'] );
 

@@ -1971,6 +1971,16 @@ function draw_message( info_msg, ID )
 		pre_plain.html( pre_plain.text() );
 
 	} else {
+
+		if( info_msg.hasOwnProperty('content_type_additional') ){
+			switch( info_msg.content_type_additional ){
+				case "message/delivery-status"           :
+				case "message/disposition-notification"  : 
+					newBody = '<pre>' + info_msg.body_alternative + newBody + '</pre>';
+					break;
+			}
+		}
+	
 		$(_body).html( newBody.replace(/<\/?body[^>]*>/ig,''));
 	}
 
