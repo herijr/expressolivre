@@ -304,6 +304,7 @@ It allow you to remove attachments from messages	expressoMail1_2	pt-br	Permite q
 It allow you to send emails with important flag, but you can receive unwanted messages with important flag	expressoMail1_2	pt-br	Ela permite que você envie e-mails com sinalização de importante, mas você pode receber mensagens indesejadas com sinalização de importante
 It is where the keyword should be searched when the user executes a quick search.	expressoMail1_2	pt-br	Aonde a busca deve ser realizada quando o usuário realizar uma pesquisa rápida.
 It's not possible create inside: 	expressoMail1_2	pt-br	Não é possivel criar dentro de: 
+It's not possible delete the selected folder	expressoMail1_2	pt-br	Não é possível remover a pasta selecionada 
 It's not possible delete the folder: 	expressoMail1_2	pt-br	Não é possível remover a pasta: 
 It's not possible delete this folder, because it is being used in the moment!	expressoMail1_2	pt-br	Não é possível remover esta pasta, pois está em uso no momento!
 It's not possible remove this folder, because it is being used in the moment!	expressoMail1_1	pt-br	Não é possível remover esta pasta, pois estão em uso no momento!
@@ -337,6 +338,7 @@ Logoff	expressoMail1_2	pt-br	Desconectar
 l_seen	expressoMail1_2	pt-br	Lidas
 l_unseen	expressoMail1_2	pt-br	Não lidas
 Mailbox already exists	expressoMail1_2	pt-br	Pasta já existe.
+Mailbox does not exist	expressoMail1_2	pt-br	Pasta não existe
 Mailbox in migration	expressoMail1_2	pt-br	Caixa postal em migração
 Mailbox Sharing	expressoMail1_2	pt-br	Compartilhamento de Caixa Postal
 Mail	expressoMail1_2	pt-br	Correio

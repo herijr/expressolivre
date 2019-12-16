@@ -1887,19 +1887,51 @@ class imap_functions
 		$mbox_stream = $this->open_mbox();
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 
+		// System folders
+		$draftFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'];
+		$trashFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'];
+		$sentFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'];
+		$spamFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder'];
+
 		if( preg_match("/^user\/.*?\//i", $mailbox, $matches)) {
 			$userSharedFolder = $matches[0];
 			$userSharedFolder = trim($userSharedFolder);
 			$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
 			$foldersDefault = array(
 				$userSharedFolder,
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'],
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'],
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
+				$userSharedFolder . $this->imap_delimiter . $draftFolder,
+				$userSharedFolder . $this->imap_delimiter . $trashFolder,
+				$userSharedFolder . $this->imap_delimiter . $sentFolder,
+				$userSharedFolder . $this->imap_delimiter . $spamFolder
 			);
 			
 			if (array_search($mailbox, $foldersDefault)) {
+				return array("status" => false, "error" => "You don't have permission for this operation!");
+			}
+
+		} else {
+			//Draft Folder
+			if( preg_match( "/^INBOX?(\/|\.)".$draftFolder."$/i", $mailbox ) ){
+				$mailbox = "INBOX" . $this->imap_delimiter . $draftFolder;
+			}
+
+			//Trash Folder
+			if( preg_match( "/^INBOX?(\/|\.)".$trashFolder."$/i", $mailbox ) ){
+				$mailbox = "INBOX" . $this->imap_delimiter . $trashFolder;
+			}
+				
+			//Sent Folder
+			if( preg_match( "/^INBOX?(\/|\.)".$sentFolder."$/i", $mailbox ) ){
+				$mailbox = "INBOX" . $this->imap_delimiter . $sentFolder;
+			}
+
+			//Spam Folder
+			if( preg_match( "/^INBOX?(\/|\.)".$spamFolder."$/i", $mailbox ) ){
+				$mailbox = "INBOX" . $this->imap_delimiter . $spamFolder;
+			}
+
+			// INBOX || INBOX/INBOX 
+			if( preg_match( "/^(INBOX|INBOX\/INBOX|INBOX\.INBOX|Caixa de Entrada)$/i", $mailbox ) ){
 				return array("status" => false, "error" => "You don't have permission for this operation!");
 			}
 		}
@@ -1909,8 +1941,7 @@ class imap_functions
 		if(!imap_createmailbox($mbox_stream,"{".$imap_server."}$mailbox")){
 			$result = array(
 				"status" => false,
-				"error" => implode("<br />\n", imap_errors())
-			);
+				"error" => implode("<br />\n", imap_errors()));
 		}
 
 		if($mbox_stream){ $this->close_mbox($mbox_stream); }
@@ -1920,11 +1951,11 @@ class imap_functions
 
 	function create_extra_mailbox($arr)
 	{
-		$nameboxs = explode(";",$arr['nw_folders']);
+		$mailboxs = explode(";",$arr['nw_folders']);
 		$result = "";
 		$mbox_stream = $this->open_mbox();
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
-		foreach($nameboxs as $key=>$tmp){
+		foreach($mailboxs as $key=>$tmp){
 			if($tmp != ""){
 				$to_create_array = explode($this->imap_delimiter, $tmp);
 				array_pop($to_create_array);
@@ -1951,40 +1982,63 @@ class imap_functions
 
 	function delete_mailbox($arr)
 	{
-		$mailbox     = $this->_toMaibox( $arr['del_past'] );
+		$mailbox = mb_convert_encoding( trim( $arr['del_past'] ), "UTF7-IMAP", "UTF-8");
 		$imap_server = $_SESSION['phpgw_info']['expressomail']['email_server']['imapServer'];
 		$mbox_stream = $this->mbox ? $this->mbox : $this->open_mbox();
 
+		$foldersDefault = array();
+		$errorMsg = "";
+
+		// System folders
+		$draftFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'];
+		$trashFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'];
+		$sentFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'];
+		$spamFolder = $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder'];
+
 		if( preg_match("/^user\/.*?\//i", $mailbox, $matches)) {
+			
 			$userSharedFolder = $matches[0];
 			$userSharedFolder = trim($userSharedFolder);
 			$userSharedFolder = substr($userSharedFolder, 0, strlen($userSharedFolder) - 1);
+			
 			$foldersDefault = array(
 				$userSharedFolder,
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultDraftsFolder'],
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultTrashFolder'],
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSentFolder'],
-				$userSharedFolder . $this->imap_delimiter . $_SESSION['phpgw_info']['expressomail']['email_server']['imapDefaultSpamFolder']
-			);
+				$userSharedFolder . $this->imap_delimiter . $draftFolder,
+				$userSharedFolder . $this->imap_delimiter . $trashFolder,
+				$userSharedFolder . $this->imap_delimiter . $sentFolder,
+				$userSharedFolder . $this->imap_delimiter . $spamFolder);
+
+			$errorMsg = "You don't have permission for this operation!";
 			
-			if (array_search($mailbox, $foldersDefault)) {
-				return array("status" => false, "error" => "You don't have permission for this operation!");
+		} else {
+
+			$foldersDefault = array(
+				'INBOX',
+				'INBOX' . $this->imap_delimiter . $draftFolder,
+				'INBOX' . $this->imap_delimiter . $trashFolder,
+				'INBOX' . $this->imap_delimiter . $sentFolder,
+				'INBOX' . $this->imap_delimiter . $spamFolder);
+
+			$errorMsg = "It's not possible delete the selected folder";
+		}
+
+		if( array_search($mailbox, $foldersDefault) ) {
+			
+			return array("status" => false, "error" => $errorMsg );
+		} else {
+			
+			$result['status'] = true;
+
+			if(!imap_deletemailbox($mbox_stream,"{".$imap_server."}$mailbox")){
+				$result = array( "status" => false, "error" => imap_last_error() );
 			}
+			
+			if($mbox_stream){ $this->close_mbox($mbox_stream); }
+			
+			return $result;
 		}
-		
-		$result['status'] = true;
-
-		if (!imap_deletemailbox($mbox_stream,"{".$imap_server."}$mailbox")) {
-			$result = array(
-				"status" => false,
-				"error" => imap_last_error()
-			);
-		}
-
-		if($mbox_stream){ $this->close_mbox($mbox_stream); }
-
-		return $result;
 	}
+
 
 	function ren_mailbox($arr)
 	{

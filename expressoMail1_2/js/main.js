@@ -876,6 +876,8 @@ function move_msgs( folder, msgs_number, border_ID, new_folder, new_folder_name 
 					if( data.hasOwnProperty('error') ){
 						if( ( new RegExp("Permission denied") ).test( data.error ) ){ 
 							msgError = get_lang("You don't have permission for this operation!"); 
+						} else if( ( new RegExp("Mailbox does not exist") ).test( data.error ) ){ 
+							alert( get_lang("Mailbox does not exist")  + " : " + new_folder_name );
 						} else {
 							msgError = get_lang('Error moving message.') + " :\n " + data.error;
 						}

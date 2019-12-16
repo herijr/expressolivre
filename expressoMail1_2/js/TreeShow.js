@@ -71,7 +71,6 @@ var ttreeBox = new function () {
 
 		for (var i = 0; i < arr_nm_folder.length; i++) {
 			if (name_folder == arr_nm_folder[i]) {
-				ttree.FOLDER = '';
 				return true;
 			}
 		}
@@ -80,14 +79,73 @@ var ttreeBox = new function () {
 
 	// Valida os nomes das pastas
 	this.validate = function (func) {
-		var aux = ttree.FOLDER.split(cyrus_delimiter);
+		/*var aux = ttree.FOLDER.split(cyrus_delimiter);
 		var aux2;
-		if (ttree.FOLDER != "") {
+		if (ttree.FOLDER != "") {*/
+		if( $.trim(ttree.FOLDER) !== "" ){
 
-			if (aux.length > 1) aux2 = aux[1];
-			else aux2 = aux[0];
+			/*if (aux.length > 1) aux2 = aux[1];
+			else aux2 = aux[0];*/
 
-			if (func == 'rename' && this.verify_names(aux2)) {
+			let folderName = ttree.FOLDER.split( cyrus_delimiter ).pop();
+			let newFolder = "";
+
+			if( func === "rename" ){
+				
+				if ( this.verify_names( folderName ) ) {
+					alert( get_lang( 'It\'s not possible rename the folder: ') + lang_folder( folderName ) + '.' );
+					return false;
+				}
+				
+				if ( ttree.FOLDER == 'root' ) {
+					alert( get_lang( 'It\'s not possible rename this folder!' ) );
+					return false;
+				}
+								 
+				if ( $.trim(ttree.FOLDER) === $.trim(get_current_folder()) ) {
+					alert( get_lang('It\'s not possible rename this folder, because it is being used in the moment!') );
+					return false;
+				}
+				
+				newFolder = prompt( get_lang( 'Enter a name for the box'), '' );
+				
+			} else {
+				
+				newFolder = prompt( get_lang( 'Enter the name of the new folder:' ), '' );
+			}
+				
+			newFolder = $.trim( newFolder );
+
+			if( newFolder !== "" ){
+
+				if ( newFolder.indexOf( 'local_' ) > -1 ) {
+					alert( get_lang( 'cannot create folder. try other folder name' ) );
+					return false;
+				}
+
+				if ( newFolder.match( /(INBOX|inbox|Caixa de Entrada)/gi ) ) {
+					alert( get_lang( 'NOME INVALIDO' ) );
+					return false;
+				}
+					
+				if ( newFolder.match( /[\/\\\!\@\#\$\%\&\*\(\)]/gi ) ) {
+					alert( get_lang( 'Caracteres inválidos' ) );
+					return false;
+				}
+					
+				if( func === "rename" ){
+
+					ttreeBox.rename( newFolder );
+				} else {
+
+					ttreeBox.new_past( newFolder );
+				}
+			} else {
+
+				return false;
+			}
+
+			/*if (func == 'rename' && this.verify_names(aux2)) {
 
 				alert(get_lang('It\'s not possible rename the folder: ') + lang_folder(aux2) + '.');
 				return false;
@@ -142,7 +200,7 @@ var ttreeBox = new function () {
 					if (trim(button1) == '' || trim(button1) == null) return false;
 					else ttreeBox.rename(button1);
 				}
-			}
+			}*/
 		} else {
 			alert(get_lang('Select a folder!'));
 			return false;
