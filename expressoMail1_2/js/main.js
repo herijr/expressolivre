@@ -484,9 +484,19 @@ function show_msg(msg_info){
 			}
 
 		}
+		
 		//Change msg class to read.
 		if (!msg_is_read(ID))
 		{
+			if( localCache.hasOwnProperty('data') && localCache.data.hasOwnProperty('get_folders_list')){
+				let hash = Object.keys( localCache.data.get_folders_list );
+				$(localCache.data.get_folders_list[hash].result).each( function( index ){
+					if( $.trim(localCache.data.get_folders_list[hash].result[index].folder_id) ===  $.trim(msg_info.folder) ){
+						localCache.data.get_folders_list[hash].result[index].folder_unseen--;
+					}
+				});
+			}
+		
 			set_msg_as_read(ID, true);
 			if (msg_info.cacheHit || (!proxy_mensagens.is_local_folder(get_current_folder()) && msg_info.original_ID))
 			{
