@@ -627,6 +627,7 @@ class imap_functions
 		else $return['reply_to'] = $return['reply_to']['full'];
 		// Sender attribute
 		$return['toaddress2']      = $this->mk_addr_list( isset( $header->to  )? $header->to  : false );
+
 		$return['cc']              = $this->mk_addr_list( isset( $header->cc  )? $header->cc  : false );
 		$return['bcc']             = $this->mk_addr_list( isset( $header->bcc )? $header->bcc : false );
 		$return['reply_toaddress'] = $header->reply_toaddress;
@@ -3177,40 +3178,14 @@ class imap_functions
 		$toaddress = $params['notificationto'];
 		$body  = lang("Your message: %1",$this->_toUTF8( $params['subject'] )) . '<br>';
 		$body .= lang("Received in: %1",date("d/m/Y H:i",$params['date'])) . '<br>';
-
-		$resultParse = '';
-		
-		if ( !empty( $params['toaddress2'] ) ) {
-
-			$resultParse = imap_rfc822_parse_adrlist( $params['toaddress2'], null );
-
-			$params['toaddress2name'] = $resultParse[0]->personal;
-			$params['toaddress2mail'] = $resultParse[0]->mailbox . '@' . $resultParse[0]->host;
-		}
-
-		$ldapFunctions = CreateObject('expressoMail1_2.ldap_functions');
-		$ehLista = $ldapFunctions->testMailList($resultParse[0]->mailbox);
-		
-		//Caso nao seja uma lista, entao eh uma conta institucional
-		if ( isset($params['toaddress2mail']) && !empty( $params['toaddress2mail'] ) && !$ehLista ) {
-			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $params['toaddress2name'] , $params['toaddress2mail'], date("d/m/Y H:i"));
-		} else {
-			$body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));			
-		}
+        $body .= lang("Has been read by: %1 &lt;%2&gt; at %3", $this->fullNameUser , $_SESSION['phpgw_info']['expressomail']['user']['email'], date("d/m/Y H:i"));
 		
 		$mail->SMTPDebug = false;
 		$mail->IsSMTP();
 		$mail->Host = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpServer'];
 		$mail->Port = $_SESSION['phpgw_info']['expressomail']['email_server']['smtpPort'];
-		
-		//Caso nao seja uma lista, entao eh uma conta institucional
-		if ( isset($params['toaddress2mail']) && !empty( $params['toaddress2mail'] ) && !$ehLista ) {
-			$mail->From = $params['toaddress2mail'];
-			$mail->FromName = $params['toaddress2name'];
-		} else {
-			$mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];	
-			$mail->FromName = $this->fullNameUser;
-		}
+        $mail->From = $_SESSION['phpgw_info']['expressomail']['user']['email'];	
+		$mail->FromName = $this->fullNameUser;
 		
 		$mail->AddAddress($toaddress);
 		$mail->Subject = $this->_toUTF8( lang("Read receipt: %1", "" ) ) . $this->_toUTF8( $params['subject'] );
