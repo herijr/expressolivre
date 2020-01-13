@@ -1004,7 +1004,7 @@ function select_all_messages(select)
 {
 	var listEmails = $("#tbody_box")[0].childNodes;
 
-	if( listEmails.length > 1 ){
+	if( listEmails.length >= 1 ){
 		for( i = 0; i < listEmails.length; i++ )
 		{
 			if (select) {
