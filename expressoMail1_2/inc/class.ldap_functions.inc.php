@@ -535,7 +535,7 @@ class ldap_functions
         {
 	    	foreach( $groups as $id => $user_array )
 	    	{
-	                $newId = $id.'U';
+	                $newId = $id.'G';
 	                $group_options .= '<option  value="'.$newId.'">'.utf8_decode($user_array['name']).'</option>'."\n";
 	        }
 	    }

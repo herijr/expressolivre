@@ -1,6 +1,6 @@
 <?php
 	/**********************************************************************************\
-	* Expresso Administração                 									      *
+	* Expresso Administraï¿½ï¿½o                 									      *
 	* by Joao Alfredo Knopik Junior (joao.alfredo@gmail.com, jakjr@celepar.pr.gov.br) *
 	* --------------------------------------------------------------------------------*
 	*  This program is free software; you can redistribute it and/or modify it		  *
@@ -85,7 +85,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			
 			if ( $isPhpgwAccount ) {
 				
-				// Leio o ID a ser usado na criação do objecto.
+				// Leio o ID a ser usado na criaï¿½ï¿½o do objecto.
 				$result = $this->db_functions->get_next_id();
 				if ( !( is_numeric( $result['id'] ) && $result['status'] ) )
 					return array( 'status' => false, 'msg' => lang( 'Problems getting group ID' ).':'.$result['msg'] );
@@ -495,9 +495,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 		function get_info($gidnumber)
 		{
-			$group_info_ldap = $this->ldap_functions->get_group_info($gidnumber);
-			$group_info_db = $this->db_functions->get_group_info($gidnumber);
-			$group_info = array_merge($group_info_ldap, $group_info_db);
+                        $group_info = $this->ldap_functions->get_group_info($gidnumber);
 			return $group_info;
 		}
 

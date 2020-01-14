@@ -7,8 +7,8 @@ include_once('class.functions.inc.php');
 
 function ldapRebind($ldap_connection, $ldap_url)
 {
-	// Enquanto estivermos utilizando referral na arvore ldap, teremos que continuar a utilizar o usuário sistemas:expresso.
-	// Depois, quando não existir mais referral, não existirá a necessidade de ldapRebind.
+	// Enquanto estivermos utilizando referral na arvore ldap, teremos que continuar a utilizar o usuï¿½rio sistemas:expresso.
+	// Depois, quando nï¿½o existir mais referral, nï¿½o existirï¿½ a necessidade de ldapRebind.
 	//ldap_bind($ldap_connection, $GLOBALS['phpgw_info']['server']['ldap_master_root_dn'], $GLOBALS['phpgw_info']['server']['ldap_master_root_pw']);
 	if ( ($_SESSION['phpgw_info']['expresso']['cc_ldap_server']['acc'] != '') && ($_SESSION['phpgw_info']['expresso']['cc_ldap_server']['pw'] != '') )
 	{
@@ -70,7 +70,7 @@ class ldap_functions
 		}
 		else
 		{
-		    $array1 = array( "á", "à", "â", "ã", "ä", "é", "è", "ê", "ë", "í", "ì", "î", "ï", "ó", "ò", "ô", "õ", "ö", "ú", "ù", "û", "ü", "ç", "Á", "À", "Â", "Ã", "Ä", "É", "È", "Ê", "Ë", "Í", "Ì", "Î", "Ï", "Ó", "Ò", "Ô", "Õ", "Ö", "Ú", "Ù", "Û", "Ü", "Ç" );
+		    $array1 = array( "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½", "ï¿½" );
 
 		    $array2 = array( "a", "a", "a", "a", "a", "e", "e", "e", "e", "i", "i", "i", "i", "o", "o", "o", "o", "o", "u", "u", "u", "u", "c", "A", "A", "A", "A", "A", "E", "E", "E", "E", "I", "I", "I", "I", "O", "O", "O", "O", "O", "U", "U", "U", "U", "C" );
 
@@ -212,7 +212,7 @@ class ldap_functions
 			return $this->ldap;
 		*/
 		
-		// Este if é para utilizar o master. (para replicação)
+		// Este if ï¿½ para utilizar o master. (para replicaï¿½ï¿½o)
 		if ( (!empty($GLOBALS['phpgw_info']['server']['ldap_master_host'])) && ($ldap_connection = ldap_connect($GLOBALS['phpgw_info']['server']['ldap_master_host'])) )
 		{
 			/*
@@ -313,7 +313,7 @@ class ldap_functions
 		{
 			if ($this->current_config['expressoAdmin_prefix_org'] == 'true')
 			{
-				//Obtenho UID sem a organização. Na criação o uid já vem sem a organização
+				//Obtenho UID sem a organizaï¿½ï¿½o. Na criaï¿½ï¿½o o uid jï¿½ vem sem a organizaï¿½ï¿½o
 				$tmp_uid_without_org = explode("-", $params['uid']);
 				$tmp_reverse_uid_without_org = array_reverse($tmp_uid_without_org);
 				array_pop($tmp_reverse_uid_without_org);
@@ -328,7 +328,7 @@ class ldap_functions
 			//UID
 			if (($type == 'rename_user') && ($this->current_config['expressoAdmin_prefix_org'] == 'true'))
 			{
-				//Obtenho UID sem a organização. Na criação o uid já vem sem a organização
+				//Obtenho UID sem a organizaï¿½ï¿½o. Na criaï¿½ï¿½o o uid jï¿½ vem sem a organizaï¿½ï¿½o
 				$tmp_uid_without_org = explode("-", $params['uid']);
 				$tmp_reverse_uid_without_org = array_reverse($tmp_uid_without_org);
 				array_pop($tmp_reverse_uid_without_org);
@@ -371,7 +371,7 @@ class ldap_functions
 			}
 			
 			
-			// UID em outras organizações, pesquiso apenas na maquina local e se utilizar prefix_org
+			// UID em outras organizaï¿½ï¿½es, pesquiso apenas na maquina local e se utilizar prefix_org
 			if ($this->current_config['expressoAdmin_prefix_org'] == 'true')
 			{
 				$ldap_connection2 = ldap_connect($GLOBALS['phpgw_info']['server']['ldap_host']);
@@ -380,13 +380,13 @@ class ldap_functions
 				ldap_bind($ldap_connection2, $GLOBALS['phpgw_info']['server']['ldap_root_dn'], $GLOBALS['phpgw_info']['server']['ldap_root_pw']);
 				$context = $GLOBALS['phpgw_info']['server']['ldap_context'];
 				
-				//Obtenho UID sem a organização
+				//Obtenho UID sem a organizaï¿½ï¿½o
 				/*
 				$tmp_uid_without_org = explode("-", $params['uid']);
 				if (count($tmp_uid_without_org) < 2)
 				{
 					$result['status'] = false;
-					$result['msg'] = 'Novo login sem organização.';
+					$result['msg'] = 'Novo login sem organizaï¿½ï¿½o.';
 					return $result;
 				}
 				$tmp_reverse_uid_without_org = array_reverse($tmp_uid_without_org);
@@ -485,7 +485,7 @@ class ldap_functions
 				}
 				else
 				{
-					//retira caracteres que não são números.
+					//retira caracteres que nï¿½o sï¿½o nï¿½meros.
 					$cpf = preg_replace("/[^0-9]/", "", $cpf);
 				
 					$local_ldap_connection = ldap_connect($GLOBALS['phpgw_info']['server']['ldap_host']);
@@ -808,7 +808,7 @@ class ldap_functions
 		return $result;	
 	}
 
-	//Busca usuários de um contexto e já retorna as options do select;
+	//Busca usuï¿½rios de um contexto e jï¿½ retorna as options do select;
 	function get_available_users($params)
 	{
 		$context = $params['context'];
@@ -884,13 +884,13 @@ class ldap_functions
 
 	}
 
-	//Busca usuários e listas de um contexto e já retorna as options do select;
+	//Busca usuï¿½rios e listas de um contexto e jï¿½ retorna as options do select;
 	function get_available_users_and_maillist($params)
 	{
 		$context = $params['context'];
 		$recursive = $params['recursive'];
 		
-		//Usado para retirar a própria lista das possibilidades de inclusão.
+		//Usado para retirar a prï¿½pria lista das possibilidades de inclusï¿½o.
 		$denied_uidnumber = $params['denied_uidnumber'];
 		
 		$justthese = array("cn", "uidNumber", "mail");
@@ -1085,7 +1085,7 @@ class ldap_functions
 		return true;
 	}	
 	
-	// Pode receber tanto um único memberUid quanto um array de memberUid's
+	// Pode receber tanto um ï¿½nico memberUid quanto um array de memberUid's
 	function add_user2group($gidNumber, $memberUid)
 	{
 		$filter = "(&(phpgwAccountType=g)(gidNumber=$gidNumber))";
@@ -1459,54 +1459,54 @@ class ldap_functions
 	
 	function get_group_info($gidnumber)
 	{
-		foreach ($this->manager_contexts as $index=>$context)
-		{
-			$filter="(&(phpgwAccountType=g)(gidNumber=".$gidnumber."))";
-			$search = ldap_search($this->ldap, $context, $filter);
-			$entry = ldap_get_entries($this->ldap, $search);
+                $context = $GLOBALS['phpgw_info']['server']['ldap_context'];
+                
+		$filter="(&(phpgwAccountType=g)(gidNumber=".$gidnumber."))";
+		$search = ldap_search($this->ldap, $context, $filter);
+		$entry = ldap_get_entries($this->ldap, $search);
 			
-			if ($entry['count'])
-			{
-				$result['context']                = implode( ',', array_splice( explode( ',', $entry[0]['dn'] ), 1 ) );
-				$result['cn']                     = $entry[0]['cn'][0];
-				$result['description']            = utf8_decode($entry[0]['description'][0]);
-				$result['gidnumber']              = $entry[0]['gidnumber'][0];
-				$result['memberuid_info']         = $this->get_group_members( isset( $entry[0]['memberuid'] )? $entry[0]['memberuid'] : array() );
-				$result['memberuid_scm_info']     = $this->get_group_members( isset( $entry[0]['mailsenderaddress'] )? $entry[0]['mailsenderaddress'] : array(), 'mail' );
-				if ( isset( $entry[0]['phpgwaccountvisible'][0] )    ) $result['phpgwaccountvisible']    = $entry[0]['phpgwaccountvisible'][0];
-				if ( isset( $entry[0]['mail'][0] )                   ) $result['email']                  = $entry[0]['mail'][0];
-				if ( isset( $entry[0]['accountrestrictive'][0] )     ) $result['accountrestrictive']     = $entry[0]['accountrestrictive'][0];
-				if ( isset( $entry[0]['participantcansendmail'][0] ) ) $result['participantcansendmail'] = $entry[0]['participantcansendmail'][0];
+		if ($entry['count'])
+		{
+			$result['context']                = implode( ',', array_splice( explode( ',', $entry[0]['dn'] ), 1 ) );
+			$result['cn']                     = $entry[0]['cn'][0];
+			$result['description']            = utf8_decode($entry[0]['description'][0]);
+			$result['gidnumber']              = $entry[0]['gidnumber'][0];
+			$result['memberuid_info']         = $this->get_group_members( isset( $entry[0]['memberuid'] )? $entry[0]['memberuid'] : array() );
+			$result['memberuid_scm_info']     = $this->get_group_members( isset( $entry[0]['mailsenderaddress'] )? $entry[0]['mailsenderaddress'] : array(), 'mail' );
+			if ( isset( $entry[0]['phpgwaccountvisible'][0] )    ) $result['phpgwaccountvisible']    = $entry[0]['phpgwaccountvisible'][0];
+			if ( isset( $entry[0]['mail'][0] )                   ) $result['email']                  = $entry[0]['mail'][0];
+			if ( isset( $entry[0]['accountrestrictive'][0] )     ) $result['accountrestrictive']     = $entry[0]['accountrestrictive'][0];
+			if ( isset( $entry[0]['participantcansendmail'][0] ) ) $result['participantcansendmail'] = $entry[0]['participantcansendmail'][0];
 				
-				// Checamos e-mails que não fazem parte do expresso.
-				// Criamos um array temporario
-				$tmp_array = array();
-				if($result['memberuid_info'])
-					foreach ($result['memberuid_info'] as $uid => $user_data)
-					{
-						$tmp_array[] = $uid;
-					}
+			// Checamos e-mails que nï¿½o fazem parte do expresso.
+			// Criamos um array temporario
+			$tmp_array = array();
+			if($result['memberuid_info']) {
+				foreach ($result['memberuid_info'] as $uid => $user_data)
+				{
+					$tmp_array[] = $uid;
+                                }
+                        }
 		
-				if($entry[0]['memberuid']) {
-					// Retira o count do array
-					array_shift($entry[0]['memberuid']);
-					// Vemos a diferença
-					$array_diff = array_diff($entry[0]['memberuid'], $tmp_array);
-					// Incluimos no resultado			
-					foreach ($array_diff as $index=>$uid)
-					{
-						$result['memberuid_info'][$uid]['cn'] = $uid;
-					}
+			if($entry[0]['memberuid']) {
+				// Retira o count do array
+				array_shift($entry[0]['memberuid']);
+				// Vemos a diferenï¿½a
+				$array_diff = array_diff($entry[0]['memberuid'], $tmp_array);
+				// Incluimos no resultado			
+				foreach ($array_diff as $index=>$uid)
+				{
+					$result['memberuid_info'][$uid]['cn'] = $uid;
 				}
-		
-				// Samba
-				if ( in_array( 'sambaGroupMapping', $entry[0]['objectclass'] ) ) {
-					$result['use_attrs_samba'] = true;
-					$result['sambasid']        = preg_filter( '/-[^-]*$/', '', $entry[0]['sambasid'][0] );
-				}
-				
-				return $result;
 			}
+		
+			// Samba
+			if ( in_array( 'sambaGroupMapping', $entry[0]['objectclass'] ) ) {
+				$result['use_attrs_samba'] = true;
+				$result['sambasid']        = preg_filter( '/-[^-]*$/', '', $entry[0]['sambasid'][0] );
+			}
+				
+			return $result;
 		}
 	}	
 	
@@ -1581,14 +1581,14 @@ class ldap_functions
 					}
 				}
 
-				// Emails não encontrados no ldap
+				// Emails nï¿½o encontrados no ldap
 				array_shift($entry[0]['mailforwardingaddress']); //Retira o count do array
 				$missing_emails = array_diff($entry[0]['mailforwardingaddress'], $result['mailForwardingAddress']);
 				
 				// Incluimos estes no resultado
 				foreach ($missing_emails as $index=>$mailforwardingaddress)
 				{
-					// Verifico se não é um uid ao inves de um email
+					// Verifico se nï¿½o ï¿½ um uid ao inves de um email
 					$filter="(&(phpgwAccountType=u)(uid=$mailforwardingaddress))";
 					$search = ldap_search($ldap_conn_following_ref, $GLOBALS['phpgw_info']['server']['ldap_context'], $filter, $justthese);
 					$count_entries = ldap_count_entries($ldap_conn_following_ref, $search);
@@ -1686,7 +1686,7 @@ class ldap_functions
 				$result['groups_info'][$i]['gidnumber'] = $gidnumber;
 			
 				/* o gerente pode excluir um grupo de um usuario onde este grupo esta em outra OU ? */
-				/* é o mesmo que o manager editar um grupo de outra OU */
+				/* ï¿½ o mesmo que o manager editar um grupo de outra OU */
 				$result['groups_info'][$i]['group_disabled'] = 'true';
 				foreach ($this->manager_contexts as $index=>$context)
 				{
@@ -1818,7 +1818,7 @@ class ldap_functions
 	
 	function delete_user($user_info)
 	{
-		// Verifica acesso do gerente (OU) ao tentar deletar um usuário.
+		// Verifica acesso do gerente (OU) ao tentar deletar um usuï¿½rio.
 		$manager_access = false;
 		foreach ($this->manager_contexts as $index=>$context)
 		{
@@ -2100,7 +2100,7 @@ class ldap_functions
 		return false;
 	}
 	
-	// Primeiro nivel de organização.
+	// Primeiro nivel de organizaï¿½ï¿½o.
 	function exist_sambadomains_in_context($params)
 	{
 		$dn = $GLOBALS['phpgw_info']['server']['ldap_context'];
