@@ -87,9 +87,13 @@
 		 	
 		var $db_tables = array();
 
-		var $remove_all = false;
+                var $remove_all = false;
+                
+                // Variavel auxiliar
+                var $id_contact = '';
 	
-		function init()
+                
+                function init()
 		{
 			$this->db = $GLOBALS['phpgw']->db;
 		}
@@ -205,7 +209,7 @@
 				}
 			}
 			
-			if($table_main!='') { //Quando faço checkout e não incluo a tabela principal, a função precisa funcionar...
+			if($table_main!='') { //Quando faï¿½o checkout e nï¿½o incluo a tabela principal, a funï¿½ï¿½o precisa funcionar...
 				$query = $query_main_select . $query_main_from . $query_main_where;
 	
 //			echo 'Query in SO_Main CheckOut: "'.$query.'"<br>';
@@ -277,7 +281,7 @@
 
 			$table_main = '';
 			$main_table_changed = false;
-			reset($this->db_tables);
+                        reset($this->db_tables);
 			while(list($table, $table_info) = each($this->db_tables))
 			{
 				if ($table_info['type'] === 'main')
@@ -434,7 +438,7 @@
 			$query_multi_fields = array();
 			$query_multi_values = array();
 
-			reset($this->db_tables);
+                        reset($this->db_tables);
 			while(list($table, $table_info) = each($this->db_tables))
 			{
 				if ($table_info['type'] === 'main')
@@ -448,13 +452,16 @@
 					
 					$query_id = 'SELECT MAX('.$main_pkey.') AS new_id FROM '.$table_main;
 					
-					//echo 'Query MAX: '.$query_id.'<br>';
+                                        //echo 'Query MAX: '.$query_id.'<br>';
 					if (!$this->db->query($query_id, __LINE__, __FILE__) or !$this->db->next_record())
 					{
 						exit('Error in '.__FILE__.' line: '.__LINE__);
 					}
 					
-					$this->id = $this->db->f('new_id')+1;
+                                        $this->id = $this->db->f('new_id')+1;
+                                        
+                                        if ( $main_pkey === 'id_contact' ) $this->id_contact = $this->id;
+
 					$this->manage_fields($this->main_fields[$main_pkey], 'sync');
 					//echo 'ID: '.$this->id.' Type: '.gettype($this->id);
 				
@@ -488,7 +495,6 @@
 					$query = $query_main_head . $query_main_fields . $query_main_values;
 					
 					//echo '<p>Main Insert Query: "'.$query.'"</p>';
-
 					if (!$this->db->query($query, __LINE__, __FILE__))
 					{
 						return false;
@@ -549,7 +555,10 @@
 						case 'new':
 							$multi_table_changed = 'new';
 							$query_multi_insert_fields .= $field_info['name'].',';
-							$query_multi_insert_values .= $f_value.',';
+                                                        
+                                                        if ( $field_info['name'] === 'id_contact' ) $query_multi_insert_values .= $this->id_contact.',';
+                                                        else $query_multi_insert_values .= $f_value.',';
+
 							$this->manage_fields($this->db_tables[$table]['fields'][$field_info['name']], 'sync', $i);
 							break;
 
@@ -593,7 +602,6 @@
 				}
 
 //				echo '<p>Multi Query, type '.$multi_table_changed.': "'.$query.'"</p>';
-
 				if (!$this->db->query($query, __LINE__, __FILE__))
 				{
 					return false;
