@@ -112,9 +112,14 @@ class MessageReader
 
 	public function getAttachInfo( $section = false )
 	{
-		if ( $section !== false ) return $this->_sections[$section];
+		if ( $section !== false ){ return $this->_sections[$section]; }
+		
 		$result = array();
-		foreach ( $this->_attachs as $section ) $result[] = $this->_sections[$section];
+		
+		foreach ( $this->_attachs as $section ){
+			$result[] = $this->_sections[$section];
+		}
+		
 		return $result;
 	}
 
@@ -161,9 +166,10 @@ class MessageReader
 			$obj->encoding = strtolower( $this->getPartEncoding( $node->encoding ) );
 			$obj->size     = $node->bytes;
 		}
-
 		$obj->section = ( $node->type === TYPEMESSAGE || $prefix === '' )? ( $prefix.($prefix?'.':'').'0' ) : $prefix;
-
+		// @TODO image cid: tentar identificar quando deve ser baixada e que nao seja uma imagem incorporada.
+		$obj->isImage = ( strpos( $obj->type , 'image' ) === true && isset( $obj->cid ) ? 1 : 0 );
+		
 		// PARAMETERS
 		$params = array();
 		if ( $node->parameters  ) foreach ( $node->parameters  as $x ) $params = array_merge( $params, $this->_attr_decode( $x->attribute, $x->value ) );
@@ -171,9 +177,10 @@ class MessageReader
 		if ( count( $params ) ) $obj->params = (object)$params;
 
 		// ATTACHMENTS
-		if ( ( $node->ifdisposition && strtolower( $node->disposition ) === 'attachment' ) || $params['filename'] || $params['name'] ) {
+		if ( ( $node->ifdisposition && (strtolower( $node->disposition ) === 'attachment'  || strtolower( $node->disposition ) === 'inline') ) || $params['filename'] || $params['name'] ) {
 			$read_deep = false;
 			$this->_attachs[] = $obj->section;
+
 			$obj->filename = isset( $params['filename'] )? $params['filename'] : ( isset( $params['name'] )? $params['name'] : false );
 			if ( $obj->filename === false ) {
 				if (function_exists('imap_fetchmime')) {				
@@ -182,6 +189,7 @@ class MessageReader
 				$obj->filename = isset( $matchs[1] )? $this->_str_decode( $matchs[1] ) : 'attachment.bin';
 			}
 			$obj->filename = $this->_stripWinBadChars( $obj->filename );
+
 		} else if ( ( $node->type === TYPETEXT || $node->type === TYPEMESSAGE ) ) {
 			if ( strtolower( $node->subtype ) === 'plain' ) $this->_content_plain[] = $obj->section;
 			else $this->_content_html[] = $obj->section;

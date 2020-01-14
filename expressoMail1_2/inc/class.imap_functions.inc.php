@@ -4101,7 +4101,7 @@ class imap_functions
 		
 		mb_internal_encoding("UTF-8");
 
-		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/', $str ) ) $str = mb_decode_mimeheader( $str );
+		if ( preg_match( '/=\?[\w-#]+\?[BQ]\?[^?]*\?=/i', $str ) ) $str = mb_decode_mimeheader( $str );
 
 		mb_internal_encoding($int_encoding);
 
