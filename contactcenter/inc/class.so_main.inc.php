@@ -556,6 +556,7 @@
 							$multi_table_changed = 'new';
 							$query_multi_insert_fields .= $field_info['name'].',';
                                                         
+                                                        //Tratamento para recuperar o id_contact para popular a base e impedir o erro.
                                                         if ( $field_info['name'] === 'id_contact' ) $query_multi_insert_values .= $this->id_contact.',';
                                                         else $query_multi_insert_values .= $f_value.',';
 
