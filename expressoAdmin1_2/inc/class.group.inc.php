@@ -85,7 +85,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 			
 			if ( $isPhpgwAccount ) {
 				
-				// Leio o ID a ser usado na cria��o do objecto.
+				// Leio o ID a ser usado na criacao do objecto.
 				$result = $this->db_functions->get_next_id();
 				if ( !( is_numeric( $result['id'] ) && $result['status'] ) )
 					return array( 'status' => false, 'msg' => lang( 'Problems getting group ID' ).':'.$result['msg'] );
@@ -495,7 +495,7 @@ include_once(PHPGW_API_INC.'/class.aclmanagers.inc.php');
 
 		function get_info($gidnumber)
 		{
-                        $group_info = $this->ldap_functions->get_group_info($gidnumber);
+			$group_info = $this->ldap_functions->get_group_info($gidnumber);
 			return $group_info;
 		}
 

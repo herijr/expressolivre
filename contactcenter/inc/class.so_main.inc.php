@@ -209,7 +209,7 @@
 				}
 			}
 			
-			if($table_main!='') { //Quando fa�o checkout e n�o incluo a tabela principal, a fun��o precisa funcionar...
+			if($table_main!='') { //Quando faco checkout e naoo incluo a tabela principal, a funcao precisa funcionar...
 				$query = $query_main_select . $query_main_from . $query_main_where;
 	
 //			echo 'Query in SO_Main CheckOut: "'.$query.'"<br>';
