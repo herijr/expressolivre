@@ -119,5 +119,6 @@
 <div id="div_sel_messages" style="display:none"></div>
 <div id="import_window" style="display:none"></div>
 <div id="expressoFolders" style="display:none;overflow:hidden"></div>
+<div id="windowRichTextTable" style="display:none"></div>
 
 <!-- END list -->
