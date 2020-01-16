@@ -3523,8 +3523,7 @@ class imap_functions
 
 				if (preg_match("/^.?\bALL\b/", $filter)) {
 					// Quick Search, note: this ALL isn't the same ALL from imap_search
-                                        $all_criterias = array("TO", "SUBJECT", "FROM", "CC");
-                                        //$all_criterias = array("TO", "SUBJECT", "FROM", "CC", "BCC");
+                                        $all_criterias = array("TO", "SUBJECT", "FROM", "CC", "BCC");
 
 					foreach ($all_criterias as $criteria_fixed) {
 						$_filter = $criteria_fixed . substr($filter, 4);
