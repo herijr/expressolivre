@@ -398,16 +398,16 @@ cRichTextEditor.prototype.createTable = function () {
 	$("#windowRichTextTable").parent().find("span.ui-dialog-title").css("text-align", "left");
 
 	let RichTextTableHtml = "<table style='width:auto; text-align:right;font-size:small'>" +
-		"<tr><td style='padding:0px 6px;'><label style='font-weight:800'>" + get_lang('Rows') + "</label></td><td style='padding:0px 4px;'><input style='text-align:right' type='text' id='rows' size='3' maxlength='2' value='1'></td><td style='padding:0px 6px;'><div id='sliderRows' style='width:186px;margin:4px;'></div></td></tr>" +
-		"<tr><td style='padding:0px 6px;'><label style='font-weight:800'>" + get_lang('Cols') + "</label></td><td style='padding:0px 4px;'><input style='text-align:right' type='text' id='cols' size='3' maxlength='2' value='1'></td><td style='padding:0px 6px;'><div id='sliderCols' style='width:186px;margin:4px;'></div></td></tr>" +
-		"<tr><td style='padding:0px 6px;'><label style='font-weight:800'>" + get_lang('Border') + "</label></td><td style='padding:0px 4px;'><input style='text-align:right' type='text' id='border' size='3' maxlength='2' value='1'></td><td  style='padding:0px 6px;'><div id='sliderBorder' style='width:186px;margin:4px;'></div></td></tr>" +
+		"<tr><td style='padding:0px 6px;'><label style='font-weight:800'>" + get_lang('Rows') + "</label></td><td style='padding:0px 4px;'><input style='text-align:right' type='text' id='rows' size='3' maxlength='2' value='1' readonly></td><td style='padding:0px 6px;'><div id='sliderRows' style='width:186px;margin:4px;'></div></td></tr>" +
+		"<tr><td style='padding:0px 6px;'><label style='font-weight:800'>" + get_lang('Cols') + "</label></td><td style='padding:0px 4px;'><input style='text-align:right' type='text' id='cols' size='3' maxlength='2' value='1' readonly></td><td style='padding:0px 6px;'><div id='sliderCols' style='width:186px;margin:4px;'></div></td></tr>" +
+		"<tr><td style='padding:0px 6px;'><label style='font-weight:800'>" + get_lang('Border') + "</label></td><td style='padding:0px 4px;'><input style='text-align:right' type='text' id='border' size='3' maxlength='2' value='1' readonly></td><td  style='padding:0px 6px;'><div id='sliderBorder' style='width:186px;margin:4px;'></div></td></tr>" +
 		"</table>";
 
 	$("#windowRichTextTable").html(RichTextTableHtml);
 
-	$("#sliderRows").slider({ 'animate': 'fast', 'min': 0, 'max': 15, stop: function (event, ui) { $("#rows").val(ui.value); } });
-	$("#sliderCols").slider({ 'animate': 'fast', 'min': 0, 'max': 15, stop: function (event, ui) { $("#cols").val(ui.value); } });
-	$("#sliderBorder").slider({ 'animate': 'fast', 'min': 0, 'max': 15, stop: function (event, ui) { $("#border").val(ui.value); } });
+	$("#sliderRows").slider({ 'animate': 'fast', 'min': 0, 'max': 15, stop: function (event, ui) { $("#rows").val(ui.value); }, slide: function(event, ui){ $("#rows").val(ui.value); } });
+	$("#sliderCols").slider({ 'animate': 'fast', 'min': 0, 'max': 15, stop: function (event, ui) { $("#cols").val(ui.value); }, slide: function(event, ui){ $("#cols").val(ui.value); } });
+	$("#sliderBorder").slider({ 'animate': 'fast', 'min': 0, 'max': 15, stop: function (event, ui) { $("#border").val(ui.value); }, slide: function(event, ui){ $("#border").val(ui.value); } });
 }
 
 cRichTextEditor.prototype.createImage = function () {
