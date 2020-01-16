@@ -3523,7 +3523,8 @@ class imap_functions
 
 				if (preg_match("/^.?\bALL\b/", $filter)) {
 					// Quick Search, note: this ALL isn't the same ALL from imap_search
-					$all_criterias = array("TO", "SUBJECT", "FROM", "CC");
+                                        $all_criterias = array("TO", "SUBJECT", "FROM", "CC");
+                                        //$all_criterias = array("TO", "SUBJECT", "FROM", "CC", "BCC");
 
 					foreach ($all_criterias as $criteria_fixed) {
 						$_filter = $criteria_fixed . substr($filter, 4);
@@ -3582,7 +3583,19 @@ class imap_functions
 			$this->close_mbox($mbox_stream);
 		}
 
-		$num_msgs = count($retorno);
+                $num_msgs = count($retorno);
+                
+                $trataRegistrosDuplicados = array();
+                
+                if ( $num_msgs > 1 ) {
+                        foreach( $retorno as $reg ) {
+                                $trataRegistrosDuplicados[$reg['uid']] = $reg;
+                        }
+
+                        $retorno = $trataRegistrosDuplicados;
+                }
+
+                $num_msgs = count($retorno);
 
 		/* Comparison functions, descendent is ascendent with parms inverted */
 		function SORTDATE($a, $b){ return ($a['udatecomp'] < $b['udatecomp']); }
