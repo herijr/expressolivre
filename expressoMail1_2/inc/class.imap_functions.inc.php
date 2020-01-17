@@ -3584,17 +3584,19 @@ class imap_functions
 
                 $num_msgs = count($retorno);
                 
-                $trataRegistrosDuplicados = array();
-                
                 if ( $num_msgs > 1 ) {
+
+                        $trataRegistrosDuplicados = array();
+                        
                         foreach( $retorno as $reg ) {
+                                
                                 $trataRegistrosDuplicados[$reg['uid']] = $reg;
                         }
 
                         $retorno = $trataRegistrosDuplicados;
-                }
 
-                $num_msgs = count($retorno);
+                        $num_msgs = count($retorno);
+                }
 
 		/* Comparison functions, descendent is ascendent with parms inverted */
 		function SORTDATE($a, $b){ return ($a['udatecomp'] < $b['udatecomp']); }
