@@ -185,7 +185,7 @@ class imap_functions
 			$i = 0;
 			if ( is_array( $sort_array_msg ) ) {
 				foreach ( $sort_array_msg as $msg_number => $value ) {
-					$temp = $this->get_info_head_msg( $msg_number );
+                                        $temp = $this->get_info_head_msg( $msg_number );
 					if ( !$temp ) return false;
 					if ( $temp['Unseen'] === 'U' || $temp['Recent'] === 'N' ) $return['tot_unseen']++;
 					if ( $i <= ( $msg_range_end - $msg_range_begin ) ) $return[$i] = $temp;
@@ -240,14 +240,18 @@ class imap_functions
 		$head_array['smalldate'] = (date("d/m/Y") == $date_msg) ? gmdate("H:i",$msgTimestamp) : gmdate("d/m/Y",$msgTimestamp);
 
 		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? end( $header->from ) : false );
-		$head_array['to'] = (array)$this->mk_addr( isset( $header->to ) && is_array( $header->to ) && !( isset( $header->to[1]->host ) && $header->to[1]->host === '.SYNTAX-ERROR.' )? reset( $header->to   ) : false );
 
-		// $head_array['to'] = array();
-		// foreach($header->to as $to) $head_array['to'][] = (array)$this->mk_addr($to);
-		
-		if ( empty( $head_array['to']['email'] ) && isset( $header->cc  ) && is_array( $header->cc  ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->cc ) );
-		if ( empty( $head_array['to']['email'] ) && isset( $header->bcc ) && is_array( $header->bcc ) ) $head_array['to'] = (array)$this->mk_addr( reset( $header->bcc ) );
-		if ( empty( $head_array['to']['email'] ) ) $head_array['to']['name'] = $head_array['to']['email'] = null;
+                if ( isset( $header->to  ) && count($header->to) > 0 && $header->to[0]->host != "unspecified-domain" ) {
+                        $head_array['to'][] = (array)$this->mk_addr( reset( $header->to ) );
+                }
+
+                if ( isset( $header->cc  ) && count($header->cc) > 0 ) {
+                        $head_array['to'][] = (array)$this->mk_addr( reset( $header->cc ) );
+                }
+                
+                if ( isset( $header->bcc ) && count($header->bcc) > 0 ) {
+                        $head_array['to'][] = (array)$this->mk_addr( reset( $header->bcc ) );
+                }
 
 		$head_array['subject'] = ( isset( $header->fetchsubject ) ) ? trim($this->decode_string($header->fetchsubject)) : '';
 		$head_array['subject'] = ( strstr( $head_array['subject'], ' ' ) === false )? str_replace( '_', ' ', $head_array['subject'] ) : $head_array['subject'];		
@@ -255,7 +259,7 @@ class imap_functions
 
 		$head_array['attachment'] = array();
 		$head_array['attachment'] = $imap_attachment->get_attachment_headerinfo($this->mbox, $msg_number);
-		
+                
 		return $head_array;
 	}
 
@@ -478,7 +482,7 @@ class imap_functions
 			//ini_set("display_errors","1");
 			$msg_info = $this->get_info_msg($new_params);
 			$this->mbox = $this->open_mbox($params['folder']); //Nao sei porque, mas se nao abrir de novo a caixa da erro.
-			$msg_info['header'] = $this->get_info_head_msg($msg_number);
+                        $msg_info['header'] = $this->get_info_head_msg($msg_number);
 
 			$attach_params["num_msg"] = $msg_number;
 			$this->close_mbox($this->mbox);
@@ -3317,7 +3321,7 @@ class imap_functions
 					
 					foreach($messages as $msg_number)
 					{
-						$temp = $this->get_info_head_msg($msg_number);
+                                                $temp = $this->get_info_head_msg($msg_number);
 						if(!$temp)
 							return false;
 						$temp['msg_folder'] = $folder['folder_id'];
