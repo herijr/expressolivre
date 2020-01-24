@@ -241,17 +241,9 @@ class imap_functions
 
 		$head_array['from']    = (array)$this->mk_addr( isset( $header->from ) && is_array( $header->from )? end( $header->from ) : false );
 
-                if ( isset( $header->to  ) && count($header->to) > 0 && $header->to[0]->host != "unspecified-domain" ) {
-                        $head_array['to'][] = (array)$this->mk_addr( reset( $header->to ) );
-                }
-
-                if ( isset( $header->cc  ) && count($header->cc) > 0 ) {
-                        $head_array['to'][] = (array)$this->mk_addr( reset( $header->cc ) );
-                }
-                
-                if ( isset( $header->bcc ) && count($header->bcc) > 0 ) {
-                        $head_array['to'][] = (array)$this->mk_addr( reset( $header->bcc ) );
-                }
+                if ( isset( $header->to  ) && count($header->to) > 0 && $header->to[0]->host != "unspecified-domain" ) foreach( $header->to as $to ) $head_array['to'][] = (array)$this->mk_addr( $to );
+                if ( isset( $header->cc  ) && count($header->cc) > 0 ) foreach( $header->cc as $cc ) $head_array['to'][] = (array)$this->mk_addr( $cc );
+                if ( isset( $header->bcc ) && count($header->bcc) > 0 ) foreach( $header->bcc as $bcc ) $head_array['to'][] = (array)$this->mk_addr( $bcc );
 
 		$head_array['subject'] = ( isset( $header->fetchsubject ) ) ? trim($this->decode_string($header->fetchsubject)) : '';
 		$head_array['subject'] = ( strstr( $head_array['subject'], ' ' ) === false )? str_replace( '_', ' ', $head_array['subject'] ) : $head_array['subject'];		
