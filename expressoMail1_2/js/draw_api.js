@@ -1787,9 +1787,13 @@ function draw_message( info_msg, ID )
 			div_ccoaddress_full.id = "div_ccoaddress_full_"+ID;
 			div_ccoaddress.style.display="";
 
-			//cco.innerHTML = draw_plugin_cc(ID, ccoaddress_array[ID][0]);
-			cco.innerHTML = ccoaddress_array[ID][0];
-			div_ccoaddress.innerHTML += " (<a STYLE='color: RED;' onclick=javascript:show_div_address_full('"+ID+"','cco');>"+get_lang('more')+"</a>)";
+                        //cco.innerHTML = draw_plugin_cc(ID, ccoaddress_array[ID][0]);
+                        ccoaddress_array[ID][0] = ccoaddress_array[ID][0].replace(/</g, '&lt;');
+                        ccoaddress_array[ID][0] = ccoaddress_array[ID][0].replace(/>/g, '&gt;');
+
+                        cco.innerHTML = ccoaddress_array[ID][0];
+                        
+                        div_ccoaddress.innerHTML += " (<a STYLE='color: RED;' onclick=javascript:show_div_address_full('"+ID+"','cco');>"+get_lang('more')+"</a>)";
 			cco.appendChild(div_ccoaddress);
 		}
 		else{
@@ -3245,7 +3249,7 @@ function deny_email(email){
 
 }
 function show_div_address_full(id, type) {
-	var div_address_full = Element("div_"+type+"address_full_"+id);
+        var div_address_full = Element("div_"+type+"address_full_"+id);
 	if(!div_address_full) {
 		div_address_full = document.createElement("SPAN");
 		div_address_full.id = "div_"+type+"address_full_"+id;
