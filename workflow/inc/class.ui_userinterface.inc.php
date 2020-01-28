@@ -179,6 +179,7 @@ class ui_userinterface extends ui_ajaxinterface
 			$currentArea = &$areaStack[count($areaStack) - 1];
 			unset($areaStack[count($areaStack) - 1]);
 
+			$currentArea['sigla'] = htmlentities($currentArea['sigla']);
 			$currentArea['children'] = array_reverse($currentArea['children']);
 			foreach ($currentArea['children'] as &$item)
 			{
