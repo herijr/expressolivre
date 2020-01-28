@@ -177,7 +177,7 @@ class MessageReader
 		if ( count( $params ) ) $obj->params = (object)$params;
 
 		// ATTACHMENTS
-		if ( ( $node->ifdisposition && (strtolower( $node->disposition ) === 'attachment'  || strtolower( $node->disposition ) === 'inline') ) || $params['filename'] || $params['name'] ) {
+		if ( ( $node->ifdisposition && ( strtolower( $node->disposition ) === 'attachment' ) ) || $params['filename'] || $params['name'] ) {
 			$read_deep = false;
 			$this->_attachs[] = $obj->section;
 
