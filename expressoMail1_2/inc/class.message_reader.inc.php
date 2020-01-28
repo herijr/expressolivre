@@ -33,6 +33,7 @@ class MessageReader
 	private $_content_plain     = array();
 	private $_content_html      = array();
 	private $_attachs           = array();
+	private $_imagesCid         = array();
 
 	private function _clear()
 	{
@@ -107,6 +108,7 @@ class MessageReader
 			$obj->body = $this->_replaceCID( $obj->body );
 			if( !empty( $plain ) ) $obj->body_alternative = $plain;
 		}
+
 		return $obj;
 	}
 
@@ -167,14 +169,18 @@ class MessageReader
 			$obj->size     = $node->bytes;
 		}
 		$obj->section = ( $node->type === TYPEMESSAGE || $prefix === '' )? ( $prefix.($prefix?'.':'').'0' ) : $prefix;
-		// @TODO image cid: tentar identificar quando deve ser baixada e que nao seja uma imagem incorporada.
-		$obj->isImage = ( strpos( $obj->type , 'image' ) === true && isset( $obj->cid ) ? 1 : 0 );
 		
 		// PARAMETERS
 		$params = array();
 		if ( $node->parameters  ) foreach ( $node->parameters  as $x ) $params = array_merge( $params, $this->_attr_decode( $x->attribute, $x->value ) );
 		if ( $node->dparameters ) foreach ( $node->dparameters as $x ) $params = array_merge( $params, $this->_attr_decode( $x->attribute, $x->value ) );
 		if ( count( $params ) ) $obj->params = (object)$params;
+
+		//IMAGE CID
+		if( $node->type == 5 && strtolower( $node->disposition ) === 'inline' ){
+			$cID = preg_replace('/(<|>)/','', $node->id );
+			$this->_imagesCid[ md5( $cID ) ] = array( 'id' => $cID, 'size' => $node->bytes ); 
+		}
 
 		// ATTACHMENTS
 		if ( ( $node->ifdisposition && ( strtolower( $node->disposition ) === 'attachment' ) ) || $params['filename'] || $params['name'] ) {
@@ -248,10 +254,24 @@ class MessageReader
 
 	private function _replaceCID( $body )
 	{
-		foreach ( $this->_attachs as $section )
+		// CID : content-disposition: attachment;
+		foreach ( $this->_attachs as $section ){
 			if ( isset( $this->_sections[$section]->cid ) )
 				$body = preg_replace( '/[Cc][Ii][Dd]:'.preg_quote( $this->_sections[$section]->cid ).'/',
 					'./inc/show_img.php?msg_folder='.$this->_folder.'&msg_num='.$this->_uid.'&msg_part='.$section, $body );
+		}
+
+		// CID : content-disposition: inline;
+		foreach( $this->_sections as $section ){
+			if( isset( $section->cid ) && isset( $this->_imagesCid[ md5( $section->cid ) ] ) ){
+				if( $this->_imagesCid[ md5( $section->cid ) ]['size'] &&  isset( $section->size ) ){
+					$body = preg_replace( '/[Cc][Ii][Dd]:'. preg_quote( $section->cid ).'/',
+										  './inc/show_img.php?msg_folder='.$this->_folder.'&msg_num='.$this->_uid.'&msg_part='.$section->section, 
+										  $body );
+				}
+			}
+		}
+
 		return $body;
 	}
 
