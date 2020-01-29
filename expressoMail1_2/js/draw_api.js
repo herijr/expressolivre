@@ -935,27 +935,38 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
 				td_element3.innerHTML += "<span style=\"color:red\">(" + get_lang("Draft") + ") </span>";
 			} else {
 				if ( headers_msgs.to !== undefined ){
-					td_element24.innerHTML = "<img valign='center' src ='templates/" + template + "/images/sent.gif' title='" + get_lang('Sent') + "'>";
-					let moreMails = '';
-					if (headers_msgs.to.length > 1) moreMails = ' e mais ' + (headers_msgs.to.length-1) + ' destinat&aacute;rio(s)...';
-					let mailsTitle = '';
-					for(x=0;x<headers_msgs.to.length;x++){
-							mailsTitle += headers_msgs.to[x].name + ' ' + headers_msgs.to[x].email;
-							if (x+1<headers_msgs.to.length) mailsTitle += '\n';
-					}
 
-					// Use field TO
-					td_element3.onmouseover = function () {this.title=mailsTitle;};
-					if(headers_msgs.to[0]){
-							if(  headers_msgs.to[0].name != null && ( typeof(headers_msgs.to[0].name) == "string" &&  $.trim(headers_msgs.to[0].name) !== "" ) ){
-								td_element3.innerHTML += headers_msgs.to[0].name + moreMails;
-							} else if(headers_msgs.to.email != null) {
-									td_element3.innerHTML += headers_msgs.to[0].email + moreMails;
-			
-						} else {
-							td_element3.innerHTML += get_lang("without destination");
-						}
-					}
+                                        if(Array.isArray(headers_msgs.to)) {
+                                                td_element24.innerHTML = "<img valign='center' src ='templates/" + template + "/images/sent.gif' title='" + get_lang('Sent') + "'>";
+                                                let moreMails = '';
+                                                if (headers_msgs.to.length > 1) moreMails = ' e mais ' + (headers_msgs.to.length - 1) + ' destinat&aacute;rio(s)...';
+                                                let mailsTitle = '';
+                                                for (x = 0; x < headers_msgs.to.length; x++) {
+                                                        mailsTitle += headers_msgs.to[x].name + ' ' + headers_msgs.to[x].email;
+                                                        if (x + 1 < headers_msgs.to.length) mailsTitle += '\n';
+                                                }
+
+                                                // Use field TO
+                                                td_element3.onmouseover = function () { this.title = mailsTitle; };
+                                                if (headers_msgs.to[0]) {
+                                                        if (headers_msgs.to[0].name != null && (typeof (headers_msgs.to[0].name) == "string" && $.trim(headers_msgs.to[0].name) !== "")) {
+                                                                td_element3.innerHTML += headers_msgs.to[0].name + moreMails;
+                                                        } else if (headers_msgs.to.email != null) {
+                                                                td_element3.innerHTML += headers_msgs.to[0].email + moreMails;
+
+                                                        } else {
+                                                                td_element3.innerHTML += get_lang("without destination");
+                                                        }
+                                                }
+                                        } else {
+                                                if (headers_msgs.to.name !== undefined && (typeof (headers_msgs.to.name) == "string" && $.trim(headers_msgs.to.name) !== "")) {
+                                                        td_element3.innerHTML += headers_msgs.to.name;
+                                                } else if (headers_msgs.to.email !== undefined) {
+                                                        td_element3.innerHTML += headers_msgs.to.email;
+                                                } else {
+                                                        td_element3.innerHTML += get_lang("without destination");
+                                                }
+                                        }
 				} else {
 					td_element3.innerHTML += get_lang("without destination");
 				}
