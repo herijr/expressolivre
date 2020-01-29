@@ -936,7 +936,7 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
 			} else {
 				if ( headers_msgs.to !== undefined ){
 
-                                        if(Array.isArray(headers_msgs.to)) {
+                                        if(Array.isArray(headers_msgs.to) && isSendFolder ) {
                                                 td_element24.innerHTML = "<img valign='center' src ='templates/" + template + "/images/sent.gif' title='" + get_lang('Sent') + "'>";
                                                 let moreMails = '';
                                                 if (headers_msgs.to.length > 1) moreMails = ' e mais ' + (headers_msgs.to.length - 1) + ' destinat&aacute;rio(s)...';
@@ -957,6 +957,14 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
                                                         } else {
                                                                 td_element3.innerHTML += get_lang("without destination");
                                                         }
+                                                }
+                                        } else if(Array.isArray(headers_msgs.to)) {
+                                                if (headers_msgs.to[0].name !== undefined && (typeof (headers_msgs.to[0].name) == "string" && $.trim(headers_msgs.to[0].name) !== "")) {
+                                                        td_element3.innerHTML += headers_msgs.to[0].name;
+                                                } else if (headers_msgs.to[0].email !== undefined) {
+                                                        td_element3.innerHTML += headers_msgs.to[0].email;
+                                                } else {
+                                                        td_element3.innerHTML += get_lang("without destination");
                                                 }
                                         } else {
                                                 if (headers_msgs.to.name !== undefined && (typeof (headers_msgs.to.name) == "string" && $.trim(headers_msgs.to.name) !== "")) {
