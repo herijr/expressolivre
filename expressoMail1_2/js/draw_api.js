@@ -930,7 +930,6 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
 		
 		if (isCurrentMailOnFROM || (isChangeOnSendFolderPreference && isSendFolder)) {
 			// Use field TO
-			td_element3.onmouseover = function () { this.title = headers_msgs.to; };
 			if (headers_msgs.Draft == 'X') {
 				td_element3.innerHTML += "<span style=\"color:red\">(" + get_lang("Draft") + ") </span>";
 			} else {
@@ -959,21 +958,49 @@ function make_tr_message(headers_msgs, msg_folder, offsetToGMT){
                                                         }
                                                 }
                                         } else if(Array.isArray(headers_msgs.to)) {
-                                                if (headers_msgs.to[0].name !== undefined && (typeof (headers_msgs.to[0].name) == "string" && $.trim(headers_msgs.to[0].name) !== "")) {
+                                                //td_element3.onmouseover = function () { this.title = headers_msgs.to[0].email; };
+
+                                                let spanSender = document.createElement("SPAN");
+				                spanSender.onmouseover = function (event) {this.style.textDecoration = "underline";try {InfoContact.begin(this,headers_msgs.to[0].email)} catch(e){};};
+				                spanSender.onmouseout = function (){try {this.style.textDecoration = "none";clearTimeout(InfoContact.timeout);} catch(e){}};
+				                spanSender.innerHTML =  headers_msgs.to[0].name !== undefined ? headers_msgs.to[0].name : headers_msgs.to[0].email;
+				                if (spanSender.innerHTML.indexOf(" ") == '-1' && spanSender.innerHTML.length > 25){
+					                spanSender.innerHTML = spanSender.innerHTML.substring(0,25) + "...";
+				                } else if (spanSender.innerHTML.length > 40 ){
+					                spanSender.innerHTML = spanSender.innerHTML.substring(0,40) + "...";
+                                                }
+                                                
+                                                td_element3.appendChild(spanSender);
+                                                
+                                                /*if (headers_msgs.to[0].name !== undefined && (typeof (headers_msgs.to[0].name) == "string" && $.trim(headers_msgs.to[0].name) !== "")) {
                                                         td_element3.innerHTML += headers_msgs.to[0].name;
                                                 } else if (headers_msgs.to[0].email !== undefined) {
                                                         td_element3.innerHTML += headers_msgs.to[0].email;
                                                 } else {
                                                         td_element3.innerHTML += get_lang("without destination");
-                                                }
+                                                }*/
                                         } else {
-                                                if (headers_msgs.to.name !== undefined && (typeof (headers_msgs.to.name) == "string" && $.trim(headers_msgs.to.name) !== "")) {
+                                                //td_element3.onmouseover = function () { this.title = headers_msgs.to.email; };
+                                                
+                                                let spanSender = document.createElement("SPAN");
+				                spanSender.onmouseover = function (event) {this.style.textDecoration = "underline";try {InfoContact.begin(this,headers_msgs.to.email)} catch(e){};};
+				                spanSender.onmouseout = function (){try {this.style.textDecoration = "none";clearTimeout(InfoContact.timeout);} catch(e){}};
+				                spanSender.innerHTML =  headers_msgs.to.name !== undefined ? headers_msgs.to.name : headers_msgs.to.email;
+				                if (spanSender.innerHTML.indexOf(" ") == '-1' && spanSender.innerHTML.length > 25){
+					                spanSender.innerHTML = spanSender.innerHTML.substring(0,25) + "...";
+				                } else if (spanSender.innerHTML.length > 40 ){
+					                spanSender.innerHTML = spanSender.innerHTML.substring(0,40) + "...";
+				                }
+                                                
+                                                td_element3.appendChild(spanSender);
+                                
+                                                /*if (headers_msgs.to.name !== undefined && (typeof (headers_msgs.to.name) == "string" && $.trim(headers_msgs.to.name) !== "")) {
                                                         td_element3.innerHTML += headers_msgs.to.name;
                                                 } else if (headers_msgs.to.email !== undefined) {
                                                         td_element3.innerHTML += headers_msgs.to.email;
                                                 } else {
                                                         td_element3.innerHTML += get_lang("without destination");
-                                                }
+                                                }*/
                                         }
 				} else {
 					td_element3.innerHTML += get_lang("without destination");
