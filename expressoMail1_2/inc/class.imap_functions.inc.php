@@ -1611,7 +1611,7 @@ class imap_functions
 			$to = ( isset($header->to) ? $header->to : false );
 			$result[$i]['to'] = array();
 			$tmp = ( isset($to[0]->personal) ? imap_mime_header_decode($to[0]->personal) : false );
-			$result[$i]['to']['name'] = ( isset($tmp[0]->text) ? $tmp[0]->text : false );
+			$result[$i]['to']['name'] = ( isset($tmp[0]->text) ? str_replace( '_', ' ', $tmp[0]->text ) : false );
 			$result[$i]['to']['email'] = ( isset($to[0]->mailbox) && isset($to[0]->host) ? $to[0]->mailbox . "@" . $to[0]->host : false );
 			$result[$i]['to']['full'] = '"' . $result[$i]['to']['name'] . '" ' . '<' . $result[$i]['to']['email'] . '>';
 			$cc = ( isset($header->cc) ? $header->cc : false );
