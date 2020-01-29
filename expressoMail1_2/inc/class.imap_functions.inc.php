@@ -1602,7 +1602,7 @@ class imap_functions
 			$from = $header->from;
 			$result[$i]['from'] = array();
 			$tmp = imap_mime_header_decode($from[0]->personal);
-			$result[$i]['from']['name'] = $tmp[0]->text;
+			$result[$i]['from']['name'] = str_replace( '_', ' ', $tmp[0]->text );
 			$result[$i]['from']['email'] = $from[0]->mailbox . "@" . $from[0]->host;
 			if(!$result[$i]['from']['name']){
 				$result[$i]['from']['name'] = $result[$i]['from']['email'];
